@@ -8,7 +8,7 @@ import {
   readdirSync,
 } from "fs";
 import { join } from "path";
-import { validateWeb, formatReport } from "../wck/src/index";
+import { validateWeb, formatReport } from "../../packages/wck/src/index";
 
 const DIST_DIR = join(import.meta.dir, "dist");
 if (existsSync(DIST_DIR)) {
