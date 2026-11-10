@@ -91,7 +91,7 @@ describe("Aphrody Bundle Build Output", () => {
     expect(html).toContain('src="/app.js"');
     expect(html).toContain('href="/style.css"');
     expect(html).toContain(
-      "<title>Google - Recherche Web, Applications & Portail Aphrody</title>",
+      "<title>Aphrody - Recherche, Mode IA Gemini et paquets</title>",
     );
   });
 });
@@ -485,7 +485,7 @@ describe("Aphrody HTTP Server & Endpoints", () => {
       new Request("http://localhost:3000/sitemap.xml"),
     );
     expect(sRes.status).toBe(200);
-    expect(await sRes.text()).toContain("<urlset");
+    expect(await sRes.text()).toContain("<sitemapindex");
 
     const lRes = await server.fetch(
       new Request("http://localhost:3000/llms.txt"),

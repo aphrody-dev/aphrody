@@ -1,66 +1,100 @@
 import { serve } from "bun";
-import { existsSync, readFileSync, statSync } from "fs";
-import { join } from "path";
+import { existsSync, readFileSync } from "fs";
+import { dirname, join } from "path";
 import { getSuggestions } from "./src/data/suggestions";
 import { UniversalStoreManager } from "./src/store/universal-manager";
 import { runBenchmarkSuite } from "./src/benchmark/stack-picker";
+import { AssetStore, respondWithAsset } from "./src/runtime/assets";
+import { getHashEngine } from "./src/runtime/hash";
+import { buildCsp, readGoogleConfig, type GoogleConfig } from "./src/google/config";
+import { handleCollect } from "./src/google/relay";
+import { handleGeminiSearch } from "./src/gemini/search";
+import { indexNowKey, indexNowPayload } from "./src/seo/documents";
+import { render404, renderSearchResults } from "./src/seo/html";
+import type { Locale } from "./src/seo/site";
 
 const PORT = Number(process.env.PORT) || 3000;
-const DIST_DIR = join(import.meta.dir, "dist");
-const storeManager = UniversalStoreManager.getInstance("var/store.sqlite");
 
-const MIME_TYPES: Record<string, string> = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "application/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".svg": "image/svg+xml",
-  ".json": "application/json; charset=utf-8",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".ico": "image/x-icon",
-  ".woff2": "font/woff2",
-  ".woff": "font/woff",
-  ".ttf": "font/ttf",
-  ".wasm": "application/wasm",
-  ".txt": "text/plain; charset=utf-8",
-  ".xml": "application/xml; charset=utf-8",
-};
+function resolveDist(): string {
+  if (process.env.APHRODY_DIST) return process.env.APHRODY_DIST;
+  const candidates = [
+    join(import.meta.dir, "dist"),
+    join(dirname(process.execPath), "dist"),
+    join(process.cwd(), "dist"),
+  ];
+  return candidates.find((c) => existsSync(join(c, "index.html"))) || candidates[0];
+}
+
+const DIST_DIR = resolveDist();
+const storeManager = UniversalStoreManager.getInstance("var/store.sqlite");
+const assets = new AssetStore(DIST_DIR);
+
+/** Google ids: runtime env first, else the config baked into dist/ by the build. */
+function loadGoogleConfig(): GoogleConfig {
+  const fromEnv = readGoogleConfig(process.env);
+  if (Object.keys(fromEnv).length) return fromEnv;
+  try {
+    return readGoogleConfig(JSON.parse(readFileSync(join(DIST_DIR, "g-cfg.json"), "utf-8")) as never);
+  } catch {
+    return {};
+  }
+}
+const GOOGLE_CFG = loadGoogleConfig();
+const INDEXNOW_KEY = indexNowKey(process.env);
 
 const SECURITY_HEADERS: Record<string, string> = {
-  "Content-Security-Policy":
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self';",
+  "Content-Security-Policy": buildCsp(GOOGLE_CFG),
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "SAMEORIGIN",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "microphone=(self)",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
   "X-XSS-Protection": "1; mode=block",
 };
 
-function jsonResponse(data: any, status = 200, req?: Request): Response {
+/** CDNs (for example Cloudflare) can turn these Link headers into 103 Early Hints. */
+const LINK_HOME =
+  "</style.css>; rel=preload; as=style, </app.js>; rel=modulepreload, </boot.js>; rel=modulepreload, <https://fonts.googleapis.com>; rel=preconnect";
+const LINK_PAGE = "</style.css>; rel=preload; as=style, </boot.js>; rel=modulepreload";
+
+function jsonResponse(data: unknown, status = 200, req?: Request): Response {
   const payload = JSON.stringify(data);
   const headers: Record<string, string> = {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-cache",
     ...SECURITY_HEADERS,
   };
-
-  if (req) {
-    const acceptEncoding = req.headers.get("accept-encoding") || "";
-    if (acceptEncoding.includes("gzip")) {
-      headers["Content-Encoding"] = "gzip";
-      return new Response(Bun.gzipSync(Buffer.from(payload)), {
-        status,
-        headers,
-      });
-    }
+  if (req && (req.headers.get("accept-encoding") || "").includes("gzip")) {
+    headers["Content-Encoding"] = "gzip";
+    return new Response(Bun.gzipSync(Buffer.from(payload)), { status, headers });
   }
-
   return new Response(payload, { status, headers });
+}
+
+function withSecurity(res: Response): Response {
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) if (!res.headers.has(k)) res.headers.set(k, v);
+  return res;
+}
+
+function localeOf(req: Request, url: URL): Locale {
+  const hl = url.searchParams.get("hl");
+  if (hl === "en" || hl === "fr") return hl;
+  if (url.pathname.startsWith("/en/") || url.pathname === "/en") return "en";
+  return (req.headers.get("accept-language") || "").toLowerCase().startsWith("en") ? "en" : "fr";
+}
+
+function clientId(req: Request, srv?: { requestIP?: (r: Request) => { address: string } | null }): string {
+  const fwd = req.headers.get("cf-connecting-ip") || (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
+  return fwd || srv?.requestIP?.(req)?.address || "local";
+}
+
+function htmlHeaders(pathname: string): Record<string, string> {
+  return { Link: pathname === "/" || pathname === "/en/" ? LINK_HOME : LINK_PAGE, ...SECURITY_HEADERS };
 }
 
 export const server = serve({
   port: PORT,
-  async fetch(req: Request) {
+  async fetch(req: Request, srv?: { requestIP?: (r: Request) => { address: string } | null }) {
     const url = new URL(req.url);
     const pathname = url.pathname;
 
@@ -72,12 +106,8 @@ export const server = serve({
     }
 
     // 2. Health check (short: /ok, legacy: /healthz, /api/health)
-    if (
-      pathname === "/ok" ||
-      pathname === "/healthz" ||
-      pathname === "/api/health"
-    ) {
-      return jsonResponse({ status: "healthy", service: "aphrody" }, 200, req);
+    if (pathname === "/ok" || pathname === "/healthz" || pathname === "/api/health") {
+      return jsonResponse({ status: "healthy", service: "aphrody", hash: getHashEngine().name }, 200, req);
     }
 
     // 3. API: Store Search (short: /api/pm, legacy: /api/store/search)
@@ -85,11 +115,7 @@ export const server = serve({
       const q = url.searchParams.get("q") || "";
       const eco = (url.searchParams.get("ecosystem") || "all") as any;
       const packages = await storeManager.search(q, eco);
-      return jsonResponse(
-        { query: q, ecosystem: eco, count: packages.length, packages },
-        200,
-        req,
-      );
+      return jsonResponse({ query: q, ecosystem: eco, count: packages.length, packages }, 200, req);
     }
 
     // 4. API: Store Install
@@ -109,11 +135,7 @@ export const server = serve({
         try {
           const body = (await req.json()) as { rollbackId: number };
           const rolledBackGen = storeManager.rollback(body.rollbackId);
-          return jsonResponse(
-            { success: true, generation: rolledBackGen },
-            200,
-            req,
-          );
+          return jsonResponse({ success: true, generation: rolledBackGen }, 200, req);
         } catch (err: any) {
           return jsonResponse({ success: false, error: err.message }, 400, req);
         }
@@ -126,17 +148,10 @@ export const server = serve({
     // 6. API: Awesome-List to Store Converter
     if (pathname === "/api/store/awesome-convert" && req.method === "POST") {
       try {
-        const body = (await req.json()) as {
-          markdownUrl?: string;
-          markdown?: string;
-        };
+        const body = (await req.json()) as { markdownUrl?: string; markdown?: string };
         const target = body.markdownUrl || body.markdown || "";
         const imported = await storeManager.convertAwesomeList(target);
-        return jsonResponse(
-          { success: true, count: imported.length, packages: imported },
-          200,
-          req,
-        );
+        return jsonResponse({ success: true, count: imported.length, packages: imported }, 200, req);
       } catch (err: any) {
         return jsonResponse({ success: false, error: err.message }, 400, req);
       }
@@ -152,74 +167,83 @@ export const server = serve({
       }
     }
 
-    // 8. Static Assets from dist/
-    let targetFile = pathname === "/" ? "/index.html" : pathname;
-    let filePath = join(DIST_DIR, targetFile);
-
-    // If file doesn't exist, SPA fallback to index.html
-    if (!existsSync(filePath) || !statSync(filePath).isFile()) {
-      filePath = join(DIST_DIR, "index.html");
-      targetFile = "/index.html";
+    // 8. Gemini grounded search (JSON, or SSE with ?stream=1 / Accept: text/event-stream)
+    if (pathname === "/api/gemini/search") {
+      if (req.method !== "GET") return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET" } });
+      return withSecurity(await handleGeminiSearch(req, { env: process.env, client: clientId(req, srv) }));
     }
 
-    if (existsSync(filePath) && statSync(filePath).isFile()) {
-      const ext = targetFile.slice(targetFile.lastIndexOf("."));
-      const contentType = MIME_TYPES[ext] || "application/octet-stream";
-      const headers: Record<string, string> = {
-        "Content-Type": contentType,
-        ...SECURITY_HEADERS,
-      };
-
-      // Set long cache for immutable static assets
-      if (
-        ext === ".js" ||
-        ext === ".css" ||
-        ext === ".svg" ||
-        ext === ".wasm"
-      ) {
-        headers["Cache-Control"] = "public, max-age=31536000, immutable";
-      } else if (ext === ".html") {
-        headers["Cache-Control"] = "no-cache, must-revalidate";
-      }
-
-      const acceptEncoding = req.headers.get("accept-encoding") || "";
-      const gzPath = filePath + ".gz";
-
-      // Serve pre-compressed gzip if available and client accepts gzip
-      if (
-        acceptEncoding.includes("gzip") &&
-        existsSync(gzPath) &&
-        statSync(gzPath).isFile()
-      ) {
-        headers["Content-Encoding"] = "gzip";
-        return new Response(readFileSync(gzPath), { headers });
-      }
-
-      // Dynamic gzip for text assets if pre-compressed does not exist
-      if (
-        acceptEncoding.includes("gzip") &&
-        (contentType.startsWith("text/") ||
-          contentType.startsWith("application/javascript") ||
-          contentType.startsWith("application/json"))
-      ) {
-        const rawContent = readFileSync(filePath);
-        headers["Content-Encoding"] = "gzip";
-        return new Response(Bun.gzipSync(rawContent), { headers });
-      }
-
-      return new Response(readFileSync(filePath), { headers });
+    // 9. First-party GA4 relay
+    if (pathname === "/g/collect") {
+      return withSecurity(await handleCollect(req, { ga4: GOOGLE_CFG.ga4 }));
     }
 
-    return new Response(
-      "404 Not Found - Build the app first with bun run build",
-      {
-        status: 404,
-        headers: {
-          "Content-Type": "text/plain; charset=utf-8",
-          ...SECURITY_HEADERS,
-        },
-      },
-    );
+    // 10. IndexNow: GET = dry-run payload, POST = submit (requires INDEXNOW_ADMIN_TOKEN)
+    if (pathname === "/api/seo/indexnow") {
+      const payload = indexNowPayload(INDEXNOW_KEY);
+      if (req.method === "GET") return jsonResponse({ submit: "POST with Authorization: Bearer <token>", ...payload }, 200, req);
+      if (req.method === "POST") {
+        const token = process.env.INDEXNOW_ADMIN_TOKEN || "";
+        if (!token || req.headers.get("authorization") !== `Bearer ${token}`) {
+          return jsonResponse({ error: "forbidden" }, 403, req);
+        }
+        try {
+          const r = await fetch("https://api.indexnow.org/indexnow", {
+            method: "POST",
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(8000),
+          });
+          return jsonResponse({ submitted: (payload.urlList as string[]).length, status: r.status }, 200, req);
+        } catch (err: any) {
+          return jsonResponse({ error: "upstream_failed", message: String(err?.message || err) }, 502, req);
+        }
+      }
+      return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, POST" } });
+    }
+
+    // 11. IndexNow key file
+    if (pathname === `/${INDEXNOW_KEY}.txt`) {
+      return new Response(INDEXNOW_KEY, {
+        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=86400", ...SECURITY_HEADERS },
+      });
+    }
+
+    // 12. No-JavaScript search results page (noindex)
+    if (pathname === "/search") {
+      const q = (url.searchParams.get("q") || "").replace(/\s+/g, " ").trim().slice(0, 200);
+      const locale = localeOf(req, url);
+      const pkgs = q ? (await storeManager.search(q, "all")).slice(0, 6) : [];
+      const html = renderSearchResults(
+        q,
+        locale,
+        q ? getSuggestions(q).slice(0, 8) : [],
+        pkgs.map((p) => ({ name: p.name, description: p.description, installCmd: p.installCmd })),
+        GOOGLE_CFG,
+      );
+      return new Response(html, {
+        headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, no-cache", ...htmlHeaders(pathname) },
+      });
+    }
+
+    // 13. Static assets from memory (pre-compressed, strong ETag, 304)
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD", ...SECURITY_HEADERS } });
+    }
+    if (pathname.length > 1 && pathname.endsWith("/") && pathname !== "/en/") {
+      return Response.redirect(url.origin + pathname.slice(0, -1) + url.search, 301);
+    }
+    if (pathname === "/en") return Response.redirect(url.origin + "/en/" + url.search, 301);
+
+    const asset = assets.get(pathname);
+    if (asset) {
+      return respondWithAsset(req, asset, asset.ext === ".html" ? htmlHeaders(pathname) : SECURITY_HEADERS);
+    }
+
+    return new Response(render404(localeOf(req, url), GOOGLE_CFG), {
+      status: 404,
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache", ...htmlHeaders(pathname) },
+    });
   },
 });
 

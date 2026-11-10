@@ -1,134 +1,159 @@
 import {
+  copyFileSync,
   existsSync,
   mkdirSync,
-  readFileSync,
-  writeFileSync,
-  statSync,
-  rmSync,
   readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
 } from "fs";
-import { join } from "path";
+import { dirname, extname, join } from "path";
+import { brotliCompressSync, constants as zc } from "node:zlib";
 import { validateWeb, formatReport } from "../../packages/wck/src/index";
+import { getMaterialCssSubset } from "./src/design/material-tokens";
+import { readGoogleConfig } from "./src/google/config";
+import {
+  adsTxt,
+  agentJson,
+  buildSitemaps,
+  humansTxt,
+  indexNowKey,
+  llmsFullTxt,
+  llmsTxt,
+  robotsTxt,
+  securityTxt,
+  sellersJson,
+  webmcpJson,
+} from "./src/seo/documents";
+import { minifyCss } from "./src/seo/page-css";
+import { renderHome, renderNews, renderPackageHub, renderVertical } from "./src/seo/html";
+import { LOCALES, NEWS, PACKAGE_ECOSYSTEMS, VERTICALS, localizedPath, newsPath, packageHubPath, verticalPath } from "./src/seo/site";
+import { UniversalStoreManager } from "./src/store/universal-manager";
 
-const DIST_DIR = join(import.meta.dir, "dist");
-if (existsSync(DIST_DIR)) {
-  rmSync(DIST_DIR, { recursive: true, force: true });
-}
+const ROOT = import.meta.dir;
+const DIST_DIR = join(ROOT, "dist");
+const BUILD_DATE = new Date().toISOString().slice(0, 10);
+const cfg = readGoogleConfig(process.env);
+
+if (existsSync(DIST_DIR)) rmSync(DIST_DIR, { recursive: true, force: true });
 mkdirSync(DIST_DIR, { recursive: true });
+
+function emit(rel: string, content: string | Uint8Array): void {
+  const file = join(DIST_DIR, rel);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
+}
 
 console.log("Building Aphrody with native Bun.build()...");
 
-const buildResult = await Bun.build({
-  entrypoints: [join(import.meta.dir, "src", "main.ts")],
+// 1. Application bundle (code-split) and the small boot entry.
+const appBuild = await Bun.build({
+  entrypoints: [join(ROOT, "src", "main.ts")],
   outdir: DIST_DIR,
-  naming: "app.js",
+  naming: { entry: "app.js", chunk: "chunk-[hash].js" },
   minify: true,
   target: "browser",
   format: "esm",
   splitting: true,
 });
-
-if (!buildResult.success) {
-  console.error("Build failed:", buildResult.logs);
-  process.exit(1);
-}
-
-// 1. Copy style.css to dist (minifying whitespace)
-const cssPath = join(import.meta.dir, "src", "style.css");
-const rawCss = readFileSync(cssPath, "utf-8");
-const minifiedCss = rawCss
-  .replace(/\/\*[\s\S]*?\*\//g, "")
-  .replace(/\s+/g, " ")
-  .replace(/\s*([\{\}\:\;\,])\s*/g, "$1")
-  .trim();
-writeFileSync(join(DIST_DIR, "style.css"), minifiedCss);
-
-// 2. Copy index.html to dist
-const htmlPath = join(import.meta.dir, "index.html");
-const rawHtml = readFileSync(htmlPath, "utf-8");
-const minifiedHtml = rawHtml.replace(/\s+/g, " ").replace(/> </g, "><").trim();
-writeFileSync(join(DIST_DIR, "index.html"), minifiedHtml);
-
-// 3. Generate robots.txt at compile time
-const robotsContent = [
-  "User-agent: *",
-  "Allow: /",
-  "Sitemap: https://aphrody.com/sitemap.xml",
-  "",
-].join("\n");
-writeFileSync(join(DIST_DIR, "robots.txt"), robotsContent);
-
-// 4. Generate sitemap.xml at compile time
-const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://aphrody.com/</loc>
-    <lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>
-`;
-writeFileSync(join(DIST_DIR, "sitemap.xml"), sitemapContent);
-
-// 5. Generate /llms.txt AI crawler index at compile time
-const llmsContent = `# Aphrody
-
-> Strict pixel-identical replica of Google search engine and sovereign workspace portal propulsed by oven-sh/bun v1.4.4 Full Rust.
-
-## Canonical AI Endpoints
-
-- Search Query: https://aphrody.com/api/q?q={query}
-- Package Manager: https://aphrody.com/api/pm
-- Benchmarks: https://aphrody.com/api/bnc
-- Health Status: https://aphrody.com/ok
-`;
-writeFileSync(join(DIST_DIR, "llms.txt"), llmsContent);
-
-// 6. Pre-compress all static assets using native Bun.gzipSync
-const distFiles = readdirSync(DIST_DIR);
-for (const file of distFiles) {
-  if (file.endsWith(".gz")) continue;
-  const filePath = join(DIST_DIR, file);
-  if (statSync(filePath).isFile()) {
-    const raw = readFileSync(filePath);
-    const gz = Bun.gzipSync(raw);
-    writeFileSync(`${filePath}.gz`, gz);
+const bootBuild = await Bun.build({
+  entrypoints: [join(ROOT, "src", "client", "boot.ts")],
+  outdir: DIST_DIR,
+  naming: "boot.js",
+  define: { __G_CFG__: JSON.stringify(cfg) },
+  minify: true,
+  target: "browser",
+  format: "esm",
+});
+for (const r of [appBuild, bootBuild]) {
+  if (!r.success) {
+    console.error("Build failed:", r.logs);
+    process.exit(1);
   }
 }
 
-const appJsStat = statSync(join(DIST_DIR, "app.js"));
-const appJsGz = readFileSync(join(DIST_DIR, "app.js.gz"));
-const cssStat = statSync(join(DIST_DIR, "style.css"));
-const cssGz = readFileSync(join(DIST_DIR, "style.css.gz"));
-const htmlStat = statSync(join(DIST_DIR, "index.html"));
-const htmlGz = readFileSync(join(DIST_DIR, "index.html.gz"));
+// 2. CSS: legacy stylesheet + generated M3 token subset + M3 layer, minified.
+const rawCss = [
+  readFileSync(join(ROOT, "src", "style.css"), "utf-8"),
+  getMaterialCssSubset(),
+  readFileSync(join(ROOT, "src", "m3.css"), "utf-8"),
+].join("\n");
+emit("style.css", minifyCss(rawCss));
 
-const totalRawKb = (appJsStat.size + cssStat.size + htmlStat.size) / 1024;
-const totalGzKb = (appJsGz.length + cssGz.length + htmlGz.length) / 1024;
+// 3. Static HTML (SSG): home, topic hubs, package hubs, news - fr and en.
+const store = new UniversalStoreManager(":memory:");
+for (const l of LOCALES) {
+  emit(`${localizedPath("/", l).slice(1)}index.html`, renderHome(l, cfg));
+  for (const v of VERTICALS) emit(`${localizedPath(verticalPath(v.slug), l).slice(1)}/index.html`, renderVertical(v, l, cfg));
+  for (const eco of PACKAGE_ECOSYSTEMS) {
+    const pkgs = (await store.search("", eco as never)).map((p) => ({
+      name: p.name,
+      description: p.description,
+      installCmd: p.installCmd,
+    }));
+    emit(`${localizedPath(packageHubPath(eco), l).slice(1)}/index.html`, renderPackageHub(eco, pkgs, l, cfg));
+  }
+  for (const n of NEWS) emit(`${localizedPath(newsPath(n.slug), l).slice(1)}/index.html`, renderNews(n, l, cfg));
+}
 
+// 4. Crawler, agent and compliance documents.
+emit("robots.txt", robotsTxt());
+for (const [name, xml] of Object.entries(buildSitemaps(BUILD_DATE))) emit(name, xml);
+emit("llms.txt", llmsTxt());
+emit("llms-full.txt", llmsFullTxt());
+const contact = (process.env.PUBLIC_CONTACT_EMAIL || "").trim() || undefined;
+emit("ads.txt", adsTxt(cfg));
+emit("sellers.json", JSON.stringify(sellersJson(contact), null, 2));
+emit(".well-known/security.txt", securityTxt(BUILD_DATE, contact));
+emit(".well-known/agent.json", JSON.stringify(agentJson(), null, 2));
+emit(".well-known/webmcp.json", JSON.stringify(webmcpJson(), null, 2));
+emit("humans.txt", humansTxt(BUILD_DATE));
+const nowKey = indexNowKey(process.env);
+emit(`${nowKey}.txt`, nowKey);
+emit("g-cfg.json", JSON.stringify(cfg));
+emit(
+  "favicon.svg",
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#6750a4"/><circle cx="28" cy="28" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M37 37l13 13" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>',
+);
+const publicDir = join(ROOT, "public");
+if (existsSync(publicDir)) {
+  for (const f of readdirSync(publicDir)) copyFileSync(join(publicDir, f), join(DIST_DIR, f));
+}
+
+// 5. Pre-compress text assets (gzip + brotli) for in-memory serving.
+const COMPRESS = new Set([".html", ".js", ".css", ".svg", ".json", ".txt", ".xml"]);
+function walk(dir: string): string[] {
+  return readdirSync(dir).flatMap((n) => {
+    const p = join(dir, n);
+    return statSync(p).isDirectory() ? walk(p) : [p];
+  });
+}
+let htmlCount = 0;
+for (const file of walk(DIST_DIR)) {
+  if (/\.(gz|br)$/.test(file)) continue;
+  if (file.endsWith(".html")) htmlCount++;
+  if (!COMPRESS.has(extname(file).toLowerCase())) continue;
+  const raw = readFileSync(file);
+  writeFileSync(`${file}.gz`, Bun.gzipSync(raw));
+  writeFileSync(`${file}.br`, brotliCompressSync(raw, { params: { [zc.BROTLI_PARAM_QUALITY]: 11 } }));
+}
+
+const sz = (rel: string) => statSync(join(DIST_DIR, rel)).size;
+const gz = (rel: string) => statSync(join(DIST_DIR, rel + ".gz")).size;
 console.log("Aphrody build finished:");
-console.log(
-  `- dist/app.js: ${(appJsStat.size / 1024).toFixed(2)} KB (gz: ${(appJsGz.length / 1024).toFixed(2)} KB)`,
-);
-console.log(
-  `- dist/style.css: ${(cssStat.size / 1024).toFixed(2)} KB (gz: ${(cssGz.length / 1024).toFixed(2)} KB)`,
-);
-console.log(
-  `- dist/index.html: ${(htmlStat.size / 1024).toFixed(2)} KB (gz: ${(htmlGz.length / 1024).toFixed(2)} KB)`,
-);
-console.log(
-  `Total entry bundle raw: ${totalRawKb.toFixed(2)} KB | gzipped: ${totalGzKb.toFixed(2)} KB`,
-);
+for (const f of ["app.js", "boot.js", "style.css", "index.html"]) {
+  console.log(`- dist/${f}: ${(sz(f) / 1024).toFixed(2)} KB (gz: ${(gz(f) / 1024).toFixed(2)} KB)`);
+}
+console.log(`- ${htmlCount} HTML pages, ${Object.keys(buildSitemaps(BUILD_DATE)).length} sitemap files`);
+console.log(`- google ids configured: ${Object.keys(cfg).join(", ") || "none (no Google tag is loaded)"}`);
 
-// 7. Execute WCK Compile-Time 7-Spec Validator Gate
+// 6. WCK compile-time 7-spec gate (Lighthouse 100, CLS = 0, LCP budget).
 console.log("\nExecuting WCK 7-Spec Compile-Time Web & Lighthouse Gate...");
 const report = validateWeb(DIST_DIR);
 console.log(formatReport(report));
-
 if (!report.allPassed) {
   console.error("FATAL: WCK Compile-Time Gate failed! Build aborted.");
   process.exit(1);
 }
-
 console.log("Aphrody build 100% validated by WCK!");

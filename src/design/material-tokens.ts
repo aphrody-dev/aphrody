@@ -6,6 +6,8 @@
 
 export interface MaterialThemeTokens {
   surface: string;
+  onSurface: string;
+  onSurfaceVariant: string;
   surfaceDim: string;
   surfaceBright: string;
   surfaceContainerLowest: string;
@@ -36,6 +38,8 @@ export interface MaterialThemeTokens {
 
 export const MATERIAL_LIGHT_TOKENS: MaterialThemeTokens = {
   surface: "#fef7ff",
+  onSurface: "#1d1b20",
+  onSurfaceVariant: "#49454f",
   surfaceDim: "#ded8e1",
   surfaceBright: "#fef7ff",
   surfaceContainerLowest: "#ffffff",
@@ -66,6 +70,8 @@ export const MATERIAL_LIGHT_TOKENS: MaterialThemeTokens = {
 
 export const MATERIAL_DARK_TOKENS: MaterialThemeTokens = {
   surface: "#141218",
+  onSurface: "#e6e0e9",
+  onSurfaceVariant: "#cac4d0",
   surfaceDim: "#141218",
   surfaceBright: "#3b383e",
   surfaceContainerLowest: "#0f0d13",
@@ -190,4 +196,35 @@ export function renderMaterialSymbol(
 ): string {
   const path = MATERIAL_SYMBOLS[name] || MATERIAL_SYMBOLS.apps;
   return `<svg class="md-symbol" viewBox="0 0 24 24" width="${size}" height="${size}" fill="${fill}">${path}</svg>`;
+}
+
+/**
+ * Compact CSS custom properties for the M3 components of the SEO pages and the
+ * consent banner (keeps the initial CSS inside the 14 KB LCP budget).
+ * Emits :root (light) and [data-theme="dark"]; the inline head script sets
+ * data-theme from storage or prefers-color-scheme before first paint.
+ */
+const M3_SUBSET_KEYS: Array<keyof MaterialThemeTokens> = [
+  "surface",
+  "surfaceContainer",
+  "onSurface",
+  "onSurfaceVariant",
+  "primary",
+  "onPrimary",
+  "secondaryContainer",
+  "onSecondaryContainer",
+  "outlineVariant",
+];
+
+function m3Vars(t: MaterialThemeTokens): string {
+  return M3_SUBSET_KEYS.map((k) => `--m3-${k}:${t[k]}`).join(";");
+}
+
+export function getMaterialCssSubset(): string {
+  const light = m3Vars(MATERIAL_LIGHT_TOKENS);
+  const dark = m3Vars(MATERIAL_DARK_TOKENS);
+  return (
+    `:root{${light}}` +
+    `[data-theme="dark"]{${dark}}`
+  );
 }
