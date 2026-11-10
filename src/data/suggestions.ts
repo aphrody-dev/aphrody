@@ -14,7 +14,6 @@ export const POPULAR_SUGGESTIONS: string[] = [
   "programme tv ce soir",
   "recette facile et rapide",
   "bun runtime",
-  "vite react typescript",
   "le monde actualité",
   "résultats loto",
   "sncf connect horaires",
