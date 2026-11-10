@@ -5,37 +5,37 @@ export class VoiceModal {
   private isOpen = false;
 
   constructor(private onSpeechResult: (text: string) => void) {
-    this.element = document.createElement('div');
-    this.element.className = 'voice-overlay';
-    this.element.setAttribute('role', 'dialog');
-    this.element.setAttribute('aria-modal', 'true');
-    this.element.setAttribute('aria-label', 'Recherche vocale');
+    this.element = document.createElement("div");
+    this.element.className = "voice-overlay";
+    this.element.setAttribute("role", "dialog");
+    this.element.setAttribute("aria-modal", "true");
+    this.element.setAttribute("aria-label", "Recherche vocale");
     this.render();
     this.attachEvents();
   }
 
   private render(): void {
-    const card = document.createElement('div');
-    card.className = 'voice-card';
+    const card = document.createElement("div");
+    card.className = "voice-card";
 
-    const closeBtn = document.createElement('button');
-    closeBtn.type = 'button';
-    closeBtn.className = 'voice-close-btn';
-    closeBtn.setAttribute('aria-label', 'Fermer');
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "voice-close-btn";
+    closeBtn.setAttribute("aria-label", "Fermer");
     closeBtn.innerHTML = `
       <svg viewBox="0 0 24 24">
         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
       </svg>
     `;
-    closeBtn.addEventListener('click', () => this.close());
+    closeBtn.addEventListener("click", () => this.close());
 
-    this.statusEl = document.createElement('h2');
-    this.statusEl.className = 'voice-status';
-    this.statusEl.textContent = 'Écoute en cours...';
+    this.statusEl = document.createElement("h2");
+    this.statusEl.className = "voice-status";
+    this.statusEl.textContent = "Écoute en cours...";
 
-    const micCircle = document.createElement('div');
-    micCircle.className = 'voice-mic-circle';
-    micCircle.setAttribute('title', "Arrêter l'écoute");
+    const micCircle = document.createElement("div");
+    micCircle.className = "voice-mic-circle";
+    micCircle.setAttribute("title", "Arrêter l'écoute");
     micCircle.innerHTML = `
       <div class="pulse-ring ring-1"></div>
       <div class="pulse-ring ring-2"></div>
@@ -46,7 +46,7 @@ export class VoiceModal {
         <path fill="#ffffff" d="m12 17c-2.76 0-5-2.24-5-5h-2c0 3.53 2.61 6.43 6 6.92v2.08h2v-2.08c3.39-.49 6-3.39 6-6.92h-2c0 2.76-2.24 5-5 5z"/>
       </svg>
     `;
-    micCircle.addEventListener('click', () => this.close());
+    micCircle.addEventListener("click", () => this.close());
 
     card.appendChild(closeBtn);
     card.appendChild(this.statusEl);
@@ -56,14 +56,14 @@ export class VoiceModal {
   }
 
   private attachEvents(): void {
-    this.element.addEventListener('mousedown', (e: MouseEvent) => {
+    this.element.addEventListener("mousedown", (e: MouseEvent) => {
       if (e.target === this.element) {
         this.close();
       }
     });
 
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (this.isOpen && e.key === 'Escape') {
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (this.isOpen && e.key === "Escape") {
         this.close();
       }
     });
@@ -71,25 +71,26 @@ export class VoiceModal {
 
   public open(): void {
     this.isOpen = true;
-    this.element.classList.add('open');
-    this.statusEl.textContent = 'Écoute en cours...';
+    this.element.classList.add("open");
+    this.statusEl.textContent = "Écoute en cours...";
     this.startListening();
   }
 
   public close(): void {
     this.isOpen = false;
-    this.element.classList.remove('open');
+    this.element.classList.remove("open");
     this.stopListening();
   }
 
   private startListening(): void {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
     if (SpeechRecognition) {
       try {
         this.recognition = new SpeechRecognition();
-        this.recognition.lang = 'fr-FR';
+        this.recognition.lang = "fr-FR";
         this.recognition.interimResults = false;
         this.recognition.maxAlternatives = 1;
 
@@ -102,15 +103,15 @@ export class VoiceModal {
         };
 
         this.recognition.onerror = () => {
-          this.statusEl.textContent = 'Dites quelque chose...';
+          this.statusEl.textContent = "Dites quelque chose...";
         };
 
         this.recognition.start();
       } catch (err) {
-        console.warn('SpeechRecognition error:', err);
+        console.warn("SpeechRecognition error:", err);
       }
     } else {
-      this.statusEl.textContent = 'Reconnaissance vocale non supportée';
+      this.statusEl.textContent = "Reconnaissance vocale non supportée";
     }
   }
 

@@ -3,11 +3,14 @@ export class Logo {
   private isAphrody = false;
 
   constructor() {
-    this.element = document.createElement('div');
-    this.element.className = 'google-logo-wrapper';
-    this.element.setAttribute('title', 'Cliquez pour basculer Google / Aphrody');
+    this.element = document.createElement("div");
+    this.element.className = "google-logo-wrapper";
+    this.element.setAttribute(
+      "title",
+      "Cliquez pour basculer Google / Aphrody",
+    );
     this.render();
-    this.element.addEventListener('click', () => this.toggle());
+    this.element.addEventListener("click", () => this.toggle());
   }
 
   private render(): void {

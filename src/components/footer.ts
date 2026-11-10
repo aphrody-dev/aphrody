@@ -5,31 +5,31 @@ export class Footer {
   private isSettingsOpen = false;
 
   constructor(
-    private currentTheme: 'light' | 'dark',
-    private onToggleTheme: () => void
+    private currentTheme: "light" | "dark",
+    private onToggleTheme: () => void,
   ) {
-    this.element = document.createElement('footer');
-    this.element.className = 'google-footer';
+    this.element = document.createElement("footer");
+    this.element.className = "google-footer";
     this.render();
     this.attachEvents();
   }
 
   private render(): void {
     // 1. Top row: France
-    const topRow = document.createElement('div');
-    topRow.className = 'footer-top';
-    const locSpan = document.createElement('span');
-    locSpan.className = 'footer-location';
-    locSpan.textContent = 'France';
+    const topRow = document.createElement("div");
+    topRow.className = "footer-top";
+    const locSpan = document.createElement("span");
+    locSpan.className = "footer-location";
+    locSpan.textContent = "France";
     topRow.appendChild(locSpan);
 
     // 2. Bottom row
-    const bottomRow = document.createElement('div');
-    bottomRow.className = 'footer-bottom';
+    const bottomRow = document.createElement("div");
+    bottomRow.className = "footer-bottom";
 
     // Left links
-    const leftCol = document.createElement('div');
-    leftCol.className = 'footer-left';
+    const leftCol = document.createElement("div");
+    leftCol.className = "footer-left";
     leftCol.innerHTML = `
       <a href="https://about.google/?utm_source=google-FR&utm_medium=referral&utm_campaign=hp-footer&fg=1" class="footer-link" target="_blank" rel="noreferrer">À propos</a>
       <a href="https://www.google.com/intl/fr_fr/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpafooter&fg=1" class="footer-link" target="_blank" rel="noreferrer">Publicité</a>
@@ -38,8 +38,8 @@ export class Footer {
     `;
 
     // Center climate link
-    const centerCol = document.createElement('div');
-    centerCol.className = 'footer-center';
+    const centerCol = document.createElement("div");
+    centerCol.className = "footer-center";
     centerCol.innerHTML = `
       <a href="https://sustainability.google/intl/fr_fr/?utm_source=googlehpfooter&utm_medium=housepromos&utm_campaign=bottom-footer" class="footer-link climate-link" target="_blank" rel="noreferrer">
         <svg class="leaf-icon" viewBox="0 0 24 24">
@@ -50,35 +50,35 @@ export class Footer {
     `;
 
     // Right links & settings
-    const rightCol = document.createElement('div');
-    rightCol.className = 'footer-right';
+    const rightCol = document.createElement("div");
+    rightCol.className = "footer-right";
 
-    const privacyLink = document.createElement('a');
-    privacyLink.href = 'https://policies.google.com/privacy?hl=fr&fg=1';
-    privacyLink.className = 'footer-link';
-    privacyLink.target = '_blank';
-    privacyLink.rel = 'noreferrer';
-    privacyLink.textContent = 'Confidentialité';
+    const privacyLink = document.createElement("a");
+    privacyLink.href = "https://policies.google.com/privacy?hl=fr&fg=1";
+    privacyLink.className = "footer-link";
+    privacyLink.target = "_blank";
+    privacyLink.rel = "noreferrer";
+    privacyLink.textContent = "Confidentialité";
 
-    const termsLink = document.createElement('a');
-    termsLink.href = 'https://policies.google.com/terms?hl=fr&fg=1';
-    termsLink.className = 'footer-link';
-    termsLink.target = '_blank';
-    termsLink.rel = 'noreferrer';
-    termsLink.textContent = 'Conditions';
+    const termsLink = document.createElement("a");
+    termsLink.href = "https://policies.google.com/terms?hl=fr&fg=1";
+    termsLink.className = "footer-link";
+    termsLink.target = "_blank";
+    termsLink.rel = "noreferrer";
+    termsLink.textContent = "Conditions";
 
-    const settingsWrap = document.createElement('div');
-    settingsWrap.className = 'settings-wrapper';
+    const settingsWrap = document.createElement("div");
+    settingsWrap.className = "settings-wrapper";
 
-    const settingsBtn = document.createElement('button');
-    settingsBtn.type = 'button';
-    settingsBtn.className = 'footer-link settings-btn';
-    settingsBtn.textContent = 'Paramètres';
-    settingsBtn.addEventListener('click', () => this.toggleSettings());
+    const settingsBtn = document.createElement("button");
+    settingsBtn.type = "button";
+    settingsBtn.className = "footer-link settings-btn";
+    settingsBtn.textContent = "Paramètres";
+    settingsBtn.addEventListener("click", () => this.toggleSettings());
 
-    this.settingsMenu = document.createElement('div');
-    this.settingsMenu.className = 'settings-menu';
-    this.settingsMenu.setAttribute('role', 'menu');
+    this.settingsMenu = document.createElement("div");
+    this.settingsMenu.className = "settings-menu";
+    this.settingsMenu.setAttribute("role", "menu");
     this.settingsMenu.innerHTML = `
       <a href="https://www.google.com/preferences?hl=fr&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Paramètres de recherche</a>
       <a href="https://www.google.com/advanced_search?hl=fr&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Recherche avancée</a>
@@ -88,14 +88,18 @@ export class Footer {
       <div class="settings-menu-divider"></div>
       <button type="button" class="settings-item theme-toggle-item" role="menuitem">
         <span>Thème sombre : </span>
-        <span class="theme-status">${this.currentTheme === 'dark' ? 'Activé' : 'Désactivé'}</span>
+        <span class="theme-status">${this.currentTheme === "dark" ? "Activé" : "Désactivé"}</span>
       </button>
     `;
 
-    const themeToggleBtn = this.settingsMenu.querySelector('.theme-toggle-item') as HTMLButtonElement;
-    this.themeStatusSpan = this.settingsMenu.querySelector('.theme-status') as HTMLSpanElement;
+    const themeToggleBtn = this.settingsMenu.querySelector(
+      ".theme-toggle-item",
+    ) as HTMLButtonElement;
+    this.themeStatusSpan = this.settingsMenu.querySelector(
+      ".theme-status",
+    ) as HTMLSpanElement;
 
-    themeToggleBtn.addEventListener('click', () => {
+    themeToggleBtn.addEventListener("click", () => {
       this.onToggleTheme();
       this.closeSettings();
     });
@@ -116,24 +120,25 @@ export class Footer {
   }
 
   private attachEvents(): void {
-    document.addEventListener('mousedown', (e: MouseEvent) => {
+    document.addEventListener("mousedown", (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (this.isSettingsOpen && !this.element.contains(target)) {
         this.closeSettings();
       }
     });
 
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (this.isSettingsOpen && e.key === 'Escape') {
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (this.isSettingsOpen && e.key === "Escape") {
         this.closeSettings();
       }
     });
   }
 
-  public updateTheme(newTheme: 'light' | 'dark'): void {
+  public updateTheme(newTheme: "light" | "dark"): void {
     this.currentTheme = newTheme;
     if (this.themeStatusSpan) {
-      this.themeStatusSpan.textContent = newTheme === 'dark' ? 'Activé' : 'Désactivé';
+      this.themeStatusSpan.textContent =
+        newTheme === "dark" ? "Activé" : "Désactivé";
     }
   }
 
@@ -147,11 +152,11 @@ export class Footer {
 
   private openSettings(): void {
     this.isSettingsOpen = true;
-    this.settingsMenu.classList.add('open');
+    this.settingsMenu.classList.add("open");
   }
 
   private closeSettings(): void {
     this.isSettingsOpen = false;
-    this.settingsMenu.classList.remove('open');
+    this.settingsMenu.classList.remove("open");
   }
 }

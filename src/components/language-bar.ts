@@ -2,8 +2,8 @@ export class LanguageBar {
   public element: HTMLDivElement;
 
   constructor() {
-    this.element = document.createElement('div');
-    this.element.className = 'google-lang-bar';
+    this.element = document.createElement("div");
+    this.element.className = "google-lang-bar";
     this.render();
   }
 
