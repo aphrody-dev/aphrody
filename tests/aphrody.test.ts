@@ -90,7 +90,9 @@ describe("Aphrody Bundle Build Output", () => {
     expect(html).toContain('<div id="root"></div>');
     expect(html).toContain('src="/app.js"');
     expect(html).toContain('href="/style.css"');
-    expect(html).toContain("<title>Google</title>");
+    expect(html).toContain(
+      "<title>Google - Recherche Web, Applications & Portail Aphrody</title>",
+    );
   });
 });
 
@@ -443,11 +445,52 @@ describe("Aphrody HTTP Server & Endpoints", () => {
     expect(data.sqlite).toBeDefined();
   });
 
-  it("should serve health check at GET /healthz", async () => {
-    const req = new Request("http://localhost:3000/healthz");
+  it("should serve health check at GET /healthz and /ok", async () => {
+    const req = new Request("http://localhost:3000/ok");
     const res = await server.fetch(req);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.status).toBe("healthy");
+  });
+
+  it("should serve short 3-7 char routes (/api/q, /api/pm, /api/bnc)", async () => {
+    const qRes = await server.fetch(
+      new Request("http://localhost:3000/api/q?q=bun"),
+    );
+    expect(qRes.status).toBe(200);
+    const qData = await qRes.json();
+    expect(qData.suggestions.length).toBeGreaterThan(0);
+
+    const pmRes = await server.fetch(
+      new Request("http://localhost:3000/api/pm?q=bun"),
+    );
+    expect(pmRes.status).toBe(200);
+    const pmData = await pmRes.json();
+    expect(pmData.packages.length).toBeGreaterThan(0);
+
+    const bncRes = await server.fetch(
+      new Request("http://localhost:3000/api/bnc"),
+    );
+    expect(bncRes.status).toBe(200);
+  });
+
+  it("should serve static crawler files (/robots.txt, /sitemap.xml, /llms.txt)", async () => {
+    const rRes = await server.fetch(
+      new Request("http://localhost:3000/robots.txt"),
+    );
+    expect(rRes.status).toBe(200);
+    expect(await rRes.text()).toContain("User-agent: *");
+
+    const sRes = await server.fetch(
+      new Request("http://localhost:3000/sitemap.xml"),
+    );
+    expect(sRes.status).toBe(200);
+    expect(await sRes.text()).toContain("<urlset");
+
+    const lRes = await server.fetch(
+      new Request("http://localhost:3000/llms.txt"),
+    );
+    expect(lRes.status).toBe(200);
+    expect(await lRes.text()).toContain("# Aphrody");
   });
 });

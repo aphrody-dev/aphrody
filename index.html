@@ -3,7 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Google</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>Google - Recherche Web, Applications & Portail Aphrody</title>
+    <meta
+      name="description"
+      content="Recherchez sur le Web avec le moteur de recherche Aphrody, portail et suite souveraine propulsés par oven-sh/bun."
+    />
+    <link rel="canonical" href="https://aphrody.com/" />
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+
+    <!-- OpenGraph Metadata -->
+    <meta property="og:title" content="Google - Aphrody" />
+    <meta
+      property="og:description"
+      content="Recherchez sur le Web avec le moteur souverain Aphrody, réplique pixel-identique de Google."
+    />
+    <meta property="og:url" content="https://aphrody.com/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Schema.org JSON-LD Structured Data for AI Crawlers -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Google",
+        "alternateName": "Aphrody",
+        "url": "https://aphrody.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://aphrody.com/api/q?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
     <link
       rel="icon"
       href="https://www.google.com/favicon.ico"
@@ -18,7 +54,12 @@
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <div id="root"></div>
+    <header role="banner" class="google-header"></header>
+    <main role="main" class="google-main">
+      <h1 class="visually-hidden">Google</h1>
+      <div id="root"></div>
+    </main>
+    <footer role="contentinfo" class="google-footer"></footer>
     <script type="module" src="/app.js"></script>
   </body>
 </html>

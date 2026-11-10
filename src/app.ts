@@ -8,9 +8,6 @@ import { VoiceModal } from "./components/voice-modal";
 import { LensModal } from "./components/lens-modal";
 import { AdaptiveShell, ShellMode } from "./design/adaptive-shell";
 import { WindowManager } from "./windowing/macos-window";
-import { StorytoldSuite } from "./suite/storytold-suite";
-import { StoreApp } from "./components/store-app";
-import { BenchmarkApp } from "./components/benchmark-app";
 
 export class App {
   public rootElement: HTMLDivElement;
@@ -75,8 +72,9 @@ export class App {
     this.header.updateShellMode(next);
   }
 
-  public openAppWindow(appId: string): void {
+  public async openAppWindow(appId: string): Promise<void> {
     if (appId === "storytold") {
+      const { StorytoldSuite } = await import("./suite/storytold-suite");
       const suite = new StorytoldSuite();
       this.windowManager.openWindow({
         id: "win-storytold",
@@ -87,6 +85,7 @@ export class App {
         onClose: () => suite.destroy(),
       });
     } else if (appId === "store") {
+      const { StoreApp } = await import("./components/store-app");
       const store = new StoreApp();
       this.windowManager.openWindow({
         id: "win-store",
@@ -97,6 +96,7 @@ export class App {
         content: store.element,
       });
     } else if (appId === "bench") {
+      const { BenchmarkApp } = await import("./components/benchmark-app");
       const bench = new BenchmarkApp();
       this.windowManager.openWindow({
         id: "win-bench",

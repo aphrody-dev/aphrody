@@ -4,13 +4,17 @@ import {
   readFileSync,
   writeFileSync,
   statSync,
+  rmSync,
+  readdirSync,
 } from "fs";
 import { join } from "path";
+import { validateWeb, formatReport } from "../wck/src/index";
 
 const DIST_DIR = join(import.meta.dir, "dist");
-if (!existsSync(DIST_DIR)) {
-  mkdirSync(DIST_DIR, { recursive: true });
+if (existsSync(DIST_DIR)) {
+  rmSync(DIST_DIR, { recursive: true, force: true });
 }
+mkdirSync(DIST_DIR, { recursive: true });
 
 console.log("Building Aphrody with native Bun.build()...");
 
@@ -21,6 +25,7 @@ const buildResult = await Bun.build({
   minify: true,
   target: "browser",
   format: "esm",
+  splitting: true,
 });
 
 if (!buildResult.success) {
@@ -28,7 +33,7 @@ if (!buildResult.success) {
   process.exit(1);
 }
 
-// Copy style.css to dist (minifying whitespace)
+// 1. Copy style.css to dist (minifying whitespace)
 const cssPath = join(import.meta.dir, "src", "style.css");
 const rawCss = readFileSync(cssPath, "utf-8");
 const minifiedCss = rawCss
@@ -38,28 +43,66 @@ const minifiedCss = rawCss
   .trim();
 writeFileSync(join(DIST_DIR, "style.css"), minifiedCss);
 
-// Copy index.html to dist
+// 2. Copy index.html to dist
 const htmlPath = join(import.meta.dir, "index.html");
 const rawHtml = readFileSync(htmlPath, "utf-8");
 const minifiedHtml = rawHtml.replace(/\s+/g, " ").replace(/> </g, "><").trim();
 writeFileSync(join(DIST_DIR, "index.html"), minifiedHtml);
 
-// Pre-compress using native Bun.gzipSync
-const appJsBuf = readFileSync(join(DIST_DIR, "app.js"));
-const cssBuf = readFileSync(join(DIST_DIR, "style.css"));
-const htmlBuf = readFileSync(join(DIST_DIR, "index.html"));
+// 3. Generate robots.txt at compile time
+const robotsContent = [
+  "User-agent: *",
+  "Allow: /",
+  "Sitemap: https://aphrody.com/sitemap.xml",
+  "",
+].join("\n");
+writeFileSync(join(DIST_DIR, "robots.txt"), robotsContent);
 
-const appJsGz = Bun.gzipSync(appJsBuf);
-const cssGz = Bun.gzipSync(cssBuf);
-const htmlGz = Bun.gzipSync(htmlBuf);
+// 4. Generate sitemap.xml at compile time
+const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://aphrody.com/</loc>
+    <lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`;
+writeFileSync(join(DIST_DIR, "sitemap.xml"), sitemapContent);
 
-writeFileSync(join(DIST_DIR, "app.js.gz"), appJsGz);
-writeFileSync(join(DIST_DIR, "style.css.gz"), cssGz);
-writeFileSync(join(DIST_DIR, "index.html.gz"), htmlGz);
+// 5. Generate /llms.txt AI crawler index at compile time
+const llmsContent = `# Aphrody
+
+> Strict pixel-identical replica of Google search engine and sovereign workspace portal propulsed by oven-sh/bun v1.4.4 Full Rust.
+
+## Canonical AI Endpoints
+
+- Search Query: https://aphrody.com/api/q?q={query}
+- Package Manager: https://aphrody.com/api/pm
+- Benchmarks: https://aphrody.com/api/bnc
+- Health Status: https://aphrody.com/ok
+`;
+writeFileSync(join(DIST_DIR, "llms.txt"), llmsContent);
+
+// 6. Pre-compress all static assets using native Bun.gzipSync
+const distFiles = readdirSync(DIST_DIR);
+for (const file of distFiles) {
+  if (file.endsWith(".gz")) continue;
+  const filePath = join(DIST_DIR, file);
+  if (statSync(filePath).isFile()) {
+    const raw = readFileSync(filePath);
+    const gz = Bun.gzipSync(raw);
+    writeFileSync(`${filePath}.gz`, gz);
+  }
+}
 
 const appJsStat = statSync(join(DIST_DIR, "app.js"));
+const appJsGz = readFileSync(join(DIST_DIR, "app.js.gz"));
 const cssStat = statSync(join(DIST_DIR, "style.css"));
+const cssGz = readFileSync(join(DIST_DIR, "style.css.gz"));
 const htmlStat = statSync(join(DIST_DIR, "index.html"));
+const htmlGz = readFileSync(join(DIST_DIR, "index.html.gz"));
 
 const totalRawKb = (appJsStat.size + cssStat.size + htmlStat.size) / 1024;
 const totalGzKb = (appJsGz.length + cssGz.length + htmlGz.length) / 1024;
@@ -75,5 +118,17 @@ console.log(
   `- dist/index.html: ${(htmlStat.size / 1024).toFixed(2)} KB (gz: ${(htmlGz.length / 1024).toFixed(2)} KB)`,
 );
 console.log(
-  `Total bundle raw: ${totalRawKb.toFixed(2)} KB | gzipped: ${totalGzKb.toFixed(2)} KB (< 15 KB target satisfied!)`,
+  `Total entry bundle raw: ${totalRawKb.toFixed(2)} KB | gzipped: ${totalGzKb.toFixed(2)} KB`,
 );
+
+// 7. Execute WCK Compile-Time 7-Spec Validator Gate
+console.log("\nExecuting WCK 7-Spec Compile-Time Web & Lighthouse Gate...");
+const report = validateWeb(DIST_DIR);
+console.log(formatReport(report));
+
+if (!report.allPassed) {
+  console.error("FATAL: WCK Compile-Time Gate failed! Build aborted.");
+  process.exit(1);
+}
+
+console.log("Aphrody build 100% validated by WCK!");

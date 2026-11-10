@@ -22,6 +22,8 @@ const MIME_TYPES: Record<string, string> = {
   ".woff": "font/woff",
   ".ttf": "font/ttf",
   ".wasm": "application/wasm",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
 };
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -62,20 +64,24 @@ export const server = serve({
     const url = new URL(req.url);
     const pathname = url.pathname;
 
-    // 1. API: Autocomplete Suggestions
-    if (pathname === "/api/complete") {
+    // 1. API: Autocomplete Suggestions (short: /api/q, legacy: /api/complete)
+    if (pathname === "/api/q" || pathname === "/api/complete") {
       const q = url.searchParams.get("q") || "";
       const suggestions = getSuggestions(q);
       return jsonResponse({ query: q, suggestions }, 200, req);
     }
 
-    // 2. Health check
-    if (pathname === "/healthz" || pathname === "/api/health") {
+    // 2. Health check (short: /ok, legacy: /healthz, /api/health)
+    if (
+      pathname === "/ok" ||
+      pathname === "/healthz" ||
+      pathname === "/api/health"
+    ) {
       return jsonResponse({ status: "healthy", service: "aphrody" }, 200, req);
     }
 
-    // 3. API: Store Search
-    if (pathname === "/api/store/search") {
+    // 3. API: Store Search (short: /api/pm, legacy: /api/store/search)
+    if (pathname === "/api/pm" || pathname === "/api/store/search") {
       const q = url.searchParams.get("q") || "";
       const eco = (url.searchParams.get("ecosystem") || "all") as any;
       const packages = await storeManager.search(q, eco);
@@ -136,8 +142,8 @@ export const server = serve({
       }
     }
 
-    // 7. API: Performance, LTO, AOT & Zero-Copy Stack Benchmark
-    if (pathname === "/api/bench") {
+    // 7. API: Performance, LTO, AOT & Zero-Copy Stack Benchmark (short: /api/bnc, legacy: /api/bench)
+    if (pathname === "/api/bnc" || pathname === "/api/bench") {
       try {
         const report = await runBenchmarkSuite();
         return jsonResponse(report, 200, req);
