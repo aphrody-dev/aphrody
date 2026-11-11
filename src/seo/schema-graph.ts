@@ -6,7 +6,7 @@
  * no invented versions. Pure TypeScript, zero dependencies.
  */
 
-import { APP_URL, HREFLANG, SITE_URL, type Locale } from "./site";
+import { ABOUT_URL, APP_URL, HREFLANG, SITE_URL, type Locale } from "./site";
 
 export interface GraphFaq {
   question: string;
@@ -45,7 +45,7 @@ export function buildPageGraph(o: PageGraphOptions): Record<string, unknown> {
       name: "Aphrody",
       url: SITE_URL + "/",
       logo: `${SITE_URL}/favicon.svg`,
-      sameAs: [APP_URL + "/"],
+      sameAs: [APP_URL + "/", ABOUT_URL + "/"],
     },
     {
       "@type": "WebSite",

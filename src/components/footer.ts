@@ -31,7 +31,7 @@ export class Footer {
     const leftCol = document.createElement("div");
     leftCol.className = "footer-left";
     leftCol.innerHTML = `
-      <a href="https://about.google/?utm_source=google-FR&utm_medium=referral&utm_campaign=hp-footer&fg=1" class="footer-link" target="_blank" rel="noreferrer">À propos</a>
+      <a href="https://about.aphrody.com" class="footer-link" target="_blank" rel="noreferrer">À propos</a>
       <a href="https://www.google.com/intl/fr_fr/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpafooter&fg=1" class="footer-link" target="_blank" rel="noreferrer">Publicité</a>
       <a href="https://www.google.com/services/?subid=ww-ww-et-g-awa-a-g_hpbfoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpbfooter&fg=1" class="footer-link" target="_blank" rel="noreferrer">Entreprise</a>
       <a href="https://google.com/search/howsearchworks/?fg=1" class="footer-link" target="_blank" rel="noreferrer">Comment fonctionne la recherche Google ?</a>

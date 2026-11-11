@@ -7,6 +7,7 @@
 
 export const SITE_URL = "https://aphrody.com";
 export const APP_URL = "https://aphrody.app";
+export const ABOUT_URL = "https://about.aphrody.com";
 
 export type Locale = "fr" | "en";
 export const LOCALES: Locale[] = ["fr", "en"];
