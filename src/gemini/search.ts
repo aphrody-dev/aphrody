@@ -9,6 +9,7 @@
 
 import { VERTICALS, SITE_URL, type Locale } from "../seo/site";
 import { getSuggestions } from "../data/suggestions";
+import { runKeylessGoogleSearchGrounding } from "../../../../packages/ai-os/src/extracted/index";
 
 export interface GeminiCitation {
   title: string;
@@ -112,6 +113,25 @@ export async function geminiSearch(
   fetchImpl: typeof fetch = fetch,
 ): Promise<GeminiSearchResult> {
   const key = (env.GEMINI_API_KEY || env.GOOGLE_API_KEY || "").trim();
+  if (!key && env.AI_OS_KEYLESS === "1") {
+    const grounded = await runKeylessGoogleSearchGrounding(query, {
+      locale,
+      model: env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
+      fetchImpl,
+    });
+    if (grounded.grounded || grounded.transport === "vertex-ai-keyless-adc") {
+      return {
+        query,
+        answer: grounded.answer,
+        citations: grounded.citations,
+        grounded: grounded.grounded,
+        source: "gemini-google-search",
+        model: grounded.model,
+        searchQueries: grounded.searchQueries,
+      };
+    }
+    return localFallback(query, locale);
+  }
   if (!key) return localFallback(query, locale);
   const model = (env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL).trim();
   try {
