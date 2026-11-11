@@ -31,7 +31,12 @@ export interface Vertical {
 export const VERTICALS: Vertical[] = [
   {
     slug: "web",
-    links: [{ href: "/api/q?q=bun", label: { fr: "API de suggestions", en: "Suggestions API" } }],
+    links: [
+      {
+        href: "/api/q?q=bun",
+        label: { fr: "API de suggestions", en: "Suggestions API" },
+      },
+    ],
     fr: {
       title: "Recherche web - Aphrody",
       description:
@@ -62,7 +67,10 @@ export const VERTICALS: Vertical[] = [
   {
     slug: "ai-gemini",
     links: [
-      { href: "/api/gemini/search?q=webgpu", label: { fr: "API Gemini (JSON)", en: "Gemini API (JSON)" } },
+      {
+        href: "/api/gemini/search?q=webgpu",
+        label: { fr: "API Gemini (JSON)", en: "Gemini API (JSON)" },
+      },
       { href: "/llms.txt", label: { fr: "llms.txt", en: "llms.txt" } },
     ],
     fr: {
@@ -94,7 +102,12 @@ export const VERTICALS: Vertical[] = [
   },
   {
     slug: "packages",
-    links: [{ href: "/api/pm?q=rust", label: { fr: "API catalogue", en: "Catalog API" } }],
+    links: [
+      {
+        href: "/api/pm?q=rust",
+        label: { fr: "API catalogue", en: "Catalog API" },
+      },
+    ],
     fr: {
       title: "Catalogue de paquets - Aphrody",
       description:
@@ -124,7 +137,12 @@ export const VERTICALS: Vertical[] = [
   },
   {
     slug: "wasm-webgpu",
-    links: [{ href: "/search/benchmarks", label: { fr: "Benchmarks", en: "Benchmarks" } }],
+    links: [
+      {
+        href: "/search/benchmarks",
+        label: { fr: "Benchmarks", en: "Benchmarks" },
+      },
+    ],
     fr: {
       title: "WebAssembly et WebGPU - Aphrody",
       description:
@@ -154,7 +172,9 @@ export const VERTICALS: Vertical[] = [
   },
   {
     slug: "wayland-rust-desktop",
-    links: [{ href: APP_URL + "/", label: { fr: "aphrody.app", en: "aphrody.app" } }],
+    links: [
+      { href: APP_URL + "/", label: { fr: "aphrody.app", en: "aphrody.app" } },
+    ],
     fr: {
       title: "Bureau Wayland et Rust - Aphrody",
       description:
@@ -184,7 +204,9 @@ export const VERTICALS: Vertical[] = [
   },
   {
     slug: "benchmarks",
-    links: [{ href: "/api/bnc", label: { fr: "Donn�es JSON", en: "JSON data" } }],
+    links: [
+      { href: "/api/bnc", label: { fr: "Donn�es JSON", en: "JSON data" } },
+    ],
     fr: {
       title: "Benchmarks runtime - Aphrody",
       description:
@@ -214,7 +236,12 @@ export const VERTICALS: Vertical[] = [
   },
   {
     slug: "design-systems",
-    links: [{ href: "https://m3.material.io/", label: { fr: "Material Design 3", en: "Material Design 3" } }],
+    links: [
+      {
+        href: "https://m3.material.io/",
+        label: { fr: "Material Design 3", en: "Material Design 3" },
+      },
+    ],
     fr: {
       title: "Design systems - Aphrody",
       description:
@@ -244,7 +271,9 @@ export const VERTICALS: Vertical[] = [
   },
   {
     slug: "cloud-edge",
-    links: [{ href: "/ok", label: { fr: "État du service", en: "Service status" } }],
+    links: [
+      { href: "/ok", label: { fr: "État du service", en: "Service status" } },
+    ],
     fr: {
       title: "Cloud et edge - Aphrody",
       description:
@@ -274,7 +303,15 @@ export const VERTICALS: Vertical[] = [
   },
 ];
 
-export const PACKAGE_ECOSYSTEMS = ["bun", "winget", "aur", "nix", "flatpak", "playstore", "wasm-hub"] as const;
+export const PACKAGE_ECOSYSTEMS = [
+  "bun",
+  "winget",
+  "aur",
+  "nix",
+  "flatpak",
+  "playstore",
+  "wasm-hub",
+] as const;
 export type PackageEcosystem = (typeof PACKAGE_ECOSYSTEMS)[number];
 
 export const ECOSYSTEM_LABELS: Record<PackageEcosystem, string> = {
@@ -287,7 +324,10 @@ export const ECOSYSTEM_LABELS: Record<PackageEcosystem, string> = {
   "wasm-hub": "WASM hub",
 };
 
-export const HOME: Record<Locale, { title: string; description: string; h1: string; intro: string }> = {
+export const HOME: Record<
+  Locale,
+  { title: string; description: string; h1: string; intro: string }
+> = {
   fr: {
     title: "Aphrody - Recherche, Mode IA Gemini et paquets",
     description:
@@ -306,7 +346,10 @@ export const HOME: Record<Locale, { title: string; description: string; h1: stri
   },
 };
 
-export const HOME_FAQS: Record<Locale, Array<{ question: string; answer: string }>> = {
+export const HOME_FAQS: Record<
+  Locale,
+  Array<{ question: string; answer: string }>
+> = {
   fr: [
     {
       question: "Qu'est-ce qu'Aphrody ?",
@@ -370,7 +413,7 @@ export function localePrefix(locale: Locale): string {
 /** Path of a page for a locale. `path` is the fr path such as "/search/web" or "/". */
 export function localizedPath(path: string, locale: Locale): string {
   const prefix = localePrefix(locale);
-  if (path === "/") return prefix === "" ? "/" : "/en/";
+  if (path === "/") return prefix === "" ? "/" : "/en";
   return prefix + path;
 }
 
@@ -391,7 +434,10 @@ export function newsPath(slug: string): string {
 }
 
 /** All indexable fr paths grouped by sitemap. */
-export function pathGroups(): Record<"core" | "verticals" | "packages" | "news", string[]> {
+export function pathGroups(): Record<
+  "core" | "verticals" | "packages" | "news",
+  string[]
+> {
   return {
     core: ["/"],
     verticals: VERTICALS.map((v) => verticalPath(v.slug)),

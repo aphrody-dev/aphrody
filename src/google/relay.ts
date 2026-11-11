@@ -23,7 +23,10 @@ function noContent(state: string): Response {
   });
 }
 
-export async function handleCollect(req: Request, opts: RelayOptions): Promise<Response> {
+export async function handleCollect(
+  req: Request,
+  opts: RelayOptions,
+): Promise<Response> {
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -31,29 +34,41 @@ export async function handleCollect(req: Request, opts: RelayOptions): Promise<R
     });
   }
   if (req.method !== "GET" && req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, POST, OPTIONS" } });
+    return new Response("Method Not Allowed", {
+      status: 405,
+      headers: { Allow: "GET, POST, OPTIONS" },
+    });
   }
   if (!opts.ga4) return noContent("disabled");
 
   const url = new URL(req.url);
-  const body = req.method === "POST" ? new Uint8Array(await req.arrayBuffer()) : undefined;
+  const body =
+    req.method === "POST" ? new Uint8Array(await req.arrayBuffer()) : undefined;
   if (body && body.byteLength > MAX_RELAY_BODY_BYTES) {
     return new Response("Payload Too Large", { status: 413 });
   }
-  const tid = url.searchParams.get("tid") || new URLSearchParams(body ? new TextDecoder().decode(body) : "").get("tid");
+  const tid =
+    url.searchParams.get("tid") ||
+    new URLSearchParams(body ? new TextDecoder().decode(body) : "").get("tid");
   if (tid !== opts.ga4) {
-    return new Response("Bad Request", { status: 400, headers: { "Cache-Control": "no-store" } });
+    return new Response("Bad Request", {
+      status: 400,
+      headers: { "Cache-Control": "no-store" },
+    });
   }
 
   const f = opts.fetchImpl || fetch;
   const target = `${opts.endpoint || GA_COLLECT_ENDPOINT}${url.search}`;
   const headers: Record<string, string> = {
-    "Content-Type": req.headers.get("content-type") || "text/plain;charset=UTF-8",
+    "Content-Type":
+      req.headers.get("content-type") || "text/plain;charset=UTF-8",
   };
   const ua = req.headers.get("user-agent");
   if (ua) headers["User-Agent"] = ua;
   try {
-    void Promise.resolve(f(target, { method: req.method, headers, body })).catch(() => {});
+    void Promise.resolve(
+      f(target, { method: req.method, headers, body }),
+    ).catch(() => {});
   } catch {
     /* forwarding failures must never affect the visitor */
   }

@@ -45,8 +45,14 @@ function initShortcut(): void {
   doc.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
     const t = e.target as HTMLElement | null;
-    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-    const input = doc.querySelector<HTMLInputElement>(".search-input, #q, #ns-q");
+    if (
+      t &&
+      (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
+    )
+      return;
+    const input = doc.querySelector<HTMLInputElement>(
+      ".search-input, #q, #ns-q",
+    );
     if (input) {
       e.preventDefault();
       input.focus();
@@ -80,7 +86,12 @@ function applyConsent(granted: boolean): void {
 }
 
 function saveDecision(granted: boolean): void {
-  safe(() => localStorage.setItem(STORE_KEY, JSON.stringify({ v: 1, a: granted ? 1 : 0 })));
+  safe(() =>
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify({ v: 1, a: granted ? 1 : 0 }),
+    ),
+  );
   applyConsent(granted);
 }
 
@@ -89,7 +100,10 @@ function showBanner(): void {
   const el = doc.createElement("div");
   el.className = "consent-banner";
   el.setAttribute("role", "region");
-  el.setAttribute("aria-label", fr ? "Préférences de confidentialité" : "Privacy preferences");
+  el.setAttribute(
+    "aria-label",
+    fr ? "Préférences de confidentialité" : "Privacy preferences",
+  );
   const text = fr
     ? "Aphrody peut utiliser des cookies de mesure d'audience et de publicité (Google). Tout est refusé tant que vous ne choisissez pas."
     : "Aphrody may use audience-measurement and advertising cookies (Google). Everything stays denied until you choose.";
@@ -98,7 +112,9 @@ function showBanner(): void {
     `<button type="button" class="m3-btn m3-btn-tonal" data-c="0">${fr ? "Tout refuser" : "Reject all"}</button>` +
     `<button type="button" class="m3-btn" data-c="1">${fr ? "Tout accepter" : "Accept all"}</button></div>`;
   el.addEventListener("click", (e) => {
-    const b = (e.target as HTMLElement).closest("button[data-c]") as HTMLElement | null;
+    const b = (e.target as HTMLElement).closest(
+      "button[data-c]",
+    ) as HTMLElement | null;
     if (!b) return;
     saveDecision(b.dataset.c === "1");
     el.remove();
@@ -149,14 +165,22 @@ function loadAdsense(): void {
 function loadGoogleTags(): void {
   const base = cfg.srv || "https://www.googletagmanager.com";
   if (cfg.gtm) {
-    (w.dataLayer = w.dataLayer || []).push({ "gtm.start": Date.now(), event: "gtm.js" });
+    (w.dataLayer = w.dataLayer || []).push({
+      "gtm.start": Date.now(),
+      event: "gtm.js",
+    });
     addScript(`${base}/gtm.js?id=${encodeURIComponent(cfg.gtm)}`);
   } else if (cfg.ga4 || cfg.ads) {
     const first = (cfg.ga4 || cfg.ads) as string;
-    addScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(first)}`);
+    addScript(
+      `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(first)}`,
+    );
     gtag("js", new Date());
     // First-party relay: hits go to <origin>/g/collect, forwarded by the server.
-    if (cfg.ga4) gtag("config", cfg.ga4, { server_container_url: cfg.srv || location.origin });
+    if (cfg.ga4)
+      gtag("config", cfg.ga4, {
+        server_container_url: cfg.srv || location.origin,
+      });
     if (cfg.ads) gtag("config", cfg.ads);
   }
   const d = readDecision();
@@ -168,13 +192,16 @@ function whenIdleOrInteracted(fn: () => void): void {
   const run = () => {
     if (done) return;
     done = true;
-    ["pointerdown", "keydown", "scroll", "touchstart"].forEach((t) => removeEventListener(t, run));
+    ["pointerdown", "keydown", "scroll", "touchstart"].forEach((t) =>
+      removeEventListener(t, run),
+    );
     safe(fn);
   };
   ["pointerdown", "keydown", "scroll", "touchstart"].forEach((t) =>
     addEventListener(t, run, { once: true, passive: true }),
   );
-  if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(run, { timeout: 4000 });
+  if (typeof w.requestIdleCallback === "function")
+    w.requestIdleCallback(run, { timeout: 4000 });
   else setTimeout(run, 4000);
 }
 
@@ -188,8 +215,12 @@ function initWebMcp(): void {
     inputSchema: t.inputSchema,
     annotations: t.annotations,
     async execute(args: Record<string, unknown>) {
-      const q = t.http.param ? `?${t.http.param}=${encodeURIComponent(String(args?.[t.http.param] ?? ""))}` : "";
-      const res = await fetch(t.http.path + q, { headers: { Accept: "application/json" } });
+      const q = t.http.param
+        ? `?${t.http.param}=${encodeURIComponent(String(args?.[t.http.param] ?? ""))}`
+        : "";
+      const res = await fetch(t.http.path + q, {
+        headers: { Accept: "application/json" },
+      });
       return { content: [{ type: "text", text: await res.text() }] };
     },
   }));
@@ -204,7 +235,10 @@ function initWebMcp(): void {
 safe(initShortcut);
 safe(initWebMcp);
 safe(() => {
-  if (!doc.documentElement.hasAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches) {
+  if (
+    !doc.documentElement.hasAttribute("data-theme") &&
+    matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
     doc.documentElement.setAttribute("data-theme", "dark");
   }
 });

@@ -12,7 +12,7 @@ import { dirname, extname, join } from "path";
 import { brotliCompressSync, constants as zc } from "node:zlib";
 import { validateWeb, formatReport } from "../../packages/wck/src/index";
 import { getMaterialCssSubset } from "./src/design/material-tokens";
-import { readGoogleConfig } from "./src/google/config";
+import { buildCsp, readGoogleConfig } from "./src/google/config";
 import {
   adsTxt,
   agentJson,
@@ -27,8 +27,23 @@ import {
   webmcpJson,
 } from "./src/seo/documents";
 import { minifyCss } from "./src/seo/page-css";
-import { renderHome, renderNews, renderPackageHub, renderVertical } from "./src/seo/html";
-import { LOCALES, NEWS, PACKAGE_ECOSYSTEMS, VERTICALS, localizedPath, newsPath, packageHubPath, verticalPath } from "./src/seo/site";
+import {
+  render404,
+  renderHome,
+  renderNews,
+  renderPackageHub,
+  renderVertical,
+} from "./src/seo/html";
+import {
+  LOCALES,
+  NEWS,
+  PACKAGE_ECOSYSTEMS,
+  VERTICALS,
+  localizedPath,
+  newsPath,
+  packageHubPath,
+  verticalPath,
+} from "./src/seo/site";
 import { UniversalStoreManager } from "./src/store/universal-manager";
 
 const ROOT = import.meta.dir;
@@ -83,23 +98,30 @@ emit("style.css", minifyCss(rawCss));
 
 // 3. Static HTML (SSG): home, topic hubs, package hubs, news - fr and en.
 const store = new UniversalStoreManager(":memory:");
+const pageFile = (path: string, l: "fr" | "en") => {
+  const p = localizedPath(path, l);
+  return (p === "/" ? "" : p.slice(1) + "/") + "index.html";
+};
 for (const l of LOCALES) {
-  emit(`${localizedPath("/", l).slice(1)}index.html`, renderHome(l, cfg));
-  for (const v of VERTICALS) emit(`${localizedPath(verticalPath(v.slug), l).slice(1)}/index.html`, renderVertical(v, l, cfg));
+  emit(pageFile("/", l), renderHome(l, cfg));
+  for (const v of VERTICALS)
+    emit(pageFile(verticalPath(v.slug), l), renderVertical(v, l, cfg));
   for (const eco of PACKAGE_ECOSYSTEMS) {
     const pkgs = (await store.search("", eco as never)).map((p) => ({
       name: p.name,
       description: p.description,
       installCmd: p.installCmd,
     }));
-    emit(`${localizedPath(packageHubPath(eco), l).slice(1)}/index.html`, renderPackageHub(eco, pkgs, l, cfg));
+    emit(pageFile(packageHubPath(eco), l), renderPackageHub(eco, pkgs, l, cfg));
   }
-  for (const n of NEWS) emit(`${localizedPath(newsPath(n.slug), l).slice(1)}/index.html`, renderNews(n, l, cfg));
+  for (const n of NEWS)
+    emit(pageFile(newsPath(n.slug), l), renderNews(n, l, cfg));
 }
 
 // 4. Crawler, agent and compliance documents.
 emit("robots.txt", robotsTxt());
-for (const [name, xml] of Object.entries(buildSitemaps(BUILD_DATE))) emit(name, xml);
+for (const [name, xml] of Object.entries(buildSitemaps(BUILD_DATE)))
+  emit(name, xml);
 emit("llms.txt", llmsTxt());
 emit("llms-full.txt", llmsFullTxt());
 const contact = (process.env.PUBLIC_CONTACT_EMAIL || "").trim() || undefined;
@@ -112,19 +134,54 @@ emit("humans.txt", humansTxt(BUILD_DATE));
 const nowKey = indexNowKey(process.env);
 emit(`${nowKey}.txt`, nowKey);
 emit("g-cfg.json", JSON.stringify(cfg));
+emit("404.html", render404("fr", cfg));
+// Edge headers (Cloudflare Workers assets / Pages). Same policy as server.ts.
+emit(
+  "_headers",
+  [
+    "/*",
+    "  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload",
+    "  X-Content-Type-Options: nosniff",
+    "  X-Frame-Options: SAMEORIGIN",
+    "  Referrer-Policy: strict-origin-when-cross-origin",
+    "  Permissions-Policy: microphone=(self)",
+    `  Content-Security-Policy: ${buildCsp(cfg)}`,
+    "/",
+    "  Link: </style.css>; rel=preload; as=style, </app.js>; rel=modulepreload, </boot.js>; rel=modulepreload",
+    "/en",
+    "  Link: </style.css>; rel=preload; as=style, </app.js>; rel=modulepreload, </boot.js>; rel=modulepreload",
+    "/chunk-*.js",
+    "  Cache-Control: public, max-age=31536000, immutable",
+    "/*.xml",
+    "  Cache-Control: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
+    "/ads.txt",
+    "  Content-Type: text/plain; charset=utf-8",
+    "  Cache-Control: public, max-age=0, s-maxage=3600",
+    "",
+  ].join("\n"),
+);
 emit(
   "favicon.svg",
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#6750a4"/><circle cx="28" cy="28" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M37 37l13 13" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>',
 );
 const publicDir = join(ROOT, "public");
 if (existsSync(publicDir)) {
-  for (const f of readdirSync(publicDir)) copyFileSync(join(publicDir, f), join(DIST_DIR, f));
+  for (const f of readdirSync(publicDir))
+    copyFileSync(join(publicDir, f), join(DIST_DIR, f));
 }
 
 // 5. Pre-compress text assets (gzip + brotli) for in-memory serving.
-const COMPRESS = new Set([".html", ".js", ".css", ".svg", ".json", ".txt", ".xml"]);
+const COMPRESS = new Set([
+  ".html",
+  ".js",
+  ".css",
+  ".svg",
+  ".json",
+  ".txt",
+  ".xml",
+]);
 function walk(dir: string): string[] {
-  return readdirSync(dir).flatMap((n) => {
+  return readdirSync(dir).flatMap((n: string) => {
     const p = join(dir, n);
     return statSync(p).isDirectory() ? walk(p) : [p];
   });
@@ -136,17 +193,26 @@ for (const file of walk(DIST_DIR)) {
   if (!COMPRESS.has(extname(file).toLowerCase())) continue;
   const raw = readFileSync(file);
   writeFileSync(`${file}.gz`, Bun.gzipSync(raw));
-  writeFileSync(`${file}.br`, brotliCompressSync(raw, { params: { [zc.BROTLI_PARAM_QUALITY]: 11 } }));
+  writeFileSync(
+    `${file}.br`,
+    brotliCompressSync(raw, { params: { [zc.BROTLI_PARAM_QUALITY]: 11 } }),
+  );
 }
 
 const sz = (rel: string) => statSync(join(DIST_DIR, rel)).size;
 const gz = (rel: string) => statSync(join(DIST_DIR, rel + ".gz")).size;
 console.log("Aphrody build finished:");
 for (const f of ["app.js", "boot.js", "style.css", "index.html"]) {
-  console.log(`- dist/${f}: ${(sz(f) / 1024).toFixed(2)} KB (gz: ${(gz(f) / 1024).toFixed(2)} KB)`);
+  console.log(
+    `- dist/${f}: ${(sz(f) / 1024).toFixed(2)} KB (gz: ${(gz(f) / 1024).toFixed(2)} KB)`,
+  );
 }
-console.log(`- ${htmlCount} HTML pages, ${Object.keys(buildSitemaps(BUILD_DATE)).length} sitemap files`);
-console.log(`- google ids configured: ${Object.keys(cfg).join(", ") || "none (no Google tag is loaded)"}`);
+console.log(
+  `- ${htmlCount} HTML pages, ${Object.keys(buildSitemaps(BUILD_DATE)).length} sitemap files`,
+);
+console.log(
+  `- google ids configured: ${Object.keys(cfg).join(", ") || "none (no Google tag is loaded)"}`,
+);
 
 // 6. WCK compile-time 7-spec gate (Lighthouse 100, CLS = 0, LCP budget).
 console.log("\nExecuting WCK 7-Spec Compile-Time Web & Lighthouse Gate...");

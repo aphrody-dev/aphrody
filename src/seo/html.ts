@@ -77,11 +77,20 @@ export const UI = {
 } as const;
 
 export function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 const SPECULATION_RULES = JSON.stringify({
-  prefetch: [{ where: { href_matches: ["/search/*", "/en/search/*"] }, eagerness: "moderate" }],
+  prefetch: [
+    {
+      where: { href_matches: ["/search/*", "/en/search/*"] },
+      eagerness: "moderate",
+    },
+  ],
 });
 
 export interface PageSpec {
@@ -112,7 +121,11 @@ function searchForm(locale: Locale, id: string, value = ""): string {
   );
 }
 
-export function adSlot(cfg: GoogleConfig, locale: Locale, name: string): string {
+export function adSlot(
+  cfg: GoogleConfig,
+  locale: Locale,
+  name: string,
+): string {
   if (!cfg.adsense) return "";
   const slot = cfg.slot ? ` data-ad-slot="${cfg.slot}"` : "";
   return (
@@ -124,7 +137,8 @@ export function adSlot(cfg: GoogleConfig, locale: Locale, name: string): string 
 export function renderDocument(p: PageSpec): string {
   const u = UI[p.locale];
   const indexable = p.frPath !== null && !p.noindex;
-  const canonical = p.frPath !== null ? SITE_URL + localizedPath(p.frPath, p.locale) : "";
+  const canonical =
+    p.frPath !== null ? SITE_URL + localizedPath(p.frPath, p.locale) : "";
   const head: string[] = [
     '<meta charset="UTF-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">',
@@ -141,9 +155,13 @@ export function renderDocument(p: PageSpec): string {
     head.push(`<link rel="canonical" href="${canonical}">`);
     if (indexable) {
       for (const l of LOCALES) {
-        head.push(`<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE_URL}${localizedPath(p.frPath, l)}">`);
+        head.push(
+          `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE_URL}${localizedPath(p.frPath, l)}">`,
+        );
       }
-      head.push(`<link rel="alternate" hreflang="x-default" href="${SITE_URL}${localizedPath(p.frPath, "fr")}">`);
+      head.push(
+        `<link rel="alternate" hreflang="x-default" href="${SITE_URL}${localizedPath(p.frPath, "fr")}">`,
+      );
     }
     head.push(
       `<meta property="og:title" content="${esc(p.title)}">`,
@@ -165,13 +183,15 @@ export function renderDocument(p: PageSpec): string {
   const header =
     p.header === false
       ? '<header role="banner" class="google-header"></header>'
-      : `<header role="banner" class="page-header"><a href="/${p.locale === "en" ? "en/" : ""}" class="page-brand">Aphrody</a>` +
+      : `<header role="banner" class="page-header"><a href="${localizedPath("/", p.locale)}" class="page-brand">Aphrody</a>` +
         (p.frPath !== null
           ? `<a class="page-lang" lang="${p.locale === "fr" ? "en" : "fr"}" hreflang="${HREFLANG[p.locale === "fr" ? "en" : "fr"]}" href="${localizedPath(p.frPath, p.locale === "fr" ? "en" : "fr")}" aria-label="${u.otherLabel}">${u.other}</a>`
           : "") +
         "</header>";
 
-  const scripts = (p.withApp ? '<script type="module" src="/app.js"></script>' : "") + '<script type="module" src="/boot.js"></script>';
+  const scripts =
+    (p.withApp ? '<script type="module" src="/app.js"></script>' : "") +
+    '<script type="module" src="/boot.js"></script>';
   return (
     `<!doctype html><html lang="${p.locale}"><head>${head.join("")}</head><body>` +
     `<a class="skip-link" href="#main">${u.skip}</a>${header}` +
@@ -183,15 +203,26 @@ export function renderDocument(p: PageSpec): string {
 
 function topicsNav(locale: Locale, current?: string): string {
   const items = VERTICALS.filter((v) => v.slug !== current)
-    .map((v) => `<li><a href="${localizedPath(verticalPath(v.slug), locale)}">${esc(v[locale].h1)}</a></li>`)
+    .map(
+      (v) =>
+        `<li><a href="${localizedPath(verticalPath(v.slug), locale)}">${esc(v[locale].h1)}</a></li>`,
+    )
     .join("");
   return `<nav class="seo-hub" aria-label="${UI[locale].topics}"><ul>${items}</ul></nav>`;
 }
 
-function faqHtml(locale: Locale, faqs: Array<{ question: string; answer: string }>): string {
+function faqHtml(
+  locale: Locale,
+  faqs: Array<{ question: string; answer: string }>,
+): string {
   return (
     `<section class="seo-faq" aria-label="${UI[locale].faq}">` +
-    faqs.map((f) => `<details><summary>${esc(f.question)}</summary><p>${esc(f.answer)}</p></details>`).join("") +
+    faqs
+      .map(
+        (f) =>
+          `<details><summary>${esc(f.question)}</summary><p>${esc(f.answer)}</p></details>`,
+      )
+      .join("") +
     "</section>"
   );
 }
@@ -208,7 +239,10 @@ export function renderHome(locale: Locale, cfg: GoogleConfig): string {
     description: h.description,
     breadcrumbs: [{ name: u.home, url }],
     faqs,
-    items: VERTICALS.map((v) => ({ name: v[locale].h1, url: SITE_URL + localizedPath(verticalPath(v.slug), locale) })),
+    items: VERTICALS.map((v) => ({
+      name: v[locale].h1,
+      url: SITE_URL + localizedPath(verticalPath(v.slug), locale),
+    })),
     itemListName: u.topics,
     dataset: true,
   });
@@ -231,17 +265,33 @@ export function renderHome(locale: Locale, cfg: GoogleConfig): string {
   });
 }
 
-function breadcrumbs(locale: Locale, trail: Array<{ name: string; path: string }>): { html: string; items: Array<{ name: string; url: string }> } {
-  const items = [{ name: UI[locale].home, url: SITE_URL + localizedPath("/", locale) }];
-  for (const t of trail) items.push({ name: t.name, url: SITE_URL + localizedPath(t.path, locale) });
+function breadcrumbs(
+  locale: Locale,
+  trail: Array<{ name: string; path: string }>,
+): { html: string; items: Array<{ name: string; url: string }> } {
+  const items: Array<{ name: string; url: string }> = [
+    { name: UI[locale].home, url: SITE_URL + localizedPath("/", locale) },
+  ];
+  for (const t of trail)
+    items.push({ name: t.name, url: SITE_URL + localizedPath(t.path, locale) });
   const html =
     `<nav class="crumbs" aria-label="Breadcrumb"><ol>` +
-    items.map((it, i) => (i < items.length - 1 ? `<li><a href="${it.url.replace(SITE_URL, "")}">${esc(it.name)}</a></li>` : `<li aria-current="page">${esc(it.name)}</li>`)).join("") +
+    items
+      .map((it, i) =>
+        i < items.length - 1
+          ? `<li><a href="${it.url.replace(SITE_URL, "")}">${esc(it.name)}</a></li>`
+          : `<li aria-current="page">${esc(it.name)}</li>`,
+      )
+      .join("") +
     "</ol></nav>";
   return { html, items };
 }
 
-export function renderVertical(v: Vertical, locale: Locale, cfg: GoogleConfig): string {
+export function renderVertical(
+  v: Vertical,
+  locale: Locale,
+  cfg: GoogleConfig,
+): string {
   const h = v[locale];
   const u = UI[locale];
   const path = verticalPath(v.slug);
@@ -249,7 +299,10 @@ export function renderVertical(v: Vertical, locale: Locale, cfg: GoogleConfig): 
   const crumbs = breadcrumbs(locale, [{ name: h.h1, path }]);
   const faqs = [{ question: h.h1 + " ?", answer: h.intro }];
   const links = v.links
-    .map((l) => `<li><a class="m3-btn m3-btn-tonal" href="${l.href.startsWith("/search/") ? localizedPath(l.href, locale) : l.href}">${esc(l.label[locale])}</a></li>`)
+    .map(
+      (l) =>
+        `<li><a class="m3-btn m3-btn-tonal" href="${l.href.startsWith("/search/") ? localizedPath(l.href, locale) : l.href}">${esc(l.label[locale])}</a></li>`,
+    )
     .join("");
   const hubLinks =
     v.slug === "packages"
@@ -271,7 +324,15 @@ export function renderVertical(v: Vertical, locale: Locale, cfg: GoogleConfig): 
     `<ul class="points">${h.points.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>${hubLinks}` +
     `<ul class="actions">${links}</ul>${adSlot(cfg, locale, `vertical-${v.slug}`)}` +
     `${faqHtml(locale, faqs)}</article>${searchForm(locale, "q")}${topicsNav(locale, v.slug)}`;
-  return renderDocument({ locale, frPath: path, title: h.title, description: h.description, main, cfg, graph });
+  return renderDocument({
+    locale,
+    frPath: path,
+    title: h.title,
+    description: h.description,
+    main,
+    cfg,
+    graph,
+  });
 }
 
 export interface HubPackage {
@@ -280,7 +341,12 @@ export interface HubPackage {
   installCmd: string;
 }
 
-export function renderPackageHub(eco: PackageEcosystem, pkgs: HubPackage[], locale: Locale, cfg: GoogleConfig): string {
+export function renderPackageHub(
+  eco: PackageEcosystem,
+  pkgs: HubPackage[],
+  locale: Locale,
+  cfg: GoogleConfig,
+): string {
   const u = UI[locale];
   const label = ECOSYSTEM_LABELS[eco];
   const path = packageHubPath(eco);
@@ -304,15 +370,30 @@ export function renderPackageHub(eco: PackageEcosystem, pkgs: HubPackage[], loca
     itemListName: `${u.packages} ${label}`,
   });
   const list = pkgs
-    .map((p) => `<li class="card"><h2>${esc(p.name)}</h2><p>${esc(p.description)}</p><code>${esc(p.installCmd)}</code></li>`)
+    .map(
+      (p) =>
+        `<li class="card"><h2>${esc(p.name)}</h2><p>${esc(p.description)}</p><code>${esc(p.installCmd)}</code></li>`,
+    )
     .join("");
   const main =
     `${crumbs.html}<article><h1>${u.packages} ${esc(label)}</h1><p class="lead">${esc(description)}</p>` +
     `<ul class="cards">${list}</ul>${adSlot(cfg, locale, `hub-${eco}`)}</article>${topicsNav(locale)}`;
-  return renderDocument({ locale, frPath: path, title, description, main, cfg, graph });
+  return renderDocument({
+    locale,
+    frPath: path,
+    title,
+    description,
+    main,
+    cfg,
+    graph,
+  });
 }
 
-export function renderNews(a: NewsArticle, locale: Locale, cfg: GoogleConfig): string {
+export function renderNews(
+  a: NewsArticle,
+  locale: Locale,
+  cfg: GoogleConfig,
+): string {
   const u = UI[locale];
   const c = a[locale];
   const path = newsPath(a.slug);
@@ -340,13 +421,30 @@ export function renderNews(a: NewsArticle, locale: Locale, cfg: GoogleConfig): s
   const main =
     `${crumbs.html}<article><h1>${esc(c.title)}</h1><p class="note">${u.published} <time datetime="${a.date}">${a.date}</time></p>` +
     `<p class="lead">${esc(c.body)}</p>${adSlot(cfg, locale, "news")}</article>${topicsNav(locale)}`;
-  return renderDocument({ locale, frPath: path, title: c.title.slice(0, 60), description, main, cfg, graph, ogType: "article" });
+  return renderDocument({
+    locale,
+    frPath: path,
+    title: c.title.slice(0, 60),
+    description,
+    main,
+    cfg,
+    graph,
+    ogType: "article",
+  });
 }
 
 export function render404(locale: Locale, cfg: GoogleConfig): string {
   const u = UI[locale];
   const main = `<article><h1>${u.notFound}</h1><p class="lead">${u.notFoundText}</p><p><a class="m3-btn" href="${localizedPath("/", locale)}">${u.home}</a></p></article>`;
-  return renderDocument({ locale, frPath: null, title: `${u.notFound} - Aphrody`, description: u.notFoundText + " Aphrody.", main, cfg, noindex: true });
+  return renderDocument({
+    locale,
+    frPath: null,
+    title: `${u.notFound} - Aphrody`,
+    description: u.notFoundText + " Aphrody.",
+    main,
+    cfg,
+    noindex: true,
+  });
 }
 
 export function renderSearchResults(

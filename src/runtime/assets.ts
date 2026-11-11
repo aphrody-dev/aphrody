@@ -24,7 +24,16 @@ export const MIME_TYPES: Record<string, string> = {
   ".xml": "application/xml; charset=utf-8",
 };
 
-const COMPRESSIBLE = new Set([".html", ".js", ".css", ".svg", ".json", ".txt", ".xml", ".wasm"]);
+const COMPRESSIBLE = new Set([
+  ".html",
+  ".js",
+  ".css",
+  ".svg",
+  ".json",
+  ".txt",
+  ".xml",
+  ".wasm",
+]);
 
 export interface Asset {
   urlPath: string;
@@ -42,7 +51,12 @@ export function cacheControlFor(urlPath: string, ext: string): string {
   if (/\/chunk-[a-z0-9]+\.(js|css)$/i.test(urlPath) || ext === ".woff2") {
     return "public, max-age=31536000, immutable";
   }
-  if (ext === ".html" || urlPath.endsWith(".xml") || urlPath.endsWith(".txt") || urlPath.endsWith(".json")) {
+  if (
+    ext === ".html" ||
+    urlPath.endsWith(".xml") ||
+    urlPath.endsWith(".txt") ||
+    urlPath.endsWith(".json")
+  ) {
     return "public, max-age=0, must-revalidate";
   }
   return "public, max-age=3600, stale-while-revalidate=86400";
@@ -64,7 +78,13 @@ export class AssetStore {
     } catch {
       return null;
     }
-    if (decoded.includes("\0") || decoded.includes("\\") || decoded.split("/").includes("..")) return null;
+    if (
+      decoded.includes("\0") ||
+      decoded.includes("\\") ||
+      decoded.split("/").includes("..")
+    )
+      return null;
+    if (/(^|\/)_[^/]*$/.test(decoded)) return null; // _headers and similar edge config files
     const candidates: string[] = [];
     if (decoded.endsWith("/")) candidates.push(decoded + "index.html");
     else {
@@ -75,7 +95,8 @@ export class AssetStore {
       const file = resolve(join(this.root, normalize(c)));
       if (file !== this.root && !file.startsWith(this.root + sep)) continue;
       if (/\.(gz|br)$/.test(file)) continue;
-      if (existsSync(file) && statSync(file).isFile()) return { file, urlPath: c };
+      if (existsSync(file) && statSync(file).isFile())
+        return { file, urlPath: c };
     }
     return null;
   }
@@ -99,7 +120,11 @@ export class AssetStore {
       const br = compress
         ? existsSync(brFile)
           ? new Uint8Array(readFileSync(brFile))
-          : new Uint8Array(brotliCompressSync(raw, { params: { [zc.BROTLI_PARAM_QUALITY]: 11 } }))
+          : new Uint8Array(
+              brotliCompressSync(raw, {
+                params: { [zc.BROTLI_PARAM_QUALITY]: 11 },
+              }),
+            )
         : undefined;
       asset = {
         urlPath: loc.urlPath,
@@ -130,7 +155,11 @@ export function etagMatches(header: string | null, etag: string): boolean {
     .includes(etag);
 }
 
-export function respondWithAsset(req: Request, asset: Asset, extra: Record<string, string> = {}): Response {
+export function respondWithAsset(
+  req: Request,
+  asset: Asset,
+  extra: Record<string, string> = {},
+): Response {
   const accept = req.headers.get("accept-encoding") || "";
   let body: Uint8Array = asset.raw;
   let etag = asset.etag.raw;
@@ -155,5 +184,11 @@ export function respondWithAsset(req: Request, asset: Asset, extra: Record<strin
     return new Response(null, { status: 304, headers });
   }
   headers["Content-Length"] = String(body.byteLength);
-  return new Response(req.method === "HEAD" ? null : body, { status: 200, headers });
+  return new Response(
+    req.method === "HEAD" ? null : (body as unknown as BodyInit),
+    {
+      status: 200,
+      headers,
+    },
+  );
 }

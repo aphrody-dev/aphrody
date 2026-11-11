@@ -23,13 +23,18 @@ function sha256Hex(bytes: Uint8Array): string {
   return new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
 }
 
-export function dllCandidates(env: Record<string, string | undefined> = process.env): string[] {
-  return [env.RUST_STACK_FFI_DLL, join(homedir(), ".local", "bin", "rust_stack_ffi.dll")].filter(
-    (p): p is string => Boolean(p),
-  );
+export function dllCandidates(
+  env: Record<string, string | undefined> = process.env,
+): string[] {
+  return [
+    env.RUST_STACK_FFI_DLL,
+    join(homedir(), ".local", "bin", "rust_stack_ffi.dll"),
+  ].filter((p): p is string => Boolean(p));
 }
 
-export function loadFfiBlake3(candidates: string[] = dllCandidates()): HexFn | null {
+export function loadFfiBlake3(
+  candidates: string[] = dllCandidates(),
+): HexFn | null {
   for (const path of candidates) {
     if (!existsSync(path)) continue;
     try {
@@ -42,12 +47,21 @@ export function loadFfiBlake3(candidates: string[] = dllCandidates()): HexFn | n
       const fn: HexFn = (bytes) => {
         const out = new Uint8Array(128);
         const input = bytes.byteLength ? bytes : new Uint8Array(1);
-        const n = lib.symbols.rs_blake3_hex(ptr(input), BigInt(bytes.byteLength), ptr(out), BigInt(out.byteLength));
+        const n = lib.symbols.rs_blake3_hex(
+          ptr(input),
+          BigInt(bytes.byteLength),
+          ptr(out),
+          BigInt(out.byteLength),
+        );
         if (n !== 64) throw new Error(`rs_blake3_hex returned ${n}`);
         return new TextDecoder().decode(out.subarray(0, 64));
       };
       // Self-check against the BLAKE3 test vector for the empty input.
-      if (fn(new Uint8Array(0)) !== "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262") continue;
+      if (
+        fn(new Uint8Array(0)) !==
+        "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262"
+      )
+        continue;
       return fn;
     } catch {
       /* DLL unusable: try next candidate, then fall back */

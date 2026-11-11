@@ -40,12 +40,16 @@ export function normalizeQuery(raw: string | null | undefined): string {
   return (raw || "").replace(/\s+/g, " ").trim().slice(0, MAX_QUERY_LENGTH);
 }
 
-export function localFallback(query: string, locale: Locale = "fr"): GeminiSearchResult {
+export function localFallback(
+  query: string,
+  locale: Locale = "fr",
+): GeminiSearchResult {
   const q = query.toLowerCase();
   const words = q.split(" ").filter((w) => w.length > 2);
   const scored = VERTICALS.map((v) => {
     const hub = v[locale];
-    const hay = `${v.slug} ${hub.title} ${hub.description} ${hub.intro}`.toLowerCase();
+    const hay =
+      `${v.slug} ${hub.title} ${hub.description} ${hub.intro}`.toLowerCase();
     return { v, score: words.filter((w) => hay.includes(w)).length };
   })
     .filter((s) => s.score > 0)
@@ -55,7 +59,9 @@ export function localFallback(query: string, locale: Locale = "fr"): GeminiSearc
     title: s.v[locale].title,
     url: `${SITE_URL}${locale === "fr" ? "" : "/en"}/search/${s.v.slug}`,
   }));
-  const suggestions = getSuggestions(query).slice(0, 5);
+  const suggestions = getSuggestions(query)
+    .slice(0, 5)
+    .map((s) => s.text);
   const lines: string[] = [];
   if (scored.length) {
     lines.push(
@@ -63,7 +69,8 @@ export function localFallback(query: string, locale: Locale = "fr"): GeminiSearc
         ? `Rubriques Aphrody liées à "${query}" :`
         : `Aphrody topics related to "${query}":`,
     );
-    for (const s of scored) lines.push(`- ${s.v[locale].title}: ${s.v[locale].description}`);
+    for (const s of scored)
+      lines.push(`- ${s.v[locale].title}: ${s.v[locale].description}`);
   } else {
     lines.push(
       locale === "fr"
@@ -72,7 +79,10 @@ export function localFallback(query: string, locale: Locale = "fr"): GeminiSearc
     );
   }
   if (suggestions.length) {
-    lines.push((locale === "fr" ? "Suggestions : " : "Suggestions: ") + suggestions.join(", "));
+    lines.push(
+      (locale === "fr" ? "Suggestions : " : "Suggestions: ") +
+        suggestions.join(", "),
+    );
   }
   return {
     query,
@@ -105,30 +115,37 @@ export async function geminiSearch(
   if (!key) return localFallback(query, locale);
   const model = (env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL).trim();
   try {
-    const res = await fetchImpl(`${GEMINI_BASE}/${encodeURIComponent(model)}:generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                text:
-                  (locale === "fr" ? "Réponds en français, de façon concise et factuelle. " : "Answer concisely and factually. ") +
-                  query,
-              },
-            ],
-          },
-        ],
-        tools: [{ google_search: {} }],
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
+    const res = await fetchImpl(
+      `${GEMINI_BASE}/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text:
+                    (locale === "fr"
+                      ? "Réponds en français, de façon concise et factuelle. "
+                      : "Answer concisely and factually. ") + query,
+                },
+              ],
+            },
+          ],
+          tools: [{ google_search: {} }],
+        }),
+        signal: AbortSignal.timeout(8000),
+      },
+    );
     if (!res.ok) return localFallback(query, locale);
     const data = (await res.json()) as GeminiApiResponse;
     const cand = data.candidates?.[0];
-    const text = (cand?.content?.parts || []).map((p) => p.text || "").join("").trim();
+    const text = (cand?.content?.parts || [])
+      .map((p) => p.text || "")
+      .join("")
+      .trim();
     if (!text) return localFallback(query, locale);
     const seen = new Set<string>();
     const citations: GeminiCitation[] = [];
@@ -155,7 +172,12 @@ export async function geminiSearch(
 
 /* Simple per-client token bucket: protects the API key quota. */
 const buckets = new Map<string, { n: number; t: number }>();
-export function rateLimited(client: string, limit = 30, windowMs = 60_000, now = Date.now()): boolean {
+export function rateLimited(
+  client: string,
+  limit = 30,
+  windowMs = 60_000,
+  now = Date.now(),
+): boolean {
   const b = buckets.get(client);
   if (!b || now - b.t > windowMs) {
     buckets.set(client, { n: 1, t: now });
@@ -178,25 +200,45 @@ function sse(event: string, data: unknown): Uint8Array {
   return enc.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-export async function handleGeminiSearch(req: Request, opts: GeminiHandlerOptions): Promise<Response> {
+export async function handleGeminiSearch(
+  req: Request,
+  opts: GeminiHandlerOptions,
+): Promise<Response> {
   const url = new URL(req.url);
   const query = normalizeQuery(url.searchParams.get("q"));
   const locale: Locale = url.searchParams.get("hl") === "en" ? "en" : "fr";
-  const base = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
+  const base = {
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+  };
   if (!query) {
-    return Response.json({ error: "missing_query", message: "Provide ?q=" }, { status: 400, headers: base });
+    return Response.json(
+      { error: "missing_query", message: "Provide ?q=" },
+      { status: 400, headers: base },
+    );
   }
   if (opts.client && rateLimited(opts.client)) {
-    return Response.json({ error: "rate_limited" }, { status: 429, headers: { ...base, "Retry-After": "60" } });
+    return Response.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { ...base, "Retry-After": "60" } },
+    );
   }
   const wantsSse =
-    url.searchParams.get("stream") === "1" || (req.headers.get("accept") || "").includes("text/event-stream");
+    url.searchParams.get("stream") === "1" ||
+    (req.headers.get("accept") || "").includes("text/event-stream");
   const result = await geminiSearch(query, opts.env, locale, opts.fetchImpl);
   if (!wantsSse) return Response.json(result, { headers: base });
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
-      controller.enqueue(sse("meta", { query, grounded: result.grounded, source: result.source, model: result.model }));
+      controller.enqueue(
+        sse("meta", {
+          query,
+          grounded: result.grounded,
+          source: result.source,
+          model: result.model,
+        }),
+      );
       const words = result.answer.split(/(\s+)/);
       let chunk = "";
       for (const w of words) {
@@ -213,6 +255,10 @@ export async function handleGeminiSearch(req: Request, opts: GeminiHandlerOption
     },
   });
   return new Response(stream, {
-    headers: { ...base, "Content-Type": "text/event-stream; charset=utf-8", Connection: "keep-alive" },
+    headers: {
+      ...base,
+      "Content-Type": "text/event-stream; charset=utf-8",
+      Connection: "keep-alive",
+    },
   });
 }

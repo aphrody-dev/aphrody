@@ -97,13 +97,24 @@ export function buildCsp(cfg: GoogleConfig): string {
   }
   if (cfg.gtm) frame.push("https://www.googletagmanager.com");
   if (cfg.ads || cfg.adsense) {
-    script.push("https://googleads.g.doubleclick.net", "https://www.googleadservices.com");
+    script.push(
+      "https://googleads.g.doubleclick.net",
+      "https://www.googleadservices.com",
+    );
     connect.push("https://googleads.g.doubleclick.net");
   }
   if (cfg.adsense) {
-    script.push("https://pagead2.googlesyndication.com", "https://partner.googleadservices.com", "https://tpc.googlesyndication.com");
+    script.push(
+      "https://pagead2.googlesyndication.com",
+      "https://partner.googleadservices.com",
+      "https://tpc.googlesyndication.com",
+    );
     connect.push("https://pagead2.googlesyndication.com");
-    frame.push("https://googleads.g.doubleclick.net", "https://tpc.googlesyndication.com", "https://pagead2.googlesyndication.com");
+    frame.push(
+      "https://googleads.g.doubleclick.net",
+      "https://tpc.googlesyndication.com",
+      "https://pagead2.googlesyndication.com",
+    );
   }
   if (cfg.srv) connect.push(cfg.srv);
   return [

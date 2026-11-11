@@ -160,7 +160,7 @@ export class StoreApp {
         <p class="pkg-desc">${pkg.description}</p>
         <div class="pkg-meta-row">
           <span class="meta-item">${renderMaterialSymbol("tune", 14)} ${pkg.category}</span>
-          <span class="meta-item">★ ${pkg.stars || 100}</span>
+          <span class="meta-item">${pkg.stars || 100} stars</span>
           ${pkg.sandboxed ? '<span class="badge-sandboxed">Sandboxed</span>' : ""}
         </div>
         <div class="pkg-stack-recommendation">

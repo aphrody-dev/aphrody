@@ -223,8 +223,5 @@ function m3Vars(t: MaterialThemeTokens): string {
 export function getMaterialCssSubset(): string {
   const light = m3Vars(MATERIAL_LIGHT_TOKENS);
   const dark = m3Vars(MATERIAL_DARK_TOKENS);
-  return (
-    `:root{${light}}` +
-    `[data-theme="dark"]{${dark}}`
-  );
+  return `:root{${light}}` + `[data-theme="dark"]{${dark}}`;
 }

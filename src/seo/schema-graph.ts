@@ -55,7 +55,10 @@ export function buildPageGraph(o: PageGraphOptions): Record<string, unknown> {
       publisher: { "@id": ORG_ID },
       potentialAction: {
         "@type": "SearchAction",
-        target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/search?q={search_term_string}` },
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+        },
         "query-input": "required name=search_term_string",
       },
     },
@@ -119,7 +122,10 @@ export function buildPageGraph(o: PageGraphOptions): Record<string, unknown> {
     graph.push({
       "@type": "Dataset",
       "@id": `${SITE_URL}/#dataset-benchmarks`,
-      name: o.locale === "fr" ? "Micro-benchmarks runtime Aphrody" : "Aphrody runtime micro-benchmarks",
+      name:
+        o.locale === "fr"
+          ? "Micro-benchmarks runtime Aphrody"
+          : "Aphrody runtime micro-benchmarks",
       description:
         o.locale === "fr"
           ? "Mesures calculées à la demande par /api/bnc ; les valeurs varient selon la machine."
@@ -128,7 +134,11 @@ export function buildPageGraph(o: PageGraphOptions): Record<string, unknown> {
       creator: { "@id": ORG_ID },
       isAccessibleForFree: true,
       distribution: [
-        { "@type": "DataDownload", encodingFormat: "application/json", contentUrl: `${SITE_URL}/api/bnc` },
+        {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: `${SITE_URL}/api/bnc`,
+        },
       ],
     });
   }

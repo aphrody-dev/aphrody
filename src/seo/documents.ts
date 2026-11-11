@@ -37,14 +37,21 @@ const NS_SITEMAP = "http://www.sitemaps.org/schemas/sitemap/0.9";
 const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n';
 
 export function xmlEscape(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function alternates(frPath: string): string {
   const links = LOCALES.map(
-    (l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE_URL}${localizedPath(frPath, l)}"/>`,
+    (l) =>
+      `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE_URL}${localizedPath(frPath, l)}"/>`,
   );
-  links.push(`<xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${localizedPath(frPath, "fr")}"/>`);
+  links.push(
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${localizedPath(frPath, "fr")}"/>`,
+  );
   return links.join("");
 }
 
@@ -76,18 +83,29 @@ export function buildSitemaps(buildDate: string): Record<string, string> {
   const imageUrl = (path: string, l: Locale) =>
     `<url><loc>${SITE_URL}${localizedPath(path, l)}</loc><image:image><image:loc>${SITE_URL}/og-image.jpg</image:loc></image:image></url>`;
   const imagePaths = [...g.core, ...g.verticals];
-  const images = imagePaths.flatMap((p) => LOCALES.map((l) => imageUrl(p, l))).join("\n");
+  const images = imagePaths
+    .flatMap((p) => LOCALES.map((l) => imageUrl(p, l)))
+    .join("\n");
 
   const files: Record<string, string> = {
     "sitemap-core.xml": urlset("", urlEntries(g.core, buildDate)),
     "sitemap-verticals.xml": urlset("", urlEntries(g.verticals, buildDate)),
     "sitemap-packages.xml": urlset("", urlEntries(g.packages, buildDate)),
-    "sitemap-news.xml": urlset(' xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"', newsItems),
-    "sitemap-images.xml": urlset(' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"', images),
+    "sitemap-news.xml": urlset(
+      ' xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"',
+      newsItems,
+    ),
+    "sitemap-images.xml": urlset(
+      ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"',
+      images,
+    ),
   };
   files["sitemap.xml"] =
     `${XML_HEAD}<sitemapindex xmlns="${NS_SITEMAP}">\n` +
-    SITEMAP_FILES.map((f) => `<sitemap><loc>${SITE_URL}/${f}</loc><lastmod>${buildDate}</lastmod></sitemap>`).join("\n") +
+    SITEMAP_FILES.map(
+      (f) =>
+        `<sitemap><loc>${SITE_URL}/${f}</loc><lastmod>${buildDate}</lastmod></sitemap>`,
+    ).join("\n") +
     "\n</sitemapindex>\n";
   return files;
 }
@@ -100,12 +118,23 @@ export function allIndexableUrls(): string[] {
   );
 }
 
-export const AI_CRAWLERS = ["Googlebot", "Google-Extended", "OAI-SearchBot", "ClaudeBot", "PerplexityBot"] as const;
+export const AI_CRAWLERS = [
+  "Googlebot",
+  "Google-Extended",
+  "OAI-SearchBot",
+  "ClaudeBot",
+  "PerplexityBot",
+] as const;
 const ROBOTS_DISALLOW = ["/g/", "/api/store/", "/api/seo/", "/api/gemini/"];
 
 export function robotsTxt(): string {
-  const rules = ["Allow: /", ...ROBOTS_DISALLOW.map((d) => `Disallow: ${d}`)].join("\n");
-  const groups = ["*", ...AI_CRAWLERS].map((ua) => `User-agent: ${ua}\n${rules}`);
+  const rules = [
+    "Allow: /",
+    ...ROBOTS_DISALLOW.map((d) => `Disallow: ${d}`),
+  ].join("\n");
+  const groups = ["*", ...AI_CRAWLERS].map(
+    (ua) => `User-agent: ${ua}\n${rules}`,
+  );
   return `${groups.join("\n\n")}\n\nSitemap: ${SITE_URL}/sitemap.xml\n`;
 }
 
@@ -119,7 +148,10 @@ export function llmsTxt(): string {
     "",
     "## Topic hubs",
     "",
-    ...VERTICALS.map((v) => `- [${v.en.title}](${SITE_URL}/en${verticalPath(v.slug)}): ${v.en.description}`),
+    ...VERTICALS.map(
+      (v) =>
+        `- [${v.en.title}](${SITE_URL}/en${verticalPath(v.slug)}): ${v.en.description}`,
+    ),
     "",
     "## Machine-readable endpoints",
     "",
@@ -144,7 +176,12 @@ export function llmsTxt(): string {
 export function llmsFullTxt(): string {
   const parts: string[] = [llmsTxt(), "# Full content", ""];
   for (const l of LOCALES) {
-    parts.push(`## ${l === "fr" ? "Français" : "English"}`, "", `${HOME[l].h1}: ${HOME[l].intro}`, "");
+    parts.push(
+      `## ${l === "fr" ? "Français" : "English"}`,
+      "",
+      `${HOME[l].h1}: ${HOME[l].intro}`,
+      "",
+    );
     for (const v of VERTICALS) {
       const h = v[l];
       parts.push(
@@ -158,7 +195,8 @@ export function llmsFullTxt(): string {
     parts.push(
       `### ${l === "fr" ? "Hubs de paquets" : "Package hubs"}`,
       ...PACKAGE_ECOSYSTEMS.map(
-        (e) => `- ${ECOSYSTEM_LABELS[e]}: ${SITE_URL}${localizedPath(packageHubPath(e), l)}`,
+        (e) =>
+          `- ${ECOSYSTEM_LABELS[e]}: ${SITE_URL}${localizedPath(packageHubPath(e), l)}`,
       ),
       "",
     );
@@ -192,10 +230,13 @@ export function agentJson(): Record<string, unknown> {
 export function webmcpJson(): Record<string, unknown> {
   return {
     name: "Aphrody",
-    description: "Read-only tools exposed to in-browser agents through navigator.modelContext.",
+    description:
+      "Read-only tools exposed to in-browser agents through navigator.modelContext.",
     url: SITE_URL + "/",
-    status: "discovery convention; the WebMCP API itself is a W3C Web Machine Learning CG draft and may change",
-    registration: "navigator.modelContext.registerTool / provideContext, feature-detected",
+    status:
+      "discovery convention; the WebMCP API itself is a W3C Web Machine Learning CG draft and may change",
+    registration:
+      "navigator.modelContext.registerTool / provideContext, feature-detected",
     tools: WEBMCP_TOOLS.map((t) => ({
       name: t.name,
       description: t.description,
@@ -248,10 +289,15 @@ export function humansTxt(buildDate: string): string {
 }
 
 /** IndexNow key: 8..128 chars [a-zA-Z0-9-]; env INDEXNOW_KEY, else derived deterministically. */
-export function indexNowKey(env: Record<string, string | undefined> = {}): string {
+export function indexNowKey(
+  env: Record<string, string | undefined> = {},
+): string {
   const k = (env.INDEXNOW_KEY || "").trim();
   if (/^[a-zA-Z0-9-]{8,128}$/.test(k)) return k;
-  return new Bun.CryptoHasher("sha256").update(`${SITE_URL}/indexnow`).digest("hex").slice(0, 32);
+  return new Bun.CryptoHasher("sha256")
+    .update(`${SITE_URL}/indexnow`)
+    .digest("hex")
+    .slice(0, 32);
 }
 
 export function indexNowPayload(key: string): Record<string, unknown> {
