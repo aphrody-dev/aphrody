@@ -8,7 +8,9 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["bun"]
   },
   "include": ["src", "server.ts", "build.ts", "tests", "edge"]
 }

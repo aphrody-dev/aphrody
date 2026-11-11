@@ -1,5 +1,5 @@
 /**
- * Bun Package Manager Driver (bun pm / bun install / bunx / bun pm fetch / bun pm cache)
+ * Bun Package Manager Driver (bun pm / bun install / bun pm fetch / bun pm cache)
  * 100% native oven-sh/bun (Full Rust) adapter with zero external npm dependencies
  */
 
