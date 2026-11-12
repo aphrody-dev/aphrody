@@ -1,12 +1,13 @@
-import { Header } from "./components/header";
+// SPDX-License-Identifier: Apache-2.0
 import { AppsPopover } from "./components/apps-popover";
+import { Footer } from "./components/footer";
+import { Header } from "./components/header";
+import { LanguageBar } from "./components/language-bar";
+import { LensModal } from "./components/lens-modal";
 import { Logo } from "./components/logo";
 import { SearchBar } from "./components/search-bar";
-import { LanguageBar } from "./components/language-bar";
-import { Footer } from "./components/footer";
 import { VoiceModal } from "./components/voice-modal";
-import { LensModal } from "./components/lens-modal";
-import { AdaptiveShell, ShellMode } from "./design/adaptive-shell";
+import { AdaptiveShell, type ShellMode } from "./design/adaptive-shell";
 import { WindowManager } from "./windowing/macos-window";
 
 export class App {
@@ -35,6 +36,7 @@ export class App {
     AdaptiveShell.injectStyles();
     this.initTheme();
     this.buildUI();
+    this.handleInitialRoute();
   }
 
   private initTheme(): void {
@@ -72,13 +74,129 @@ export class App {
     this.header.updateShellMode(next);
   }
 
+  public async openSearchWindow(query: string): Promise<void> {
+    const { ClusterSearchApp } = await import("./suite/cluster-search-app");
+    const app = new ClusterSearchApp(
+      query,
+      (suiteId) => void this.openAppWindow(suiteId),
+    );
+    this.windowManager.openWindow({
+      id: "win-cluster-search",
+      title: `Aphrody 3-VPS Search — ${query}`,
+      width: 920,
+      height: 600,
+      content: app.element,
+    });
+  }
+
   public async openAppWindow(appId: string): Promise<void> {
+    if (appId === "search") {
+      await this.openSearchWindow("aphrody");
+      return;
+    }
+
+    if (appId === "craft" || appId === "photos") {
+      const { CraftCloudApp } = await import("./suite/craft-cloud-app");
+      const craft = new CraftCloudApp(
+        appId === "photos" ? "photocraft" : "photocraft",
+      );
+      this.windowManager.openWindow({
+        id: "win-craft",
+        title:
+          "Craft Creative Cloud (PhotoCraft, VectorCraft, FigCraft, ShaderCraft, AudioCraft, CodeCraft)",
+        width: 960,
+        height: 600,
+        content: craft.element,
+        onClose: () => craft.destroy(),
+      });
+      return;
+    }
+
+    if (
+      appId === "docs" ||
+      appId === "sheets" ||
+      appId === "slides" ||
+      appId === "office"
+    ) {
+      const { FluentOfficeApp } = await import("./suite/fluent-office-app");
+      const tab =
+        appId === "sheets" ? "grid" : appId === "slides" ? "deck" : "word";
+      const office = new FluentOfficeApp(tab);
+      this.windowManager.openWindow({
+        id: "win-office",
+        title:
+          "Fluent UI 2 Office 365 — WordCraft (.docx), GridCraft (Formulas) & DeckCraft",
+        width: 940,
+        height: 600,
+        content: office.element,
+      });
+      return;
+    }
+
+    if (appId === "drive") {
+      const { SpacedriveApp } = await import("./suite/spacedrive-app");
+      const drive = new SpacedriveApp();
+      this.windowManager.openWindow({
+        id: "win-drive",
+        title: "Spacedrive VDFS — Blake3 Content-Addressed Storage (fr1 + fr2)",
+        width: 920,
+        height: 580,
+        content: drive.element,
+      });
+      return;
+    }
+
+    if (
+      appId === "mail" ||
+      appId === "gmail" ||
+      appId === "notes" ||
+      appId === "keep" ||
+      appId === "calendar" ||
+      appId === "contacts" ||
+      appId === "translate" ||
+      appId === "studio" ||
+      appId === "account" ||
+      appId === "workspace"
+    ) {
+      const { M3WorkspaceApp } = await import("./suite/m3-workspace-app");
+      const tabMap: Record<
+        string,
+        | "mail"
+        | "notes"
+        | "calendar"
+        | "contacts"
+        | "translate"
+        | "studio"
+        | "account"
+      > = {
+        mail: "mail",
+        gmail: "mail",
+        notes: "notes",
+        keep: "notes",
+        calendar: "calendar",
+        contacts: "contacts",
+        translate: "translate",
+        studio: "studio",
+        account: "account",
+        workspace: "mail",
+      };
+      const ws = new M3WorkspaceApp(tabMap[appId] || "mail");
+      this.windowManager.openWindow({
+        id: "win-m3-workspace",
+        title: "Aphrody Material 3 Workspace & Locally Uncensored Studio",
+        width: 940,
+        height: 600,
+        content: ws.element,
+      });
+      return;
+    }
+
     if (appId === "storytold") {
       const { StorytoldSuite } = await import("./suite/storytold-suite");
       const suite = new StorytoldSuite();
       this.windowManager.openWindow({
         id: "win-storytold",
-        title: "Storytold Creative Suite (WASM + WebGPU)",
+        title: "Storytold 3D & WebGPU Shaders",
         width: 960,
         height: 620,
         content: suite.element,
@@ -89,8 +207,7 @@ export class App {
       const store = new StoreApp();
       this.windowManager.openWindow({
         id: "win-store",
-        title:
-          "Universal Store & Awesome Converter (Play Store + Flathub + NixOS)",
+        title: "Universal Store & Awesome Converter (Flathub + NixOS + Bun)",
         width: 980,
         height: 640,
         content: store.element,
@@ -110,8 +227,19 @@ export class App {
     }
   }
 
+  private handleInitialRoute(): void {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    const suite = params.get("suite");
+    if (q) {
+      void this.openSearchWindow(q);
+    } else if (suite) {
+      void this.openAppWindow(suite);
+    }
+  }
+
   private buildUI(): void {
-    // 1. Window Container & Dock for macOS Window Manager
     this.windowContainer = document.createElement("div");
     this.windowContainer.className = "macos-window-stage";
     this.windowManager.setContainer(this.windowContainer);
@@ -120,28 +248,27 @@ export class App {
     this.dockElement.className = "macos-dock";
     this.windowManager.setDock(this.dockElement);
 
-    // 2. Modals
     this.appsPopover = new AppsPopover((appId) => {
-      this.openAppWindow(appId);
+      void this.openAppWindow(appId);
     });
 
     this.voiceModal = new VoiceModal((transcript) => {
       this.searchBar.setQueryAndSearch(transcript);
     });
-    this.lensModal = new LensModal();
+    this.lensModal = new LensModal((q) => {
+      void this.openSearchWindow(q);
+    });
 
-    // 3. Header
     this.header = new Header({
       onToggleApps: () => {
         this.appsPopover.toggle();
         this.header.setAppsActive(this.appsPopover.getIsOpen());
       },
-      onOpenAppWindow: (appId) => this.openAppWindow(appId),
+      onOpenAppWindow: (appId) => void this.openAppWindow(appId),
       onToggleShellMode: () => this.toggleShellMode(),
     });
     this.header.updateShellMode(this.adaptiveShell.getMode());
 
-    // 4. Main section (Pixel-perfect Google.com replica)
     const main = document.createElement("main");
     main.className = "google-main";
 
@@ -149,6 +276,8 @@ export class App {
     this.searchBar = new SearchBar({
       onOpenVoice: () => this.voiceModal.open(),
       onOpenLens: () => this.lensModal.open(),
+      onExecuteSearch: (q) => void this.openSearchWindow(q),
+      onOpenWorkspace: () => void this.openAppWindow("craft"),
     });
     this.languageBar = new LanguageBar();
 
@@ -156,10 +285,12 @@ export class App {
     main.appendChild(this.searchBar.element);
     main.appendChild(this.languageBar.element);
 
-    // 5. Footer
-    this.footer = new Footer(this.theme, () => this.toggleTheme());
+    this.footer = new Footer(
+      this.theme,
+      () => this.toggleTheme(),
+      (appId) => void this.openAppWindow(appId),
+    );
 
-    // Assemble root
     this.rootElement.appendChild(this.header.element);
     this.rootElement.appendChild(this.appsPopover.element);
     this.rootElement.appendChild(main);

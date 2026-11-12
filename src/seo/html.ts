@@ -455,7 +455,7 @@ export function renderSearchResults(
   cfg: GoogleConfig,
 ): string {
   const u = UI[locale];
-  const google = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+  const clusterApi = `/api/search?q=${encodeURIComponent(q)}`;
   const sug = suggestions.length
     ? `<h2>${u.suggestions}</h2><ul class="link-list">${suggestions.map((s) => `<li><a href="/search?q=${encodeURIComponent(s)}&amp;hl=${locale}">${esc(s)}</a></li>`).join("")}</ul>`
     : `<p>${u.noResults}</p>`;
@@ -464,7 +464,7 @@ export function renderSearchResults(
     : "";
   const main =
     `${searchForm(locale, "q", q)}<article><h1>${u.results} ${esc(q)}</h1>` +
-    `<p><a class="m3-btn" rel="nofollow noopener" href="${google}">${u.onGoogle}</a></p>${sug}${pk}</article>`;
+    `<p><a class="m3-btn" href="${clusterApi}">JSON RRF 3-VPS</a></p>${sug}${pk}</article>`;
   return renderDocument({
     locale,
     frPath: null,

@@ -16,6 +16,26 @@ import { handleGeminiSearch } from "./src/gemini/search";
 import { indexNowKey, indexNowPayload } from "./src/seo/documents";
 import { render404, renderSearchResults } from "./src/seo/html";
 import type { Locale } from "./src/seo/site";
+import {
+  buildDocxArchive,
+  buildIcsCalendar,
+  buildVcfContacts,
+  evaluateSpreadsheet,
+  translateSovereignText,
+} from "./src/backend/docx-ics-vcf";
+import {
+  getSharedSearchCluster,
+  probeLocalDaemons,
+  runLocalUncensoredCompletion,
+} from "./src/backend/local-studio";
+import {
+  applyWasmRgbaFilter,
+  assembleMiniWatToWasm,
+  optimizeVectorSvg,
+  synthesizePcmWav,
+  type PhotoFilterMode,
+} from "./src/backend/wasm-creative";
+import { SovereignWorkspaceDb } from "./src/backend/workspace-db";
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -33,6 +53,7 @@ function resolveDist(): string {
 
 const DIST_DIR = resolveDist();
 const storeManager = UniversalStoreManager.getInstance("var/store.sqlite");
+const workspaceDb = SovereignWorkspaceDb.getInstance("var/workspace.sqlite");
 const assets = new AssetStore(DIST_DIR);
 
 /** Google ids: runtime env first, else the config baked into dist/ by the build. */
@@ -62,7 +83,7 @@ const SECURITY_HEADERS: Record<string, string> = {
 
 /** CDNs (for example Cloudflare) can turn these Link headers into 103 Early Hints. */
 const LINK_HOME =
-  "</style.css>; rel=preload; as=style, </app.js>; rel=modulepreload, </boot.js>; rel=modulepreload, <https://fonts.googleapis.com>; rel=preconnect";
+  "</style.css>; rel=preload; as=style, </app.js>; rel=modulepreload, </boot.js>; rel=modulepreload";
 const LINK_PAGE =
   "</style.css>; rel=preload; as=style, </boot.js>; rel=modulepreload";
 
@@ -131,6 +152,289 @@ export const server = serve({
       const q = url.searchParams.get("q") || "";
       const suggestions = getSuggestions(q);
       return jsonResponse({ query: q, suggestions }, 200, req);
+    }
+
+    // 1b. API: 3-VPS Datacenter Search Cluster (RRF k=60 across fr1 + fr2 + usa)
+    if (pathname === "/api/search") {
+      const q = url.searchParams.get("q") || "";
+      const cat = url.searchParams.get("category") || "all";
+      const cluster = getSharedSearchCluster();
+      const result = await cluster.search(q, {
+        category: cat,
+        useUsaGrounding: true,
+      });
+      return jsonResponse(result, 200, req);
+    }
+
+    if (pathname === "/api/cluster/status") {
+      const probe = url.searchParams.get("probe") === "1";
+      const cluster = getSharedSearchCluster();
+      const status = await cluster.probeClusterHealth(probe);
+      return jsonResponse(status, 200, req);
+    }
+
+    if (pathname === "/api/crawl" && req.method === "POST") {
+      try {
+        const body = (await req.json()) as { url?: string; chromium?: boolean };
+        if (!body.url) return jsonResponse({ error: "missing url" }, 400, req);
+        const cluster = getSharedSearchCluster();
+        const crawled = await cluster.crawlAndIndexOnFr2(body.url, {
+          renderWithChromium: Boolean(body.chromium),
+        });
+        return jsonResponse(crawled, 200, req);
+      } catch (err: any) {
+        return jsonResponse({ error: String(err?.message || err) }, 400, req);
+      }
+    }
+
+    // 1c. API: Craft Creative Cloud (WASM RGBA, SVG Optimizer, PCM16 WAV, WAT->WASM)
+    if (pathname === "/api/craft/rgba" && req.method === "POST") {
+      try {
+        const body = (await req.json()) as {
+          rgbaBase64?: string;
+          mode?: PhotoFilterMode;
+        };
+        const raw = Uint8Array.fromBase64(body.rgbaBase64 || "");
+        const filtered = applyWasmRgbaFilter(raw, body.mode || "invert");
+        return jsonResponse(
+          {
+            mode: body.mode || "invert",
+            kernel: "wasm-linear-memory-v1",
+            rgbaBase64: Buffer.from(filtered).toString("base64"),
+          },
+          200,
+          req,
+        );
+      } catch (err: any) {
+        return jsonResponse({ error: String(err?.message || err) }, 400, req);
+      }
+    }
+
+    if (pathname === "/api/craft/svg-optimize" && req.method === "POST") {
+      const body = (await req.json()) as { svg?: string };
+      return jsonResponse(optimizeVectorSvg(body.svg || ""), 200, req);
+    }
+
+    if (pathname === "/api/craft/wav" && req.method === "GET") {
+      const freq = Number(url.searchParams.get("freq")) || 440;
+      const ms = Number(url.searchParams.get("ms")) || 320;
+      const wave = (url.searchParams.get("wave") || "harmonic") as
+        "sine" | "triangle" | "harmonic";
+      const wav = synthesizePcmWav(freq, ms, wave);
+      return new Response(new Uint8Array(wav), {
+        headers: {
+          "Content-Type": "audio/wav",
+          "Cache-Control": "no-store",
+          ...SECURITY_HEADERS,
+        },
+      });
+    }
+
+    if (pathname === "/api/craft/wat" && req.method === "POST") {
+      try {
+        const body = (await req.json()) as {
+          wat?: string;
+          args?: [number, number];
+        };
+        const compiled = assembleMiniWatToWasm(
+          body.wat || "",
+          body.args || [6, 7],
+        );
+        return jsonResponse(
+          {
+            exportName: compiled.exportName,
+            result: compiled.result,
+            byteLength: compiled.wasmBytes.byteLength,
+            hexPreview: compiled.hexPreview,
+          },
+          200,
+          req,
+        );
+      } catch (err: any) {
+        return jsonResponse({ error: String(err?.message || err) }, 400, req);
+      }
+    }
+
+    // 1d. API: Fluent 2 Office Suite (WordCraft .docx, GridCraft Zero-Eval Formulas, SQLite Docs)
+    if (pathname === "/api/office/docs") {
+      if (req.method === "POST") {
+        const body = (await req.json()) as {
+          id?: string;
+          kind?: "word" | "grid" | "deck";
+          title?: string;
+          payload?: unknown;
+        };
+        workspaceDb.saveOfficeDoc(
+          body.id || `doc-${Date.now()}`,
+          body.kind || "word",
+          body.title || "Untitled",
+          body.payload ?? {},
+        );
+        return jsonResponse({ saved: true }, 200, req);
+      }
+      const kind = url.searchParams.get("kind") || undefined;
+      return jsonResponse({ docs: workspaceDb.listOfficeDocs(kind) }, 200, req);
+    }
+
+    if (pathname === "/api/office/docx" && req.method === "POST") {
+      const body = (await req.json()) as { title?: string; body?: string };
+      const zip = buildDocxArchive(
+        body.title || "Aphrody Document",
+        body.body || "",
+      );
+      return new Response(new Uint8Array(zip), {
+        headers: {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "Content-Disposition": 'attachment; filename="aphrody-document.docx"',
+          ...SECURITY_HEADERS,
+        },
+      });
+    }
+
+    if (pathname === "/api/office/formula" && req.method === "POST") {
+      const body = (await req.json()) as { cells?: Record<string, string> };
+      const evaluated = evaluateSpreadsheet(body.cells || {});
+      return jsonResponse({ evaluated }, 200, req);
+    }
+
+    // 1e. API: Spacedrive VDFS (sd:// Blake3 CAS)
+    if (pathname === "/api/spacedrive/files") {
+      if (req.method === "POST") {
+        const body = (await req.json()) as {
+          location?: string;
+          virtualPath?: string;
+          name?: string;
+          mimeType?: string;
+          tags?: string[];
+          content?: string;
+        };
+        const entry = workspaceDb.upsertSpacedriveFile({
+          location: body.location || "sd://eu-fr1-nvme",
+          virtualPath:
+            body.virtualPath || `/Workspace/${body.name || "untitled.txt"}`,
+          name: body.name || "untitled.txt",
+          mimeType: body.mimeType || "text/plain",
+          tags: body.tags || ["workspace"],
+          content: body.content || "",
+        });
+        return jsonResponse({ entry }, 200, req);
+      }
+      const q = url.searchParams.get("q") || "";
+      const loc = url.searchParams.get("location") || "all";
+      return jsonResponse(
+        { files: workspaceDb.listSpacedriveFiles(q, loc) },
+        200,
+        req,
+      );
+    }
+
+    // 1f. API: Sovereign M3 Workspace (Mail, Notes, Calendar .ics, Contacts .vcf, Translate, Argon2id Account)
+    if (pathname === "/api/workspace/mail") {
+      if (req.method === "POST") {
+        const body = (await req.json()) as {
+          recipient?: string;
+          subject?: string;
+          body?: string;
+        };
+        const sent = workspaceDb.sendMail(
+          body.recipient || "contact@aphrody.com",
+          body.subject || "Message",
+          body.body || "",
+        );
+        return jsonResponse({ sent }, 200, req);
+      }
+      return jsonResponse({ mail: workspaceDb.listMail() }, 200, req);
+    }
+
+    if (pathname === "/api/workspace/notes") {
+      if (req.method === "POST") {
+        const body = (await req.json()) as {
+          title?: string;
+          content?: string;
+          colorHex?: string;
+        };
+        const note = workspaceDb.addNote(
+          body.title || "Note",
+          body.content || "",
+          body.colorHex,
+        );
+        return jsonResponse({ note }, 200, req);
+      }
+      return jsonResponse({ notes: workspaceDb.listNotes() }, 200, req);
+    }
+
+    if (pathname === "/api/workspace/events") {
+      return jsonResponse({ events: workspaceDb.listEvents() }, 200, req);
+    }
+
+    if (pathname === "/api/workspace/events.ics") {
+      const ics = buildIcsCalendar(workspaceDb.listEvents());
+      return new Response(ics, {
+        headers: {
+          "Content-Type": "text/calendar; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="aphrody-calendar.ics"',
+          ...SECURITY_HEADERS,
+        },
+      });
+    }
+
+    if (pathname === "/api/workspace/contacts") {
+      return jsonResponse({ contacts: workspaceDb.listContacts() }, 200, req);
+    }
+
+    if (pathname === "/api/workspace/contacts.vcf") {
+      const vcf = buildVcfContacts(workspaceDb.listContacts());
+      return new Response(vcf, {
+        headers: {
+          "Content-Type": "text/vcard; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="aphrody-contacts.vcf"',
+          ...SECURITY_HEADERS,
+        },
+      });
+    }
+
+    if (pathname === "/api/workspace/translate" && req.method === "POST") {
+      const body = (await req.json()) as {
+        text?: string;
+        from?: "fr" | "en";
+        to?: "fr" | "en";
+      };
+      const tr = translateSovereignText(
+        body.text || "",
+        body.from || "fr",
+        body.to || "en",
+      );
+      return jsonResponse(tr, 200, req);
+    }
+
+    if (pathname === "/api/workspace/account" && req.method === "POST") {
+      const body = (await req.json()) as {
+        email?: string;
+        password?: string;
+        displayName?: string;
+      };
+      if (!body.email || !body.password) {
+        return jsonResponse({ error: "email and password required" }, 400, req);
+      }
+      const auth = await workspaceDb.registerOrVerifyAccount(
+        body.email,
+        body.password,
+        body.displayName,
+      );
+      return jsonResponse(auth, 200, req);
+    }
+
+    // 1g. API: Locally Uncensored Studio Router
+    if (pathname === "/api/studio/daemons") {
+      const daemons = await probeLocalDaemons();
+      return jsonResponse({ daemons }, 200, req);
+    }
+
+    if (pathname === "/api/studio/complete" && req.method === "POST") {
+      const body = (await req.json()) as { prompt?: string };
+      const res = await runLocalUncensoredCompletion(body.prompt || "");
+      return jsonResponse(res, 200, req);
     }
 
     // 2. Health check (short: /ok, legacy: /healthz, /api/health)

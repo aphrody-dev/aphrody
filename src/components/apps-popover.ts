@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
 import {
-  GOOGLE_APPS,
   APHRODY_SYSTEM_APPS,
+  SOVEREIGN_WORKSPACE_APPS,
   getAppIconSvg,
-  GoogleApp,
+  type GoogleApp,
 } from "../data/apps";
 
 export class AppsPopover {
@@ -15,7 +16,7 @@ export class AppsPopover {
     this.element = document.createElement("div");
     this.element.className = "apps-popover";
     this.element.setAttribute("role", "dialog");
-    this.element.setAttribute("aria-label", "Applications Google & Aphrody");
+    this.element.setAttribute("aria-label", "Applications Aphrody Workspace");
     this.render();
     this.attachEvents();
   }
@@ -24,18 +25,15 @@ export class AppsPopover {
     const grid = document.createElement("div");
     grid.className = "apps-grid";
 
-    // 1. Google Official Apps
-    GOOGLE_APPS.forEach((app) => {
+    SOVEREIGN_WORKSPACE_APPS.forEach((app) => {
       grid.appendChild(this.createAppItem(app, false));
     });
 
-    // 2. Divider
     const divider = document.createElement("div");
     divider.className = "apps-grid-divider";
-    divider.innerHTML = "<span>Aphrody Suite & Outils</span>";
+    divider.innerHTML = "<span>Système, Store &amp; Benchmarks</span>";
     grid.appendChild(divider);
 
-    // 3. Aphrody System Apps
     APHRODY_SYSTEM_APPS.forEach((app) => {
       grid.appendChild(this.createAppItem(app, true));
     });
@@ -47,10 +45,6 @@ export class AppsPopover {
     const a = document.createElement("a");
     a.className = `app-item ${isSystem ? "system-app-item" : ""}`;
     a.href = app.url;
-    if (!isSystem) {
-      a.target = "_blank";
-      a.rel = "noreferrer";
-    }
     a.setAttribute("aria-label", app.name);
 
     const iconWrap = document.createElement("div");
@@ -64,13 +58,11 @@ export class AppsPopover {
     a.appendChild(iconWrap);
     a.appendChild(name);
 
-    if (isSystem) {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.close();
-        this.onSelectAppCb?.(app.id);
-      });
-    }
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.close();
+      this.onSelectAppCb?.(app.id);
+    });
 
     return a;
   }
@@ -95,11 +87,8 @@ export class AppsPopover {
   }
 
   public toggle(): void {
-    if (this.isOpen) {
-      this.close();
-    } else {
-      this.open();
-    }
+    if (this.isOpen) this.close();
+    else this.open();
   }
 
   public open(): void {

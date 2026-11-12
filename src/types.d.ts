@@ -32,10 +32,17 @@ declare module "bun:test" {
 declare module "bun:sqlite" {
   export class Database {
     constructor(path?: string, options?: any);
-    run(query: string, params?: any): any;
-    query(query: string): any;
-    prepare(query: string): any;
-    transaction(fn: (...args: any[]) => any): any;
+    exec(query: string): void;
+    run(query: string, ...params: any[]): any;
+    query<ReturnType = any, ParamsType = any>(
+      query: string,
+    ): {
+      all(...params: any[]): ReturnType[];
+      get(...params: any[]): ReturnType | null;
+      run(...params: any[]): any;
+    };
+    prepare<ReturnType = any, ParamsType = any>(query: string): any;
+    transaction<T extends (...args: any[]) => any>(fn: T): T;
     close(): void;
   }
 }

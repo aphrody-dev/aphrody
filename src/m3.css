@@ -170,3 +170,20 @@ body > main.google-main {
     animation: none;
   }
 }
+
+.aphrody-brand-hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 92px;
+  cursor: pointer;
+  user-select: none;
+}
+.aphrody-brand-wordmark {
+  font-size: 56px;
+  line-height: 64px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--text-color);
+}

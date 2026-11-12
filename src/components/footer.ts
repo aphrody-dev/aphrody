@@ -1,13 +1,22 @@
+// SPDX-License-Identifier: Apache-2.0
+/**
+ * Aphrody Sovereign Footer
+ * Zero external third-party tracking/support redirects; links exclusively to internal sovereign hubs & tools.
+ */
+
 export class Footer {
   public element: HTMLElement;
   private settingsMenu!: HTMLDivElement;
   private themeStatusSpan!: HTMLSpanElement;
   private isSettingsOpen = false;
+  private onOpenSuite?: (appId: string) => void;
 
   constructor(
     private currentTheme: "light" | "dark",
     private onToggleTheme: () => void,
+    onOpenSuite?: (appId: string) => void,
   ) {
+    this.onOpenSuite = onOpenSuite;
     this.element = document.createElement("footer");
     this.element.className = "google-footer";
     this.render();
@@ -15,57 +24,48 @@ export class Footer {
   }
 
   private render(): void {
-    // 1. Top row: France
     const topRow = document.createElement("div");
     topRow.className = "footer-top";
     const locSpan = document.createElement("span");
     locSpan.className = "footer-location";
-    locSpan.textContent = "France";
+    locSpan.textContent = "France · EU Sovereign Cluster (fr1 + fr2 + usa)";
     topRow.appendChild(locSpan);
 
-    // 2. Bottom row
     const bottomRow = document.createElement("div");
     bottomRow.className = "footer-bottom";
 
-    // Left links
     const leftCol = document.createElement("div");
     leftCol.className = "footer-left";
     leftCol.innerHTML = `
-      <a href="https://about.aphrody.com" class="footer-link" target="_blank" rel="noreferrer">À propos</a>
-      <a href="https://www.google.com/intl/fr_fr/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpafooter&fg=1" class="footer-link" target="_blank" rel="noreferrer">Publicité</a>
-      <a href="https://www.google.com/services/?subid=ww-ww-et-g-awa-a-g_hpbfoot1_1!o2&utm_source=google.com&utm_medium=referral&utm_campaign=google_hpbfooter&fg=1" class="footer-link" target="_blank" rel="noreferrer">Entreprise</a>
-      <a href="https://google.com/search/howsearchworks/?fg=1" class="footer-link" target="_blank" rel="noreferrer">Comment fonctionne la recherche Google ?</a>
+      <a href="/search/web" class="footer-link">Architecture Recherche</a>
+      <a href="/search/packages" class="footer-link">Catalogue de Paquets</a>
+      <a href="/search/benchmarks" class="footer-link">Benchmarks LTO &amp; WASM</a>
+      <a href="/llms.txt" class="footer-link">Protocole LLMs.txt</a>
     `;
 
-    // Center climate link
     const centerCol = document.createElement("div");
     centerCol.className = "footer-center";
     centerCol.innerHTML = `
-      <a href="https://sustainability.google/intl/fr_fr/?utm_source=googlehpfooter&utm_medium=housepromos&utm_campaign=bottom-footer" class="footer-link climate-link" target="_blank" rel="noreferrer">
-        <svg class="leaf-icon" viewBox="0 0 24 24">
+      <a href="/search/desktop-ui" class="footer-link climate-link">
+        <svg class="leaf-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="#34a853" d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/>
         </svg>
-        <span>Notre troisième décennie d'action pour le climat</span>
+        <span>Pure Bun v1.4.4 Full-Rust · Zéro dépendance externe</span>
       </a>
     `;
 
-    // Right links & settings
     const rightCol = document.createElement("div");
     rightCol.className = "footer-right";
 
-    const privacyLink = document.createElement("a");
-    privacyLink.href = "https://policies.google.com/privacy?hl=fr&fg=1";
-    privacyLink.className = "footer-link";
-    privacyLink.target = "_blank";
-    privacyLink.rel = "noreferrer";
-    privacyLink.textContent = "Confidentialité";
+    const securityLink = document.createElement("a");
+    securityLink.href = "/.well-known/security.txt";
+    securityLink.className = "footer-link";
+    securityLink.textContent = "Sécurité";
 
-    const termsLink = document.createElement("a");
-    termsLink.href = "https://policies.google.com/terms?hl=fr&fg=1";
-    termsLink.className = "footer-link";
-    termsLink.target = "_blank";
-    termsLink.rel = "noreferrer";
-    termsLink.textContent = "Conditions";
+    const humansLink = document.createElement("a");
+    humansLink.href = "/humans.txt";
+    humansLink.className = "footer-link";
+    humansLink.textContent = "Ingénierie";
 
     const settingsWrap = document.createElement("div");
     settingsWrap.className = "settings-wrapper";
@@ -80,17 +80,29 @@ export class Footer {
     this.settingsMenu.className = "settings-menu";
     this.settingsMenu.setAttribute("role", "menu");
     this.settingsMenu.innerHTML = `
-      <a href="https://www.google.com/preferences?hl=fr&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Paramètres de recherche</a>
-      <a href="https://www.google.com/advanced_search?hl=fr&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Recherche avancée</a>
-      <a href="https://www.google.com/history/privacyadvisor/search/unauth?utm_source=googlemenu&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Vos données dans la recherche Google</a>
-      <a href="https://www.google.com/history/optout?hl=fr&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Historique des recherches</a>
-      <a href="https://support.google.com/websearch/?p=ws_results_help&hl=fr&fg=1" class="settings-item" role="menuitem" target="_blank" rel="noreferrer">Aide sur la recherche</a>
+      <a href="/?suite=search" data-suite="search" class="settings-item" role="menuitem">Cluster Recherche 3-VPS</a>
+      <a href="/?suite=craft" data-suite="craft" class="settings-item" role="menuitem">Craft Creative Cloud (WASM)</a>
+      <a href="/?suite=docs" data-suite="docs" class="settings-item" role="menuitem">Fluent 2 Office (.docx &amp; Grid)</a>
+      <a href="/?suite=drive" data-suite="drive" class="settings-item" role="menuitem">Spacedrive VDFS (Blake3)</a>
+      <a href="/.well-known/webmcp.json" class="settings-item" role="menuitem">Manifeste WebMCP</a>
       <div class="settings-menu-divider"></div>
       <button type="button" class="settings-item theme-toggle-item" role="menuitem">
         <span>Thème sombre : </span>
         <span class="theme-status">${this.currentTheme === "dark" ? "Activé" : "Désactivé"}</span>
       </button>
     `;
+
+    for (const item of this.settingsMenu.querySelectorAll<HTMLAnchorElement>(
+      "a[data-suite]",
+    )) {
+      item.addEventListener("click", (ev) => {
+        if (this.onOpenSuite && item.dataset.suite) {
+          ev.preventDefault();
+          this.closeSettings();
+          this.onOpenSuite(item.dataset.suite);
+        }
+      });
+    }
 
     const themeToggleBtn = this.settingsMenu.querySelector(
       ".theme-toggle-item",
@@ -107,8 +119,8 @@ export class Footer {
     settingsWrap.appendChild(settingsBtn);
     settingsWrap.appendChild(this.settingsMenu);
 
-    rightCol.appendChild(privacyLink);
-    rightCol.appendChild(termsLink);
+    rightCol.appendChild(securityLink);
+    rightCol.appendChild(humansLink);
     rightCol.appendChild(settingsWrap);
 
     bottomRow.appendChild(leftCol);
@@ -143,11 +155,8 @@ export class Footer {
   }
 
   private toggleSettings(): void {
-    if (this.isSettingsOpen) {
-      this.closeSettings();
-    } else {
-      this.openSettings();
-    }
+    if (this.isSettingsOpen) this.closeSettings();
+    else this.openSettings();
   }
 
   private openSettings(): void {

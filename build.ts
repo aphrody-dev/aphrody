@@ -162,12 +162,21 @@ emit(
 );
 emit(
   "favicon.svg",
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#6750a4"/><circle cx="28" cy="28" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M37 37l13 13" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#0B57D0"/><path d="M32 14L49 48H40.6L37.1 40.4H26.9L23.4 48H15L32 14ZM29.6 34H34.4L32 28.2L29.6 34Z" fill="#FFFFFF"/><circle cx="48" cy="16" r="5" fill="#34A853"/></svg>',
 );
 const publicDir = join(ROOT, "public");
 if (existsSync(publicDir)) {
   for (const f of readdirSync(publicDir))
     copyFileSync(join(publicDir, f), join(DIST_DIR, f));
+}
+const petAtlasSrc = join(
+  ROOT,
+  "../../packages/google-design/assets/pets/sprites/spritesheet.webp",
+);
+if (existsSync(petAtlasSrc)) {
+  const petAtlasDst = join(DIST_DIR, "assets/pets/sprites/spritesheet.webp");
+  mkdirSync(dirname(petAtlasDst), { recursive: true });
+  copyFileSync(petAtlasSrc, petAtlasDst);
 }
 
 // 5. Pre-compress text assets (gzip + brotli) for in-memory serving.

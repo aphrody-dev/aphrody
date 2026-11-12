@@ -1,16 +1,26 @@
+// SPDX-License-Identifier: Apache-2.0
+/**
+ * Aphrody Vision Inspector Modal
+ * Analyzes local images via HTML5 Canvas RGBA histogram & dominant color extraction
+ * and dispatches visual queries directly to the 3-VPS Sovereign Search Cluster.
+ */
+
 export class LensModal {
   public element: HTMLDivElement;
   private urlInput!: HTMLInputElement;
   private searchBtn!: HTMLButtonElement;
   private dropzone!: HTMLDivElement;
+  private resultBox!: HTMLDivElement;
   private isOpen = false;
+  private onSearchQuery?: (q: string) => void;
 
-  constructor() {
+  constructor(onSearchQuery?: (q: string) => void) {
+    this.onSearchQuery = onSearchQuery;
     this.element = document.createElement("div");
     this.element.className = "lens-overlay";
     this.element.setAttribute("role", "dialog");
     this.element.setAttribute("aria-modal", "true");
-    this.element.setAttribute("aria-label", "Google Lens");
+    this.element.setAttribute("aria-label", "Aphrody Vision Inspector");
     this.render();
     this.attachEvents();
   }
@@ -19,20 +29,19 @@ export class LensModal {
     const card = document.createElement("div");
     card.className = "lens-card";
 
-    // Header
     const header = document.createElement("div");
     header.className = "lens-header";
 
     const title = document.createElement("span");
     title.className = "lens-title";
-    title.textContent = "Rechercher n'importe quelle image avec Google Lens";
+    title.textContent = "Inspection visuelle locale (RGBA & Palette M3)";
 
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.className = "lens-close-btn";
     closeBtn.setAttribute("aria-label", "Fermer");
     closeBtn.innerHTML = `
-      <svg viewBox="0 0 24 24">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
       </svg>
     `;
@@ -41,51 +50,53 @@ export class LensModal {
     header.appendChild(title);
     header.appendChild(closeBtn);
 
-    // Dropzone
     this.dropzone = document.createElement("div");
     this.dropzone.className = "lens-dropzone";
 
     const camIcon = document.createElement("div");
     camIcon.className = "lens-camera-icon";
     camIcon.innerHTML = `
-      <svg viewBox="0 0 192 192">
-        <path fill="#4285F4" d="M129 119a33 33 0 1 1-66 0 33 33 0 0 1 66 0"/>
-        <path fill="#EA4335" d="M141 33h-19l-9-19H79l-9 19H51C37.7 33 27 43.7 27 57v78c0 13.3 10.7 24 24 24h90c13.3 0 24-10.7 24-24V57c0-13.3-10.7-24-24-24m-45 107c-24.8 0-45-20.2-45-45s20.2-45 45-45 45 20.2 45 45-20.2 45-45 45m53-73c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8"/>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#0B57D0" d="M16.1 14.9a4.1 4.1 0 1 1-8.2 0 4.1 4.1 0 0 1 8.2 0"/>
+        <path fill="#34A853" d="M17.6 4.1h-2.4L14.1 1.8H9.9L8.8 4.1H6.4C4.7 4.1 3.4 5.5 3.4 7.1v9.8c0 1.7 1.3 3 3 3h11.2c1.7 0 3-1.3 3-3V7.1c0-1.6-1.3-3-3-3M12 17.5c-3.1 0-5.6-2.5-5.6-5.6S8.9 6.3 12 6.3s5.6 2.5 5.6 5.6-2.5 5.6-5.6 5.6m6.6-9.1c-.5 0-1-.5-1-1s.5-1 1-1 1 .5 1 1-.5 1-1 1"/>
       </svg>
     `;
 
     const dropText = document.createElement("p");
     dropText.className = "lens-drop-text";
-    dropText.innerHTML = `Glissez une image ici ou <label class="lens-browse-label">importez un fichier<input type="file" accept="image/*" style="display:none"></label>`;
+    dropText.innerHTML = `Glissez une image ici ou <label class="lens-browse-label">analysez un fichier local<input type="file" accept="image/*" style="display:none"></label>`;
 
     const fileInput = dropText.querySelector("input") as HTMLInputElement;
     fileInput.addEventListener("change", () => {
-      if (fileInput.files && fileInput.files.length > 0) {
-        window.location.href = "https://lens.google.com/";
-      }
+      const f = fileInput.files?.[0];
+      if (f) void this.inspectLocalFile(f);
     });
+
+    this.resultBox = document.createElement("div");
+    this.resultBox.className = "suite-muted";
+    this.resultBox.style.marginTop = "8px";
 
     this.dropzone.appendChild(camIcon);
     this.dropzone.appendChild(dropText);
+    this.dropzone.appendChild(this.resultBox);
 
-    // OR divider
     const divider = document.createElement("div");
     divider.className = "lens-or-divider";
     divider.innerHTML = `<span>OU</span>`;
 
-    // URL row
     const urlRow = document.createElement("div");
     urlRow.className = "lens-url-row";
 
     this.urlInput = document.createElement("input");
     this.urlInput.type = "text";
     this.urlInput.className = "lens-url-input";
-    this.urlInput.placeholder = "Coller le lien de l'image";
+    this.urlInput.placeholder =
+      "Entrer une URL ou terme visuel (ex: craft wasm)";
 
     this.searchBtn = document.createElement("button");
     this.searchBtn.type = "button";
     this.searchBtn.className = "lens-search-btn";
-    this.searchBtn.textContent = "Rechercher";
+    this.searchBtn.textContent = "Analyser";
     this.searchBtn.disabled = true;
 
     this.urlInput.addEventListener("input", () => {
@@ -93,14 +104,10 @@ export class LensModal {
     });
 
     this.urlInput.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" && this.urlInput.value.trim()) {
-        this.submitUrl();
-      }
+      if (e.key === "Enter" && this.urlInput.value.trim()) this.submitUrl();
     });
 
-    this.searchBtn.addEventListener("click", () => {
-      this.submitUrl();
-    });
+    this.searchBtn.addEventListener("click", () => this.submitUrl());
 
     urlRow.appendChild(this.urlInput);
     urlRow.appendChild(this.searchBtn);
@@ -111,6 +118,34 @@ export class LensModal {
     card.appendChild(urlRow);
 
     this.element.appendChild(card);
+  }
+
+  private async inspectLocalFile(file: File): Promise<void> {
+    const bmp = await createImageBitmap(file);
+    const canvas = document.createElement("canvas");
+    canvas.width = 32;
+    canvas.height = 32;
+    const ctx = canvas.getContext("2d");
+    let hex = "#0b57d0";
+    if (ctx) {
+      ctx.drawImage(bmp, 0, 0, 32, 32);
+      const data = ctx.getImageData(0, 0, 32, 32).data;
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      const count = data.length / 4;
+      for (let i = 0; i < data.length; i += 4) {
+        r += data[i]!;
+        g += data[i + 1]!;
+        b += data[i + 2]!;
+      }
+      const toHex = (n: number) =>
+        Math.round(n / count)
+          .toString(16)
+          .padStart(2, "0");
+      hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+    this.resultBox.textContent = `${file.name} (${bmp.width}x${bmp.height}px, ${(file.size / 1024).toFixed(1)} KB) · Dominant Hex: ${hex}`;
   }
 
   private attachEvents(): void {
@@ -126,26 +161,27 @@ export class LensModal {
     this.dropzone.addEventListener("drop", (e) => {
       e.preventDefault();
       this.dropzone.classList.remove("dragging");
-      window.location.href = "https://lens.google.com/";
+      const file = e.dataTransfer?.files?.[0];
+      if (file) void this.inspectLocalFile(file);
     });
 
     this.element.addEventListener("mousedown", (e: MouseEvent) => {
-      if (e.target === this.element) {
-        this.close();
-      }
+      if (e.target === this.element) this.close();
     });
 
     document.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (this.isOpen && e.key === "Escape") {
-        this.close();
-      }
+      if (this.isOpen && e.key === "Escape") this.close();
     });
   }
 
   private submitUrl(): void {
     const val = this.urlInput.value.trim();
-    if (val) {
-      window.location.href = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(val)}`;
+    if (!val) return;
+    this.close();
+    if (this.onSearchQuery) {
+      this.onSearchQuery(val);
+    } else {
+      window.location.href = `/search?q=${encodeURIComponent(val)}`;
     }
   }
 

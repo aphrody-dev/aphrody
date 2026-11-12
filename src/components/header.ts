@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { renderMaterialSymbol } from "../design/material-tokens";
 import type { ShellMode } from "../design/adaptive-shell";
 
@@ -31,11 +32,11 @@ export class Header {
   }
 
   private render(): void {
-    // Left side: Mode & Quick Shortcuts (for Desktop / Fluent / M3)
     const leftNav = document.createElement("div");
     leftNav.className = "header-left-tools";
 
     this.modeBtn = document.createElement("button");
+    this.modeBtn.type = "button";
     this.modeBtn.className = "header-tool-btn mode-switcher-btn";
     this.modeBtn.title =
       "Basculer le mode de design (Classic / Fluent 2 / Material 3)";
@@ -47,62 +48,86 @@ export class Header {
       this.callbacks.onToggleShellMode();
     });
 
-    const storeQuickBtn = document.createElement("button");
-    storeQuickBtn.className = "header-tool-btn";
-    storeQuickBtn.title =
-      "Ouvrir Universal Store (Play Store + Flathub + NixOS)";
-    storeQuickBtn.innerHTML = `${renderMaterialSymbol("storefront", 16)} <span class="hide-mobile">Store</span>`;
-    storeQuickBtn.addEventListener("click", () =>
-      this.callbacks.onOpenAppWindow("store"),
-    );
-
-    const storyQuickBtn = document.createElement("button");
-    storyQuickBtn.className = "header-tool-btn";
-    storyQuickBtn.title = "Ouvrir Storytold WASM/WebGPU Suite";
-    storyQuickBtn.innerHTML = `${renderMaterialSymbol("palette", 16)} <span class="hide-mobile">Storytold</span>`;
-    storyQuickBtn.addEventListener("click", () =>
-      this.callbacks.onOpenAppWindow("storytold"),
-    );
-
-    const benchQuickBtn = document.createElement("button");
-    benchQuickBtn.className = "header-tool-btn";
-    benchQuickBtn.title = "Ouvrir Stack Benchmark & Auto-Picker";
-    benchQuickBtn.innerHTML = `${renderMaterialSymbol("speed", 16)} <span class="hide-mobile">Benchmark</span>`;
-    benchQuickBtn.addEventListener("click", () =>
-      this.callbacks.onOpenAppWindow("bench"),
-    );
+    const quickItems: Array<{
+      id: string;
+      icon: string;
+      label: string;
+      title: string;
+    }> = [
+      {
+        id: "craft",
+        icon: "palette",
+        label: "Craft Cloud",
+        title: "Ouvrir Craft Creative Cloud (WASM + WebGPU)",
+      },
+      {
+        id: "docs",
+        icon: "code",
+        label: "Office 365",
+        title: "Ouvrir Fluent 2 Office (WordCraft, GridCraft, DeckCraft)",
+      },
+      {
+        id: "drive",
+        icon: "storefront",
+        label: "Spacedrive",
+        title: "Ouvrir Spacedrive VDFS (Blake3 CAS)",
+      },
+      {
+        id: "studio",
+        icon: "rocket_launch",
+        label: "Local Studio",
+        title: "Ouvrir Locally Uncensored Studio",
+      },
+      {
+        id: "bench",
+        icon: "speed",
+        label: "Benchmark",
+        title: "Ouvrir Stack Benchmark & Picker",
+      },
+    ];
 
     leftNav.appendChild(this.modeBtn);
-    leftNav.appendChild(storeQuickBtn);
-    leftNav.appendChild(storyQuickBtn);
-    leftNav.appendChild(benchQuickBtn);
+    for (const item of quickItems) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "header-tool-btn";
+      btn.title = item.title;
+      btn.innerHTML = `${renderMaterialSymbol(item.icon, 16)} <span class="hide-mobile">${item.label}</span>`;
+      btn.addEventListener("click", () =>
+        this.callbacks.onOpenAppWindow(item.id),
+      );
+      leftNav.appendChild(btn);
+    }
 
-    // Right side: Authentic Google Navigation
     const nav = document.createElement("div");
     nav.className = "google-header-right";
 
-    const gmailLink = document.createElement("a");
-    gmailLink.className = "header-link";
-    gmailLink.href = "https://mail.google.com/";
-    gmailLink.target = "_blank";
-    gmailLink.rel = "noreferrer";
-    gmailLink.textContent = "Gmail";
+    const mailLink = document.createElement("a");
+    mailLink.className = "header-link";
+    mailLink.href = "/?suite=mail";
+    mailLink.textContent = "Mail";
+    mailLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.callbacks.onOpenAppWindow("mail");
+    });
 
-    const imagesLink = document.createElement("a");
-    imagesLink.className = "header-link";
-    imagesLink.href = "https://www.google.com/imghp?hl=fr";
-    imagesLink.target = "_blank";
-    imagesLink.rel = "noreferrer";
-    imagesLink.textContent = "Images";
+    const photosLink = document.createElement("a");
+    photosLink.className = "header-link";
+    photosLink.href = "/?suite=photos";
+    photosLink.textContent = "PhotoCraft";
+    photosLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.callbacks.onOpenAppWindow("photos");
+    });
 
     this.appsBtn = document.createElement("button");
     this.appsBtn.type = "button";
     this.appsBtn.className = "apps-button";
-    this.appsBtn.setAttribute("aria-label", "Applications Google & Aphrody");
-    this.appsBtn.setAttribute("title", "Applications Google & Aphrody");
+    this.appsBtn.setAttribute("aria-label", "Applications Aphrody Workspace");
+    this.appsBtn.setAttribute("title", "Applications Aphrody Workspace");
     this.appsBtn.setAttribute("aria-haspopup", "dialog");
     this.appsBtn.innerHTML = `
-      <svg class="apps-icon" focusable="false" viewBox="0 0 24 24">
+      <svg class="apps-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"/>
       </svg>
     `;
@@ -112,13 +137,15 @@ export class Header {
 
     const signInBtn = document.createElement("a");
     signInBtn.className = "sign-in-btn";
-    signInBtn.href = "https://accounts.google.com/signin";
-    signInBtn.target = "_blank";
-    signInBtn.rel = "noreferrer";
-    signInBtn.textContent = "Connexion";
+    signInBtn.href = "/?suite=account";
+    signInBtn.textContent = "Compte";
+    signInBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.callbacks.onOpenAppWindow("account");
+    });
 
-    nav.appendChild(gmailLink);
-    nav.appendChild(imagesLink);
+    nav.appendChild(mailLink);
+    nav.appendChild(photosLink);
     nav.appendChild(this.appsBtn);
     nav.appendChild(signInBtn);
 
@@ -137,10 +164,7 @@ export class Header {
   }
 
   public setAppsActive(active: boolean): void {
-    if (active) {
-      this.appsBtn.classList.add("active");
-    } else {
-      this.appsBtn.classList.remove("active");
-    }
+    if (active) this.appsBtn.classList.add("active");
+    else this.appsBtn.classList.remove("active");
   }
 }

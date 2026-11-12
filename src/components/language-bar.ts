@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0
+/**
+ * Sovereign Locale & Translation Switcher
+ * Zero external *.google.com/setprefs links — navigates first-party locales and Sovereign M3 Translate.
+ */
 export class LanguageBar {
   public element: HTMLDivElement;
 
@@ -9,10 +14,10 @@ export class LanguageBar {
 
   private render(): void {
     this.element.innerHTML = `
-      <span>Google disponible en : </span>
-      <a href="https://www.google.com/setprefs?sig=0_aX...&hl=fr" class="lang-link">Français</a>
-      <a href="https://www.google.com/setprefs?sig=0_aX...&hl=en" class="lang-link">English</a>
-      <a href="https://www.google.com/setprefs?sig=0_aX...&hl=es" class="lang-link">Español</a>
+      <span>Aphrody disponible en : </span>
+      <a href="/" class="lang-link">Français</a>
+      <a href="/en" class="lang-link">English</a>
+      <a href="/#suite=m3:translate" class="lang-link">Traduction</a>
     `;
   }
 }
