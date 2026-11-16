@@ -22,7 +22,7 @@ jobs:
     if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || contains('gpui-kit nsh bun', github.event.inputs.target)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,51 +36,22 @@ jobs:
           git submodule update --remote --merge vendor/bun || true
       - name: Sync gpui-component skills & docs into unified plugin
         if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'gpui-kit'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 - << 'PY'
-          import json, os, subprocess, urllib.request
-          plugin = ".agents/plugins/gpui-os"
-          tree_raw = subprocess.check_output(["gh", "api", "repos/longbridge/gpui-component/git/trees/main?recursive=1"])
-          tree = json.loads(tree_raw)["tree"]
-          for node in tree:
-              if node["type"] != "blob":
-                  continue
-              p = node["path"]
-              if p.startswith("skills/"):
-                  dest = os.path.join(plugin, p)
-              elif p.startswith("docs/"):
-                  dest = os.path.join(plugin, "docs", "gpui-kit", p[len("docs/"):])
-              else:
-                  continue
-              os.makedirs(os.path.dirname(dest), exist_ok=True)
-              content = subprocess.check_output(["gh", "api", f"repos/longbridge/gpui-component/contents/{p}?ref=main", "-H", "Accept: application/vnd.github.raw"])
-              with open(dest, "wb") as f:
-                  f.write(content)
-          PY
+          rm -rf /tmp/gpui-component
+          git clone --depth=1 https://github.com/longbridge/gpui-component.git /tmp/gpui-component
+          mkdir -p .agents/plugins/gpui-os/skills .agents/plugins/gpui-os/docs/gpui-kit
+          cp -r /tmp/gpui-component/skills/. .agents/plugins/gpui-os/skills/
+          cp -r /tmp/gpui-component/docs/. .agents/plugins/gpui-os/docs/gpui-kit/
+          rm -rf /tmp/gpui-component
       - name: Sync NSH docs & references
         if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'nsh'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 - << 'PY'
-          import json, os, subprocess
-          tree_raw = subprocess.check_output(["gh", "api", "repos/longbridge/nsh/git/trees/main?recursive=1"])
-          tree = json.loads(tree_raw)["tree"]
-          for node in tree:
-              if node["type"] != "blob":
-                  continue
-              p = node["path"]
-              if p.startswith("docs/"):
-                  sub = p[len("docs/"):]
-                  for base in ("docs/nsh", ".agents/plugins/gpui-os/docs/nsh"):
-                      dest = os.path.join(base, sub)
-                      os.makedirs(os.path.dirname(dest), exist_ok=True)
-                      content = subprocess.check_output(["gh", "api", f"repos/longbridge/nsh/contents/{p}?ref=main", "-H", "Accept: application/vnd.github.raw"])
-                      with open(dest, "wb") as f:
-                          f.write(content)
-          PY
+          rm -rf /tmp/nsh
+          git clone --depth=1 https://github.com/longbridge/nsh.git /tmp/nsh
+          mkdir -p docs/nsh .agents/plugins/gpui-os/docs/nsh
+          cp -r /tmp/nsh/docs/. docs/nsh/
+          cp -r /tmp/nsh/docs/. .agents/plugins/gpui-os/docs/nsh/
+          rm -rf /tmp/nsh
       - name: Create or update upstream-sync PR if changed
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,20 +79,30 @@ jobs:
     if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'zed' || github.event.inputs.target == 'wgpu'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 100
+          fetch-depth: 500
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Check vendored WGPU against upstream gfx-rs/wgpu
+        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'wgpu'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LOCAL_VER=$(grep -m1 '^version = ' vendor/wgpu/Cargo.toml | cut -d'"' -f2 || echo "unknown")
+          LATEST_TAG=$(gh api repos/gfx-rs/wgpu/releases/latest --jq '.tag_name' 2>/dev/null || echo "unknown")
+          TRUNK_SHA=$(gh api repos/gfx-rs/wgpu/commits/trunk --jq '.sha[0:12]' 2>/dev/null || echo "unknown")
+          echo "vendor/wgpu version=$LOCAL_VER, upstream latest release=$LATEST_TAG, trunk=$TRUNK_SHA"
       - name: Attempt clean zed-industries/zed sync PR or open conflict report
+        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'zed'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote add zed-upstream https://github.com/zed-industries/zed.git || true
-          git fetch zed-upstream main --depth=100
+          git fetch zed-upstream main --depth=500
           BRANCH="sync/zed-upstream"
           git checkout -B "$BRANCH"
           if git merge --no-commit --no-ff zed-upstream/main; then
@@ -137,6 +118,8 @@ jobs:
                   --body "Clean merge from zed-industries/zed main.\n\nRelease Notes:\n\n- N/A" \
                   --label "upstream-sync,zed,auto-merge"
               fi
+            else
+              echo "Already up to date with zed-industries/zed main."
             fi
           else
             git merge --abort || true
@@ -145,7 +128,9 @@ jobs:
             BODY="Upstream sync requires manual conflict resolution or selective cherry-pick (zed-industries/zed HEAD: \`$ZED_HEAD\`, latest gfx-rs/wgpu release: \`$WGPU_TAG\`)."
             EXISTING=$(gh issue list --repo "${{ github.repository }}" --label "upstream-sync" --state open --json number --jq '.[0].number' || true)
             if [ -n "$EXISTING" ]; then
-              gh issue comment "$EXISTING" --repo "${{ github.repository }}" --body "$BODY"
+              if ! gh issue view "$EXISTING" --repo "${{ github.repository }}" --json comments --jq '.comments[].body' | grep -Fq "$ZED_HEAD"; then
+                gh issue comment "$EXISTING" --repo "${{ github.repository }}" --body "$BODY"
+              fi
             else
               gh issue create --repo "${{ github.repository }}" --title "chore(sync): review upstream zed ($ZED_HEAD) & wgpu ($WGPU_TAG)" --body "$BODY" --label "upstream-sync,zed,wgpu"
             fi

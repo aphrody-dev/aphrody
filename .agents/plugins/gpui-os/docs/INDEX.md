@@ -11,8 +11,7 @@ Central reference hub for the `gpui-os` plugin (`.agents/plugins/gpui-os/`).
 | **Native Shell (NSH)** | [`nsh`](../skills/nsh/SKILL.md), [`nsh-design-guides`](../skills/nsh-design-guides/SKILL.md), [`bun-gpui`](../skills/bun-gpui/SKILL.md) | Hybrid Rust/TSX UI runtime, shaders, animations, Bun submodule docs |
 | **GPUI Kit Components** | [`gpui-kit`](../skills/gpui-kit/SKILL.md), [`gpui-kit-design-guides`](../skills/gpui-kit-design-guides/SKILL.md) | `longbridge/gpui-component` widget patterns, design system, 23 GPUI deep references |
 | **GPU & Shaders** | [`wgpu`](../skills/wgpu/SKILL.md), [`vulkan`](../skills/vulkan/SKILL.md), [`directx`](../skills/directx/SKILL.md), [`webgpu`](../skills/webgpu/SKILL.md) | Vendored WGPU/Naga v30, `gpui-wgpu` CLI, Vulkan/SPIR-V, DirectX 12/HLSL/DXC, WebGPU/WGSL |
-| **Hardware IHV & SIMD** | [`nvidia`](../skills/nvidia/SKILL.md), [`amd`](../skills/amd/SKILL.md), [`intel`](../skills/intel/SKILL.md) | NVIDIA Ada `sm_89`/CUDA/NVTX3, AMD RDNA3-4/AGS/RGA, Intel Xe/ISPC/Level Zero/OpenCL |
-| **Hardware & IHV** | [`nvidia`](../skills/nvidia/SKILL.md), [`amd`](../skills/amd/SKILL.md), [`intel`](../skills/intel/SKILL.md) | Ada Lovelace sm_89/CUDA 13/NVTX3, RDNA 3/Wavefronts/AGS SDK/RGA, Intel Arc Xe/AVX-512/Level Zero/ISPC |
+| **Hardware IHV & SIMD** | [`nvidia`](../skills/nvidia/SKILL.md), [`amd`](../skills/amd/SKILL.md), [`intel`](../skills/intel/SKILL.md) | NVIDIA Ada `sm_89`/CUDA 13/NVTX3, AMD RDNA 3-4/AGS SDK/RGA, Intel Arc Xe/AVX-512/Level Zero/OpenCL/ISPC |
 | **Brand & GitHub Ops** | [`aphrody-brand`](../skills/aphrody-brand/SKILL.md), [`github-ops`](../skills/github-ops/SKILL.md) | `product.toml` -> `crates/brand` + `xtask brand`, GitHub Wiki, upstream sync, auto-merge |
 
 ## Bundled Reference Trees (`docs/`)

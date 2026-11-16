@@ -15,8 +15,12 @@ jobs:
   approve-and-auto-merge:
     runs-on: ubuntu-latest
     if: >-
-      github.event_name == 'workflow_run' ||
       (
+        github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success'
+      ) ||
+      (
+        github.event_name == 'pull_request_target' &&
         !github.event.pull_request.draft &&
         github.event.pull_request.head.repo.full_name == github.repository &&
         (
@@ -33,23 +37,37 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          merge_pr() {
-            local pr="$1"
-            gh pr review "$pr" --repo "$REPO" --approve --body "Automated approval via gpui-os auto-merge workflow." || true
-            gh pr merge "$pr" --repo "$REPO" --auto --squash --delete-branch || true
-          }
-
           if [ "${{ github.event_name }}" = "pull_request_target" ]; then
-            merge_pr "${{ github.event.pull_request.number }}"
+            PR="${{ github.event.pull_request.number }}"
+            gh pr review "$PR" --repo "$REPO" --approve --body "Automated approval via gpui-os auto-merge workflow." || true
+            gh pr merge "$PR" --repo "$REPO" --auto --squash --delete-branch || true
           else
-            for pr in $(gh pr list --repo "$REPO" --state open --json number,isDraft,labels,headRepositoryOwner --jq '
-              .[]
-              | select(.isDraft == false)
-              | select(.headRepositoryOwner.login == "${{ github.repository_owner }}")
-              | select(.labels | map(.name) | any(. == "auto-merge" or . == "upstream-sync" or . == "issue-fix" or . == "dependencies"))
-              | .number
-            '); do
-              merge_pr "$pr"
+            PR_NUMBERS=$(gh pr list --repo "$REPO" --state open --json number,isDraft,headRefOid,labels,headRepositoryOwner,author | python3 -c '
+          import json, os, sys
+          prs = json.load(sys.stdin)
+          owner = os.environ["OWNER"]
+          run_sha = os.environ.get("RUN_SHA", "")
+          allowed = {"auto-merge", "upstream-sync", "issue-fix", "dependencies"}
+          bots = {"renovate[bot]", "dependabot[bot]", "app/renovate", "app/dependabot"}
+          for pr in prs:
+            if pr.get("isDraft"):
+              continue
+            if (pr.get("headRepositoryOwner") or {}).get("login") != owner:
+              continue
+            if run_sha and pr.get("headRefOid") != run_sha:
+              continue
+            labels = {l["name"] for l in pr.get("labels", [])}
+            author = (pr.get("author") or {}).get("login", "")
+            if labels & allowed or author in bots:
+              print(pr["number"])
+          ')
+            for PR in $PR_NUMBERS; do
+              gh pr review "$PR" --repo "$REPO" --approve --body "Automated approval via gpui-os auto-merge workflow." || true
+              gh pr merge "$PR" --repo "$REPO" --auto --squash --delete-branch \
+                || gh pr merge "$PR" --repo "$REPO" --squash --delete-branch \
+                || true
             done
           fi

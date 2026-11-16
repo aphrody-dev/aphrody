@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto-label issue or PR by subsystem and fix links
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -74,11 +74,12 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Read toolchain from rust-toolchain.toml
         id: rt
+        shell: bash
         run: echo "toolchain=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@master
         with:
