@@ -429,12 +429,14 @@ impl MTime {
     }
 }
 
+#[cfg(feature = "proto")]
 impl From<proto::Timestamp> for MTime {
     fn from(timestamp: proto::Timestamp) -> Self {
         MTime(timestamp.into())
     }
 }
 
+#[cfg(feature = "proto")]
 impl From<MTime> for proto::Timestamp {
     fn from(mtime: MTime) -> Self {
         mtime.0.into()

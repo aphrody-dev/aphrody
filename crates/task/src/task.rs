@@ -215,7 +215,11 @@ impl FromStr for VariableName {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let without_prefix = s.strip_prefix(ZED_VARIABLE_NAME_PREFIX).ok_or(())?;
+        let primary_prefix = format!("{}_", brand::ENV_PREFIX);
+        let without_prefix = s
+            .strip_prefix(&primary_prefix)
+            .or_else(|| s.strip_prefix(ZED_VARIABLE_NAME_PREFIX))
+            .ok_or(())?;
         let value = match without_prefix {
             "FILE" => Self::File,
             "FILENAME" => Self::Filename,

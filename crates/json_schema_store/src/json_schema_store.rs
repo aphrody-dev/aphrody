@@ -143,7 +143,8 @@ pub fn handle_schema_request(
     uri: String,
     cx: &mut AsyncApp,
 ) -> Task<Result<String>> {
-    let path = match uri.strip_prefix(SCHEMA_URI_PREFIX) {
+    let path = match brand::strip_app_url_scheme(&uri).and_then(|rest| rest.strip_prefix("schemas/"))
+    {
         Some(path) => path,
         None => return Task::ready(Err(anyhow::anyhow!("Invalid schema URI: {}", uri))),
     };
@@ -435,7 +436,9 @@ pub fn all_schema_file_associations(
         },
         {
             "fileMatch": [
-            paths::local_settings_file_relative_path()],
+                paths::local_settings_file_relative_path(),
+                paths::legacy_local_settings_file_relative_path(),
+            ],
             "url": format!("{SCHEMA_URI_PREFIX}project_settings"),
         },
         {
@@ -445,14 +448,16 @@ pub fn all_schema_file_associations(
         {
             "fileMatch": [
                 schema_file_match(paths::tasks_file()),
-                paths::local_tasks_file_relative_path()
+                paths::local_tasks_file_relative_path(),
+                paths::legacy_local_tasks_file_relative_path(),
             ],
             "url": format!("{SCHEMA_URI_PREFIX}tasks"),
         },
         {
             "fileMatch": [
                 schema_file_match(paths::debug_scenarios_file()),
-                paths::local_debug_file_relative_path()
+                paths::local_debug_file_relative_path(),
+                paths::legacy_local_debug_file_relative_path(),
             ],
             "url": format!("{SCHEMA_URI_PREFIX}debug_tasks"),
         },

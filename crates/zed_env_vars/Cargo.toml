@@ -17,4 +17,5 @@ doctest = false
 default = []
 
 [dependencies]
+brand.workspace = true
 env_var.workspace = true

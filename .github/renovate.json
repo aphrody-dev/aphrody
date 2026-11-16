@@ -4,20 +4,28 @@
     "config:recommended",
     ":semanticCommitsDisabled",
     ":separateMultipleMajorReleases",
-    ":dependencyDashboardApproval",
     "helpers:pinGitHubActionDigests",
     "group:serdeMonorepo"
   ],
   "dependencyDashboard": true,
-  "timezone": "America/New_York",
-  "schedule": ["after 3pm on Wednesday"],
+  "timezone": "UTC",
+  "schedule": ["before 6am on Monday"],
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "addLabels": ["dependencies", "auto-merge"],
   "prFooter": "Release Notes:\n\n- N/A",
-  "ignorePaths": ["**/node_modules/**"],
+  "ignorePaths": ["**/node_modules/**", "vendor/**"],
   "packageRules": [
     {
       "description": "Group wasmtime crates together.",
       "groupName": "wasmtime",
       "matchPackageNames": ["wasmtime{/,}**"]
+    },
+    {
+      "description": "Never auto-bump vendored wgpu crates outside vendor/wgpu.",
+      "matchPackageNames": ["wgpu{/,}**", "naga{/,}**"],
+      "enabled": false
     }
   ]
 }

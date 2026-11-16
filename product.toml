@@ -1,0 +1,48 @@
+# Single Source of Truth for Product Identity & Zed Ecosystem Compatibility.
+# Edit this manifest and run `cargo xtask brand apply` (verify with `cargo xtask brand check`)
+# to deterministically synchronize all binaries, bundles, icons, OS manifests, and runtime constants.
+
+[product]
+name = "Aphrody"
+slug = "aphrody"
+tagline = "GPU-native code & UI studio"
+description = "Ultra-fast, modular GPU-native code and UI studio, 100% compatible with the Zed ecosystem."
+authors = ["Aphrody Labs <dev@aphrody.com>"]
+company_name = "Aphrody Labs"
+copyright = "Copyright 2026 Aphrody Labs"
+identifier_prefix = "com.aphrody.Aphrody"
+windows_app_id_prefix = "Aphrody-Studio"
+url_scheme = "aphrody"
+cli_url_scheme = "aphrody-cli"
+dock_action_scheme = "aphrody-dock-action"
+legacy_url_schemes = ["zed"]
+legacy_cli_url_schemes = ["zed-cli"]
+legacy_dock_action_schemes = ["zed-dock-action"]
+
+[paths]
+local_settings_folder = ".aphrody"
+legacy_local_settings_folder = ".zed"
+remote_server_folder = ".aphrody_server"
+legacy_remote_server_folder = ".zed_server"
+remote_wsl_server_folder = ".aphrody_wsl_server"
+legacy_remote_wsl_server_folder = ".zed_wsl_server"
+
+[urls]
+homepage = "https://aphrody.com"
+repository = "https://github.com/aphrody-dev/gpui-os"
+docs = "https://docs.aphrody.com"
+server = "https://zed.dev"
+extension_registry = "https://api.zed.dev"
+
+[env]
+prefix = "APHRODY"
+legacy_prefix = "ZED"
+
+[fonts]
+sans_alias = ".AphrodySans"
+mono_alias = ".AphrodyMono"
+legacy_sans_alias = ".ZedSans"
+legacy_mono_alias = ".ZedMono"
+
+[assets]
+logo_svg = "assets/images/aphrody_logo.svg"

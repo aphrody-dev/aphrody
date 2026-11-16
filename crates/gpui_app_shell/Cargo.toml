@@ -1,0 +1,100 @@
+[package]
+name = "gpui_app_shell"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Production-ready GPUI application starter shell: docks, panes, command palette, keymaps, settings, SQLite persistence, and plugin registry."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/gpui_app_shell.rs"
+doctest = false
+
+[features]
+default = ["panels"]
+panels = [
+    "dep:project_panel",
+    "dep:outline_panel",
+    "dep:file_finder",
+    "dep:go_to_line",
+    "dep:tab_switcher",
+    "dep:tasks_ui",
+]
+nsh = [
+    "dep:nsh_workspace",
+    "gpui_ui/nsh-dev",
+    "gpui_ui/nsh-shader",
+    "gpui_ui/nsh-math",
+    "gpui_ui/nsh-tui",
+]
+nsh-webview = [
+    "nsh",
+    "nsh_workspace/webview",
+    "gpui_ui/nsh-webview",
+]
+test-support = [
+    "gpui_ui/test-support",
+    "gpui_code/test-support",
+    "workspace/test-support",
+    "db/test-support",
+]
+
+[[example]]
+name = "studio_starter"
+path = "examples/studio_starter.rs"
+
+[dependencies]
+activity_indicator.workspace = true
+anyhow.workspace = true
+breadcrumbs.workspace = true
+client.workspace = true
+clock.workspace = true
+command_palette.workspace = true
+command_palette_hooks.workspace = true
+db.workspace = true
+feature_flags.workspace = true
+fs.workspace = true
+futures.workspace = true
+gpui_code = { workspace = true, features = ["full"] }
+gpui_tokio.workspace = true
+gpui_ui.workspace = true
+http_client.workspace = true
+keymap_editor.workspace = true
+log.workspace = true
+node_runtime.workspace = true
+notifications.workspace = true
+nsh_workspace = { workspace = true, optional = true }
+paths.workspace = true
+picker.workspace = true
+platform_title_bar.workspace = true
+recent_projects.workspace = true
+release_channel.workspace = true
+reqwest_client.workspace = true
+semver.workspace = true
+session.workspace = true
+settings.workspace = true
+task.workspace = true
+theme_selector.workspace = true
+theme_settings.workspace = true
+title_bar.workspace = true
+ui_prompt.workspace = true
+util.workspace = true
+uuid.workspace = true
+watch.workspace = true
+which_key.workspace = true
+workspace.workspace = true
+zed_actions.workspace = true
+zed_credentials_provider.workspace = true
+zlog.workspace = true
+zlog_settings.workspace = true
+
+# Optional built-in workspace panels
+file_finder = { workspace = true, optional = true }
+go_to_line = { workspace = true, optional = true }
+outline_panel = { workspace = true, optional = true }
+project_panel = { workspace = true, optional = true }
+tab_switcher = { workspace = true, optional = true }
+tasks_ui = { workspace = true, optional = true }

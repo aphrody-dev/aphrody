@@ -1,4 +1,5 @@
 use collections::{HashMap, HashSet, VecDeque};
+#[cfg(feature = "edit-prediction")]
 use edit_prediction::EditPredictionStore;
 use editor::{Editor, EditorEvent, MultiBufferOffset, actions::MoveToEnd, scroll::Autoscroll};
 use gpui::{
@@ -391,9 +392,12 @@ impl LspLogView {
         (editor, vec![editor_subscription, search_subscription])
     }
     pub(crate) fn sync_copilot_for_project(&self, cx: &mut App) {
+        #[cfg(feature = "edit-prediction")]
         let server = EditPredictionStore::try_global(cx)
             .and_then(|store| store.read(cx).copilot_for_project(&self.project))
             .and_then(|copilot| copilot.read(cx).language_server().cloned());
+        #[cfg(not(feature = "edit-prediction"))]
+        let server = None;
         self.log_store.update(cx, |log_store, cx| {
             log_store.sync_copilot_for_project(&self.project.downgrade(), server, cx);
         });

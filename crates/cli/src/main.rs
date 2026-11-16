@@ -31,7 +31,14 @@ use walkdir::WalkDir;
 
 use std::io::IsTerminal;
 
-const URL_PREFIX: [&'static str; 5] = ["zed://", "http://", "https://", "file://", "ssh://"];
+const URL_PREFIX: [&'static str; 6] = [
+    brand::URL_SCHEME_PREFIX,
+    "zed://",
+    "http://",
+    "https://",
+    "file://",
+    "ssh://",
+];
 
 struct Detect;
 
@@ -48,21 +55,10 @@ trait InstalledApp {
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "zed",
+    name = brand::APP_SLUG,
     disable_version_flag = true,
-    before_help = "The Zed CLI binary.
-This CLI is a separate binary that invokes Zed.
-
-Examples:
-    `zed`
-          Simply opens Zed
-    `zed --foreground`
-          Runs in foreground (shows all logs)
-    `zed path-to-your-project`
-          Open your project in Zed
-    `zed -n path-to-file `
-          Open file/folder in a new window",
-    after_help = "To read from stdin, append '-', e.g. 'ps axf | zed -'"
+    before_help = "The Aphrody CLI binary (100% compatible with Zed CLI flags and URLs).",
+    after_help = "To read from stdin, append '-', e.g. 'ps axf | aphrody -'"
 )]
 struct Args {
     /// Wait for all of the given paths to be opened/closed before exiting.
@@ -106,8 +102,8 @@ struct Args {
     /// Run zed in the foreground (useful for debugging)
     #[arg(long)]
     foreground: bool,
-    /// Custom path to Zed.app or the zed binary
-    #[arg(long)]
+    /// Custom path to the application bundle or binary (`--aphrody` or `--zed`)
+    #[arg(long = "zed", visible_alias = "aphrody")]
     zed: Option<PathBuf>,
     /// Run zed in dev-server mode
     #[arg(long)]
@@ -539,8 +535,8 @@ fn run() -> Result<()> {
     }
 
     let (server, server_name) =
-        IpcOneShotServer::<IpcHandshake>::new().context("Handshake before Zed spawn")?;
-    let url = format!("zed-cli://{server_name}");
+        IpcOneShotServer::<IpcHandshake>::new().context("Handshake before app spawn")?;
+    let url = format!("{}{server_name}", brand::CLI_URL_SCHEME_PREFIX);
 
     let open_behavior = if args.new {
         cli::OpenBehavior::AlwaysNew
@@ -869,8 +865,14 @@ mod linux {
 
                 // libexec is the standard, lib/zed is for Arch (and other non-libexec distros),
                 // ./zed is for the target directory in development builds.
-                let possible_locations =
-                    ["../libexec/zed-editor", "../lib/zed/zed-editor", "./zed"];
+                let possible_locations = [
+                    "../libexec/aphrody-editor",
+                    "../lib/aphrody/aphrody-editor",
+                    "./aphrody",
+                    "../libexec/zed-editor",
+                    "../lib/zed/zed-editor",
+                    "./zed",
+                ];
                 possible_locations
                     .iter()
                     .find_map(|p| dir.join(p).canonicalize().ok().filter(|path| path != &cli))
@@ -907,7 +909,8 @@ mod linux {
                 .unwrap_or_else(|| paths::data_dir().clone());
 
             let sock_path = data_dir.join(format!(
-                "zed-{}.sock",
+                "{}-{}.sock",
+                brand::APP_SLUG,
                 *release_channel::RELEASE_CHANNEL_NAME
             ));
             let sock = UnixDatagram::unbound()?;
@@ -1237,7 +1240,13 @@ mod windows {
 
                 // ../Zed.exe is the standard, lib/zed is for MSYS2, ./zed.exe is for the target
                 // directory in development builds.
-                let possible_locations = ["../Zed.exe", "../lib/zed/zed-editor.exe", "./zed.exe"];
+                let possible_locations = [
+                    "../Aphrody.exe",
+                    "./aphrody.exe",
+                    "../Zed.exe",
+                    "../lib/zed/zed-editor.exe",
+                    "./zed.exe",
+                ];
                 possible_locations
                     .iter()
                     .find_map(|p| dir.join(p).canonicalize().ok().filter(|path| path != &cli))

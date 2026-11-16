@@ -7,7 +7,7 @@
 use std::process::Command;
 
 fn git_sha() -> Option<String> {
-    if let Ok(sha) = std::env::var("ZED_COMMIT_SHA") {
+    if let Ok(sha) = brand::env_var("COMMIT_SHA") {
         return Some(sha);
     }
 
@@ -44,10 +44,10 @@ const MANIFEST_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/resources/mani
 pub fn compile(manifest: bool) -> Result<(), Box<dyn std::error::Error>> {
     let channel = option_env!("RELEASE_CHANNEL").unwrap_or("dev");
     let (icon_filename, product_name) = match channel {
-        "stable" => ("app-icon.ico", "Zed"),
-        "preview" => ("app-icon-preview.ico", "Zed Preview"),
-        "nightly" => ("app-icon-nightly.ico", "Zed Nightly"),
-        _ => ("app-icon-dev.ico", "Zed Dev"),
+        "stable" => ("app-icon.ico", brand::APP_NAME),
+        "preview" => ("app-icon-preview.ico", brand::APP_NAME_PREVIEW),
+        "nightly" => ("app-icon-nightly.ico", brand::APP_NAME_NIGHTLY),
+        _ => ("app-icon-dev.ico", brand::APP_NAME_DEV),
     };
     let icon = std::path::PathBuf::from(ICON_DIR).join(icon_filename);
     let icon_escaped = icon.to_string_lossy().replace('\\', "\\\\");
@@ -100,8 +100,8 @@ BEGIN
             VALUE "FileVersion", "{pkg_version}\0"
             VALUE "ProductName", "{product_name}\0"
             VALUE "ProductVersion", "{product_version}\0"
-            VALUE "CompanyName", "Zed Industries, Inc.\0"
-            VALUE "LegalCopyright", "Copyright 2022 - 2025 Zed Industries, Inc.\0"
+            VALUE "CompanyName", "{company_name}\0"
+            VALUE "LegalCopyright", "{copyright}\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -109,7 +109,9 @@ BEGIN
         VALUE "Translation", 0x0409, 1200
     END
 END
-"#
+"#,
+        company_name = brand::COMPANY_NAME,
+        copyright = brand::COPYRIGHT,
     );
 
     let out_dir = std::path::PathBuf::from(std::env::var("OUT_DIR")?);

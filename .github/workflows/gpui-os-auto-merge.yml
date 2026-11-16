@@ -1,0 +1,55 @@
+name: gpui-os Auto Merge
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, ready_for_review]
+  workflow_run:
+    workflows: [gpui-os CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  approve-and-auto-merge:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_run' ||
+      (
+        !github.event.pull_request.draft &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        (
+          contains(github.event.pull_request.labels.*.name, 'auto-merge') ||
+          contains(github.event.pull_request.labels.*.name, 'upstream-sync') ||
+          contains(github.event.pull_request.labels.*.name, 'issue-fix') ||
+          contains(github.event.pull_request.labels.*.name, 'dependencies') ||
+          github.event.pull_request.user.login == 'renovate[bot]' ||
+          github.event.pull_request.user.login == 'dependabot[bot]'
+        )
+      )
+    steps:
+      - name: Approve and enable auto-merge for qualifying PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          merge_pr() {
+            local pr="$1"
+            gh pr review "$pr" --repo "$REPO" --approve --body "Automated approval via gpui-os auto-merge workflow." || true
+            gh pr merge "$pr" --repo "$REPO" --auto --squash --delete-branch || true
+          }
+
+          if [ "${{ github.event_name }}" = "pull_request_target" ]; then
+            merge_pr "${{ github.event.pull_request.number }}"
+          else
+            for pr in $(gh pr list --repo "$REPO" --state open --json number,isDraft,labels,headRepositoryOwner --jq '
+              .[]
+              | select(.isDraft == false)
+              | select(.headRepositoryOwner.login == "${{ github.repository_owner }}")
+              | select(.labels | map(.name) | any(. == "auto-merge" or . == "upstream-sync" or . == "issue-fix" or . == "dependencies"))
+              | .number
+            '); do
+              merge_pr "$pr"
+            done
+          fi

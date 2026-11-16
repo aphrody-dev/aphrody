@@ -2,17 +2,17 @@
 
 #![deny(missing_docs)]
 
-use std::{env, str::FromStr, sync::LazyLock};
+use std::{str::FromStr, sync::LazyLock};
 
 use gpui::{App, Global};
 use semver::Version;
 
-const ZED_DOCS_URL: &str = "https://zed.dev/docs";
+const ZED_DOCS_URL: &str = brand::DOCS_URL;
 
 /// stable | dev | nightly | preview
 pub static RELEASE_CHANNEL_NAME: LazyLock<String> = LazyLock::new(|| {
     if cfg!(debug_assertions) {
-        env::var("ZED_RELEASE_CHANNEL").unwrap_or_else(|_| compile_time_release_channel_name())
+        brand::env_var("RELEASE_CHANNEL").unwrap_or_else(|_| compile_time_release_channel_name())
     } else {
         compile_time_release_channel_name()
     }
@@ -22,10 +22,14 @@ pub static RELEASE_CHANNEL_NAME: LazyLock<String> = LazyLock::new(|| {
 /// library, it vendors each crate separately and builds it in isolation, which
 /// makes the `include_str!` fail.
 ///
-/// The build script checks for `$ZED_RELEASE_CHANNEL` and emits the `cfg`
+/// The build script checks for `$APHRODY_RELEASE_CHANNEL` / `$ZED_RELEASE_CHANNEL` and emits the `cfg`
 #[cfg(__do_not_set_zed_release_channel)]
 fn compile_time_release_channel_name() -> String {
-    env!("ZED_RELEASE_CHANNEL").trim().to_string()
+    option_env!("APHRODY_RELEASE_CHANNEL")
+        .or(option_env!("ZED_RELEASE_CHANNEL"))
+        .expect("APHRODY_RELEASE_CHANNEL or ZED_RELEASE_CHANNEL must be set")
+        .trim()
+        .to_string()
 }
 
 #[cfg(not(__do_not_set_zed_release_channel))]
@@ -44,10 +48,10 @@ pub static RELEASE_CHANNEL: LazyLock<ReleaseChannel> =
 #[cfg(target_os = "windows")]
 pub fn app_identifier() -> &'static str {
     match *RELEASE_CHANNEL {
-        ReleaseChannel::Dev => "Zed-Editor-Dev",
-        ReleaseChannel::Nightly => "Zed-Editor-Nightly",
-        ReleaseChannel::Preview => "Zed-Editor-Preview",
-        ReleaseChannel::Stable => "Zed-Editor-Stable",
+        ReleaseChannel::Dev => brand::WINDOWS_APP_ID_DEV,
+        ReleaseChannel::Nightly => brand::WINDOWS_APP_ID_NIGHTLY,
+        ReleaseChannel::Preview => brand::WINDOWS_APP_ID_PREVIEW,
+        ReleaseChannel::Stable => brand::WINDOWS_APP_ID_STABLE,
     }
 }
 
@@ -101,8 +105,8 @@ impl AppVersion {
         build_id: Option<&str>,
         commit_sha: Option<AppCommitSha>,
     ) -> Version {
-        let mut version: Version = if let Ok(from_env) = env::var("ZED_APP_VERSION") {
-            from_env.parse().expect("invalid ZED_APP_VERSION")
+        let mut version: Version = if let Ok(from_env) = brand::env_var("APP_VERSION") {
+            from_env.parse().expect("invalid APHRODY_APP_VERSION / ZED_APP_VERSION")
         } else {
             pkg_version.parse().expect("invalid version in Cargo.toml")
         };
@@ -205,10 +209,10 @@ impl ReleaseChannel {
     /// Returns the display name for this [`ReleaseChannel`].
     pub fn display_name(&self) -> &'static str {
         match self {
-            ReleaseChannel::Dev => "Zed Dev",
-            ReleaseChannel::Nightly => "Zed Nightly",
-            ReleaseChannel::Preview => "Zed Preview",
-            ReleaseChannel::Stable => "Zed",
+            ReleaseChannel::Dev => brand::APP_NAME_DEV,
+            ReleaseChannel::Nightly => brand::APP_NAME_NIGHTLY,
+            ReleaseChannel::Preview => brand::APP_NAME_PREVIEW,
+            ReleaseChannel::Stable => brand::APP_NAME,
         }
     }
 
@@ -224,13 +228,13 @@ impl ReleaseChannel {
 
     /// Returns the application ID that's used by Wayland as application ID
     /// and WM_CLASS on X11.
-    /// This also has to match the bundle identifier for Zed on macOS.
+    /// This also has to match the bundle identifier on macOS.
     pub fn app_id(&self) -> &'static str {
         match self {
-            ReleaseChannel::Dev => "dev.zed.Zed-Dev",
-            ReleaseChannel::Nightly => "dev.zed.Zed-Nightly",
-            ReleaseChannel::Preview => "dev.zed.Zed-Preview",
-            ReleaseChannel::Stable => "dev.zed.Zed",
+            ReleaseChannel::Dev => brand::IDENTIFIER_DEV,
+            ReleaseChannel::Nightly => brand::IDENTIFIER_NIGHTLY,
+            ReleaseChannel::Preview => brand::IDENTIFIER_PREVIEW,
+            ReleaseChannel::Stable => brand::IDENTIFIER_STABLE,
         }
     }
 
@@ -286,21 +290,22 @@ mod tests {
 
     #[test]
     fn test_docs_url_for_release_channel() {
+        let base = brand::DOCS_URL;
         assert_eq!(
             ReleaseChannel::Dev.docs_url("settings"),
-            "https://zed.dev/docs/nightly/settings"
+            format!("{base}/nightly/settings")
         );
         assert_eq!(
             ReleaseChannel::Nightly.docs_url("settings"),
-            "https://zed.dev/docs/nightly/settings"
+            format!("{base}/nightly/settings")
         );
         assert_eq!(
             ReleaseChannel::Preview.docs_url("settings"),
-            "https://zed.dev/docs/preview/settings"
+            format!("{base}/preview/settings")
         );
         assert_eq!(
             ReleaseChannel::Stable.docs_url("settings"),
-            "https://zed.dev/docs/settings"
+            format!("{base}/settings")
         );
     }
 }

@@ -1,4 +1,5 @@
 mod preview;
+#[cfg(feature = "repl")]
 mod repl_menu;
 
 use agent_settings::AgentSettings;
@@ -703,10 +704,13 @@ impl Render for QuickActionBar {
                 })
         };
 
-        h_flex()
+        let toolbar_bar = h_flex()
             .id("quick action bar")
-            .gap(DynamicSpacing::Base01.rems(cx))
-            .children(self.render_repl_menu(cx))
+            .gap(DynamicSpacing::Base01.rems(cx));
+        #[cfg(feature = "repl")]
+        let toolbar_bar = toolbar_bar.children(self.render_repl_menu(cx));
+
+        toolbar_bar
             .children(self.render_preview_button(cx))
             .children(search_button)
             .when(

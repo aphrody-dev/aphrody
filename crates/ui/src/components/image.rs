@@ -14,6 +14,7 @@ use crate::traits::transformable::Transformable;
 )]
 #[strum(serialize_all = "snake_case")]
 pub enum VectorName {
+    AphrodyLogo,
     BusinessStamp,
     VipStamp,
     Grid,
@@ -188,6 +189,10 @@ mod tests {
 
     #[test]
     fn vector_path() {
+        assert_eq!(
+            VectorName::AphrodyLogo.path().as_ref(),
+            "images/aphrody_logo.svg"
+        );
         assert_eq!(VectorName::ZedLogo.path().as_ref(), "images/zed_logo.svg");
     }
 }

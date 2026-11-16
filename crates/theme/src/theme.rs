@@ -78,6 +78,43 @@ pub trait ClientDecorationsExt: Styled {
 
 impl<T: Styled> ClientDecorationsExt for T {}
 
+/// Controls which leading visual indicator panels draw ahead of directory names.
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    serde::Serialize,
+    Deserialize,
+    schemars::JsonSchema,
+    PartialEq,
+    Eq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum FolderIndicator {
+    /// Show a folder icon.
+    #[default]
+    Icon,
+    /// Show a disclosure chevron.
+    Chevron,
+    /// Show a disclosure chevron followed by a folder icon.
+    Both,
+}
+
+impl FolderIndicator {
+    /// Whether the folder entry should display a disclosure chevron.
+    pub fn shows_chevron(self) -> bool {
+        matches!(self, Self::Chevron | Self::Both)
+    }
+
+    /// Whether the folder entry should display a directory icon.
+    pub fn shows_icon(self) -> bool {
+        matches!(self, Self::Icon | Self::Both)
+    }
+}
+
 /// The appearance of the theme.
 #[derive(Debug, PartialEq, Clone, Copy, Deserialize)]
 pub enum Appearance {

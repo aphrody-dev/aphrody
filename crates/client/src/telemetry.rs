@@ -1095,7 +1095,14 @@ mod tests {
 
     fn init_test(cx: &mut TestAppContext) {
         cx.update(|cx| {
-            let settings_store = SettingsStore::test(cx);
+            let mut settings_store = SettingsStore::test(cx);
+            settings_store.update_user_settings(cx, |settings| {
+                settings.telemetry = Some(settings::TelemetrySettingsContent {
+                    diagnostics: Some(true),
+                    metrics: Some(true),
+                    anthropic_retention: Some(false),
+                });
+            });
             cx.set_global(settings_store);
         });
     }

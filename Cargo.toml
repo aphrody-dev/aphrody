@@ -23,6 +23,7 @@ members = [
     "crates/bedrock",
     "crates/bench_metrics",
     "crates/benchmarks",
+    "crates/brand",
     "crates/breadcrumbs",
     "crates/buffer_diff",
     "crates/call",
@@ -35,7 +36,6 @@ members = [
     "crates/cloud_api_types",
     "crates/cloud_llm_client",
     "crates/codestral",
-    "crates/collab",
     "crates/collab_ui",
     "crates/collections",
     "crates/command_palette",
@@ -56,7 +56,6 @@ members = [
     "crates/deepseek",
     "crates/dev_container",
     "crates/diagnostics",
-    "crates/docs_preprocessor",
     "crates/edit_prediction",
     "crates/edit_prediction_cli",
     "crates/edit_prediction_context",
@@ -107,6 +106,9 @@ members = [
     "crates/gpui_web",
     "crates/gpui_wgpu",
     "crates/gpui_windows",
+    "crates/gpui_ui",
+    "crates/gpui_code",
+    "crates/gpui_app_shell",
     "crates/grammars",
     "crates/hang_telemetry",
     "crates/html_to_markdown",
@@ -152,6 +154,38 @@ members = [
     "crates/net",
     "crates/node_runtime",
     "crates/notifications",
+    "crates/nsh-base",
+    "crates/nsh-bundler",
+    "crates/nsh-cli",
+    "crates/nsh-core",
+    "crates/nsh-dev",
+    "crates/nsh-engine",
+    "crates/nsh-gpui-host",
+    "crates/nsh-i18n",
+    "crates/nsh-ios-app",
+    "crates/nsh-ios-host",
+    "crates/nsh-js",
+    "crates/nsh-linux-app",
+    "crates/nsh-linux-host",
+    "crates/nsh-macos-app",
+    "crates/nsh-macos-host",
+    "crates/nsh-macros",
+    "crates/nsh-package",
+    "crates/nsh-platform-android",
+    "crates/nsh-platform-apple",
+    "crates/nsh-platform-gpui",
+    "crates/nsh-platform-ios",
+    "crates/nsh-platform-linux",
+    "crates/nsh-platform-macos",
+    "crates/nsh-platform-tui",
+    "crates/nsh-platform-web",
+    "crates/nsh-platform-windows",
+    "crates/nsh-testing",
+    "crates/nsh-tui-host",
+    "crates/nsh-updater",
+    "crates/nsh-windows-app",
+    "crates/nsh-windows-host",
+    "crates/nsh_workspace",
     "crates/oauth_callback_server",
     "crates/ollama",
     "crates/onboarding",
@@ -239,6 +273,7 @@ members = [
     "crates/web_search",
     "crates/web_search_providers",
     "crates/which_key",
+    "crates/wgpu_cli",
     "crates/windows_resources",
     "crates/workspace",
     "crates/worktree",
@@ -273,11 +308,18 @@ members = [
     "tooling/perf",
     "tooling/xtask",
 ]
-default-members = ["crates/zed"]
+exclude = ["vendor/wgpu"]
+default-members = ["crates/gpui_ui", "crates/gpui_code", "crates/gpui_app_shell"]
 
 [workspace.package]
-publish = false
+version = "0.5.0"
 edition = "2024"
+rust-version = "1.97"
+license = "Apache-2.0"
+homepage = "https://aphrody.com"
+readme = "README.md"
+repository = "https://github.com/aphrody-dev/gpui-os"
+publish = false
 
 [workspace.dependencies]
 
@@ -304,6 +346,7 @@ auto_update = { path = "crates/auto_update" }
 auto_update_ui = { path = "crates/auto_update_ui" }
 aws_http_client = { path = "crates/aws_http_client" }
 bedrock = { path = "crates/bedrock" }
+brand = { path = "crates/brand" }
 breadcrumbs = { path = "crates/breadcrumbs" }
 buffer_diff = { path = "crates/buffer_diff" }
 call = { path = "crates/call" }
@@ -316,7 +359,6 @@ cloud_api_client = { path = "crates/cloud_api_client" }
 cloud_api_types = { path = "crates/cloud_api_types" }
 cloud_llm_client = { path = "crates/cloud_llm_client" }
 codestral = { path = "crates/codestral" }
-collab = { path = "crates/collab" }
 collab_ui = { path = "crates/collab_ui" }
 collections = { path = "crates/collections", version = "0.1.0" }
 command_palette = { path = "crates/command_palette" }
@@ -383,6 +425,9 @@ gpui_util = { path = "crates/gpui_util" }
 gpui_web = { path = "crates/gpui_web", default-features = false }
 gpui_wgpu = { path = "crates/gpui_wgpu" }
 gpui_windows = { path = "crates/gpui_windows", default-features = false }
+gpui_ui = { path = "crates/gpui_ui" }
+gpui_code = { path = "crates/gpui_code" }
+gpui_app_shell = { path = "crates/gpui_app_shell" }
 grammars = { path = "crates/grammars" }
 hang_telemetry = { path = "crates/hang_telemetry" }
 html_to_markdown = { path = "crates/html_to_markdown" }
@@ -428,6 +473,25 @@ multi_buffer = { path = "crates/multi_buffer" }
 net = { path = "crates/net" }
 node_runtime = { path = "crates/node_runtime" }
 notifications = { path = "crates/notifications" }
+nsh-base = { version = "0.5.0", path = "crates/nsh-base", default-features = false }
+nsh-bundler = { version = "0.5.0", path = "crates/nsh-bundler", default-features = false }
+nsh-core = { version = "0.5.0", path = "crates/nsh-core" }
+nsh-dev = { version = "0.5.0", path = "crates/nsh-dev" }
+nsh-engine = { version = "0.5.0", path = "crates/nsh-engine", default-features = false }
+nsh-i18n = { version = "0.5.0", path = "crates/nsh-i18n" }
+nsh-js = { version = "0.5.0", path = "crates/nsh-js", default-features = false }
+nsh-macros = { version = "0.5.0", path = "crates/nsh-macros" }
+nsh-package = { version = "0.5.0", path = "crates/nsh-package" }
+nsh-platform-apple = { version = "0.5.0", path = "crates/nsh-platform-apple" }
+nsh-platform-gpui = { version = "0.5.0", path = "crates/nsh-platform-gpui", default-features = false }
+nsh-platform-ios = { version = "0.5.0", path = "crates/nsh-platform-ios", default-features = false }
+nsh-platform-linux = { version = "0.5.0", path = "crates/nsh-platform-linux", default-features = false }
+nsh-platform-macos = { version = "0.5.0", path = "crates/nsh-platform-macos", default-features = false }
+nsh-platform-tui = { version = "0.5.0", path = "crates/nsh-platform-tui", default-features = false }
+nsh-platform-windows = { version = "0.5.0", path = "crates/nsh-platform-windows", default-features = false }
+nsh-testing = { version = "0.5.0", path = "crates/nsh-testing", default-features = false }
+nsh-updater = { version = "0.5.0", path = "crates/nsh-updater" }
+nsh_workspace = { path = "crates/nsh_workspace" }
 oauth_callback_server = { path = "crates/oauth_callback_server" }
 ollama = { path = "crates/ollama" }
 onboarding = { path = "crates/onboarding" }
@@ -578,8 +642,6 @@ aws-sdk-bedrockruntime = { version = "1.112.0", default-features = false, featur
     "behavior-version-latest",
     "rt-tokio",
 ] }
-aws-sdk-kinesis = { version = "1.51", default-features = false }
-aws-sdk-s3 = { version = "1.15", default-features = false }
 aws-sigv4 = { version = "1.4.0", features = ["http1"] }
 aws-smithy-runtime-api = { version = "1.9.2", features = ["http-1x", "client"] }
 aws-smithy-types = { version = "1.3.4", features = ["http-body-1-x"] }
@@ -696,7 +758,6 @@ lru = "0.16"
 lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "82d7fc66ebdfabcfeb26ba16bbed9f3d26211fc3" }
 mach2 = "0.6"
 markup5ever_rcdom = "0.39"
-mdbook = { version = "=0.4.40", default-features = false, features = ["search"] }
 merman = { version = "=0.9.3", default-features = false }
 mime = "0.3.17"
 minidumper = "0.11"
@@ -710,101 +771,332 @@ objc2 = "0.6"
 objc2-ui-kit = { version = "0.3.2", default-features = false, features = [
     "std",
     "block2",
-    "objc2-quartz-core",
     "objc2-core-foundation",
+    "objc2-core-graphics",
+    "objc2-quartz-core",
+    "NSAttributedString",
+    "NSLayoutAnchor",
+    "NSLayoutConstraint",
     "NSText",
+    "NSTextContainer",
+    "UIAccessibility",
+    "UIAccessibilityConstants",
+    "UIAccessibilityCustomAction",
+    "UIAccessibilityIdentification",
+    "UIAction",
+    "UIActivityIndicatorView",
+    "UIAlertController",
     "UIApplication",
+    "UIBarAppearance",
+    "UIBarButtonItem",
+    "UIBarItem",
+    "UIBehavioralStyle",
+    "UIBlurEffect",
+    "UIButton",
+    "UIColor",
     "UICommand",
+    "UIControl",
     "UICornerConfiguration",
     "UICornerRadius",
+    "UIDevice",
     "UIEvent",
+    "UIFeedbackGenerator",
+    "UIFocus",
+    "UIFocusAnimationCoordinator",
+    "UIFocusSystem",
+    "UIFocusUpdateContext_UIKitAdditions",
+    "UIFont",
+    "UIFontDescriptor",
     "UIGeometry",
     "UIGestureRecognizer",
-    "UIPanGestureRecognizer",
-    "UIScreenEdgePanGestureRecognizer",
+    "UIGestureRecognizerSubclass",
+    "UIGraphics",
+    "UIHoverGestureRecognizer",
+    "UIHoverStyle",
+    "UIImage",
+    "UIImpactFeedbackGenerator",
+    "UIInteraction",
     "UIInterface",
+    "UIKey",
+    "UIKeyCommand",
+    "UIKeyConstants",
+    "UILabel",
+    "UILayoutGuide",
+    "UILongPressGestureRecognizer",
+    "UIMenu",
+    "UIMenuController",
+    "UIMenuElement",
+    "UINavigationBar",
+    "UINavigationBarAppearance",
+    "UINavigationController",
+    "UINavigationItem",
+    "UINotificationFeedbackGenerator",
     "UIOpenURLContext",
+    "UIOrientation",
+    "UIPanGestureRecognizer",
     "UIPasteboard",
+    "UIPinchGestureRecognizer",
+    "UIPointerInteraction",
+    "UIPointerRegion",
+    "UIPointerStyle",
+    "UIPopoverPresentationController",
+    "UIPopoverSupport",
+    "UIPresentationController",
+    "UIPress",
+    "UIPressesEvent",
+    "UIRefreshControl",
     "UIResponder",
+    "UIRotationGestureRecognizer",
     "UIScene",
     "UISceneConfiguration",
     "UISceneDefinitions",
     "UISceneOptions",
     "UISceneSession",
     "UIScreen",
+    "UIScreenEdgePanGestureRecognizer",
+    "UIScrollView",
+    "UISegmentedControl",
+    "UISelectionFeedbackGenerator",
+    "UISplitViewController",
+    "UITabBar",
+    "UITabBarItem",
+    "UITapGestureRecognizer",
+    "UITargetedPreview",
+    "UITextField",
     "UITextInput",
     "UITextInputTraits",
+    "UITextInteraction",
+    "UITextView",
+    "UITimingCurveProvider",
+    "UITimingParameters",
     "UITouch",
     "UITraitCollection",
     "UIView",
+    "UIViewAnimating",
     "UIViewController",
+    "UIViewControllerTransitionCoordinator",
+    "UIViewPropertyAnimator",
+    "UIVisualEffect",
+    "UIVisualEffectView",
     "UIWindow",
     "UIWindowScene",
+    "UIWindowSceneGeometry",
+    "UIWindowSceneGeometryPreferences",
+    "UIWindowSceneGeometryPreferencesIOS",
 ] }
 objc2-app-kit = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "block2",
+    "objc2-core-foundation",
+    "objc2-core-graphics",
+    "objc2-quartz-core",
+    "NSAccessibility",
+    "NSAccessibilityConstants",
+    "NSAccessibilityCustomAction",
+    "NSAccessibilityElement",
+    "NSAccessibilityProtocols",
+    "NSActionCell",
     "NSAlert",
+    "NSAnimationContext",
     "NSAppearance",
     "NSApplication",
+    "NSAttributedString",
+    "NSBezierPath",
+    "NSBitmapImageRep",
     "NSButton",
+    "NSButtonCell",
     "NSCell",
     "NSColor",
+    "NSColorSpace",
     "NSControl",
     "NSCursor",
     "NSDocumentController",
     "NSDragging",
     "NSDraggingItem",
     "NSEvent",
+    "NSFont",
+    "NSFontDescriptor",
     "NSGraphics",
+    "NSGraphicsContext",
     "NSImage",
+    "NSImageRep",
+    "NSLayoutConstraint",
+    "NSLayoutManager",
     "NSMenu",
     "NSMenuItem",
     "NSOpenPanel",
     "NSPanel",
+    "NSParagraphStyle",
     "NSPasteboard",
+    "NSPasteboardItem",
+    "NSProgressIndicator",
     "NSResponder",
     "NSRunningApplication",
     "NSSavePanel",
     "NSScreen",
+    "NSScrollView",
     "NSScroller",
+    "NSSecureTextField",
+    "NSStatusBar",
+    "NSStatusBarButton",
+    "NSStatusItem",
+    "NSText",
+    "NSTextContainer",
+    "NSTextField",
+    "NSTextFieldCell",
+    "NSTextInputClient",
+    "NSTextInputContext",
+    "NSTextStorage",
+    "NSTextView",
+    "NSToolbar",
     "NSTrackingArea",
+    "NSUserInterfaceItemIdentification",
+    "NSUserInterfaceValidation",
     "NSView",
     "NSVisualEffectView",
     "NSWindow",
     "NSWorkspace",
-    "block2",
-    "objc2-core-foundation",
 ] }
-objc2-core-foundation = { version = "=0.3.2", default-features = false }
-objc2-core-graphics = { version = "=0.3.2", default-features = false, features = ["CGDirectDisplay"] }
+objc2-core-foundation = { version = "=0.3.2", default-features = false, features = [
+    "std",
+    "CFArray",
+    "CFAttributedString",
+    "CFCGTypes",
+    "CFData",
+    "CFDictionary",
+    "CFNumber",
+    "CFString",
+    "CFURL",
+] }
+objc2-core-graphics = { version = "=0.3.2", default-features = false, features = [
+    "std",
+    "CGBitmapContext",
+    "CGColor",
+    "CGColorSpace",
+    "CGContext",
+    "CGDirectDisplay",
+    "CGDisplayConfiguration",
+    "CGEvent",
+    "CGEventTypes",
+    "CGGradient",
+    "CGImage",
+    "CGLayer",
+    "CGPath",
+    "CGWindowLevel",
+] }
 objc2-core-media = { version = "=0.3.2", default-features = false, features = ["CMSampleBuffer", "objc2-core-video"] }
-objc2-core-text = { version = "0.3.2", default-features = false, features = ["std", "CTFont", "CTFontDescriptor"] }
+objc2-core-text = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "objc2-core-graphics",
+    "CTFont",
+    "CTFontDescriptor",
+    "CTFontManager",
+    "CTFontTraits",
+    "CTFrame",
+    "CTFramesetter",
+    "CTLine",
+    "CTParagraphStyle",
+    "CTRun",
+    "CTRunDelegate",
+    "CTStringAttributes",
+    "CTTypesetter",
+] }
 objc2-core-video = { version = "=0.3.2", default-features = false, features = ["CVBuffer", "CVImageBuffer"] }
 objc2-foundation = { version = "=0.3.2", default-features = false, features = [
+    "std",
+    "block2",
+    "objc2-core-foundation",
     "NSArray",
     "NSAttributedString",
     "NSBundle",
+    "NSCache",
+    "NSCalendar",
     "NSCoder",
     "NSData",
     "NSDate",
+    "NSDateFormatter",
     "NSDictionary",
+    "NSDistributedNotificationCenter",
     "NSEnumerator",
     "NSError",
+    "NSFormatter",
     "NSGeometry",
+    "NSKeyValueObserving",
+    "NSLocale",
+    "NSNotification",
     "NSNull",
     "NSObjCRuntime",
     "NSObject",
+    "NSOperation",
     "NSProcessInfo",
+    "NSPropertyList",
     "NSRange",
     "NSRunLoop",
     "NSSet",
+    "NSStream",
     "NSString",
+    "NSThread",
+    "NSTimeZone",
+    "NSTimer",
     "NSURL",
+    "NSURLError",
+    "NSURLRequest",
+    "NSURLResponse",
+    "NSURLSession",
+    "NSUserActivity",
+    "NSUserDefaults",
     "NSValue",
-    "objc2-core-foundation",
+] }
+objc2-image-io = { version = "0.3.2", default-features = false, features = [
     "std",
+    "objc2-core-graphics",
+    "CGImageDestination",
+    "CGImageProperties",
+    "CGImageSource",
+] }
+objc2-io-kit = { version = "0.3.2", default-features = false, features = ["std", "libc"] }
+objc2-io-surface = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "libc",
+    "objc2",
+    "objc2-core-foundation",
+    "IOSurfaceBase",
+    "IOSurfaceRef",
+    "IOSurfaceTypes",
+] }
+objc2-metal = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "block2",
+    "objc2-io-surface",
+    "MTLAllocation",
+    "MTLCommandBuffer",
+    "MTLCommandQueue",
+    "MTLDevice",
+    "MTLPixelFormat",
+    "MTLResource",
+    "MTLTexture",
+    "MTLTypes",
 ] }
 objc2-security = { version = "0.3.2", default-features = false, features = ["std", "SecBase", "SecItem"] }
-objc2-quartz-core = { version = "=0.3.2", default-features = false, features = ["std", "CALayer", "CAMetalDisplayLink", "CAMetalLayer", "objc2-metal"] }
+objc2-quartz-core = { version = "=0.3.2", default-features = false, features = [
+    "std",
+    "objc2-core-foundation",
+    "objc2-core-graphics",
+    "objc2-metal",
+    "CAAnimation",
+    "CABase",
+    "CADisplayLink",
+    "CAFrameRateRange",
+    "CAGradientLayer",
+    "CALayer",
+    "CAMediaTiming",
+    "CAMediaTimingFunction",
+    "CAMetalDisplayLink",
+    "CAMetalLayer",
+    "CAShapeLayer",
+    "CATransaction",
+    "CATransform3D",
+] }
 objc2-screen-capture-kit = { version = "=0.3.2", default-features = false, features = [
     "block2",
     "dispatch2",
@@ -892,10 +1184,10 @@ rustls-platform-verifier = "0.7"
 # WARNING: If you change this, you must also publish a new version of zed-scap to crates.io
 scap = { git = "https://github.com/zed-industries/scap", rev = "b5c86ec58dd4b6b7732bf6ac8be03d6b1f190a82", default-features = false, package = "zed-scap", version = "0.0.8-zed" }
 schemars = { version = "1.0", default-features = false, features = ["std", "indexmap2"] }
-sea-orm = { version = "=1.1.10", default-features = false }
 seccompiler = "0.5"
 semver = { version = "1.0", features = ["serde"] }
-serde = { version = "1.0", features = ["rc"] }
+serde = { version = "1.0", features = ["rc", "derive"] }
+serde_ignored = "0.1.14"
 serde_json = { version = "1.0.144", features = ["preserve_order", "raw_value"] }
 serde_json_lenient = { version = "0.2", features = [
     "preserve_order",
@@ -915,7 +1207,6 @@ smallvec = { version = "1.6", features = ["union", "const_new"] }
 spin = { version = "0.10", default-features = false, features = ["mutex", "spin_mutex", "lock_api"] }
 smol = "2.0"
 sqlformat = "0.2"
-sqlx = { version = "0.8", default-features = false }
 stacksafe = "1.0"
 streaming-iterator = "0.1"
 strsim = "0.11"
@@ -941,7 +1232,6 @@ tokio = "1"
 tokio-rustls = { version = "0.26", default-features = false }
 toml = { version = "0.9", default-features = false, features = ["std", "serde", "parse"] }
 toml_edit = { version = "0.22", default-features = false, features = ["parse"] }
-tower-http = "0.4.4"
 tree-sitter = { git = "https://github.com/tree-sitter/tree-sitter", rev = "803c6ebaac27d69e1808b45058482e868d073ceb" }
 tracing = "0.1.40"
 tracing-subscriber = "0.3"
@@ -1004,8 +1294,8 @@ web-sys = "0.3"
 web-time = "1.1.0"
 webpki-roots = "1.0.10"
 webrtc-sys = "0.3.23"
-# 30.0.1 lacks the Vulkan surface-drop fix (wgpu#10230) and WebGL resize fix (wgpu#10348).
-wgpu = { git = "https://github.com/gfx-rs/wgpu", rev = "cddb2f5d80dc0009b2ef6767635140cacf90a007", default-features = false }
+# Vendored WGPU v30.0.0 (cddb2f5d80dc0009b2ef6767635140cacf90a007)
+wgpu = { path = "vendor/wgpu/wgpu", default-features = false }
 which = "8"
 windows-core = "0.62"
 windows-registry = "0.6.0"
@@ -1015,20 +1305,139 @@ yawc = { version = "0.4", default-features = false }
 zeroize = "1.8"
 zstd = { version = "0.13", default-features = false, features = ["legacy", "arrays"] }
 
+# Unified NSH external dependencies (deduplicated onto workspace versions)
+accesskit_consumer = "0.38"
+axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "ws"] }
+brotli = { version = "9", default-features = false, features = ["std"] }
+cap-std = "4.0.3"
+cc = "1.4"
+crc32c = "0.6"
+crc32fast = "1.5"
+crossbeam-channel = "0.5"
+crossterm = "0.29.0"
+ed25519-dalek = { version = "2.1", default-features = false, features = ["std", "fast", "zeroize"] }
+env_filter = { version = "2", default-features = false }
+flate2 = "1.1"
+fontdb = "0.23"
+futures-channel = "0.3"
+futures-util = { version = "0.3", features = ["sink"] }
+getrandom = "0.3"
+getrandom-stdlib = { package = "getrandom", version = "0.4", default-features = false }
+gif = "0.14"
+gstreamer = "0.25"
+gstreamer-app = "0.25"
+gstreamer-audio = "0.25"
+gstreamer-video = "0.25"
+gtk = "0.18"
+gtk4 = { version = "0.11", features = ["v4_14"] }
+hmac = "0.12"
+httpdate = "1"
+imagesize = "0.15"
+jni = "0.21"
+jni-verifier = { package = "jni", version = "0.22" }
+markdown-rs = { package = "markdown", version = "1.0.0" }
+md-5 = "0.10"
+naga = { path = "vendor/wgpu/naga", default-features = false, features = ["wgsl-in"] }
+notify = "9.0.0-rc.4"
+oxc = { version = "=0.153.0", features = ["transformer", "codegen", "semantic", "ast_visit"] }
+oxc_sourcemap = "9"
+pango = "0.22"
+pangocairo = "0.22"
+quickjs-jit-stdlib = { version = "=0.14.2", default-features = false, features = ["buffer", "path"] }
+ratatui-core = { version = "0.1.2", features = ["std", "layout-cache", "underline-color"] }
+ratatui-crossterm = "0.1.2"
+ratatui-widgets = { version = "0.3.2", default-features = false, features = ["std"] }
+ratex-font = "0.1.15"
+ratex-layout = "0.1.15"
+ratex-parser = "0.1.15"
+ratex-types = "0.1.15"
+ring = "0.17"
+rolldown = "=1.2.13"
+rolldown_common = "=1.2.13"
+rolldown_error = "=1.2.13"
+rolldown_sourcemap = "=1.2.13"
+ropey = "1.6"
+rquickjs = { package = "quickjs-jit", version = "=0.14.2", default-features = false, features = ["std", "futures", "loader", "macro"] }
+rust-i18n = "4.2.4"
+rust-i18n-support = "4.2.4"
+sha1 = "0.10"
+simplecss = "0.2"
+slab = "0.4"
+string_wizard = { version = "=1.2.13", features = ["sourcemap"] }
+syntect = { version = "5.3.0", default-features = false, features = ["parsing", "regex-fancy", "dump-load"] }
+tar = { version = "0.4", default-features = false }
+tiny-skia = { version = "0.11", default-features = false, features = ["std", "simd"] }
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["connect", "rustls-tls-webpki-roots"] }
+ttf-parser = "0.25"
+tungstenite = { version = "0.28", default-features = false, features = ["handshake"] }
+two-face = { version = "0.4.5", default-features = false, features = ["syntect-fancy"] }
+unicode-linebreak = "0.1.5"
+unicode-properties = { version = "0.1.3", default-features = false, features = ["emoji"] }
+ureq = { version = "3.1", features = ["platform-verifier"] }
+webkit2gtk = { version = "=2.0.1", features = ["v2_38"] }
+webkit6 = "0.6"
+webview2-com = "0.39"
+windows-numerics = "0.3"
+windows-sys = "0.61"
+wry = { package = "lb-wry", version = "0.53.3" }
+wuff = "0.2.9"
+x11rb = { version = "0.13", default-features = false, features = ["composite", "dri3", "present"] }
+zbus = { version = "5.13", default-features = false, features = ["async-io", "blocking-api"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
+
 [workspace.dependencies.windows]
 version = "0.62"
 features = [
+    "std",
+    "Data_Xml_Dom",
+    "Foundation_Numerics",
+    "UI_Notifications",
     "Win32_Foundation",
+    "Win32_Globalization",
+    "Win32_Graphics_Direct2D",
+    "Win32_Graphics_Direct2D_Common",
+    "Win32_Graphics_Direct3D",
+    "Win32_Graphics_Direct3D11",
+    "Win32_Graphics_DirectComposition",
+    "Win32_Graphics_DirectWrite",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Dxgi_Common",
     "Win32_Graphics_Gdi",
+    "Win32_Graphics_Imaging",
+    "Win32_Graphics_Imaging_D2D",
+    "Win32_Media_Audio",
+    "Win32_Media_Audio_XAudio2",
+    "Win32_Media_MediaFoundation",
     "Win32_Security",
     "Win32_Storage_FileSystem",
+    "Win32_Storage_Xps",
     "Win32_System_Com",
     "Win32_System_Com_StructuredStorage",
+    "Win32_System_DataExchange",
+    "Win32_System_Diagnostics_Debug",
     "Win32_System_IO",
     "Win32_System_LibraryLoader",
+    "Win32_System_Memory",
     "Win32_System_Ole",
+    "Win32_System_Performance",
+    "Win32_System_Power",
+    "Win32_System_Registry",
+    "Win32_System_RemoteDesktop",
+    "Win32_System_SystemInformation",
+    "Win32_System_SystemServices",
     "Win32_System_Threading",
+    "Win32_System_Time",
     "Win32_System_Variant",
+    "Win32_System_WinRT",
+    "Win32_UI_Accessibility",
+    "Win32_UI_Controls",
+    "Win32_UI_Controls_RichEdit",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Input_Ime",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Input_Pointer",
+    "Win32_UI_Notifications",
     "Win32_UI_Shell",
     "Win32_UI_Shell_Common",
     "Win32_UI_Shell_PropertiesSystem",
@@ -1068,6 +1477,7 @@ crash-context = { git = "https://github.com/rust-minidump/minidump-writer", rev 
 # per-crate scratch dirs are sufficient. Upstream issue:
 # https://github.com/dtolnay/cxx/issues/1752
 scratch = { path = "tooling/corgi/patches/scratch" }
+msvc_spectre_libs = { path = "tooling/corgi/patches/msvc_spectre_libs" }
 
 [profile.dev]
 split-debuginfo = "unpacked"
@@ -1107,6 +1517,13 @@ proc-macro2 = { opt-level = 3 }
 tree-sitter = { opt-level = 3 }
 taffy = { opt-level = 3 }
 resvg = { opt-level = 3 }
+usvg = { opt-level = 3 }
+tiny-skia = { opt-level = 3 }
+tiny-skia-path = { opt-level = 3 }
+quickjs-jit-sys = { opt-level = 3 }
+syntect = { opt-level = 3 }
+two-face = { opt-level = 3 }
+nsh-macros = { opt-level = 3 }
 wasmtime = { opt-level = 3 }
 cranelift-codegen = { opt-level = 3 }
 wasmtime-environ = { opt-level = 3 }
@@ -1164,6 +1581,20 @@ inherits = "release"
 debug = "full"
 lto = false
 codegen-units = 16
+
+[profile.dist]
+inherits = "release"
+debug = false
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+
+[profile.web]
+inherits = "release"
+opt-level = "z"
+strip = true
+panic = "abort"
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "allow" }

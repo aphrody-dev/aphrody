@@ -250,7 +250,13 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
             SwitchField::new(
                 "onboarding-telemetry-metrics",
                 None::<&str>,
-                Some("Help improve Zed by sending anonymous usage data".into()),
+                Some(
+                    format!(
+                        "Help improve {} by sending anonymous usage data",
+                        brand::APP_NAME
+                    )
+                    .into(),
+                ),
                 if TelemetrySettings::get_global(cx).metrics {
                     ui::ToggleState::Selected
                 } else {
@@ -290,8 +296,11 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
                 "onboarding-telemetry-crash-reports",
                 None::<&str>,
                 Some(
-                    "Help fix Zed by sending crash reports so we can fix critical issues fast"
-                        .into(),
+                    format!(
+                        "Help fix {} by sending crash reports so we can fix critical issues fast",
+                        brand::APP_NAME
+                    )
+                    .into(),
                 ),
                 if TelemetrySettings::get_global(cx).diagnostics {
                     ui::ToggleState::Selected
@@ -439,12 +448,21 @@ fn render_worktree_auto_trust_switch(tab_index: &mut isize, cx: &mut App) -> imp
         ui::ToggleState::Unselected
     };
 
-    let tooltip_description = "Zed can only allow services like language servers, project settings, and MCP servers to run after you mark a new project as trusted.";
+    let tooltip_description = format!(
+        "{} can only allow services like language servers, project settings, and MCP servers to run after you mark a new project as trusted.",
+        brand::APP_NAME
+    );
 
     SwitchField::new(
         "onboarding-auto-trust-worktrees",
         Some("Trust All Projects By Default"),
-        Some("Automatically mark all new projects as trusted to unlock all Zed's features".into()),
+        Some(
+            format!(
+                "Automatically mark all new projects as trusted to unlock all {} features",
+                brand::APP_NAME
+            )
+            .into(),
+        ),
         toggle_state,
         {
             let fs = <dyn Fs>::global(cx);

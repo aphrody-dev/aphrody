@@ -1269,8 +1269,8 @@ pub fn font_name_with_fallbacks<'a>(name: &'a str, system: &'a str) -> &'a str {
     // and so retained here for backward compatibility.
     match name {
         ".SystemUIFont" => system,
-        ".ZedSans" | "Zed Plex Sans" => "IBM Plex Sans",
-        ".ZedMono" | "Zed Plex Mono" => "Lilex",
+        ".AphrodySans" | ".ZedSans" | "Zed Plex Sans" => "IBM Plex Sans",
+        ".AphrodyMono" | ".ZedMono" | "Zed Plex Mono" => "Lilex",
         _ => name,
     }
 }
@@ -1286,8 +1286,12 @@ pub fn font_name_with_fallbacks_shared<'a>(
     // and so retained here for backward compatibility.
     match name.as_str() {
         ".SystemUIFont" => system,
-        ".ZedSans" | "Zed Plex Sans" => const { &SharedString::new_static("IBM Plex Sans") },
-        ".ZedMono" | "Zed Plex Mono" => const { &SharedString::new_static("Lilex") },
+        ".AphrodySans" | ".ZedSans" | "Zed Plex Sans" => {
+            const { &SharedString::new_static("IBM Plex Sans") }
+        }
+        ".AphrodyMono" | ".ZedMono" | "Zed Plex Mono" => {
+            const { &SharedString::new_static("Lilex") }
+        }
         _ => name,
     }
 }

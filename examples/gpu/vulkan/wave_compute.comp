@@ -1,0 +1,21 @@
+#version 460
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) readonly buffer InputWaveParams {
+    float frequency;
+    float amplitude;
+    float time;
+    float speed;
+} params;
+
+layout(std430, binding = 1) buffer OutputWaveData {
+    float height_field[];
+} wave_output;
+
+void main() {
+    uint index = gl_GlobalInvocationID.x;
+    float x = float(index) * 0.05;
+    float phase = x * params.frequency - params.time * params.speed;
+    float wave = params.amplitude * sin(phase) * cos(phase * 0.5);
+    wave_output.height_field[index] = wave;
+}

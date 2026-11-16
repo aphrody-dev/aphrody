@@ -77,7 +77,17 @@ use project::{
     },
     project_settings::{GitPathStyle, ProjectSettings},
 };
-use prompt_store::RULES_FILE_NAMES;
+const RULES_FILE_NAMES: &[&str] = &[
+    ".rules",
+    ".cursorrules",
+    ".windsurfrules",
+    ".clinerules",
+    ".github/copilot-instructions.md",
+    "AGENT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+];
 
 use serde::{Deserialize, Serialize};
 use settings::{

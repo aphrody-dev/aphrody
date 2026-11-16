@@ -32,13 +32,12 @@ log.workspace = true
 parking_lot.workspace = true
 paths.workspace = true
 rope.workspace = true
-proto.workspace = true
+proto = { workspace = true, optional = true }
 thiserror.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 slotmap.workspace = true
 smol.workspace = true
-telemetry.workspace = true
 tempfile.workspace = true
 text.workspace = true
 util.workspace = true
@@ -66,4 +65,5 @@ gpui = { workspace = true, features = ["test-support"] }
 git = { workspace = true, features = ["test-support"] }
 
 [features]
-test-support = ["gpui/test-support", "git/test-support", "util/test-support"]
+proto = ["dep:proto"]
+test-support = ["proto", "gpui/test-support", "git/test-support", "util/test-support"]

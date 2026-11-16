@@ -54,7 +54,7 @@ smol.workspace = true
 telemetry.workspace = true
 theme.workspace = true
 theme_settings.workspace = true
-title_bar.workspace = true
+title_bar = { workspace = true, features = ["collab"] }
 ui.workspace = true
 util.workspace = true
 workspace.workspace = true

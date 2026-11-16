@@ -1,0 +1,118 @@
+[package]
+name = "gpui_ui"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Unified GPUI UI engine, headless primitives, design system, themes, icons, and bundled assets."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/gpui_ui.rs"
+doctest = false
+
+[features]
+default = ["desktop"]
+desktop = [
+    "gpui/font-kit",
+    "gpui/wayland",
+    "gpui/x11",
+    "gpui_platform/font-kit",
+    "gpui_platform/wayland",
+    "gpui_platform/x11",
+]
+inspector = ["gpui/inspector", "gpui_platform/inspector"]
+hot-reload = ["gpui/hot-reload"]
+nsh = [
+    "desktop",
+    "dep:nsh-core",
+    "dep:nsh-macros",
+    "dep:nsh-base",
+    "dep:nsh-engine",
+    "dep:nsh-platform-gpui",
+    "nsh-core/svg",
+    "nsh-core/loader",
+    "nsh-core/websocket",
+    "nsh-core/updater",
+    "nsh-base/editor",
+    "nsh-base/rich-editor",
+    "nsh-base/plot",
+    "nsh-base/term",
+    "nsh-base/highlight",
+    "nsh-base/emoji-picker",
+    "nsh-engine/net",
+    "nsh-engine/websocket",
+    "nsh-engine/updater",
+    "nsh-platform-gpui/editor",
+    "nsh-platform-gpui/rich-editor",
+    "nsh-platform-gpui/plot",
+    "nsh-platform-gpui/term",
+    "nsh-platform-gpui/highlight",
+    "nsh-platform-gpui/emoji-picker",
+    "nsh-platform-gpui/svg",
+    "nsh-platform-gpui/net",
+    "nsh-platform-gpui/websocket",
+    "nsh-platform-gpui/updater",
+]
+nsh-js = [
+    "nsh",
+    "nsh-engine/js",
+    "nsh-platform-gpui/js",
+    "nsh-platform-gpui/zlib",
+    "nsh-platform-gpui/crypto",
+    "nsh-platform-tui?/js",
+]
+nsh-dev = [
+    "nsh-js",
+    "dep:nsh-bundler",
+    "nsh-platform-gpui/dev",
+    "nsh-platform-tui?/dev",
+]
+nsh-tui = [
+    "nsh",
+    "dep:nsh-platform-tui",
+    "nsh-platform-tui/run-app",
+    "nsh-platform-tui/net",
+    "nsh-platform-tui/websocket",
+    "nsh-platform-tui/updater",
+]
+nsh-shader = ["nsh", "nsh-platform-gpui/shader"]
+nsh-math = ["nsh", "nsh-base/math", "nsh-platform-gpui/math"]
+nsh-webview = ["nsh", "nsh-platform-gpui/webview"]
+nsh-full = ["nsh-js", "nsh-dev", "nsh-tui", "nsh-shader", "nsh-math", "nsh-webview"]
+test-support = ["gpui/test-support", "gpui_platform/test-support", "theme/test-support"]
+
+[dependencies]
+anyhow.workspace = true
+assets.workspace = true
+collections.workspace = true
+component.workspace = true
+file_icons.workspace = true
+gpui.workspace = true
+gpui_macros.workspace = true
+gpui_platform.workspace = true
+gpui_shared_string.workspace = true
+gpui_util.workspace = true
+icons.workspace = true
+log.workspace = true
+menu.workspace = true
+nsh-base = { workspace = true, optional = true }
+nsh-bundler = { workspace = true, optional = true }
+nsh-core = { workspace = true, optional = true }
+nsh-engine = { workspace = true, optional = true }
+nsh-macros = { workspace = true, optional = true }
+nsh-platform-gpui = { workspace = true, optional = true }
+nsh-platform-tui = { workspace = true, optional = true }
+refineable.workspace = true
+scheduler.workspace = true
+sum_tree.workspace = true
+syntax_theme.workspace = true
+theme.workspace = true
+ui.workspace = true
+ui_input.workspace = true
+ui_macros.workspace = true
+
+[dev-dependencies]
+gpui = { workspace = true, features = ["test-support"] }

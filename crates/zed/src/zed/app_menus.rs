@@ -1,10 +1,17 @@
+#[cfg(feature = "collab")]
 use collab_ui::collab_panel;
 use gpui::{App, Menu, MenuItem, OsAction};
+#[cfg(feature = "ai")]
 use project::DisableAiSettings;
 use release_channel::ReleaseChannel;
+#[cfg(feature = "ai")]
 use settings::Settings;
 use terminal_view::terminal_panel;
-use zed_actions::{Quit, assistant, debug_panel, dev, git_panel, project_panel};
+#[cfg(feature = "ai")]
+use zed_actions::assistant;
+#[cfg(feature = "debugger")]
+use zed_actions::debug_panel;
+use zed_actions::{Quit, dev, git_panel, project_panel};
 
 pub fn app_menus(cx: &mut App) -> Vec<Menu> {
     let mut view_items = vec![
@@ -42,11 +49,14 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
         MenuItem::separator(),
         MenuItem::action("Project Panel", project_panel::ToggleFocus),
         MenuItem::action("Outline Panel", outline_panel::ToggleFocus),
+        #[cfg(feature = "collab")]
         MenuItem::action("Collab Panel", collab_panel::ToggleFocus),
         MenuItem::action("Terminal Panel", terminal_panel::Toggle),
+        #[cfg(feature = "debugger")]
         MenuItem::action("Debugger Panel", debug_panel::ToggleFocus),
     ];
 
+    #[cfg(feature = "ai")]
     if !DisableAiSettings::get_global(cx).disable_ai {
         view_items.push(MenuItem::action("Agent Panel", assistant::ToggleFocus));
     }
@@ -68,10 +78,11 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
 
     vec![
         Menu {
-            name: "Zed".into(),
+            name: brand::APP_NAME.into(),
             disabled: false,
             items: vec![
-                MenuItem::action("About Zed", zed_actions::About),
+                MenuItem::action(format!("About {}", brand::APP_NAME), zed_actions::About),
+                #[cfg(feature = "updater")]
                 MenuItem::action("Check for Updates", auto_update::Check),
                 MenuItem::separator(),
                 MenuItem::submenu(Menu::new("Settings").items([
@@ -98,18 +109,19 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                 #[cfg(target_os = "macos")]
                 MenuItem::os_submenu("Services", gpui::SystemMenuType::Services),
                 MenuItem::separator(),
+                #[cfg(feature = "extensions")]
                 MenuItem::action("Extensions", zed_actions::Extensions::default()),
                 #[cfg(not(target_os = "windows"))]
                 MenuItem::action("Install CLI", install_cli::InstallCliBinary),
                 MenuItem::separator(),
                 #[cfg(target_os = "macos")]
-                MenuItem::action("Hide Zed", super::Hide),
+                MenuItem::action(format!("Hide {}", brand::APP_NAME), super::Hide),
                 #[cfg(target_os = "macos")]
                 MenuItem::action("Hide Others", super::HideOthers),
                 #[cfg(target_os = "macos")]
                 MenuItem::action("Show All", super::ShowAll),
                 MenuItem::separator(),
-                MenuItem::action("Quit Zed", Quit),
+                MenuItem::action(format!("Quit {}", brand::APP_NAME), Quit),
             ],
         },
         Menu {
@@ -276,18 +288,26 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                         reveal_target: None,
                     },
                 ),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Start Debugger", debugger_ui::Start),
                 MenuItem::separator(),
                 MenuItem::action("Edit tasks.json…", zed_actions::OpenProjectTasks),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Edit debug.json…", zed_actions::OpenProjectDebugTasks),
+                #[cfg(feature = "debugger")]
                 MenuItem::separator(),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Continue", debugger_ui::Continue),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Step Over", debugger_ui::StepOver),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Step Into", debugger_ui::StepInto),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Step Out", debugger_ui::StepOut),
                 MenuItem::separator(),
                 MenuItem::action("Toggle Breakpoint", editor::actions::ToggleBreakpoint),
                 MenuItem::action("Edit Breakpoint", editor::actions::EditLogBreakpoint),
+                #[cfg(feature = "debugger")]
                 MenuItem::action("Clear All Breakpoints", debugger_ui::ClearAllBreakpoints),
             ],
         },
@@ -304,6 +324,7 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
             name: "Help".into(),
             disabled: false,
             items: vec![
+                #[cfg(feature = "updater")]
                 MenuItem::action(
                     "View Release Notes Locally",
                     auto_update_ui::ViewReleaseNotesLocally,
@@ -311,28 +332,31 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                 MenuItem::action("View Telemetry", zed_actions::OpenTelemetryLog),
                 MenuItem::action("View Dependency Licenses", zed_actions::OpenLicenses),
                 MenuItem::action("Show Welcome", onboarding::ShowWelcome),
+                #[cfg(feature = "updater")]
                 MenuItem::separator(),
+                #[cfg(feature = "updater")]
                 MenuItem::action("File Bug Report...", zed_actions::feedback::FileBugReport),
+                #[cfg(feature = "updater")]
                 MenuItem::action("Request Feature...", zed_actions::feedback::RequestFeature),
+                #[cfg(feature = "updater")]
                 MenuItem::action("Email Us...", zed_actions::feedback::EmailZed),
                 MenuItem::separator(),
                 MenuItem::action(
                     "Documentation",
                     super::OpenBrowser {
-                        url: "https://zed.dev/docs".into(),
-                    },
-                ),
-                MenuItem::action("Zed Repository", feedback::OpenZedRepo),
-                MenuItem::action(
-                    "Zed Twitter",
-                    super::OpenBrowser {
-                        url: "https://twitter.com/zeddotdev".into(),
+                        url: brand::DOCS_URL.into(),
                     },
                 ),
                 MenuItem::action(
-                    "Join the Team",
+                    format!("{} Repository", brand::APP_NAME),
                     super::OpenBrowser {
-                        url: "https://zed.dev/jobs".into(),
+                        url: brand::REPOSITORY_URL.into(),
+                    },
+                ),
+                MenuItem::action(
+                    format!("{} Website", brand::APP_NAME),
+                    super::OpenBrowser {
+                        url: brand::HOMEPAGE_URL.into(),
                     },
                 ),
             ],

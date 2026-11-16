@@ -24,6 +24,7 @@ settings = { workspace = true, features = ["test-support"] }
 
 [dependencies]
 anyhow.workspace = true
+brand.workspace = true
 collections.workspace = true
 dap.workspace = true
 parking_lot.workspace = true

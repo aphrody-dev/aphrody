@@ -1,6 +1,7 @@
 // Disable command line from opening on release mode
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#[cfg(feature = "crash-reporting")]
 mod reliability;
 mod watcher_debug;
 mod zed;
@@ -15,35 +16,46 @@ const _: () = assert!(
      Forks: update APP_NAME in crates/paths/src/paths.rs when renaming the binary.",
 );
 
+#[cfg(feature = "ai")]
 use agent_ui::AgentPanel;
 use anyhow::{Context as _, Result};
 use clap::Parser;
 use cli::FORCE_CLI_MODE_ENV_VAR_NAME;
-use client::{Client, ProxySettings, RefreshLlmTokenListener, UserStore, parse_zed_link};
+#[cfg(feature = "ai")]
+use client::RefreshLlmTokenListener;
+use client::{Client, ProxySettings, UserStore, parse_zed_link};
+#[cfg(feature = "collab")]
 use collab_ui::channel_view::ChannelView;
 use collections::HashMap;
+#[cfg(feature = "crash-reporting")]
 use crashes::InitCrashHandler;
 use db::kvp::{GlobalKeyValueStore, KeyValueStore};
 use editor::Editor;
+#[cfg(any(feature = "extensions", feature = "debugger"))]
 use extension::ExtensionHostProxy;
 use fs::{Fs, RealFs};
+#[cfg(feature = "collab")]
+use futures::future;
 use futures::{
     FutureExt, StreamExt,
     channel::{mpsc, oneshot},
-    future::{self, FusedFuture},
+    future::FusedFuture,
 };
 use git::GitHostingProviderRegistry;
 use git_ui::clone::clone_and_open;
 use gpui::{
     App, AppContext, Application, AsyncApp, EntityId, QuitMode, Task, TaskExt, UpdateGlobal as _,
-    WindowHandle, block_on,
+    WindowHandle,
 };
+#[cfg(feature = "crash-reporting")]
+use gpui::block_on;
 use gpui_platform;
 
 use gpui_tokio::Tokio;
 use language::LanguageRegistry;
 use onboarding::{FIRST_OPEN, show_onboarding_view};
 use project_panel::ProjectPanel;
+#[cfg(feature = "ai")]
 use prompt_store::PromptBuilder;
 use remote::RemoteConnectionOptions;
 use reqwest_client::ReqwestClient;
@@ -56,6 +68,7 @@ use recent_projects::{RemoteSettings, open_remote_project};
 use release_channel::{AppCommitSha, AppVersion, ReleaseChannel};
 use session::{AppSession, Session};
 use settings::{BaseKeymap, Settings, SettingsStore, watch_config_file};
+#[cfg(feature = "crash-reporting")]
 use smol::future::poll_once;
 use std::{
     cell::{Cell, RefCell},
@@ -69,25 +82,32 @@ use std::{
 };
 use theme::{ActiveTheme, GlobalTheme, ThemeRegistry};
 use theme_settings::load_user_theme;
+#[cfg(feature = "collab")]
+use util::maybe;
 use util::{
-    ResultExt, maybe,
+    ResultExt,
     paths::{PathStyle, SanitizedPath},
 };
 use uuid::Uuid;
+#[cfg(feature = "collab")]
+use workspace::notifications::NotifyResultExt;
 use workspace::{
     AppState, MultiWorkspace, PathList, SerializedWorkspaceLocation, SessionWorkspace, Toast,
-    WorkspaceSettings, WorkspaceStore,
-    notifications::{NotificationId, NotifyResultExt},
-    restore_multiworkspace,
+    WorkspaceSettings, WorkspaceStore, notifications::NotificationId, restore_multiworkspace,
 };
 use zed::{
     OpenListener, OpenRequest, RawOpenRequest, app_menus, build_window_options,
-    derive_paths_with_position, edit_prediction_registry, handle_cli_connection,
-    handle_cli_request, handle_keymap_file_changes, initialize_workspace,
-    open_paths_with_positions,
+    derive_paths_with_position, handle_cli_connection, handle_cli_request,
+    handle_keymap_file_changes, initialize_workspace, open_paths_with_positions,
 };
+#[cfg(feature = "ai")]
+use zed::edit_prediction_registry;
 
-use crate::zed::{CrashHandler, OpenRequestKind, eager_load_active_theme_and_icon_theme};
+use crate::zed::OpenRequestKind;
+#[cfg(feature = "crash-reporting")]
+use crate::zed::CrashHandler;
+#[cfg(feature = "extensions")]
+use crate::zed::eager_load_active_theme_and_icon_theme;
 
 #[cfg(feature = "mimalloc")]
 #[global_allocator]
@@ -95,7 +115,7 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 fn build_application() -> Application {
     let platform = gpui_platform::current_platform(false);
-    if std::env::var("ZED_EXPERIMENTAL_A11Y").as_deref() == Ok("1") {
+    if brand::bool_env("EXPERIMENTAL_A11Y") {
         Application::with_platform(platform)
     } else {
         Application::new_inaccessible(platform)
@@ -103,7 +123,7 @@ fn build_application() -> Application {
 }
 
 fn files_not_created_on_launch(errors: HashMap<io::ErrorKind, Vec<&Path>>) {
-    let message = "Zed failed to launch";
+    let message = format!("{} failed to launch", brand::APP_NAME);
     let error_details = errors
         .into_iter()
         .flat_map(|(kind, paths)| {
@@ -140,7 +160,7 @@ fn files_not_created_on_launch(errors: HashMap<io::ErrorKind, Vec<&Path>>) {
                     .update(cx, |_, window, cx| {
                         let response = window.prompt(
                             gpui::PromptLevel::Critical,
-                            message,
+                            &message,
                             Some(&error_details),
                             &["Exit"],
                             cx,
@@ -165,7 +185,9 @@ fn fail_to_open_window_async(e: anyhow::Error, cx: &mut AsyncApp) {
 
 fn fail_to_open_window(e: anyhow::Error, _cx: &mut App) {
     eprintln!(
-        "Zed failed to open a window: {e:?}. See https://zed.dev/docs/linux for troubleshooting steps."
+        "{} failed to open a window: {e:?}. See {} for troubleshooting steps.",
+        brand::APP_NAME,
+        brand::DOCS_URL
     );
     #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
     {
@@ -181,14 +203,16 @@ fn fail_to_open_window(e: anyhow::Error, _cx: &mut App) {
                 process::exit(1);
             };
 
-            let notification_id = "dev.zed.Oops";
+            let notification_id = brand::IDENTIFIER_STABLE;
+            let title = format!("{} failed to launch", brand::APP_NAME);
             proxy
                 .add_notification(
                     notification_id,
-                    Notification::new("Zed failed to launch")
+                    Notification::new(&title)
                         .body(Some(
                             format!(
-                                "{e:?}. See https://zed.dev/docs/linux for troubleshooting steps."
+                                "{e:?}. See {} for troubleshooting steps.",
+                                brand::DOCS_URL
                             )
                             .as_str(),
                         ))
@@ -230,7 +254,10 @@ fn main() {
 
     // `zed --crash-handler` Makes zed operate in minidump crash handler mode
     if let Some(socket) = &args.crash_handler {
+        #[cfg(feature = "crash-reporting")]
         crashes::crash_server(socket.as_path(), paths::logs_dir().clone());
+        #[cfg(not(feature = "crash-reporting"))]
+        let _unused_socket = socket;
         return;
     }
 
@@ -357,6 +384,7 @@ fn main() {
     let installation_id = app
         .background_executor()
         .spawn(installation_id(KeyValueStore::from_app_db(&app_db)));
+    #[cfg(feature = "crash-reporting")]
     let background_executor = app.background_executor();
 
     let (open_listener, mut open_rx) = OpenListener::new();
@@ -393,41 +421,44 @@ fn main() {
         KeyValueStore::from_app_db(&app_db),
     ));
 
-    let should_install_crash_handler =
-        client::telemetry::should_install_crash_handler(*release_channel::RELEASE_CHANNEL);
+    #[cfg(feature = "crash-reporting")]
+    let crash_handler = {
+        let should_install_crash_handler =
+            client::telemetry::should_install_crash_handler(*release_channel::RELEASE_CHANNEL);
 
-    let crash_handler = if should_install_crash_handler {
-        Some(
-            app.background_executor().spawn(crashes::init(
-                InitCrashHandler {
-                    session_id,
-                    // strip the build and channel information from the version string, we send them separately
-                    zed_version: semver::Version::new(
-                        app_version.major,
-                        app_version.minor,
-                        app_version.patch,
-                    )
-                    .to_string(),
-                    binary: "zed".to_string(),
-                    release_channel: release_channel::RELEASE_CHANNEL_NAME.clone(),
-                    commit_sha: app_commit_sha
-                        .as_ref()
-                        .map(|sha| sha.full())
-                        .unwrap_or_else(|| "no sha".to_owned()),
-                },
-                {
-                    let background_executor1 = app.background_executor();
-                    move |task| {
-                        background_executor1.spawn(task).detach();
-                    }
-                },
-                |pid| paths::temp_dir().join(format!("zed-crash-handler-{pid}")),
-                move |duration| background_executor.timer(duration),
-            )),
-        )
-    } else {
-        crashes::force_backtrace();
-        None
+        if should_install_crash_handler {
+            Some(
+                app.background_executor().spawn(crashes::init(
+                    InitCrashHandler {
+                        session_id,
+                        // strip the build and channel information from the version string, we send them separately
+                        zed_version: semver::Version::new(
+                            app_version.major,
+                            app_version.minor,
+                            app_version.patch,
+                        )
+                        .to_string(),
+                        binary: "zed".to_string(),
+                        release_channel: release_channel::RELEASE_CHANNEL_NAME.clone(),
+                        commit_sha: app_commit_sha
+                            .as_ref()
+                            .map(|sha| sha.full())
+                            .unwrap_or_else(|| "no sha".to_owned()),
+                    },
+                    {
+                        let background_executor1 = app.background_executor();
+                        move |task| {
+                            background_executor1.spawn(task).detach();
+                        }
+                    },
+                    |pid| paths::temp_dir().join(format!("zed-crash-handler-{pid}")),
+                    move |duration| background_executor.timer(duration),
+                )),
+            )
+        } else {
+            crashes::force_backtrace();
+            None
+        }
     };
 
     let git_hosting_provider_registry = Arc::new(GitHostingProviderRegistry::new());
@@ -510,7 +541,8 @@ fn main() {
         handle_keymap_file_changes(user_keymap_file_rx, user_keymap_watcher, cx);
 
         let user_agent = format!(
-            "Zed/{} ({}; {})",
+            "{}/{} ({}; {})",
+            brand::APP_NAME,
             AppVersion::global(cx),
             std::env::consts::OS,
             std::env::consts::ARCH
@@ -532,6 +564,7 @@ fn main() {
         OpenListener::set_global(cx, open_listener.clone());
 
         extension::init(cx);
+        #[cfg(any(feature = "extensions", feature = "debugger"))]
         let extension_host_proxy = ExtensionHostProxy::global(cx);
 
         let client = Client::production(cx);
@@ -568,11 +601,13 @@ fn main() {
 
         let node_runtime = NodeRuntime::new(client.http_client(), Some(shell_env_loaded_rx), rx);
 
+        #[cfg(feature = "debugger")]
         debug_adapter_extension::init(extension_host_proxy.clone(), cx);
         languages::init(languages.clone(), fs.clone(), node_runtime.clone(), cx);
         let user_store = cx.new(|cx| UserStore::new(client.clone(), cx));
         let workspace_store = cx.new(|cx| WorkspaceStore::new(client.clone(), cx));
 
+        #[cfg(feature = "extensions")]
         language_extension::init(
             language_extension::LspAccess::ViaWorkspaces({
                 let workspace_store = workspace_store.clone();
@@ -598,8 +633,11 @@ fn main() {
         #[cfg(target_os = "macos")]
         zed::move_to_applications::init(cx);
         project::Project::init(&client, cx);
-        debugger_ui::init(cx);
-        debugger_tools::init(cx);
+        #[cfg(feature = "debugger")]
+        {
+            debugger_ui::init(cx);
+            debugger_tools::init(cx);
+        }
         client::init(&client, cx);
         feature_flags::FeatureFlagStore::init(cx);
 
@@ -614,6 +652,7 @@ fn main() {
             session.id().to_owned(),
             cx,
         );
+        #[cfg(feature = "crash-reporting")]
         cx.subscribe(&user_store, {
             let telemetry = telemetry.clone();
             move |_, evt: &client::user::Event, cx| match evt {
@@ -633,6 +672,7 @@ fn main() {
         })
         .detach();
 
+        #[cfg(feature = "ai")]
         let is_new_install = matches!(&installation_id, Some(IdType::New(_)));
 
         // We should rename these in the future to `first app open`, `first app open for release channel`, and `app open`
@@ -665,10 +705,16 @@ fn main() {
         AppState::set_global(app_state.clone(), cx);
 
         watcher_debug::init(app_state.clone(), cx);
-        auto_update::init(client.clone(), cx);
+        #[cfg(feature = "updater")]
+        {
+            auto_update::init(client.clone(), cx);
+            auto_update_ui::init(cx);
+        }
+        #[cfg(feature = "debugger")]
         dap_adapters::init(cx);
-        auto_update_ui::init(cx);
+        #[cfg(feature = "crash-reporting")]
         reliability::init(client.clone(), app_state.workspace_store.clone(), cx);
+        #[cfg(feature = "extensions")]
         extension_host::init(
             extension_host_proxy.clone(),
             app_state.fs.clone(),
@@ -678,58 +724,73 @@ fn main() {
         );
 
         theme_settings::init(theme::LoadThemes::All(Box::new(Assets)), cx);
-        eager_load_active_theme_and_icon_theme(fs.clone(), cx);
-        theme_extension::init(
-            extension_host_proxy,
-            ThemeRegistry::global(cx),
-            cx.background_executor().clone(),
-        );
+        #[cfg(feature = "extensions")]
+        {
+            eager_load_active_theme_and_icon_theme(fs.clone(), cx);
+            theme_extension::init(
+                extension_host_proxy,
+                ThemeRegistry::global(cx),
+                cx.background_executor().clone(),
+            );
+        }
         command_palette::init(cx);
-        let copilot_chat_configuration = copilot_chat::CopilotChatConfiguration {
-            enterprise_uri: settings::CopilotSettings::get_global(cx)
-                .enterprise_uri
-                .clone(),
-        };
-        let credentials_provider = zed_credentials_provider::global(cx);
-        copilot_chat::init(
-            app_state.client.http_client(),
-            credentials_provider,
-            copilot_chat_configuration,
-            cx,
-        );
-
-        copilot_ui::init(&app_state, cx);
         language_model::init(cx);
-        RefreshLlmTokenListener::register(
-            app_state.client.clone(),
-            app_state.user_store.clone(),
-            cx,
-        );
-        language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx);
-        acp_tools::init(cx);
         zed::telemetry_log::init(cx);
         zed::remote_debug::init(cx);
-        edit_prediction_ui::init(cx);
-        web_search::init(cx);
-        web_search_providers::init(app_state.client.clone(), app_state.user_store.clone(), cx);
         snippet_provider::init(cx);
-        edit_prediction_registry::init(app_state.client.clone(), app_state.user_store.clone(), cx);
-        let prompt_builder = PromptBuilder::load(app_state.fs.clone(), stdout_is_a_pty(), cx);
-        project::AgentRegistryStore::init_global(
-            cx,
-            app_state.fs.clone(),
-            app_state.client.http_client(),
-        );
-        agent_ui::init(
-            app_state.fs.clone(),
-            prompt_builder,
-            app_state.languages.clone(),
-            is_new_install,
-            false,
-            cx,
-        );
+        #[cfg(feature = "ai")]
+        {
+            let copilot_chat_configuration = copilot_chat::CopilotChatConfiguration {
+                enterprise_uri: settings::CopilotSettings::get_global(cx)
+                    .enterprise_uri
+                    .clone(),
+            };
+            let credentials_provider = zed_credentials_provider::global(cx);
+            copilot_chat::init(
+                app_state.client.http_client(),
+                credentials_provider,
+                copilot_chat_configuration,
+                cx,
+            );
+
+            copilot_ui::init(&app_state, cx);
+            RefreshLlmTokenListener::register(
+                app_state.client.clone(),
+                app_state.user_store.clone(),
+                cx,
+            );
+            language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx);
+            acp_tools::init(cx);
+            edit_prediction_ui::init(cx);
+            web_search::init(cx);
+            web_search_providers::init(
+                app_state.client.clone(),
+                app_state.user_store.clone(),
+                cx,
+            );
+            edit_prediction_registry::init(
+                app_state.client.clone(),
+                app_state.user_store.clone(),
+                cx,
+            );
+            let prompt_builder = PromptBuilder::load(app_state.fs.clone(), stdout_is_a_pty(), cx);
+            project::AgentRegistryStore::init_global(
+                cx,
+                app_state.fs.clone(),
+                app_state.client.http_client(),
+            );
+            agent_ui::init(
+                app_state.fs.clone(),
+                prompt_builder,
+                app_state.languages.clone(),
+                is_new_install,
+                false,
+                cx,
+            );
+        }
         zed::watch_user_agents_md(app_state.fs.clone(), cx);
 
+        #[cfg(feature = "repl")]
         repl::init(app_state.fs.clone(), cx);
         recent_projects::init(cx);
         dev_container::init(cx);
@@ -740,9 +801,11 @@ fn main() {
 
         editor::init(cx);
         image_viewer::init(cx);
+        #[cfg(feature = "repl")]
         repl::notebook::init(cx);
         diagnostics::init(cx);
 
+        #[cfg(feature = "collab")]
         audio::init(cx);
         workspace::init(app_state.clone(), cx);
         ui_prompt::init(cx);
@@ -781,18 +844,26 @@ fn main() {
         theme_selector::init(cx);
         settings_profile_selector::init(cx);
         language_tools::init(cx);
+        #[cfg(feature = "collab")]
         call::init(app_state.client.clone(), app_state.user_store.clone(), cx);
         notifications::init(app_state.client.clone(), app_state.user_store.clone(), cx);
+        #[cfg(feature = "collab")]
         collab_ui::init(&app_state, cx);
         git_ui::init(cx);
+        #[cfg(feature = "updater")]
         feedback::init(cx);
         markdown_preview::init(cx);
         tabular_data_preview::init(cx);
         svg_preview::init(cx);
+        #[cfg(feature = "nsh")]
+        nsh_workspace::init(cx);
         onboarding::init(cx);
+        #[cfg(feature = "ai")]
         settings_ui::init(cx);
         keymap_editor::init(cx);
+        #[cfg(feature = "extensions")]
         extensions_ui::init(cx);
+        #[cfg(feature = "ai")]
         edit_prediction::init(cx);
         inspector_ui::init(app_state.clone(), cx);
         json_schema_store::init(cx);
@@ -865,6 +936,7 @@ fn main() {
         let menus = app_menus(cx);
         cx.set_menus(menus);
 
+        #[cfg(feature = "crash-reporting")]
         if let Some(mut crash_handler) = crash_handler {
             let crash_handler2 = block_on(poll_once(&mut crash_handler));
             match crash_handler2 {
@@ -1528,6 +1600,7 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut 
                 })
                 .detach_and_log_err(cx);
             }
+            #[cfg(feature = "ai")]
             OpenRequestKind::AgentPanel {
                 external_source_prompt,
             } => {
@@ -1565,6 +1638,7 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut 
                 })
                 .detach_and_log_err(cx);
             }
+            #[cfg(feature = "ai")]
             OpenRequestKind::InstallSkill { content } => {
                 cx.spawn(async move |cx| {
                     let multi_workspace =
@@ -1797,6 +1871,7 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut 
         }));
     }
 
+    #[cfg(feature = "collab")]
     if !request.open_channel_notes.is_empty() || request.join_channel.is_some() {
         cx.spawn(async move |cx| {
             let result = maybe!(async {
@@ -1849,8 +1924,11 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut 
                 fail_to_open_window_async(err, cx);
             }
         })
-        .detach()
-    } else if let Some(task) = task {
+        .detach();
+        return;
+    }
+
+    if let Some(task) = task {
         cx.spawn(async move |cx| {
             if let Err(err) = task.await {
                 fail_to_open_window_async(err, cx);

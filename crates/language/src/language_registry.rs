@@ -3,9 +3,13 @@ use crate::{
     CachedLspAdapter, File, Language, LanguageConfig, LanguageId, LanguageMatcher,
     LanguageServerName, LspAdapter, ManifestName, PLAIN_TEXT, ToolchainLister,
     available_languages::AvailableLanguages, language_settings::all_language_settings,
-    task_context::ContextProvider, with_parser,
+    task_context::ContextProvider,
 };
-use anyhow::{Context as _, Result, anyhow};
+#[cfg(feature = "wasm-grammars")]
+use crate::with_parser;
+#[cfg(feature = "wasm-grammars")]
+use anyhow::Context as _;
+use anyhow::{Result, anyhow};
 use collections::{FxHashMap, HashMap, HashSet, hash_map};
 pub use language_core::{
     BinaryStatus, LanguageName, LanguageQueries, LanguageServerStatusUpdate, QueryFile,
@@ -25,8 +29,9 @@ use parking_lot::{Mutex, RwLock};
 use postage::watch;
 use smallvec::SmallVec;
 
+#[cfg(feature = "wasm-grammars")]
+use std::ffi::OsStr;
 use std::{
-    ffi::OsStr,
     path::{Path, PathBuf},
     sync::Arc,
 };
@@ -955,18 +960,30 @@ impl LanguageRegistry {
                     *grammar = AvailableGrammar::Loading(wasm_path.clone(), vec![tx]);
                     self.executor
                         .spawn(async move {
-                            let grammar_result = maybe!({
-                                let wasm_bytes = std::fs::read(&wasm_path)?;
-                                let grammar_name = wasm_path
-                                    .file_stem()
-                                    .and_then(OsStr::to_str)
-                                    .context("invalid grammar filename")?;
-                                anyhow::Ok(with_parser(|parser| {
-                                    let mut store = parser.take_wasm_store().unwrap();
-                                    let grammar = store.load_language(grammar_name, &wasm_bytes);
-                                    parser.set_wasm_store(store).unwrap();
-                                    grammar
-                                })?)
+                            let grammar_result: Result<tree_sitter::Language, Arc<anyhow::Error>> =
+                                maybe!({
+                                #[cfg(feature = "wasm-grammars")]
+                                {
+                                    let wasm_bytes = std::fs::read(&wasm_path)?;
+                                    let grammar_name = wasm_path
+                                        .file_stem()
+                                        .and_then(OsStr::to_str)
+                                        .context("invalid grammar filename")?;
+                                    anyhow::Ok(with_parser(|parser| {
+                                        let mut store = parser.take_wasm_store().unwrap();
+                                        let grammar =
+                                            store.load_language(grammar_name, &wasm_bytes);
+                                        parser.set_wasm_store(store).unwrap();
+                                        grammar
+                                    })?)
+                                }
+                                #[cfg(not(feature = "wasm-grammars"))]
+                                {
+                                    anyhow::bail!(
+                                        "Wasm grammar '{}' requires the `wasm-grammars` feature",
+                                        wasm_path.display()
+                                    )
+                                }
                             })
                             .map_err(Arc::new);
 

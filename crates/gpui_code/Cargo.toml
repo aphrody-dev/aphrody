@@ -1,0 +1,133 @@
+[package]
+name = "gpui_code"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Rust code library for GPUI: rope, text buffers, Tree-sitter syntax, diffs, fuzzy search, LSP, Git, worktrees, terminal, and code editor."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/gpui_code.rs"
+doctest = false
+
+[features]
+default = ["syntax", "lsp", "git", "worktree", "terminal", "editor", "grammars"]
+syntax = [
+    "dep:buffer_diff",
+    "dep:language_core",
+    "dep:language",
+    "dep:language_detection",
+    "dep:snippet",
+    "dep:outline",
+]
+grammars = [
+    "syntax",
+    "dep:grammars",
+    "grammars/load-grammars",
+    "dep:languages",
+    "languages/load-grammars",
+]
+lsp = [
+    "syntax",
+    "dep:lsp",
+    "dep:json_schema_store",
+    "dep:prettier",
+]
+git = [
+    "dep:git",
+    "dep:git_hosting_providers",
+]
+worktree = [
+    "syntax",
+    "git",
+    "lsp",
+    "dep:fs",
+    "dep:worktree",
+    "dep:project",
+]
+terminal = [
+    "dep:terminal",
+    "dep:shell_command_parser",
+]
+editor = [
+    "worktree",
+    "dep:multi_buffer",
+    "dep:editor",
+    "dep:search",
+    "dep:diagnostics",
+]
+terminal-ui = [
+    "terminal",
+    "editor",
+    "dep:terminal_view",
+]
+git-ui = [
+    "git",
+    "editor",
+    "dep:git_ui_core",
+    "dep:git_ui",
+]
+vim = [
+    "editor",
+    "dep:vim",
+    "dep:vim_mode_setting",
+]
+full = ["default", "terminal-ui", "git-ui", "vim"]
+test-support = [
+    "gpui_ui/test-support",
+    "text/test-support",
+]
+
+[dependencies]
+anyhow.workspace = true
+buffer_diff = { workspace = true, optional = true }
+fuzzy.workspace = true
+fuzzy_nucleo.workspace = true
+gpui_ui.workspace = true
+imara-diff.workspace = true
+path.workspace = true
+rope.workspace = true
+streaming_diff.workspace = true
+sum_tree.workspace = true
+text.workspace = true
+
+# Optional syntax / Tree-sitter layer
+grammars = { workspace = true, optional = true }
+language = { workspace = true, optional = true }
+language_core = { workspace = true, optional = true }
+language_detection = { workspace = true, optional = true }
+languages = { workspace = true, optional = true }
+outline = { workspace = true, optional = true }
+snippet = { workspace = true, optional = true }
+
+# Optional LSP layer
+json_schema_store = { workspace = true, optional = true }
+lsp = { workspace = true, optional = true }
+prettier = { workspace = true, optional = true }
+
+# Optional Git layer
+git = { workspace = true, optional = true }
+git_hosting_providers = { workspace = true, optional = true }
+git_ui = { workspace = true, optional = true }
+git_ui_core = { workspace = true, optional = true }
+
+# Optional Worktree / Project layer
+fs = { workspace = true, optional = true }
+project = { workspace = true, optional = true }
+worktree = { workspace = true, optional = true }
+
+# Optional Terminal layer
+shell_command_parser = { workspace = true, optional = true }
+terminal = { workspace = true, optional = true }
+terminal_view = { workspace = true, optional = true }
+
+# Optional Editor UI layer
+diagnostics = { workspace = true, optional = true }
+editor = { workspace = true, optional = true }
+multi_buffer = { workspace = true, optional = true }
+search = { workspace = true, optional = true }
+vim = { workspace = true, optional = true }
+vim_mode_setting = { workspace = true, optional = true }

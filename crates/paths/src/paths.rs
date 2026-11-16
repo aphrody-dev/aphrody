@@ -14,37 +14,12 @@ pub const EDITORCONFIG_NAME: &str = ".editorconfig";
 /// The application name, used to derive platform-specific data, config, cache,
 /// and state directory paths.
 ///
-/// Forks should change this to avoid colliding with Zed's user data.
-pub const APP_NAME: &str = "Zed";
+/// Derived from root `product.toml` via [`brand::APP_NAME`].
+pub const APP_NAME: &str = brand::APP_NAME;
 
 /// Lowercased form of [`APP_NAME`], for use in XDG-style paths on
 /// Linux/FreeBSD and the macOS `~/.config` fallback.
-pub const APP_NAME_LOWERCASE: &str = {
-    assert!(!APP_NAME.is_empty(), "APP_NAME must not be empty");
-    assert!(APP_NAME.as_bytes().is_ascii(), "APP_NAME must be ASCII");
-    const BYTES: [u8; APP_NAME.len()] = {
-        let mut bytes = [0u8; APP_NAME.len()];
-        let mut i = 0;
-        while i < APP_NAME.len() {
-            assert!(
-                APP_NAME.as_bytes()[i] != b'/' && APP_NAME.as_bytes()[i] != b'\\',
-                "APP_NAME must not contain path separators",
-            );
-            assert!(
-                APP_NAME.as_bytes()[i] >= 0x20,
-                "APP_NAME must not contain control characters"
-            );
-            bytes[i] = APP_NAME.as_bytes()[i];
-            i += 1;
-        }
-        bytes.make_ascii_lowercase();
-        bytes
-    };
-    match std::str::from_utf8(&BYTES) {
-        Ok(s) => s,
-        Err(_) => unreachable!(),
-    }
-};
+pub const APP_NAME_LOWERCASE: &str = brand::APP_SLUG;
 
 /// A custom data directory override, set only by `set_custom_data_dir`.
 /// This is used to override the default data directory location.
@@ -65,18 +40,18 @@ static CURRENT_DATA_DIR: OnceLock<PathBuf> = OnceLock::new();
 /// On Windows, this is `%APPDATA%\Zed`.
 static CONFIG_DIR: OnceLock<PathBuf> = OnceLock::new();
 
-/// Returns the relative path to the zed_server directory on the ssh host.
+/// Returns the relative path to the remote server directory on the ssh host.
 pub fn remote_server_dir_relative() -> &'static RelPath {
     static CACHED: LazyLock<&'static RelPath> =
-        LazyLock::new(|| RelPath::from_unix_str(".zed_server").unwrap());
+        LazyLock::new(|| RelPath::from_unix_str(brand::REMOTE_SERVER_FOLDER).unwrap());
     *CACHED
 }
 
 // Remove this once 223 goes stable
-/// Returns the relative path to the zed_wsl_server directory on the wsl host.
+/// Returns the relative path to the wsl server directory on the wsl host.
 pub fn remote_wsl_server_dir_relative() -> &'static RelPath {
     static CACHED: LazyLock<&'static RelPath> =
-        LazyLock::new(|| RelPath::from_unix_str(".zed_wsl_server").unwrap());
+        LazyLock::new(|| RelPath::from_unix_str(brand::REMOTE_WSL_SERVER_FOLDER).unwrap());
     *CACHED
 }
 
@@ -483,9 +458,19 @@ pub fn devcontainer_dir() -> &'static PathBuf {
     DEVCONTAINER_DIR.get_or_init(|| data_dir().join("devcontainer"))
 }
 
-/// Returns the relative path to a `.zed` folder within a project.
+/// Returns the relative path to the primary project settings folder (`.aphrody`).
 pub fn local_settings_folder_name() -> &'static str {
-    ".zed"
+    brand::LOCAL_SETTINGS_FOLDER
+}
+
+/// Returns the relative path to the legacy Zed project settings folder (`.zed`) for full compatibility.
+pub fn legacy_local_settings_folder_name() -> &'static str {
+    brand::LEGACY_LOCAL_SETTINGS_FOLDER
+}
+
+/// Returns true if `name` matches either `.aphrody` or `.zed`.
+pub fn is_local_settings_folder_name(name: &str) -> bool {
+    name == brand::LOCAL_SETTINGS_FOLDER || name == brand::LEGACY_LOCAL_SETTINGS_FOLDER
 }
 
 /// Returns the relative path to a `.vscode` folder within a project.
@@ -493,17 +478,31 @@ pub fn local_vscode_folder_name() -> &'static str {
     ".vscode"
 }
 
-/// Returns the relative path to a `settings.json` file within a project.
+/// Returns the relative path to a `settings.json` file within a project (`.aphrody/settings.json`).
 pub fn local_settings_file_relative_path() -> &'static RelPath {
     static CACHED: LazyLock<&'static RelPath> =
-        LazyLock::new(|| RelPath::from_unix_str(".zed/settings.json").unwrap());
+        LazyLock::new(|| RelPath::from_unix_str(brand::LOCAL_SETTINGS_FILE).unwrap());
     *CACHED
 }
 
-/// Returns the relative path to a `tasks.json` file within a project.
+/// Returns the legacy Zed relative path `.zed/settings.json` for full compatibility with Zed repos.
+pub fn legacy_local_settings_file_relative_path() -> &'static RelPath {
+    static CACHED: LazyLock<&'static RelPath> =
+        LazyLock::new(|| RelPath::from_unix_str(brand::LEGACY_LOCAL_SETTINGS_FILE).unwrap());
+    *CACHED
+}
+
+/// Returns the relative path to a `tasks.json` file within a project (`.aphrody/tasks.json`).
 pub fn local_tasks_file_relative_path() -> &'static RelPath {
     static CACHED: LazyLock<&'static RelPath> =
-        LazyLock::new(|| RelPath::from_unix_str(".zed/tasks.json").unwrap());
+        LazyLock::new(|| RelPath::from_unix_str(brand::LOCAL_TASKS_FILE).unwrap());
+    *CACHED
+}
+
+/// Returns the legacy Zed relative path `.zed/tasks.json` for full compatibility with Zed repos.
+pub fn legacy_local_tasks_file_relative_path() -> &'static RelPath {
+    static CACHED: LazyLock<&'static RelPath> =
+        LazyLock::new(|| RelPath::from_unix_str(brand::LEGACY_LOCAL_TASKS_FILE).unwrap());
     *CACHED
 }
 
@@ -522,11 +521,17 @@ pub fn task_file_name() -> &'static str {
     "tasks.json"
 }
 
-/// Returns the relative path to a `debug.json` file within a project.
-/// .zed/debug.json
+/// Returns the relative path to a `debug.json` file within a project (`.aphrody/debug.json`).
 pub fn local_debug_file_relative_path() -> &'static RelPath {
     static CACHED: LazyLock<&'static RelPath> =
-        LazyLock::new(|| RelPath::from_unix_str(".zed/debug.json").unwrap());
+        LazyLock::new(|| RelPath::from_unix_str(brand::LOCAL_DEBUG_FILE).unwrap());
+    *CACHED
+}
+
+/// Returns the legacy Zed relative path `.zed/debug.json` for full compatibility with Zed repos.
+pub fn legacy_local_debug_file_relative_path() -> &'static RelPath {
+    static CACHED: LazyLock<&'static RelPath> =
+        LazyLock::new(|| RelPath::from_unix_str(brand::LEGACY_LOCAL_DEBUG_FILE).unwrap());
     *CACHED
 }
 

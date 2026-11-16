@@ -19,6 +19,11 @@ enum CliCommand {
     Licenses(tasks::licenses::LicensesArgs),
     /// Checks that packages conform to a set of standards.
     PackageConformity(tasks::package_conformity::PackageConformityArgs),
+    /// Scaffolds a new standalone GPUI application powered by `gpui_ui`, `gpui_code`, and `gpui_app_shell`.
+    NewApp(tasks::new_app::NewAppArgs),
+    /// Applies or verifies declarative product branding (`product.toml`) across manifests and icons.
+    #[command(subcommand)]
+    Brand(tasks::brand::BrandCommand),
     /// Inspect the GPUI publish plan and its dependencies.
     #[command(subcommand)]
     Gpui(tasks::gpui::GpuiCommand),
@@ -44,6 +49,8 @@ fn main() -> Result<()> {
         CliCommand::PackageConformity(args) => {
             tasks::package_conformity::run_package_conformity(args)
         }
+        CliCommand::NewApp(args) => tasks::new_app::run_new_app(args),
+        CliCommand::Brand(cmd) => tasks::brand::run_brand(cmd),
         CliCommand::Gpui(args) => tasks::gpui::run_gpui(args),
         CliCommand::SandboxTests(args) => tasks::sandbox_tests::run_sandbox_tests(args),
         CliCommand::WslSandboxTests(args) => tasks::wsl_sandbox_tests::run_wsl_sandbox_tests(args),

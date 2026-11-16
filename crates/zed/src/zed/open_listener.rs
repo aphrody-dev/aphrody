@@ -1,5 +1,6 @@
 use crate::handle_open_request;
 use crate::restore_or_create_workspace;
+#[cfg(feature = "ai")]
 use agent_ui::ExternalSourcePrompt;
 use anyhow::{Context as _, Result, anyhow};
 use cli::{CliRequest, CliResponse, CliResponseSink};
@@ -57,9 +58,11 @@ pub enum OpenRequestKind {
     Extension {
         extension_id: String,
     },
+    #[cfg(feature = "ai")]
     AgentPanel {
         external_source_prompt: Option<ExternalSourcePrompt>,
     },
+    #[cfg(feature = "ai")]
     InstallSkill {
         /// Full `SKILL.md` contents embedded in a `zed://skill` share link.
         content: String,
@@ -91,12 +94,14 @@ impl std::fmt::Debug for OpenRequestKind {
                 .debug_struct("Extension")
                 .field("extension_id", extension_id)
                 .finish(),
+            #[cfg(feature = "ai")]
             Self::AgentPanel {
                 external_source_prompt,
             } => f
                 .debug_struct("AgentPanel")
                 .field("external_source_prompt", external_source_prompt)
                 .finish(),
+            #[cfg(feature = "ai")]
             Self::InstallSkill { content } => f
                 .debug_struct("InstallSkill")
                 .field("content_len", &content.len())
@@ -155,43 +160,67 @@ impl OpenRequest {
         }
 
         for url in request.urls {
-            if let Some(server_name) = url.strip_prefix("zed-cli://") {
+            if let Some(server_name) = brand::strip_cli_url_scheme(&url) {
                 this.kind = Some(OpenRequestKind::CliConnection(connect_to_cli(server_name)?));
-            } else if let Some(action_index) = url.strip_prefix("zed-dock-action://") {
+            } else if let Some(action_index) = brand::strip_dock_action_scheme(&url) {
                 this.kind = Some(OpenRequestKind::DockMenuAction {
                     index: action_index.parse()?,
                 });
             } else if let Some(file) = url.strip_prefix("file://") {
                 this.parse_local_file_path(file)
-            } else if let Some(file) = url.strip_prefix("zed://file") {
-                this.parse_local_file_path(file)
-            } else if let Some(file) = url.strip_prefix("zed://ssh") {
-                let ssh_url = "ssh:/".to_string() + file;
-                this.parse_ssh_file_path(&ssh_url, cx)?
-            } else if let Some(extension_id) = url.strip_prefix("zed://extension/") {
-                this.kind = Some(OpenRequestKind::Extension {
-                    extension_id: extension_id.to_string(),
-                });
-            } else if url.starts_with(agent_skills::SKILL_SHARE_LINK_PREFIX) {
-                this.parse_skill_install_url(&url)?
-            } else if let Some(agent_path) = url.strip_prefix("zed://agent") {
-                this.parse_agent_url(agent_path)
-            } else if url == "zed://" || url == "zed://open" || url == "zed://open/" {
-                this.kind = Some(OpenRequestKind::FocusApp);
-            } else if let Some(schema_path) = url.strip_prefix("zed://schemas/") {
-                this.kind = Some(OpenRequestKind::BuiltinJsonSchema {
-                    schema_path: schema_path.to_string(),
-                });
-            } else if url == "zed://settings" || url == "zed://settings/" {
-                this.kind = Some(OpenRequestKind::Setting { setting_path: None });
-            } else if let Some(setting_path) = url.strip_prefix("zed://settings/") {
-                this.kind = Some(OpenRequestKind::Setting {
-                    setting_path: Some(setting_path.to_string()),
-                });
-            } else if let Some(clone_path) = url.strip_prefix("zed://git/clone") {
-                this.parse_git_clone_url(clone_path)?
-            } else if let Some(commit_path) = url.strip_prefix("zed://git/commit/") {
-                this.parse_git_commit_url(commit_path)?
+            } else if let Some(app_rest) = brand::strip_app_url_scheme(&url) {
+                if let Some(file) = app_rest.strip_prefix("file") {
+                    this.parse_local_file_path(file)
+                } else if let Some(file) = app_rest.strip_prefix("ssh") {
+                    let ssh_url = "ssh:/".to_string() + file;
+                    this.parse_ssh_file_path(&ssh_url, cx)?
+                } else if let Some(extension_id) = app_rest.strip_prefix("extension/") {
+                    this.kind = Some(OpenRequestKind::Extension {
+                        extension_id: extension_id.to_string(),
+                    });
+                } else if app_rest.is_empty() || app_rest == "open" || app_rest == "open/" {
+                    this.kind = Some(OpenRequestKind::FocusApp);
+                } else if let Some(schema_path) = app_rest.strip_prefix("schemas/") {
+                    this.kind = Some(OpenRequestKind::BuiltinJsonSchema {
+                        schema_path: schema_path.to_string(),
+                    });
+                } else if app_rest == "settings" || app_rest == "settings/" {
+                    this.kind = Some(OpenRequestKind::Setting { setting_path: None });
+                } else if let Some(setting_path) = app_rest.strip_prefix("settings/") {
+                    this.kind = Some(OpenRequestKind::Setting {
+                        setting_path: Some(setting_path.to_string()),
+                    });
+                } else if let Some(clone_path) = app_rest.strip_prefix("git/clone") {
+                    this.parse_git_clone_url(clone_path)?
+                } else if let Some(commit_path) = app_rest.strip_prefix("git/commit/") {
+                    this.parse_git_commit_url(commit_path)?
+                } else if let Some(zed_link) = parse_zed_link(&url, cx) {
+                    match zed_link {
+                        ZedLink::Channel { channel_id } => {
+                            this.join_channel = Some(channel_id);
+                        }
+                        ZedLink::ChannelNotes {
+                            channel_id,
+                            heading,
+                        } => {
+                            this.open_channel_notes.push((channel_id, heading));
+                        }
+                    }
+                } else {
+                    #[cfg(feature = "ai")]
+                    {
+                        if app_rest.starts_with("skill") {
+                            let canonical_zed_url = format!("zed://{app_rest}");
+                            this.parse_skill_install_url(&canonical_zed_url)?;
+                            continue;
+                        }
+                        if let Some(agent_path) = app_rest.strip_prefix("agent") {
+                            this.parse_agent_url(agent_path);
+                            continue;
+                        }
+                    }
+                    log::error!("unhandled url: {}", url);
+                }
             } else if url.starts_with("ssh://") {
                 this.parse_ssh_file_path(&url, cx)?
             } else if let Some(zed_link) = parse_zed_link(&url, cx) {
@@ -227,6 +256,7 @@ impl OpenRequest {
         }
     }
 
+    #[cfg(feature = "ai")]
     fn parse_agent_url(&mut self, agent_path: &str) {
         // Format: "" or "?prompt=<text>".
         let agent_path = agent_path.strip_prefix('/').unwrap_or(agent_path);
@@ -240,6 +270,7 @@ impl OpenRequest {
         });
     }
 
+    #[cfg(feature = "ai")]
     fn parse_skill_install_url(&mut self, url: &str) -> Result<()> {
         // Format: zed://skill?data=<base64url of SKILL.md contents>
         let content = agent_skills::decode_skill_share_link(url)?;
@@ -418,7 +449,11 @@ pub fn listen_for_cli_connections(opener: OpenListener) -> Result<()> {
     use release_channel::RELEASE_CHANNEL_NAME;
     use std::os::unix::net::UnixDatagram;
 
-    let sock_path = paths::data_dir().join(format!("zed-{}.sock", *RELEASE_CHANNEL_NAME));
+    let sock_path = paths::data_dir().join(format!(
+        "{}-{}.sock",
+        brand::APP_SLUG,
+        *RELEASE_CHANNEL_NAME
+    ));
     // remove the socket if the process listening on it has died
     if let Err(e) = UnixDatagram::unbound()?.connect(&sock_path)
         && e.kind() == std::io::ErrorKind::ConnectionRefused
@@ -1161,7 +1196,7 @@ pub async fn derive_paths_with_position(
     result
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "full"))]
 mod tests {
     use super::*;
     use crate::zed::{open_listener::open_local_workspace, tests::init_test};

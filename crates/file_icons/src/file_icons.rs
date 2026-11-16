@@ -2,8 +2,7 @@ use std::sync::Arc;
 use std::{path::Path, str};
 
 use gpui::{App, SharedString};
-use settings_content::FolderIndicator;
-use theme::{GlobalTheme, IconTheme, ThemeRegistry};
+use theme::{FolderIndicator, GlobalTheme, IconTheme, ThemeRegistry};
 use util::paths::PathExt;
 
 #[derive(Debug)]

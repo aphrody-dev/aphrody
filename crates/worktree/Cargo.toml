@@ -36,7 +36,7 @@ clock.workspace = true
 collections.workspace = true
 encoding_rs.workspace = true
 file_content.workspace = true
-fs.workspace = true
+fs = { workspace = true, features = ["proto"] }
 futures.workspace = true
 futures-lite.workspace = true
 fuzzy.workspace = true

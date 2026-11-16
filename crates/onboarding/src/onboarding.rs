@@ -347,15 +347,18 @@ impl Render for Onboarding {
                                     .child(
                                         h_flex()
                                             .gap_4()
-                                            .child(Vector::square(VectorName::ZedLogo, rems(2.5)))
+                                            .child(Vector::square(VectorName::AphrodyLogo, rems(2.5)))
                                             .child(
                                                 v_flex()
                                                     .child(
-                                                        Headline::new("Welcome to Zed")
-                                                            .size(HeadlineSize::Small),
+                                                        Headline::new(format!(
+                                                            "Welcome to {}",
+                                                            brand::APP_NAME
+                                                        ))
+                                                        .size(HeadlineSize::Small),
                                                     )
                                                     .child(
-                                                        Label::new("The editor for what's next")
+                                                        Label::new(brand::TAGLINE)
                                                             .color(Color::Muted)
                                                             .size(LabelSize::Small)
                                                             .italic(),

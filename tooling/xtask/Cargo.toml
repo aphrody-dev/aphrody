@@ -18,15 +18,18 @@ clap.workspace = true
 compliance = { workspace = true, features = ["octo-client"] }
 gh-workflow.workspace = true
 guppy = "0.18"
+image.workspace = true
 indoc.workspace = true
 indexmap.workspace = true
 itertools.workspace = true
 regex = { workspace = true, features = ["unicode-perl"] }
+resvg.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 serde_yaml = "0.9.34"
 strum.workspace = true
 thiserror.workspace = true
+tiny-skia.workspace = true
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 toml.workspace = true
 toml_edit.workspace = true

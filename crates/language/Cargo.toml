@@ -13,7 +13,10 @@ path = "src/language.rs"
 doctest = false
 
 [features]
+default = []
+wasm-grammars = ["tree-sitter/wasm"]
 test-support = [
+    "wasm-grammars",
     "rand",
     "collections/test-support",
     "grammars",
@@ -37,7 +40,7 @@ diffy.workspace = true
 ec4rs.workspace = true
 encoding_rs.workspace = true
 file_content.workspace = true
-fs.workspace = true
+fs = { workspace = true, features = ["proto"] }
 futures.workspace = true
 futures-lite.workspace = true
 fuzzy_nucleo.workspace = true
@@ -73,7 +76,7 @@ tree-sitter-md = { workspace = true, optional = true }
 tree-sitter-python = { workspace = true, optional = true }
 tree-sitter-rust = { workspace = true, optional = true }
 tree-sitter-typescript = { workspace = true, optional = true }
-tree-sitter = { workspace = true, features = ["wasm"] }
+tree-sitter.workspace = true
 unicase.workspace = true
 util.workspace = true
 watch.workspace = true
