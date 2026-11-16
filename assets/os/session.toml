@@ -1,0 +1,80 @@
+schema_version = 1
+
+[session]
+name = "aphrody-cosmic"
+default_shell = "os-desktop"
+default_theme = "aphrody"
+default_appearance = "dark"
+focus_follows_mouse = false
+autotile_default = "dwindle"
+
+[environment]
+XDG_CURRENT_DESKTOP = "COSMIC"
+XDG_SESSION_DESKTOP = "COSMIC"
+COSMIC_DATA_CONTROL_ENABLED = "1"
+
+[[units]]
+id = "compositor"
+description = "COSMIC/GPUI window layout & layer-shell compositor"
+kind = "compositor"
+command = "aphrody-os"
+args = ["--role", "compositor"]
+restart = "always"
+depends_on = []
+platforms = ["linux", "windows", "macos"]
+autostart = true
+
+[[units]]
+id = "panel"
+description = "COSMIC top panel and workspace dock applets"
+kind = "shell"
+command = "aphrody-os"
+args = ["--role", "panel"]
+restart = "always"
+depends_on = ["compositor"]
+platforms = ["linux", "windows", "macos"]
+autostart = true
+
+[[units]]
+id = "launcher"
+description = "App library & command launcher daemon"
+kind = "shell"
+command = "aphrody-os"
+args = ["--role", "launcher"]
+restart = "on_failure"
+depends_on = ["compositor"]
+platforms = ["linux", "windows", "macos"]
+autostart = true
+
+[[units]]
+id = "files-daemon"
+description = "Filesystem watcher and craft-sniff indexer"
+kind = "daemon"
+command = "aphrody-os"
+args = ["--role", "files"]
+restart = "on_failure"
+depends_on = ["compositor"]
+platforms = ["linux", "windows", "macos"]
+autostart = true
+
+[[units]]
+id = "craft-mcp"
+description = "Unified OS + ArtCraft + Craft Anything MCP JSON-RPC bridge"
+kind = "mcp"
+command = "aphrody-os"
+args = ["--mcp"]
+restart = "on_failure"
+depends_on = ["files-daemon"]
+platforms = ["linux", "windows", "macos"]
+autostart = true
+
+[[units]]
+id = "xdg-desktop-portal-cosmic"
+description = "Wayland/XDG portal screencast, file chooser, and settings bridge"
+kind = "portal"
+command = "xdg-desktop-portal-cosmic"
+args = []
+restart = "on_failure"
+depends_on = ["compositor"]
+platforms = ["linux"]
+autostart = true

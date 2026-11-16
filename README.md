@@ -19,7 +19,11 @@ Modular, local-first, ultra-fast Rust **GPU UI Framework**, **Code Engine**, **N
 | **`crates/nsh-*` & `crates/nsh_workspace`** | Absorbed Native Shell v0.5.0 unified on `gpui 0.2.2` & `wgpu 30.0.0`: Solid-style signals, 35+ controls, live in-memory `.tsx` hot-reload preview, and `<GpuiCodeEditor>` native embedding. | **Zero** `gpui-fast` duplicate, **zero** npm TypeScript tarballs |
 | **`crates/gpui_app_shell`** | Production multi-window docked application starter pack (`Workspace`, `Dock`, `Pane`, Command Palette, Keymaps, JSON Settings, SQLite `db`, `AppModule` trait, `NshModule`). | **Zero** WebRTC / Wasmtime |
 | **`crates/wgpu_cli` (`gpui-wgpu`)** | GPU adapter inspector, Naga WGSL validator/reflector, cross-compiler (HLSL/MSL/GLSL/SPIR-V), headless PNG renderer, compute runner, and GPU benchmark CLI built on `vendor/wgpu`. | Standalone Apache-2.0 CLI |
-| **`crates/zed` (`bin = "aphrody"`)** | **Aphrody Studio**: **Local-First Lite** by default (`default = []`), with opt-in Cargo features (`nsh`, `extensions`, `debugger`, `repl`, `collab`, `ai`, `updater`, `crash-reporting`, `full`). | **Zero** by default; 100% opt-in via `--features full` |
+| **`crates/os_session`** | Wayland/X11/Windows/macOS desktop session supervisor, topological unit startup (`assets/os/session.toml`), `taffy`-backed LayerShell/Dwindle/CosmicGrid/NiriScroll compositor geometry, XDG/StartMenu app discovery, and `.deb`/`.desktop`/Flatpak descriptors. | Pure Rust (`wasm32`-ready) |
+| **`crates/os_ui`** | Unified GPUI OS toolkit combining Material 3 & COSMIC RON theming (`assets/os/themes.json` + WCAG AA checks), `PanelApplet` / `NavRail` / `ContextDrawer` / atomic `OsConfigStore`, `iced`-style `ReactiveProgram` & `TaskCommand`, and `egui`-style `ImmediateUi` + `gpui::canvas` telemetry sparklines. | Pure GPUI (`ui` + `theme`) |
+| **`crates/os_craft`** | Unified **ArtCraft** 17-application studio catalog (`assets/os/craft_catalog.toml`), [`vendor/craft-libs`](./vendor/craft-libs) pure-Rust decoders (`craft-sniff`, `craft-psd`, `craft-exr`, `craft-plist`, `image`, `usvg`/`resvg`), `object`/`wasmparser` inspector, and Craft Anything stdio/HTTP JSON-RPC 2.0 MCP server. | Opt-in codecs (`--no-default-features` skips raster/native/Wasm) |
+| **`crates/os_desktop` (`bin = "aphrody-os"`)** | COSMIC Epoch GPU desktop shell (`TopPanel`, compositor tiling stage, `DockBar`, searchable `Launcher`, Files, Reactive Settings, System Monitor, unified ArtCraft Studio, and optional `ArtCraftShellModule`). | `default = ["desktop"]` |
+| **`crates/zed` (`bin = "aphrody"`)** | **Aphrody Studio**: full ecosystem profile by default (`default = ["full"]`), with `--no-default-features` stripping `nsh`, `extensions`, `debugger`, `repl`, `collab`, `ai`, `updater`, and `crash-reporting` down to the local-first editor core. | `--no-default-features` trims optional subsystems |
 
 ---
 
@@ -34,14 +38,18 @@ cargo check
 ### 2. Run & Build Aphrody Studio
 
 ```sh
-# Ultra-fast Local-First Aphrody (LSP, Git, Worktree, Terminal, Multi-buffer, Vim, Search, Tasks):
+# Local-First Core Aphrody Studio (no collab, updater, telemetry, or extensions):
+cargo run -p zed --no-default-features
+
+# Full Aphrody Studio (default profile):
 cargo run -p zed
 
-# Aphrody with Native Shell live TSX surfaces + Wasm Extensions + Debugger:
-cargo run -p zed --features "nsh,extensions,debugger"
-
-# Full Aphrody with every subsystem enabled:
-cargo run -p zed --features full
+# Aphrody GPUI OS Shell & Unified 17-App ArtCraft + Craft Anything Workbench:
+cargo run -p os_desktop --bin aphrody-os
+cargo run -p os_desktop --bin aphrody-os -- doctor --json
+cargo run -p os_desktop --bin aphrody-os -- catalog
+cargo run -p os_desktop --bin aphrody-os -- inspect assets/images/aphrody_logo.svg --json
+cargo run -p os_desktop --bin aphrody-os -- mcp
 
 # Maximum-optimization LLVM FatLTO distribution build:
 cargo build -p zed --profile dist --features "nsh,extensions,debugger"
@@ -107,10 +115,10 @@ Aphrody isolates its user directories (`%APPDATA%\Aphrody` / `%LOCALAPPDATA%\Aph
 - `telemetry.diagnostics = false` and `telemetry.metrics = false`
 - `auto_update = false`
 - `title_bar.show_sign_in = false` and `title_bar.show_user_menu = false`
-- Legacy SaaS server (`crates/collab`) and `aws-sdk-s3` / `aws-sdk-kinesis` / `sqlx` / `sea-orm` dependencies are purged.
+- Legacy SaaS server (`crates/collab`) and `aws-sdk-s3` / `aws-sdk-kinesis` / `sqlx` / `sea-orm` dependencies are purged (`collab_ui` remains strictly behind the `collab` feature in `crates/zed`).
 
 ---
 
 ## Licensing
 
-Derived from [Zed](https://github.com/zed-industries/zed) and [Native Shell](https://github.com/longbridge/nsh), with [`wgpu`](https://github.com/gfx-rs/wgpu) (Apache-2.0 / MIT) in `vendor/wgpu` and [`bun`](https://github.com/aphrody-labs/bun) as a submodule in `vendor/bun`. Source code is licensed under GPL-3.0-or-later and Apache-2.0 / MIT where marked (including `gpui`, `brand`, `wgpu_cli`, and `nsh-*`).
+Derived from [Zed](https://github.com/zed-industries/zed) and [Native Shell](https://github.com/longbridge/nsh), with [`wgpu`](https://github.com/gfx-rs/wgpu) (Apache-2.0 / MIT) in `vendor/wgpu`, [`bun`](https://github.com/aphrody-labs/bun) in `vendor/bun`, [`craft-libs`](https://github.com/aphrody-labs/craft-libs) in `vendor/craft-libs`, and [`craft-anything`](https://github.com/aphrody-labs/craft-anything) in `vendor/craft-anything`. Source code is licensed under GPL-3.0-or-later and Apache-2.0 / MIT where marked (`gpui`, `brand`, `wgpu_cli`, `os_session`, `os_ui`, `os_craft`, and `nsh-*`).

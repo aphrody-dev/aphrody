@@ -1,3 +1,11 @@
 [submodule "vendor/bun"]
 	path = vendor/bun
-	url = https://github.com/aphrody-labs/bun
+	url = ../../aphrody-labs/bun.git
+[submodule "vendor/craft-libs"]
+	path = vendor/craft-libs
+	url = ../../aphrody-labs/craft-libs.git
+	branch = main
+[submodule "vendor/craft-anything"]
+	path = vendor/craft-anything
+	url = ../../aphrody-labs/craft-anything.git
+	branch = main

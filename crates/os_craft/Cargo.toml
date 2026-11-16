@@ -1,0 +1,52 @@
+[package]
+name = "os_craft"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Declarative ArtCraft studio catalog, craft-libs format/codec inspection pipeline, and unified Craft Anything + OS MCP control server."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/os_craft.rs"
+doctest = false
+
+[features]
+default = ["codecs", "wasm-inspect", "native-inspect"]
+codecs = [
+    "dep:craft-exr",
+    "craft-exr/decode",
+    "dep:craft-plist",
+    "dep:craft-psd",
+    "dep:image",
+    "dep:resvg",
+    "dep:usvg",
+]
+wasm-inspect = ["dep:wasmparser"]
+native-inspect = ["dep:object"]
+
+[dependencies]
+anyhow.workspace = true
+brand.workspace = true
+craft-exr = { workspace = true, optional = true }
+craft-plist = { workspace = true, optional = true }
+craft-psd = { workspace = true, optional = true }
+craft-sniff.workspace = true
+dirs.workspace = true
+image = { workspace = true, optional = true }
+log.workspace = true
+object = { workspace = true, optional = true }
+os_session.workspace = true
+resvg = { workspace = true, optional = true }
+schemars.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+usvg = { workspace = true, optional = true }
+wasmparser = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile.workspace = true
