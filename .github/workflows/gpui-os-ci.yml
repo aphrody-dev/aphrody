@@ -67,7 +67,12 @@ jobs:
             libsqlite3-dev libssl-dev libva-dev libvulkan1 libwayland-dev \
             libx11-xcb-dev libxcb-shape0-dev libxcb-xfixes0-dev \
             libxkbcommon-dev libxkbcommon-x11-dev libzstd-dev
+      - name: Read toolchain from rust-toolchain.toml
+        id: rt
+        run: echo "toolchain=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.rt.outputs.toolchain }}
       - uses: Swatinem/rust-cache@v2
       - name: Brand manifest & icon consistency check
         run: |
@@ -87,7 +92,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: false
+      - name: Read toolchain from rust-toolchain.toml
+        id: rt
+        run: echo "toolchain=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.rt.outputs.toolchain }}
       - uses: Swatinem/rust-cache@v2
       - name: Brand check & Windows compilation
         shell: pwsh
