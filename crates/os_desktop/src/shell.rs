@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::time::Instant;
+use web_time::Instant;
 
 use gpui::{
     AnyElement, App, Context, ElementId, Entity, FocusHandle, Focusable, KeyDownEvent, Render,
@@ -14,19 +14,19 @@ use os_session::{
     WorkspaceId, discover_system_apps,
 };
 use os_ui::{
-    AppearanceMode, AppletSlot, ImmediateUi, OsConfigStore, OsTheme, OsThemeCatalog, PanelApplet,
-    ReactiveHost, StatusTone, contrast_ratio, focusable_action_chip, render_context_drawer,
-    status_badge,
+    AdaptiveViewport, AppearanceMode, AppletSlot, OsConfigStore, OsTheme, OsThemeCatalog,
+    PanelApplet, ReactiveHost, StatusTone, focusable_action_chip, status_badge,
 };
 use ui::{Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
 
 use crate::applets::{BrandLauncherApplet, SystemTelemetryApplet, WorkspaceApplet, WorkspacePill};
+use crate::overlays::{render_context_drawer_pane, render_launcher_modal};
 use crate::studio_view::{StudioCallbacks, StudioState, render_studio_window};
 use crate::windows::{
     DesktopPrefs, FilesState, SettingsFlags, SettingsMessage, SettingsProgram, WindowKind,
     render_files_window, render_monitor_window,
 };
-use crate::{DesktopOptions, parse_icon_name};
+use crate::DesktopOptions;
 
 const TOP_PANEL_HEIGHT: f32 = 44.0;
 const BOTTOM_DOCK_HEIGHT: f32 = 64.0;
@@ -49,16 +49,17 @@ actions!(
 /// floating DockBar, searchable unified Launcher, and modular reactive/immediate windows.
 pub struct OsDesktopShell {
     focus_handle: FocusHandle,
-    theme_catalog: OsThemeCatalog,
-    theme: OsTheme,
+    pub(crate) theme_catalog: OsThemeCatalog,
+    pub(crate) theme: OsTheme,
     prefs_store: OsConfigStore<DesktopPrefs>,
-    craft_catalog: CraftCatalog,
+    pub(crate) craft_catalog: CraftCatalog,
     supervisor: SessionSupervisor,
     compositor: CompositorState,
-    discovered_apps: Vec<AppEntry>,
+    pub(crate) discovered_apps: Vec<AppEntry>,
     window_kinds: BTreeMap<ToplevelId, WindowKind>,
-    studio: StudioState,
+    pub(crate) studio: StudioState,
     files: FilesState,
+    files_scan_seq: u64,
     settings_host: Entity<ReactiveHost<SettingsProgram>>,
     _settings_obs: Subscription,
     pub launcher_open: bool,
@@ -87,7 +88,7 @@ impl OsDesktopShell {
 
         let theme = theme_catalog
             .resolve(&prefs_store.value.theme_id, Some(prefs_store.value.mode))
-            .or_else(|| theme_catalog.resolve("aphrody", Some(prefs_store.value.mode)))
+            .or_else(|| theme_catalog.resolve(brand::APP_SLUG, Some(prefs_store.value.mode)))
             .or_else(|| {
                 let ids = theme_catalog.ids();
                 ids.first().and_then(|id| theme_catalog.resolve(id, None))
@@ -203,6 +204,7 @@ impl OsDesktopShell {
             window_kinds,
             studio,
             files,
+            files_scan_seq: 0,
             settings_host,
             _settings_obs: settings_obs,
             launcher_open: false,
@@ -297,11 +299,8 @@ impl OsDesktopShell {
     }
 
     fn panel_heights(viewport_h: f32) -> (f32, f32) {
-        if viewport_h < 680.0 {
-            (38.0, 54.0)
-        } else {
-            (TOP_PANEL_HEIGHT, BOTTOM_DOCK_HEIGHT)
-        }
+        let vp = AdaptiveViewport::from_size(1440.0, viewport_h);
+        (vp.top_panel_height, vp.dock_height)
     }
 
     fn sync_chrome_layers(&mut self, viewport_w: f32, viewport_h: f32) -> (f32, f32) {
@@ -713,6 +712,28 @@ impl OsDesktopShell {
         )
     }
 
+    /// Scans `dir` on GPUI's background pool and updates [`FilesState`] without stalling UI frames.
+    pub fn open_directory_async(&mut self, dir: PathBuf, cx: &mut Context<Self>) {
+        self.files_scan_seq = self.files_scan_seq.wrapping_add(1);
+        let seq = self.files_scan_seq;
+        let catalog = self.craft_catalog.clone();
+        let target_dir = dir.clone();
+        cx.spawn(async move |this, cx| {
+            let entries = cx
+                .background_spawn(async move { FilesState::scan_directory(&dir, &catalog) })
+                .await;
+            if let Err(err) = this.update(cx, |shell, cx| {
+                if shell.files_scan_seq == seq {
+                    shell.files.apply_scan_results(target_dir, entries);
+                    cx.notify();
+                }
+            }) {
+                log::debug!("files rescan finished after shell dropped: {err:#}");
+            }
+        })
+        .detach();
+    }
+
     fn build_files_body(&self, cx: &mut Context<Self>) -> AnyElement {
         let e1 = cx.entity();
         let e2 = cx.entity();
@@ -724,11 +745,11 @@ impl OsDesktopShell {
                 e1.update(cx, |shell, cx| {
                     if let Some(row) = shell.files.entries.get(idx).cloned() {
                         if row.is_dir {
-                            shell.files.rescan(&row.path, &shell.craft_catalog);
+                            shell.open_directory_async(row.path, cx);
                         } else {
                             shell.files.selected_idx = Some(idx);
+                            cx.notify();
                         }
-                        cx.notify();
                     }
                 });
             }),
@@ -741,8 +762,7 @@ impl OsDesktopShell {
             Arc::new(move |_w, cx| {
                 e3.update(cx, |shell, cx| {
                     if let Some(parent) = shell.files.current_dir.parent().map(Path::to_path_buf) {
-                        shell.files.rescan(&parent, &shell.craft_catalog);
-                        cx.notify();
+                        shell.open_directory_async(parent, cx);
                     }
                 });
             }),
@@ -765,200 +785,8 @@ impl OsDesktopShell {
         )
     }
 
-    fn render_context_drawer_pane(&self, cx: &mut Context<Self>) -> AnyElement {
-        let mut ui = ImmediateUi::new(&self.theme);
-        ui.heading("Desktop Tokens & Contrast");
-        let on_bg = contrast_ratio(
-            self.theme.colors.on_background,
-            self.theme.colors.background,
-        );
-        let on_primary = contrast_ratio(self.theme.colors.on_primary, self.theme.colors.primary);
-        ui.kv_row(
-            "Theme ID",
-            format!("{} ({:?})", self.theme.id, self.theme.mode),
-        );
-        ui.kv_row("AA Background", format!("{on_bg:.2}:1"));
-        ui.kv_row("AA Primary", format!("{on_primary:.2}:1"));
-        ui.color_swatch("Primary Seed", self.theme.colors.primary, "Interactive");
-        ui.color_swatch("Secondary", self.theme.colors.secondary, "Accent");
-        ui.color_swatch(
-            "Surface Low",
-            self.theme.colors.surface_container_low,
-            "Chrome",
-        );
-
-        ui.section("Quick Themes", |sec| {
-            for tid in self.theme_catalog.ids() {
-                let entity = cx.entity();
-                let label = tid.clone();
-                let selected = tid == self.theme.id;
-                sec.button(
-                    ElementId::Name(format!("drawer-theme-{tid}").into()),
-                    IconName::Sparkle,
-                    label,
-                    selected,
-                    move |_, _w, cx| {
-                        entity.update(cx, |shell, cx| shell.select_theme(&tid, cx));
-                    },
-                );
-            }
-        });
-
-        let close_entity = cx.entity();
-        render_context_drawer(
-            "Inspector Drawer",
-            ui.finish(),
-            &self.theme,
-            move |_w, cx| {
-                close_entity.update(cx, |shell, cx| shell.toggle_drawer(cx));
-            },
-        )
-    }
-
-    fn render_launcher_modal(&self, vw: f32, vh: f32, cx: &mut Context<Self>) -> AnyElement {
-        let query = self.launcher_query.trim().to_ascii_lowercase();
-        let close_entity = cx.entity();
-
-        let mut app_list = v_flex().w_full().gap_1p5();
-        let mut shown = 0_usize;
-
-        for app in &self.craft_catalog.apps {
-            if !query.is_empty()
-                && !app.name.to_ascii_lowercase().contains(&query)
-                && !app.tagline.to_ascii_lowercase().contains(&query)
-                && !app.category.to_ascii_lowercase().contains(&query)
-            {
-                continue;
-            }
-            let entity = cx.entity();
-            let app_id = app.id.clone();
-            let selected = app_id == self.studio.active_app_id;
-            app_list = app_list.child(focusable_action_chip(
-                ElementId::Name(format!("launcher-craft-{app_id}").into()),
-                parse_icon_name(&app.icon),
-                SharedString::from(format!("{} · {}", app.name, app.category)),
-                Some(SharedString::from(format!("{} ext", app.extensions.len()))),
-                SharedString::from(format!("Launch {}", app.name)),
-                selected,
-                (500 + shown) as isize,
-                &self.theme,
-                move |_, _w, cx| {
-                    entity.update(cx, |shell, cx| shell.select_craft_app(&app_id, cx));
-                },
-            ));
-            shown += 1;
-            if shown >= 12 {
-                break;
-            }
-        }
-
-        for sys_app in &self.discovered_apps {
-            if shown >= 16 {
-                break;
-            }
-            if !query.is_empty() && !sys_app.name.to_ascii_lowercase().contains(&query) {
-                continue;
-            }
-            let entity = cx.entity();
-            let app_name = sys_app.name.clone();
-            app_list = app_list.child(focusable_action_chip(
-                ElementId::Name(format!("launcher-sys-{shown}").into()),
-                IconName::Terminal,
-                SharedString::from(format!("{} ({:?})", sys_app.name, sys_app.origin)),
-                None,
-                SharedString::from(format!("Open system entry {}", sys_app.name)),
-                false,
-                (530 + shown) as isize,
-                &self.theme,
-                move |_, _w, cx| {
-                    entity.update(cx, |shell, cx| {
-                        shell.open_or_focus_window(WindowKind::Files, &app_name, cx);
-                    });
-                },
-            ));
-            shown += 1;
-        }
-
-        let modal_w = (vw - 32.0).clamp(280.0, 580.0);
-        let modal_h = (vh - 108.0).clamp(240.0, 620.0);
-        let modal_top = if vh < 680.0 { 44.0 } else { 72.0 };
-
-        div()
-            .id("launcher-backdrop")
-            .role(Role::Dialog)
-            .aria_label("Unified Application Launcher")
-            .absolute()
-            .inset_0()
-            .flex()
-            .items_start()
-            .justify_center()
-            .pt(px(modal_top))
-            .bg(gpui::Hsla {
-                h: 0.0,
-                s: 0.0,
-                l: 0.0,
-                a: 0.45,
-            })
-            .child(
-                v_flex()
-                    .w(px(modal_w))
-                    .max_h(px(modal_h))
-                    .p_4()
-                    .gap_3()
-                    .rounded(px(14.0))
-                    .bg(self.theme.colors.surface_container)
-                    .border_2()
-                    .border_color(self.theme.colors.primary)
-                    .child(
-                        h_flex()
-                            .w_full()
-                            .justify_between()
-                            .items_center()
-                            .child(
-                                h_flex()
-                                    .gap_2()
-                                    .items_center()
-                                    .child(Icon::new(IconName::MagnifyingGlass).size(IconSize::Small))
-                                    .child(
-                                        Label::new(if self.launcher_query.is_empty() {
-                                            "Type to filter 17 ArtCraft apps + system desktop entries…"
-                                                .to_owned()
-                                        } else {
-                                            format!("Filter: {}", self.launcher_query)
-                                        })
-                                        .size(LabelSize::Default),
-                                    ),
-                            )
-                            .child(focusable_action_chip(
-                                "launcher-close",
-                                IconName::Close,
-                                SharedString::from("Esc"),
-                                None,
-                                SharedString::from("Close launcher modal"),
-                                false,
-                                499,
-                                &self.theme,
-                                move |_, _w, cx| {
-                                    close_entity.update(cx, |shell, cx| {
-                                        shell.launcher_open = false;
-                                        cx.notify();
-                                    });
-                                },
-                            )),
-                    )
-                    .child(
-                        v_flex()
-                            .id("launcher-scroll")
-                            .flex_1()
-                            .overflow_y_scroll()
-                            .child(app_list),
-                    ),
-            )
-            .into_any_element()
-    }
-
     fn render_dock(&self, dock_h: f32, vw: f32, cx: &mut Context<Self>) -> AnyElement {
-        let compact_dock = vw < 640.0;
+        let compact_dock = AdaptiveViewport::from_size(vw, dock_h).compact_dock;
         let items: Vec<(
             &'static str,
             IconName,
@@ -1249,12 +1077,39 @@ impl Render for OsDesktopShell {
                             .children(stage_children),
                     )
                     .when(self.drawer_open, |el| {
-                        el.child(self.render_context_drawer_pane(cx))
+                        el.child(render_context_drawer_pane(self, cx))
                     }),
             )
             .child(dock)
             .when(self.launcher_open, |el| {
-                el.child(self.render_launcher_modal(vw, vh, cx))
+                el.child(render_launcher_modal(self, vw, vh, cx))
             })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn adaptive_panel_heights_compact_below_threshold() {
+        assert_eq!(OsDesktopShell::panel_heights(600.0), (38.0, 54.0));
+        assert_eq!(
+            OsDesktopShell::panel_heights(900.0),
+            (TOP_PANEL_HEIGHT, BOTTOM_DOCK_HEIGHT)
+        );
+    }
+
+    #[test]
+    fn files_scan_directory_lists_sorted_entries_without_panicking() {
+        let dir = tempfile::tempdir().expect("create temp dir");
+        std::fs::create_dir_all(dir.path().join("z_folder")).expect("create subdir");
+        std::fs::write(dir.path().join("sample.svg"), b"<svg/>").expect("write svg");
+        let catalog = CraftCatalog::bundled().expect("catalog parses");
+        let rows = FilesState::scan_directory(dir.path(), &catalog);
+        assert_eq!(rows.len(), 2);
+        assert!(rows[0].is_dir);
+        assert_eq!(rows[0].name, "z_folder");
+        assert_eq!(rows[1].name, "sample.svg");
     }
 }

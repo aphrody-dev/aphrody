@@ -8,6 +8,7 @@ pub mod cosmic_shell;
 pub mod cosmic_theme;
 pub mod immediate;
 pub mod reactive;
+pub mod unified_runtime;
 
 pub use cosmic_shell::{
     AppletSlot, NavItem, OsConfigStore, PanelApplet, render_context_drawer, render_nav_rail,
@@ -23,3 +24,4 @@ pub use reactive::{
     ReactiveHost, ReactiveProgram, SubscriptionSpec, TaskCommand, focusable_action_chip,
     progress_meter, slider_control, toggle_control,
 };
+pub use unified_runtime::{AdaptiveViewport, FormFactor, FrameworkLayer, UnifiedPlatformProfile};

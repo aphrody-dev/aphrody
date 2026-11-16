@@ -9,8 +9,9 @@ use os_session::{
 };
 use os_ui::{
     AppearanceMode, ImmediateUi, OsConfigStore, OsTheme, OsThemeCatalog, ReactiveHost,
-    ReactiveProgram, StatusTone, SubscriptionSpec, TaskCommand, focusable_action_chip,
-    progress_meter, slider_control, sparkline_chart, status_badge, toggle_control,
+    ReactiveProgram, StatusTone, SubscriptionSpec, TaskCommand, UnifiedPlatformProfile,
+    focusable_action_chip, progress_meter, slider_control, sparkline_chart, status_badge,
+    toggle_control,
 };
 use serde::{Deserialize, Serialize};
 use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
@@ -59,7 +60,7 @@ pub struct DesktopPrefs {
 impl Default for DesktopPrefs {
     fn default() -> Self {
         Self {
-            theme_id: "aphrody".to_owned(),
+            theme_id: brand::APP_SLUG.to_owned(),
             mode: AppearanceMode::Dark,
             layout_mode: TilingMode::Dwindle,
             window_gap: 8.0,
@@ -309,42 +310,68 @@ impl FilesState {
         state
     }
 
-    pub fn rescan(&mut self, dir: &PathBuf, catalog: &CraftCatalog) {
-        self.current_dir = dir.clone();
-        self.entries.clear();
-        if let Ok(read_dir) = std::fs::read_dir(dir) {
-            for entry in read_dir.flatten() {
-                let path = entry.path();
-                let name = entry.file_name().to_string_lossy().into_owned();
-                if name.starts_with('.') {
-                    continue;
-                }
-                let meta = entry.metadata().ok();
-                let is_dir = meta.as_ref().is_some_and(|m| m.is_dir());
-                let bytes = meta.as_ref().map_or(0, |m| m.len());
-                let report = if !is_dir && bytes <= 512 * 1024 {
-                    inspect_path(&path, Some(catalog)).ok()
-                } else {
-                    None
-                };
-                self.entries.push(FileRow {
-                    path,
-                    name,
-                    is_dir,
-                    bytes,
-                    report,
-                });
-                if self.entries.len() >= 24 {
-                    break;
+    /// Reads directory entries and runs bounded `craft-sniff` inspection on a thread-safe slice.
+    #[must_use]
+    pub fn scan_directory(dir: &std::path::Path, catalog: &CraftCatalog) -> Vec<FileRow> {
+        let mut entries = Vec::new();
+        match std::fs::read_dir(dir) {
+            Ok(read_dir) => {
+                for entry in read_dir.flatten() {
+                    let path = entry.path();
+                    let name = entry.file_name().to_string_lossy().into_owned();
+                    if name.starts_with('.') {
+                        continue;
+                    }
+                    let meta = entry.metadata().ok();
+                    let is_dir = meta.as_ref().is_some_and(|m| m.is_dir());
+                    let bytes = meta.as_ref().map_or(0, |m| m.len());
+                    let report = if !is_dir && bytes <= 512 * 1024 {
+                        match inspect_path(&path, Some(catalog)) {
+                            Ok(report) => Some(report),
+                            Err(err) => {
+                                log::debug!(
+                                    "skipping file inspection for '{}': {err:#}",
+                                    path.display()
+                                );
+                                None
+                            }
+                        }
+                    } else {
+                        None
+                    };
+                    entries.push(FileRow {
+                        path,
+                        name,
+                        is_dir,
+                        bytes,
+                        report,
+                    });
+                    if entries.len() >= 24 {
+                        break;
+                    }
                 }
             }
+            Err(err) => {
+                log::warn!("failed to list directory '{}': {err}", dir.display());
+            }
         }
-        self.entries.sort_by(|a, b| {
+        entries.sort_by(|a, b| {
             b.is_dir
                 .cmp(&a.is_dir)
                 .then_with(|| a.name.to_lowercase().cmp(&b.name.to_lowercase()))
         });
+        entries
+    }
+
+    pub fn apply_scan_results(&mut self, dir: PathBuf, entries: Vec<FileRow>) {
+        self.current_dir = dir;
+        self.entries = entries;
         self.selected_idx = (!self.entries.is_empty()).then_some(0);
+    }
+
+    pub fn rescan(&mut self, dir: &PathBuf, catalog: &CraftCatalog) {
+        let entries = Self::scan_directory(dir, catalog);
+        self.apply_scan_results(dir.clone(), entries);
     }
 }
 
@@ -459,9 +486,12 @@ pub fn render_files_window(
                 )
                 .child(
                     v_flex()
+                        .id("files-detail-scroll")
                         .w(px(230.0))
                         .h_full()
                         .p_2()
+                        .pb_4()
+                        .overflow_y_scroll()
                         .rounded(px(8.0))
                         .bg(theme.colors.surface_container)
                         .border_1()
@@ -549,6 +579,28 @@ pub fn render_monitor_window(
         sec.kv_row("Format Spec", "deb / flatpak / appimage / desktop");
     });
 
+    let unified = UnifiedPlatformProfile::detect();
+    let layer_list = unified
+        .active_layers
+        .iter()
+        .map(|layer| layer.slug())
+        .collect::<Vec<_>>()
+        .join(" · ");
+    ui.section("Unified Stack (WebGPU / Desktop / Mobile)", |sec| {
+        sec.kv_row("Target Family", unified.target_family.clone());
+        sec.kv_row(
+            "Surface Cohorts",
+            format!(
+                "webgpu:{} desktop:{} mobile:{}",
+                unified.wasm_webgpu_ready, unified.desktop_ready, unified.mobile_ready
+            ),
+        );
+        sec.kv_row(
+            format!("Layers ({})", unified.active_layers.len()),
+            layer_list,
+        );
+    });
+
     ui.section("Supervised Units", |sec| {
         for unit in &snapshot {
             let (icon, text, tone) = match unit.phase {
@@ -581,6 +633,7 @@ pub fn render_monitor_window(
         .id("monitor-scroll")
         .size_full()
         .p_3()
+        .pb_6()
         .overflow_y_scroll()
         .bg(theme.colors.surface)
         .child(ui.finish())

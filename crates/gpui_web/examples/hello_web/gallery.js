@@ -26,11 +26,10 @@ if (route !== "/") {
         status.textContent = `Loading ${title}…`;
 
         try {
-            if (!window.crossOriginIsolated) {
-                throw new Error("Shared-memory WASM requires cross-origin isolation. Serve this page with trunk serve.");
-            }
-
-            const bindings = await import(`/${example.dataset.module}.js`);
+            const cohort = window.crossOriginIsolated && example.dataset.mtModule
+                ? example.dataset.mtModule
+                : example.dataset.module;
+            const bindings = await import(`/${cohort}.js`);
             await bindings.default();
             window.wasmBindings = bindings;
             // GPUI chooses WebGPU or WebGL2 and reports initialization failures itself.

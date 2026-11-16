@@ -13,7 +13,7 @@ path = "src/gpui_platform.rs"
 doctest = false
 
 [features]
-default = ["multithreaded"]
+default = []
 # Threads in the browser: needs a nightly toolchain and a cross-origin-isolated
 # page. Off, gpui_web builds on stable.
 multithreaded = ["gpui_web/multithreaded"]

@@ -3,8 +3,8 @@ use std::sync::Arc;
 use gpui::{App, ElementId, SharedString, Window, div, prelude::*, px};
 use os_session::{TilingMode, WorkspaceId};
 use os_ui::{
-    AppearanceMode, AppletSlot, OsTheme, PanelApplet, StatusTone, focusable_action_chip,
-    status_badge,
+    AdaptiveViewport, AppearanceMode, AppletSlot, OsTheme, PanelApplet, StatusTone,
+    focusable_action_chip, status_badge,
 };
 use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex};
 
@@ -45,9 +45,10 @@ impl PanelApplet for WorkspaceApplet {
     }
 
     fn render_pill(&self, theme: &OsTheme, window: &mut Window, _cx: &mut App) -> gpui::AnyElement {
-        let vw = f32::from(window.viewport_size().width);
-        let narrow = vw < 1080.0;
-        let ultra_narrow = vw < 820.0;
+        let vp_size = window.viewport_size();
+        let vp = AdaptiveViewport::from_size(f32::from(vp_size.width), f32::from(vp_size.height));
+        let narrow = vp.narrow_panel_labels;
+        let ultra_narrow = vp.icon_only_panel_controls;
         let mut bar = h_flex().gap_1().items_center();
 
         for (idx, ws) in self.workspaces.iter().enumerate() {
@@ -128,9 +129,10 @@ impl PanelApplet for BrandLauncherApplet {
     }
 
     fn render_pill(&self, theme: &OsTheme, window: &mut Window, _cx: &mut App) -> gpui::AnyElement {
-        let vw = f32::from(window.viewport_size().width);
-        let narrow = vw < 1120.0;
-        let ultra_narrow = vw < 840.0;
+        let vp_size = window.viewport_size();
+        let vp = AdaptiveViewport::from_size(f32::from(vp_size.width), f32::from(vp_size.height));
+        let narrow = vp.narrow_panel_labels;
+        let ultra_narrow = vp.icon_only_panel_controls;
         let on_toggle = Arc::clone(&self.on_toggle_launcher);
 
         let title_pill = (!ultra_narrow).then(|| {
@@ -213,9 +215,10 @@ impl PanelApplet for SystemTelemetryApplet {
     }
 
     fn render_pill(&self, theme: &OsTheme, window: &mut Window, _cx: &mut App) -> gpui::AnyElement {
-        let vw = f32::from(window.viewport_size().width);
-        let narrow = vw < 1120.0;
-        let ultra_narrow = vw < 840.0;
+        let vp_size = window.viewport_size();
+        let vp = AdaptiveViewport::from_size(f32::from(vp_size.width), f32::from(vp_size.height));
+        let narrow = vp.narrow_panel_labels;
+        let ultra_narrow = vp.icon_only_panel_controls;
 
         let mode_label = if ultra_narrow {
             SharedString::default()

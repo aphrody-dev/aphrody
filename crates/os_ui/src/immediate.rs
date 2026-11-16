@@ -117,7 +117,7 @@ impl<'a> ImmediateUi<'a> {
                 .w_full()
                 .min_w(px(0.0))
                 .justify_between()
-                .items_center()
+                .items_start()
                 .gap_2()
                 .child(
                     div().flex_shrink_0().child(
@@ -130,14 +130,9 @@ impl<'a> ImmediateUi<'a> {
                     div()
                         .flex_1()
                         .min_w(px(0.0))
-                        .overflow_hidden()
                         .flex()
                         .justify_end()
-                        .child(
-                            Label::new(value.into())
-                                .size(LabelSize::XSmall)
-                                .truncate_middle(),
-                        ),
+                        .child(Label::new(value.into()).size(LabelSize::XSmall)),
                 )
                 .into_any_element(),
         );

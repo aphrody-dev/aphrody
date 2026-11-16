@@ -14,11 +14,12 @@ path = "src/gpui_code.rs"
 doctest = false
 
 [features]
-default = ["syntax", "lsp", "git", "worktree", "terminal", "editor", "grammars"]
+default = ["syntax"]
 syntax = [
     "dep:buffer_diff",
     "dep:language_core",
     "dep:language",
+    "dep:languages",
     "dep:language_detection",
     "dep:snippet",
     "dep:outline",
@@ -27,7 +28,6 @@ grammars = [
     "syntax",
     "dep:grammars",
     "grammars/load-grammars",
-    "dep:languages",
     "languages/load-grammars",
 ]
 lsp = [

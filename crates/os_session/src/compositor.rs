@@ -177,112 +177,112 @@ impl LayerShellManager {
             }
         }
 
-        let mut tree: TaffyTree<()> = TaffyTree::new();
-        let top_node = tree
-            .new_leaf(Style {
-                size: taffy::Size {
-                    width: auto(),
-                    height: length(top),
-                },
-                flex_shrink: 0.0,
-                ..Default::default()
-            })
-            .ok();
-        let bottom_node = tree
-            .new_leaf(Style {
-                size: taffy::Size {
-                    width: auto(),
-                    height: length(bottom),
-                },
-                flex_shrink: 0.0,
-                ..Default::default()
-            })
-            .ok();
-        let left_node = tree
-            .new_leaf(Style {
-                size: taffy::Size {
-                    width: length(left),
-                    height: auto(),
-                },
-                flex_shrink: 0.0,
-                ..Default::default()
-            })
-            .ok();
-        let right_node = tree
-            .new_leaf(Style {
-                size: taffy::Size {
-                    width: length(right),
-                    height: auto(),
-                },
-                flex_shrink: 0.0,
-                ..Default::default()
-            })
-            .ok();
-        let content_node = tree
-            .new_leaf(Style {
-                flex_grow: 1.0,
-                size: taffy::Size {
-                    width: auto(),
-                    height: auto(),
-                },
-                ..Default::default()
-            })
-            .ok();
-
-        if let (Some(t), Some(b), Some(l), Some(r), Some(c)) =
-            (top_node, bottom_node, left_node, right_node, content_node)
-            && let Ok(middle) = tree.new_with_children(
-                Style {
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Row,
-                    flex_grow: 1.0,
-                    ..Default::default()
-                },
-                &[l, c, r],
-            )
-            && let Ok(root) = tree.new_with_children(
-                Style {
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Column,
-                    size: taffy::Size {
-                        width: length(screen.w.max(0.0)),
-                        height: length(screen.h.max(0.0)),
-                    },
-                    margin: taffy::Rect {
-                        left: LengthPercentageAuto::length(0.0),
-                        right: LengthPercentageAuto::length(0.0),
-                        top: LengthPercentageAuto::length(0.0),
-                        bottom: LengthPercentageAuto::length(0.0),
-                    },
-                    ..Default::default()
-                },
-                &[t, middle, b],
-            )
-            && tree
-                .compute_layout(
-                    root,
-                    taffy::Size {
-                        width: taffy::AvailableSpace::Definite(screen.w.max(0.0)),
-                        height: taffy::AvailableSpace::Definite(screen.h.max(0.0)),
-                    },
+        match Self::try_taffy_content_rect(screen, top, bottom, left, right) {
+            Ok(rect) => rect,
+            Err(err) => {
+                log::warn!("taffy layer-shell layout fallback: {err}");
+                Rect::new(
+                    screen.x + left,
+                    screen.y + top,
+                    (screen.w - left - right).max(120.0),
+                    (screen.h - top - bottom).max(120.0),
                 )
-                .is_ok()
-            && let (Ok(mid_layout), Ok(content_layout)) = (tree.layout(middle), tree.layout(c))
-        {
-            return Rect::new(
-                screen.x + mid_layout.location.x + content_layout.location.x,
-                screen.y + mid_layout.location.y + content_layout.location.y,
-                content_layout.size.width.max(120.0),
-                content_layout.size.height.max(120.0),
-            );
+            }
         }
+    }
 
-        Rect::new(
-            screen.x + left,
-            screen.y + top,
-            (screen.w - left - right).max(120.0),
-            (screen.h - top - bottom).max(120.0),
-        )
+    fn try_taffy_content_rect(
+        screen: Rect,
+        top: f32,
+        bottom: f32,
+        left: f32,
+        right: f32,
+    ) -> Result<Rect, taffy::TaffyError> {
+        let mut tree: TaffyTree<()> = TaffyTree::new();
+        let top_node = tree.new_leaf(Style {
+            size: taffy::Size {
+                width: auto(),
+                height: length(top),
+            },
+            flex_shrink: 0.0,
+            ..Default::default()
+        })?;
+        let bottom_node = tree.new_leaf(Style {
+            size: taffy::Size {
+                width: auto(),
+                height: length(bottom),
+            },
+            flex_shrink: 0.0,
+            ..Default::default()
+        })?;
+        let left_node = tree.new_leaf(Style {
+            size: taffy::Size {
+                width: length(left),
+                height: auto(),
+            },
+            flex_shrink: 0.0,
+            ..Default::default()
+        })?;
+        let right_node = tree.new_leaf(Style {
+            size: taffy::Size {
+                width: length(right),
+                height: auto(),
+            },
+            flex_shrink: 0.0,
+            ..Default::default()
+        })?;
+        let content_node = tree.new_leaf(Style {
+            flex_grow: 1.0,
+            size: taffy::Size {
+                width: auto(),
+                height: auto(),
+            },
+            ..Default::default()
+        })?;
+
+        let middle = tree.new_with_children(
+            Style {
+                display: Display::Flex,
+                flex_direction: FlexDirection::Row,
+                flex_grow: 1.0,
+                ..Default::default()
+            },
+            &[left_node, content_node, right_node],
+        )?;
+        let root = tree.new_with_children(
+            Style {
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+                size: taffy::Size {
+                    width: length(screen.w.max(0.0)),
+                    height: length(screen.h.max(0.0)),
+                },
+                margin: taffy::Rect {
+                    left: LengthPercentageAuto::length(0.0),
+                    right: LengthPercentageAuto::length(0.0),
+                    top: LengthPercentageAuto::length(0.0),
+                    bottom: LengthPercentageAuto::length(0.0),
+                },
+                ..Default::default()
+            },
+            &[top_node, middle, bottom_node],
+        )?;
+        tree.compute_layout(
+            root,
+            taffy::Size {
+                width: taffy::AvailableSpace::Definite(screen.w.max(0.0)),
+                height: taffy::AvailableSpace::Definite(screen.h.max(0.0)),
+            },
+        )?;
+        let mid_layout = tree.layout(middle)?;
+        let content_layout = tree.layout(content_node)?;
+
+        Ok(Rect::new(
+            screen.x + mid_layout.location.x + content_layout.location.x,
+            screen.y + mid_layout.location.y + content_layout.location.y,
+            content_layout.size.width.max(120.0),
+            content_layout.size.height.max(120.0),
+        ))
     }
 }
 

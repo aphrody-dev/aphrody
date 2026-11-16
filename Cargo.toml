@@ -45,6 +45,7 @@ members = [
     "crates/context_server",
     "crates/copilot",
     "crates/copilot_chat",
+    "crates/copilot_ui",
     "crates/crashes",
     "crates/credentials_provider",
     "crates/dap",
@@ -312,8 +313,29 @@ members = [
     "tooling/perf",
     "tooling/xtask",
 ]
-exclude = ["vendor/wgpu", "vendor/bun", "vendor/craft-libs", "vendor/craft-anything"]
-default-members = ["crates/gpui_ui", "crates/gpui_code", "crates/gpui_app_shell"]
+exclude = [
+    "vendor/accesskit",
+    "vendor/anyrender",
+    "vendor/blitz",
+    "vendor/bun",
+    "vendor/cosmic",
+    "vendor/cosmic-epoch",
+    "vendor/cosmic-text",
+    "vendor/craft-anything",
+    "vendor/craft-libs",
+    "vendor/dioxus",
+    "vendor/egui",
+    "vendor/iced",
+    "vendor/libcosmic",
+    "vendor/smithay",
+    "vendor/softbuffer",
+    "vendor/taffy",
+    "vendor/tauri",
+    "vendor/vello",
+    "vendor/wgpu",
+    "vendor/winit",
+]
+default-members = ["crates/gpui_ui", "crates/gpui_code", "crates/os_session", "crates/os_craft", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
 
 [workspace.package]
 version = "0.5.0"
@@ -602,10 +624,10 @@ ztracing_macro = { path = "crates/ztracing_macro" }
 # External crates
 #
 
-accesskit = { version = "0.24.0", features = ["enumn"] }
-accesskit_macos = "0.26.0"
-accesskit_unix = "0.22"
-accesskit_windows = "0.34"
+accesskit = { path = "vendor/accesskit/accesskit", features = ["enumn"] }
+accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
+accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
+accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
 agent-client-protocol = { version = "=5.3.0", features = ["schemars", "unstable", "unstable_protocol_v2"] }
 aho-corasick = "1.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
@@ -679,6 +701,7 @@ core-graphics = "0.24"
 core-services = "1"
 core-text = "21"
 coreaudio-rs = { version = "0.12", default-features = false }
+cosmic-text = { path = "vendor/cosmic-text" }
 craft-exr = { path = "vendor/craft-libs/crates/exr" }
 craft-plist = { path = "vendor/craft-libs/crates/plist" }
 craft-psd = { path = "vendor/craft-libs/crates/psd" }
@@ -690,7 +713,6 @@ perf-event = { package = "perf-event2", version = "0.7.4" }
 crossbeam-queue = "0.3.12"
 ctor = "1.0.12"
 dap-types = { git = "https://github.com/zed-industries/dap-types", rev = "1b461b310481d01e02b2603c16d7144b926339f8" }
-dashmap = "6.0"
 derive_more = { version = "2.1", features = ["deref", "deref_mut", "from_str"] }
 dialoguer = { version = "0.12", default-features = false }
 diffy = "0.4.2"
@@ -1227,7 +1249,7 @@ swash = "0.2.6"
 syn = { version = "2.0", default-features = false, features = ["proc-macro"] }
 sys-locale = "0.3.1"
 sysinfo = { version = "0.39", default-features = false, features = ["system"] }
-taffy = { version = "=0.15.0", default-features = false }
+taffy = { path = "vendor/taffy", default-features = false }
 tempfile = "3.20.0"
 tendril = "0.5"
 thiserror = "2.0.12"
@@ -1318,7 +1340,7 @@ zeroize = "1.8"
 zstd = { version = "0.13", default-features = false, features = ["legacy", "arrays"] }
 
 # Unified NSH external dependencies (deduplicated onto workspace versions)
-accesskit_consumer = "0.38"
+accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
 axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "ws"] }
 brotli = { version = "9", default-features = false, features = ["std"] }
 cap-std = "4.0.3"
@@ -1386,12 +1408,12 @@ two-face = { version = "0.4.5", default-features = false, features = ["syntect-f
 unicode-linebreak = "0.1.5"
 unicode-properties = { version = "0.1.3", default-features = false, features = ["emoji"] }
 ureq = { version = "3.1", features = ["platform-verifier"] }
-webkit2gtk = { version = "=2.0.1", features = ["v2_38"] }
+webkit2gtk = { version = "=2.0.2", features = ["v2_38"] }
 webkit6 = "0.6"
 webview2-com = "0.39"
 windows-numerics = "0.3"
 windows-sys = "0.61"
-wry = { package = "lb-wry", version = "0.53.3" }
+wry = { path = "vendor/tauri/wry" }
 wuff = "0.2.9"
 x11rb = { version = "0.13", default-features = false, features = ["composite", "dri3", "present"] }
 zbus = { version = "5.13", default-features = false, features = ["async-io", "blocking-api"] }
@@ -1457,6 +1479,20 @@ features = [
 ]
 
 [patch.crates-io]
+# Unified single-source framework crates across Aphrody submodules
+taffy = { path = "vendor/taffy" }
+cosmic-text = { path = "vendor/cosmic-text" }
+wgpu = { path = "vendor/wgpu/wgpu" }
+wgpu-core = { path = "vendor/wgpu/wgpu-core" }
+wgpu-hal = { path = "vendor/wgpu/wgpu-hal" }
+wgpu-types = { path = "vendor/wgpu/wgpu-types" }
+wgpu-naga-bridge = { path = "vendor/wgpu/wgpu-naga-bridge" }
+naga = { path = "vendor/wgpu/naga" }
+accesskit = { path = "vendor/accesskit/accesskit" }
+accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
+accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
+accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
+accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
 cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7" }
 # Unify `tree_sitter_language::LanguageFn` between crates.io grammar crates and
 # the git tree-sitter above; two instances of the crate would make grammar
@@ -1605,6 +1641,9 @@ panic = "abort"
 [profile.web]
 inherits = "release"
 opt-level = "z"
+lto = "thin"
+codegen-units = 1
+debug = false
 strip = true
 panic = "abort"
 

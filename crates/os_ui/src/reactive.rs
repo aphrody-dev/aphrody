@@ -153,7 +153,6 @@ impl<P: ReactiveProgram> Render for ReactiveHost<P> {
 }
 
 /// Accessible focus-visible action pill meeting WCAG contrast, 2px focus ring, and 36-44px target ergonomics.
-#[allow(clippy::too_many_arguments)]
 pub fn focusable_action_chip<F>(
     id: impl Into<ElementId>,
     icon: IconName,
@@ -231,7 +230,6 @@ where
 }
 
 /// Accessible slider bar with explicit keyboard/button steppers and visible value text (`iced`/`libcosmic` pattern).
-#[allow(clippy::too_many_arguments)]
 pub fn slider_control<F>(
     id: &str,
     label: impl Into<SharedString>,

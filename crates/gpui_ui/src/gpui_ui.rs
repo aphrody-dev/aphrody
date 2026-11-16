@@ -52,12 +52,16 @@ pub mod prelude {
 /// Create a cross-platform [`Application`] preloaded with the default [`Assets`]
 /// (fonts, icons, and themes).
 pub fn application() -> Application {
+    #[cfg(target_family = "wasm")]
+    gpui_platform::web_init();
     let platform = gpui_platform::current_platform(false);
     Application::with_platform(platform).with_assets(Assets)
 }
 
 /// Create a headless [`Application`] suitable for CLI/background tools or tests.
 pub fn headless_application() -> Application {
+    #[cfg(target_family = "wasm")]
+    gpui_platform::web_init();
     let platform = gpui_platform::current_platform(true);
     Application::with_platform(platform).with_assets(Assets)
 }

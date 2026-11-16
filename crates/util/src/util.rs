@@ -712,7 +712,7 @@ pub mod __rust_embed {
 /// directory that passes the same rust_embed include/exclude globs the
 /// release derive uses, so the dev and release file sets are identical. Reuses
 /// rust_embed's own matcher rather than reimplementing glob semantics.
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
+#[cfg(all(debug_assertions, not(feature = "debug-embed"), not(target_family = "wasm")))]
 #[doc(hidden)]
 pub fn __fs_embed_iter(
     root_relative: &str,
@@ -724,7 +724,7 @@ pub fn __fs_embed_iter(
         .map(std::borrow::Cow::Owned)
 }
 
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
+#[cfg(all(debug_assertions, not(feature = "debug-embed"), not(target_family = "wasm")))]
 fn fs_embed_file_names(root_relative: &str, includes: &[&str], excludes: &[&str]) -> Vec<String> {
     let Some(root) = dev_repo_root().map(|root| root.join(root_relative)) else {
         return Vec::new();
@@ -738,7 +738,7 @@ fn fs_embed_file_names(root_relative: &str, includes: &[&str], excludes: &[&str]
 /// Backs the dev arm of [`fs_embed!`]'s `get`: reads a single file from the
 /// checkout, returning `None` when the include/exclude globs filter it out so
 /// `get` matches release's embedded set exactly.
-#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
+#[cfg(all(debug_assertions, not(feature = "debug-embed"), not(target_family = "wasm")))]
 #[doc(hidden)]
 pub fn __fs_embed_get(
     root_relative: &str,
@@ -756,7 +756,7 @@ pub fn __fs_embed_get(
     rust_embed::utils::read_file_from_fs(&root.join(file_path)).ok()
 }
 
-#[cfg(feature = "debug-embed")]
+#[cfg(any(feature = "debug-embed", target_family = "wasm"))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __fs_embed {
@@ -777,7 +777,7 @@ macro_rules! __fs_embed {
     };
 }
 
-#[cfg(not(feature = "debug-embed"))]
+#[cfg(all(not(feature = "debug-embed"), not(target_family = "wasm")))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __fs_embed {

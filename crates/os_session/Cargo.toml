@@ -18,12 +18,10 @@ default = []
 test-support = []
 
 [dependencies]
-anyhow.workspace = true
 bitflags.workspace = true
 brand.workspace = true
 dirs.workspace = true
 log.workspace = true
-schemars.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 taffy = { workspace = true, features = ["std", "taffy_tree", "flexbox", "grid"] }

@@ -7,8 +7,9 @@ use gpui::{
 };
 use os_craft::{CraftAppSpec, CraftCatalog, InspectionReport, inspect_bytes, inspect_path};
 use os_ui::{
-    ImmediateMemory, ImmediateUi, NavItem, OsTheme, StatusTone, focusable_action_chip,
-    render_nav_rail, slider_control, sparkline_chart, status_badge, toggle_control,
+    AdaptiveViewport, ImmediateMemory, ImmediateUi, NavItem, OsTheme, StatusTone,
+    focusable_action_chip, render_nav_rail, slider_control, sparkline_chart, status_badge,
+    toggle_control,
 };
 use ui::{Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
 
@@ -172,9 +173,10 @@ pub fn render_studio_window(
         })
         .collect();
 
-    let compact_rail = window_width < 920.0;
-    let stacked_inspector = window_width < 680.0;
-    let inspector_width = if compact_rail { 228.0 } else { 292.0 };
+    let vp = AdaptiveViewport::from_size(window_width, 900.0);
+    let compact_rail = vp.compact_nav_rail;
+    let stacked_inspector = vp.stacked_inspector;
+    let inspector_width = vp.studio_inspector_width;
     let on_select_app = Arc::clone(&cb.on_select_app);
     let rail = render_nav_rail(
         "studio-catalog-rail",
@@ -720,6 +722,7 @@ fn render_inspector_pane(
         })
         .when(stacked, |el| el.w_full().h(px(210.0)).border_t_1())
         .p_2p5()
+        .pb_6()
         .overflow_y_scroll()
         .bg(theme.colors.surface_container)
         .border_color(theme.colors.outline_variant)

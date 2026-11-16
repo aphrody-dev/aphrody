@@ -7,6 +7,7 @@ use os_ui::AppearanceMode;
 use ui::IconName;
 
 pub mod applets;
+pub mod overlays;
 pub mod shell;
 pub mod studio_view;
 pub mod windows;
@@ -62,42 +63,55 @@ pub fn bind_desktop_keys(cx: &mut App) {
     ]);
 }
 
-/// Launches the live native GPU window hosting [`OsDesktopShell`].
-pub fn run_desktop_app(options: DesktopOptions) -> anyhow::Result<()> {
-    let requested = size(px(options.width), px(options.height));
-    gpui_ui::application().run(move |cx: &mut App| {
-        gpui_ui::init(cx);
-        bind_desktop_keys(cx);
+/// Initializes [`OsDesktopShell`] inside any pre-configured GPUI `App` (desktop, web, or mobile).
+pub fn mount_desktop_shell(options: DesktopOptions, cx: &mut App) {
+    gpui_ui::init(cx);
+    bind_desktop_keys(cx);
 
-        let adaptive_size = cx
-            .primary_display()
-            .map(|display| {
-                let vis = display.visible_bounds().size;
-                size(
-                    requested.width.min(vis.width.max(px(360.0))),
-                    requested.height.min(vis.height.max(px(480.0))),
-                )
-            })
-            .unwrap_or(requested);
-        let bounds = Bounds::centered(None, adaptive_size, cx);
-        if let Err(err) = cx.open_window(
-            WindowOptions {
-                window_bounds: Some(WindowBounds::Windowed(bounds)),
-                titlebar: Some(gpui::TitlebarOptions {
-                    title: Some(format!("{} OS — ArtCraft Studio", brand::APP_NAME).into()),
-                    ..Default::default()
-                }),
+    let requested = size(px(options.width), px(options.height));
+    let adaptive_size = cx
+        .primary_display()
+        .map(|display| {
+            let vis = display.visible_bounds().size;
+            size(
+                requested.width.min(vis.width.max(px(360.0))),
+                requested.height.min(vis.height.max(px(480.0))),
+            )
+        })
+        .unwrap_or(requested);
+    let bounds = Bounds::centered(None, adaptive_size, cx);
+    if let Err(err) = cx.open_window(
+        WindowOptions {
+            window_bounds: Some(WindowBounds::Windowed(bounds)),
+            titlebar: Some(gpui::TitlebarOptions {
+                title: Some(format!("{} OS — ArtCraft Studio", brand::APP_NAME).into()),
                 ..Default::default()
-            },
-            move |window, cx| cx.new(|cx| OsDesktopShell::new(options, window, cx)),
-        ) {
-            log::error!("failed to open {} desktop window: {err:#}", brand::APP_NAME);
-            cx.quit();
-            return;
-        }
-        cx.activate(true);
+            }),
+            ..Default::default()
+        },
+        move |window, cx| cx.new(|cx| OsDesktopShell::new(options, window, cx)),
+    ) {
+        log::error!("failed to open {} desktop window: {err:#}", brand::APP_NAME);
+        cx.quit();
+        return;
+    }
+    cx.activate(true);
+}
+
+/// Launches the live GPU window hosting [`OsDesktopShell`] on Desktop and Mobile targets.
+pub fn run_desktop_app(options: DesktopOptions) -> anyhow::Result<()> {
+    gpui_ui::application().run(move |cx: &mut App| {
+        mount_desktop_shell(options, cx);
     });
     Ok(())
+}
+
+/// Starts [`OsDesktopShell`] in a browser WebGPU/WebGL2 `canvas` using `gpui_web`.
+#[cfg(target_family = "wasm")]
+pub fn start_web_app(options: DesktopOptions) {
+    gpui_ui::application().run(move |cx: &mut App| {
+        mount_desktop_shell(options, cx);
+    });
 }
 
 #[cfg(feature = "shell-module")]

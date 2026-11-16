@@ -402,9 +402,7 @@ impl HardwareCapabilities {
             .unwrap_or(1);
         let recommended_build_jobs = cpu_threads.clamp(1, 16);
 
-        let target_fps = ["APHRODY_TARGET_FPS", "GPUI_TARGET_FPS", "ZED_TARGET_FPS"]
-            .into_iter()
-            .find_map(|key| std::env::var(key).ok())
+        let target_fps = env_with_gpui_fallback("TARGET_FPS", "GPUI_TARGET_FPS")
             .and_then(|raw| raw.trim().parse::<u32>().ok())
             .map_or(120, |fps| fps.clamp(24, 360));
         let frame_budget_ms = 1_000.0 / target_fps as f32;
@@ -419,15 +417,9 @@ impl HardwareCapabilities {
                 _ => "webgpu,webgl".to_owned(),
             });
 
-        let present_mode_hint = [
-            "APHRODY_PRESENT_MODE",
-            "GPUI_PRESENT_MODE",
-            "ZED_PRESENT_MODE",
-        ]
-        .into_iter()
-        .find_map(|key| std::env::var(key).ok())
-        .filter(|v| !v.trim().is_empty())
-        .unwrap_or_else(|| "mailbox->fifo_relaxed->fifo".to_owned());
+        let present_mode_hint = env_with_gpui_fallback("PRESENT_MODE", "GPUI_PRESENT_MODE")
+            .filter(|v| !v.trim().is_empty())
+            .unwrap_or_else(|| "mailbox->fifo_relaxed->fifo".to_owned());
 
         let detected_toolchains = discover_host_toolchains();
 
@@ -444,6 +436,12 @@ impl HardwareCapabilities {
             detected_toolchains,
         }
     }
+}
+
+fn env_with_gpui_fallback(suffix: &str, gpui_key: &str) -> Option<String> {
+    brand::env_var(suffix)
+        .ok()
+        .or_else(|| std::env::var(gpui_key).ok())
 }
 
 fn discover_host_toolchains() -> Vec<String> {

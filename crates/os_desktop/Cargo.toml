@@ -16,19 +16,27 @@ doctest = false
 [[bin]]
 name = "aphrody-os"
 path = "src/main.rs"
+required-features = ["cli"]
+
+[[example]]
+name = "web_os"
+path = "examples/web_os.rs"
 
 [features]
-default = ["desktop"]
+default = ["desktop", "cli"]
 desktop = ["gpui_ui/desktop"]
+web = []
+mobile = []
+cli = ["dep:clap", "dep:env_logger"]
 shell-module = ["dep:gpui_app_shell"]
 
 [dependencies]
 anyhow.workspace = true
 assets.workspace = true
 brand.workspace = true
-clap.workspace = true
+clap = { workspace = true, optional = true }
 chrono.workspace = true
-env_logger.workspace = true
+env_logger = { workspace = true, optional = true }
 gpui.workspace = true
 gpui_app_shell = { workspace = true, optional = true }
 gpui_platform.workspace = true
@@ -42,8 +50,9 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 theme.workspace = true
 ui.workspace = true
+web-time.workspace = true
 
-[dev-dependencies]
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 gpui = { workspace = true, features = ["test-support"] }
 gpui_platform = { workspace = true, features = ["test-support"] }
 gpui_wgpu = { workspace = true, features = ["test-support"] }

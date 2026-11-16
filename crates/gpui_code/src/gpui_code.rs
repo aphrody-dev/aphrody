@@ -41,10 +41,10 @@ pub use outline;
 #[cfg(feature = "syntax")]
 pub use snippet;
 
+#[cfg(feature = "syntax")]
+pub use languages;
 #[cfg(feature = "grammars")]
 pub use grammars;
-#[cfg(feature = "grammars")]
-pub use languages;
 
 #[cfg(feature = "lsp")]
 pub use json_schema_store;

@@ -12,7 +12,7 @@ default-run = "aphrody"
 workspace = true
 
 [features]
-default = ["full"]
+default = ["nsh"]
 extensions = [
     "dep:extension_host",
     "dep:extensions_ui",
@@ -73,6 +73,9 @@ crash-reporting = [
 nsh = [
     "dep:nsh_workspace",
 ]
+grammars = [
+    "languages/load-grammars",
+]
 full = [
     "extensions",
     "debugger",
@@ -82,6 +85,7 @@ full = [
     "updater",
     "crash-reporting",
     "nsh",
+    "grammars",
 ]
 tracy = ["ztracing/tracy"]
 # LEAK_BACKTRACE=1 cargo run --features zed/track-project-leak --profile release-fast
@@ -228,7 +232,7 @@ language_models = { workspace = true, optional = true }
 language_onboarding.workspace = true
 language_selector.workspace = true
 language_tools.workspace = true
-languages = { workspace = true, features = ["load-grammars"] }
+languages.workspace = true
 line_ending_selector.workspace = true
 lsp_command_selector.workspace = true
 log.workspace = true

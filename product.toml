@@ -64,7 +64,7 @@ upstream_wgpu = "https://github.com/gfx-rs/wgpu.git"
 submodule_bun = "https://github.com/aphrody-labs/bun"
 
 [features]
-default_app_features = ["full"]
+default_app_features = ["nsh"]
 modular_ui_crate = "gpui_ui"
 modular_ui_features = "nsh-full"
 modular_code_crate = "gpui_code"

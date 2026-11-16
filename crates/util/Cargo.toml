@@ -27,7 +27,6 @@ globset.workspace = true
 itertools.workspace = true
 rand = { workspace = true, optional = true }
 regex = { workspace = true, features = ["unicode-bool", "unicode-gencat"] }
-rust-embed.workspace = true
 schemars = { workspace = true, features = ["derive"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
@@ -41,6 +40,7 @@ gpui_util.workspace = true
 path = { workspace = true, features = ["serde"] }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
+rust-embed.workspace = true
 async_zip.workspace = true
 futures-lite.workspace = true
 futures.workspace = true
@@ -49,6 +49,9 @@ smol.workspace = true
 async-fs.workspace = true
 walkdir.workspace = true
 dirs.workspace = true
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+rust-embed = { workspace = true, features = ["debug-embed"] }
 
 [target.'cfg(any(unix, not(target_family = "wasm")))'.dependencies]
 log.workspace = true

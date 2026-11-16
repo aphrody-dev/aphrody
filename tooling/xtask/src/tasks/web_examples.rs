@@ -11,10 +11,14 @@ use clap::Parser;
 pub struct WebExamplesArgs {
     #[arg(long)]
     pub release: bool,
+    #[arg(long)]
+    pub opt: bool,
     #[arg(long, default_value = "8080")]
     pub port: u16,
     #[arg(long)]
     pub no_serve: bool,
+    #[arg(long)]
+    pub coi: bool,
 }
 
 fn check_program(binary: &str, install_hint: &str) -> Result<()> {
@@ -48,9 +52,20 @@ fn discover_examples() -> Result<Vec<String>> {
 pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
     let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
     let profile = if args.release { "release" } else { "debug" };
-    let out_dir = "target/web-examples";
+    let metadata = cargo_metadata::MetadataCommand::new()
+        .no_deps()
+        .exec()
+        .context("failed to read cargo metadata")?;
+    let target_dir = metadata.target_directory.into_std_path_buf();
+    let out_dir = target_dir.join("web-examples");
+    let out_dir_str = out_dir.to_string_lossy().into_owned();
 
     check_program("wasm-bindgen", "cargo install wasm-bindgen-cli")?;
+    let has_wasm_opt = (args.opt || args.release)
+        && Command::new("wasm-opt")
+            .arg("--version")
+            .output()
+            .is_ok_and(|o| o.status.success());
 
     let examples = discover_examples()?;
     eprintln!(
@@ -58,7 +73,7 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
         examples.len()
     );
 
-    std::fs::create_dir_all(out_dir).context("failed to create output directory")?;
+    std::fs::create_dir_all(&out_dir).context("failed to create output directory")?;
 
     eprintln!("Building all examples...");
 
@@ -71,8 +86,9 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
         "gpui",
         "--keep-going",
     ]);
-    // 🙈
+    // Avoid Windows sccache web-sys argv limit failures and match Cargo web config.
     cmd.env("RUSTC_BOOTSTRAP", "1");
+    cmd.env("RUSTC_WRAPPER", "");
     for name in &examples {
         cmd.args(["--example", name]);
     }
@@ -87,27 +103,33 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
     let mut failed: Vec<String> = Vec::new();
 
     for name in &examples {
-        let wasm_path = format!("target/wasm32-unknown-unknown/{profile}/examples/{name}.wasm");
-        if !Path::new(&wasm_path).exists() {
+        let wasm_path = target_dir
+            .join("wasm32-unknown-unknown")
+            .join(profile)
+            .join("examples")
+            .join(format!("{name}.wasm"));
+        if !wasm_path.exists() {
             eprintln!("[{name}] SKIPPED (build failed)");
             failed.push(name.clone());
             continue;
         }
+        let wasm_path_str = wasm_path.to_string_lossy().into_owned();
 
         eprintln!("[{name}] Running wasm-bindgen...");
 
-        let example_dir = format!("{out_dir}/{name}");
+        let example_dir = out_dir.join(name);
         std::fs::create_dir_all(&example_dir)
-            .with_context(|| format!("failed to create {example_dir}"))?;
+            .with_context(|| format!("failed to create {}", example_dir.display()))?;
+        let example_dir_str = example_dir.to_string_lossy().into_owned();
 
         let status = Command::new("wasm-bindgen")
             .args([
-                &wasm_path,
+                wasm_path_str.as_str(),
                 "--target",
                 "web",
                 "--no-typescript",
                 "--out-dir",
-                &example_dir,
+                example_dir_str.as_str(),
                 "--out-name",
                 name,
             ])
@@ -121,11 +143,39 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
             continue;
         }
 
+        if has_wasm_opt {
+            let bg_wasm = example_dir.join(format!("{name}_bg.wasm"));
+            if bg_wasm.exists() {
+                let bg_wasm_str = bg_wasm.to_string_lossy().into_owned();
+                let opt_status = Command::new("wasm-opt")
+                    .args([
+                        bg_wasm_str.as_str(),
+                        "-Oz",
+                        "--enable-bulk-memory",
+                        "--enable-bulk-memory-opt",
+                        "--enable-nontrapping-float-to-int",
+                        "--enable-sign-ext",
+                        "--enable-reference-types",
+                        "--enable-multivalue",
+                        "--strip-debug",
+                        "-o",
+                        bg_wasm_str.as_str(),
+                    ])
+                    .status()
+                    .context("failed to run wasm-opt")?;
+                if !opt_status.success() {
+                    eprintln!("[{name}] SKIPPED (wasm-opt failed)");
+                    failed.push(name.clone());
+                    continue;
+                }
+            }
+        }
+
         // Write per-example index.html.
-        let html_path = format!("{example_dir}/index.html");
+        let html_path = example_dir.join("index.html");
         std::fs::File::create(&html_path)
             .and_then(|mut file| file.write_all(make_example_html(name).as_bytes()))
-            .with_context(|| format!("failed to write {html_path}"))?;
+            .with_context(|| format!("failed to write {}", html_path.display()))?;
 
         eprintln!("[{name}] OK");
         succeeded.push(name.clone());
@@ -136,7 +186,7 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
     }
 
     let example_names: Vec<&str> = succeeded.iter().map(|s| s.as_str()).collect();
-    let index_path = format!("{out_dir}/index.html");
+    let index_path = out_dir.join("index.html");
     std::fs::File::create(&index_path)
         .and_then(|mut file| file.write_all(make_gallery_html(&example_names).as_bytes()))
         .context("failed to write index.html")?;
@@ -145,30 +195,48 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
         return Ok(());
     }
 
-    // Serve with COEP/COOP headers required for WebGPU / SharedArrayBuffer.
-    eprintln!("Serving on http://127.0.0.1:{}...", args.port);
+    eprintln!("Serving with Bun on http://127.0.0.1:{} (COI={})...", args.port, args.coi);
 
+    let coi_flag = if args.coi { "true" } else { "false" };
+    let out_dir_js = out_dir_str.replace('\\', "/");
     let server_script = format!(
-        r#"
-import http.server
-class Handler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory="{out_dir}", **kwargs)
-    def end_headers(self):
-        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
-        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
-        super().end_headers()
-http.server.HTTPServer(("127.0.0.1", {port}), Handler).serve_forever()
+        r#"import {{ extname, resolve }} from "node:path";
+const root = resolve("{out_dir_js}");
+const coi = {coi_flag};
+const mime = {{
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".wasm": "application/wasm",
+  ".json": "application/json; charset=utf-8",
+}};
+Bun.serve({{
+  hostname: "127.0.0.1",
+  port: {port},
+  async fetch(req) {{
+    const rel = new URL(req.url).pathname === "/" ? "/index.html" : new URL(req.url).pathname;
+    const p = resolve(root, "." + rel);
+    if (!p.startsWith(root)) return new Response("Forbidden", {{ status: 403 }});
+    const f = Bun.file(p);
+    if (!(await f.exists())) return new Response("Not Found", {{ status: 404 }});
+    const headers = new Headers({{ "Content-Type": mime[extname(p)] ?? "application/octet-stream" }});
+    if (coi) {{
+      headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+      headers.set("Cross-Origin-Opener-Policy", "same-origin");
+    }}
+    return new Response(f, {{ headers }});
+  }},
+}});
 "#,
         port = args.port,
     );
 
-    let status = Command::new("python3")
-        .args(["-c", &server_script])
+    let status = Command::new("bun")
+        .args(["-e", &server_script])
         .status()
-        .context("failed to run python3 http server (is python3 installed?)")?;
+        .context("failed to run bun http server (is bun installed?)")?;
     if !status.success() {
-        bail!("python3 http server exited with: {status}");
+        bail!("bun http server exited with: {status}");
     }
 
     Ok(())

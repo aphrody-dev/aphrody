@@ -165,7 +165,10 @@ fn main() -> anyhow::Result<()> {
             let spec = DistBundleSpec::from_brand(env!("CARGO_PKG_VERSION"));
             match DistFormat::parse(&format) {
                 Some(DistFormat::PopDeb) => print!("{}", spec.render_debian_control()),
-                _ => print!("{}", spec.render_desktop_entry("aphrody-os")),
+                _ => print!(
+                    "{}",
+                    spec.render_desktop_entry(&format!("{}-os", brand::APP_SLUG))
+                ),
             }
         }
         Some(Command::Mcp) => {

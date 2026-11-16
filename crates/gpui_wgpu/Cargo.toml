@@ -23,7 +23,7 @@ gpui.workspace = true
 anyhow.workspace = true
 bytemuck.workspace = true
 collections.workspace = true
-cosmic-text = "0.19.0"
+cosmic-text.workspace = true
 etagere.workspace = true
 itertools.workspace = true
 image = { workspace = true, optional = true }

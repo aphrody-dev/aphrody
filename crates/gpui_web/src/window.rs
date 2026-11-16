@@ -116,6 +116,12 @@ impl WebWindow {
             .dyn_into()
             .map_err(|error| anyhow::anyhow!("Created element is not a canvas: {error:?}"))?;
         canvas.set_tab_index(-1);
+        if let Err(err) = canvas.set_attribute("role", "application") {
+            log::debug!("failed to set canvas ARIA role: {err:?}");
+        }
+        if let Err(err) = canvas.set_attribute("aria-label", "GPU Interactive Application") {
+            log::debug!("failed to set default canvas aria-label: {err:?}");
+        }
 
         let style = canvas.style();
         for (property, value) in [
@@ -897,6 +903,9 @@ impl PlatformWindow for WebWindow {
 
     fn set_title(&mut self, title: &str) {
         self.inner.state.borrow_mut().title = title.to_owned();
+        if let Err(err) = self.inner.canvas.set_attribute("aria-label", title) {
+            log::debug!("failed to update canvas aria-label: {err:?}");
+        }
         if let Some(document) = self.inner.browser_window.document() {
             document.set_title(title);
         }

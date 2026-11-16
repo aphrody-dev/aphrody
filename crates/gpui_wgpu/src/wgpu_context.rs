@@ -10,6 +10,15 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use wgpu::TextureFormat;
 
 #[derive(Clone)]
+pub struct SharedWgpuHandles {
+    pub instance: wgpu::Instance,
+    pub adapter: wgpu::Adapter,
+    pub device: Arc<wgpu::Device>,
+    pub queue: Arc<wgpu::Queue>,
+    pub color_texture_format: TextureFormat,
+}
+
+#[derive(Clone)]
 pub struct WgpuContext {
     pub instance: wgpu::Instance,
     pub adapter: wgpu::Adapter,
@@ -396,19 +405,35 @@ impl WgpuContext {
                 anyhow::anyhow!("Failed to create browser graphics surface: {error}")
             })?;
 
-        let adapter = instance
+        let adapter_res = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::HighPerformance,
                 compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
                 apply_limit_buckets: false,
             })
-            .await
-            .map_err(|error| {
-                anyhow::anyhow!(
-                    "Failed to request a {preference:?} adapter compatible with the canvas: {error}"
-                )
-            })?;
+            .await;
+        let adapter = match adapter_res {
+            Ok(adapter) => adapter,
+            Err(hw_err) => {
+                log::warn!(
+                    "No hardware {preference:?} adapter found ({hw_err}); retrying software fallback adapter"
+                );
+                instance
+                    .request_adapter(&wgpu::RequestAdapterOptions {
+                        power_preference: wgpu::PowerPreference::LowPower,
+                        compatible_surface: Some(&surface),
+                        force_fallback_adapter: true,
+                        apply_limit_buckets: false,
+                    })
+                    .await
+                    .map_err(|error| {
+                        anyhow::anyhow!(
+                            "Failed to request a {preference:?} adapter compatible with the canvas: {error}"
+                        )
+                    })?
+            }
+        };
         let adapter_info = adapter.get_info();
         let backend = match adapter_info.backend {
             wgpu::Backend::BrowserWebGpu => WgpuBackend::BrowserWebGpu,
@@ -770,6 +795,18 @@ impl WgpuContext {
     /// The device-wide error state, shared with renderers on this device.
     pub fn errors(&self) -> &Arc<DeviceErrorState> {
         &self.errors
+    }
+
+    /// Exports cloned shared WGPU instance, adapter, device, and queue handles so secondary UI
+    /// bridges (`os_ui`, `egui-wgpu`, `iced_wgpu`, `anyrender`, `cef` OSR) render onto one GPU device.
+    pub fn shared_handles(&self) -> SharedWgpuHandles {
+        SharedWgpuHandles {
+            instance: self.instance.clone(),
+            adapter: self.adapter.clone(),
+            device: Arc::clone(&self.device),
+            queue: Arc::clone(&self.queue),
+            color_texture_format: self.color_texture_format,
+        }
     }
 }
 

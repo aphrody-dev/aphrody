@@ -110,6 +110,7 @@ where
         .when(compact, |el| el.w(px(64.0)))
         .when(!compact, |el| el.w(px(212.0)))
         .p_2()
+        .pb_5()
         .gap_2()
         .overflow_y_scroll()
         .bg(theme.colors.surface_container_low)
@@ -190,6 +191,7 @@ where
                 .flex_1()
                 .size_full()
                 .p_3()
+                .pb_6()
                 .overflow_y_scroll()
                 .child(body),
         )

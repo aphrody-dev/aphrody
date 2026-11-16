@@ -1,4 +1,6 @@
+#[cfg(not(target_family = "wasm"))]
 use std::io::{BufRead, Read, Write};
+#[cfg(not(target_family = "wasm"))]
 use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -319,6 +321,7 @@ fn call_tool(state: &Arc<Mutex<McpServerState>>, params: &Value) -> Result<Value
 }
 
 /// Runs blocking stdio JSON-RPC 2.0 MCP loop until EOF.
+#[cfg(not(target_family = "wasm"))]
 pub fn serve_stdio(state: Arc<Mutex<McpServerState>>) -> anyhow::Result<()> {
     let stdin = std::io::stdin();
     let stdout = std::io::stdout();
@@ -337,6 +340,7 @@ pub fn serve_stdio(state: Arc<Mutex<McpServerState>>) -> anyhow::Result<()> {
 }
 
 /// Resolves bind address dynamically (`explicit` -> `APHRODY_MCP_ADDR` -> ephemeral localhost).
+#[cfg(not(target_family = "wasm"))]
 #[must_use]
 pub fn resolve_bind_addr(explicit: Option<&str>) -> String {
     if let Some(addr) = explicit
@@ -353,6 +357,7 @@ pub fn resolve_bind_addr(explicit: Option<&str>) -> String {
 }
 
 /// Minimal dependency-free HTTP/1.1 MCP & health discovery server.
+#[cfg(not(target_family = "wasm"))]
 pub fn serve_http(
     state: Arc<Mutex<McpServerState>>,
     addr_override: Option<&str>,
@@ -360,7 +365,10 @@ pub fn serve_http(
     let requested = resolve_bind_addr(addr_override);
     let listener = TcpListener::bind(&requested)?;
     let local_addr = listener.local_addr()?;
-    log::info!("Aphrody OS MCP HTTP endpoint listening on http://{local_addr}");
+    log::info!(
+        "{} OS MCP HTTP endpoint listening on http://{local_addr}",
+        brand::APP_NAME
+    );
     println!("{{\"listening\":\"http://{local_addr}\"}}");
 
     for stream in listener.incoming() {
@@ -378,10 +386,11 @@ pub fn serve_http(
 }
 
 fn craft_anything_discovery_json() -> Value {
-    let manifest_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    let vendor_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .and_then(|p| p.parent())
-        .map(|root| root.join("vendor").join("craft-anything"));
+        .map(|root| root.join("vendor"));
+    let manifest_root = vendor_dir.as_ref().map(|v| v.join("craft-anything"));
     let submodule_present = manifest_root
         .as_ref()
         .is_some_and(|p| p.join("Cargo.toml").is_file());
@@ -398,14 +407,30 @@ fn craft_anything_discovery_json() -> Value {
         }
         crate_dirs.sort();
     }
+    let mut vendor_modules = Vec::new();
+    if let Some(vroot) = &vendor_dir
+        && let Ok(entries) = std::fs::read_dir(vroot)
+    {
+        for entry in entries.flatten() {
+            let p = entry.path();
+            if p.is_dir()
+                && let Some(name) = entry.file_name().to_str()
+            {
+                vendor_modules.push(name.to_owned());
+            }
+        }
+        vendor_modules.sort();
+    }
     let configured_bin = std::env::var("CRAFT_ANYTHING_BIN").ok();
     json!({
         "submodule_present": submodule_present,
         "submodule_crates": crate_dirs,
+        "vendor_modules": vendor_modules,
         "configured_bin": configured_bin,
     })
 }
 
+#[cfg(not(target_family = "wasm"))]
 fn handle_http_conn(
     mut stream: TcpStream,
     state: &Arc<Mutex<McpServerState>>,
