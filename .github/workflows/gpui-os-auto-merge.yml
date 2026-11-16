@@ -42,8 +42,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request_target" ]; then
             PR="${{ github.event.pull_request.number }}"
-            gh pr review "$PR" --repo "$REPO" --approve --body "Automated approval via gpui-os auto-merge workflow." || true
-            gh pr merge "$PR" --repo "$REPO" --auto --squash --delete-branch || true
+            gh pr review "$PR" --repo "$REPO" --approve --body "Automated approval via gpui-os auto-merge workflow (waiting for gpui-os CI completion before merge)." || true
           else
             PR_NUMBERS=$(gh pr list --repo "$REPO" --state open --json number,isDraft,headRefOid,labels,headRepositoryOwner,author | python3 -c '
           import json, os, sys

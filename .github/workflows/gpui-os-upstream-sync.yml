@@ -34,15 +34,15 @@ jobs:
         if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'bun'
         run: |
           git submodule update --remote --merge vendor/bun || true
-      - name: Sync gpui-component skills & docs into unified plugin
+      - name: Sync gpui-kit skills & docs into unified plugin
         if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'gpui-kit'
         run: |
-          rm -rf /tmp/gpui-component
-          git clone --depth=1 https://github.com/longbridge/gpui-component.git /tmp/gpui-component
+          rm -rf /tmp/gpui-kit
+          git clone --depth=1 https://github.com/longbridge/gpui-kit.git /tmp/gpui-kit
           mkdir -p .agents/plugins/gpui-os/skills .agents/plugins/gpui-os/docs/gpui-kit
-          cp -r /tmp/gpui-component/skills/. .agents/plugins/gpui-os/skills/
-          cp -r /tmp/gpui-component/docs/. .agents/plugins/gpui-os/docs/gpui-kit/
-          rm -rf /tmp/gpui-component
+          cp -r /tmp/gpui-kit/skills/. .agents/plugins/gpui-os/skills/
+          cp -r /tmp/gpui-kit/docs/. .agents/plugins/gpui-os/docs/gpui-kit/
+          rm -rf /tmp/gpui-kit
       - name: Sync NSH docs & references
         if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'nsh'
         run: |
@@ -57,7 +57,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes from bun/gpui-component/nsh upstreams."
+            echo "No changes from bun/gpui-kit/nsh upstreams."
             exit 0
           fi
           BRANCH="sync/upstreams-auto"
@@ -71,7 +71,7 @@ jobs:
               --head "$BRANCH" \
               --base main \
               --title "chore(sync): sync upstream bun / gpui-kit / nsh" \
-              --body "Automated upstream sync PR for bun, longbridge/gpui-component, and longbridge/nsh.\n\nRelease Notes:\n\n- N/A" \
+              --body "Automated upstream sync PR for bun, longbridge/gpui-kit, and longbridge/nsh.\n\nRelease Notes:\n\n- N/A" \
               --label "upstream-sync,auto-merge,gpui-kit,nsh"
           fi
 

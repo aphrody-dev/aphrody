@@ -1,5 +1,5 @@
 name: Upstream Sync / Feature Request
-description: Request or track synchronization with Zed, NSH, gpui-component, WGPU, or Bun, or propose an enhancement.
+description: Request or track synchronization with Zed, NSH, gpui-kit, WGPU, or Bun, or propose an enhancement.
 labels: ["enhancement"]
 body:
   - type: dropdown
@@ -9,7 +9,7 @@ body:
       options:
         - zed-industries/zed
         - longbridge/nsh
-        - longbridge/gpui-component
+        - longbridge/gpui-kit
         - gfx-rs/wgpu
         - aphrody-labs/bun
         - Vulkan / DirectX 12 / WebGPU

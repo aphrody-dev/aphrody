@@ -5,7 +5,7 @@ Thank you for contributing to **Aphrody** (`aphrody-dev/gpui-os`), unifying GPUI
 ## Before You Start
 
 - **Use Discussions for architecture proposals**: Open a thread in [gpui-os Discussions](https://github.com/aphrody-dev/gpui-os/discussions) or check existing [Issues](https://github.com/aphrody-dev/gpui-os/issues) before large cross-crate refactors.
-- **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-component`, `gfx-rs/wgpu`, and `aphrody-labs/bun` is managed through [`.github/workflows/gpui-os-upstream-sync.yml`](./.github/workflows/gpui-os-upstream-sync.yml).
+- **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, `gfx-rs/wgpu`, and `aphrody-labs/bun` is managed through [`.github/workflows/gpui-os-upstream-sync.yml`](./.github/workflows/gpui-os-upstream-sync.yml).
 - **Plugin, coding rules & design guides**: Read [`.agents/plugins/gpui-os/rules/AGENTS.md`](./.agents/plugins/gpui-os/rules/AGENTS.md) and [`.agents/plugins/gpui-os/docs/INDEX.md`](./.agents/plugins/gpui-os/docs/INDEX.md).
 
 ## Engineering Standards

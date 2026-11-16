@@ -3,7 +3,7 @@ name: github-ops
 description: >-
   GitHub repository automation for aphrody-dev/gpui-os: Issues, Wiki sync, PR
   templates, Renovate, scheduled upstream syncs from zed-industries/zed,
-  longbridge/nsh, longbridge/gpui-component, gfx-rs/wgpu, and aphrody-labs/bun,
+  longbridge/nsh, longbridge/gpui-kit, gfx-rs/wgpu, and aphrody-labs/bun,
   automated PR approval and auto-merge, and automated issue-fix/triage workflows.
   Use when modifying .github/workflows, labels, Wiki pages, or triage/sync ops.
 ---
@@ -25,7 +25,7 @@ Verify live settings on `aphrody-dev/gpui-os` with `gh api repos/aphrody-dev/gpu
 2. **`gpui-os-upstream-sync.yml`**: Scheduled (`cron`) & `workflow_dispatch` upstream sync tracking:
    - `zed-industries/zed` (git merge/cherry-pick candidates & commit digest / PR creation)
    - `longbridge/nsh` (`crates/nsh-*`, `docs/nsh`)
-   - `longbridge/gpui-component` (`skills/gpui-kit*`, `docs/gpui-kit`)
+   - `longbridge/gpui-kit` (`skills/gpui-kit*`, `docs/gpui-kit`)
    - `gfx-rs/wgpu` (upstream revision check against `vendor/wgpu`)
    - `aphrody-labs/bun` (`vendor/bun` submodule fast-forward PR)
    - Automatically labels sync PRs with `upstream-sync` + `auto-merge`.

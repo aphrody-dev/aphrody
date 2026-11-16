@@ -302,12 +302,19 @@ fn sync_text_file(
     write_changes: bool,
     changed: &mut Vec<PathBuf>,
 ) -> Result<()> {
-    let current =
+    let raw =
         fs::read_to_string(path).with_context(|| format!("failed to read {}", path.display()))?;
-    let expected = transform(&current)?;
+    let uses_crlf = raw.contains("\r\n");
+    let current = raw.replace("\r\n", "\n");
+    let expected = transform(&current)?.replace("\r\n", "\n");
     if current != expected {
         if write_changes {
-            fs::write(path, expected)
+            let formatted = if uses_crlf {
+                expected.replace('\n', "\r\n")
+            } else {
+                expected
+            };
+            fs::write(path, formatted)
                 .with_context(|| format!("failed to write {}", path.display()))?;
         }
         changed.push(path.to_path_buf());
@@ -648,9 +655,8 @@ fn write_bytes_if_changed(
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_app_cargo_toml_branding_is_idempotent_and_preserves_zed_scheme() -> Result<()> {
-        let sample_manifest = ProductManifest {
+    fn test_manifest() -> ProductManifest {
+        ProductManifest {
             product: ProductSection {
                 name: "Aphrody".into(),
                 slug: "aphrody".into(),
@@ -678,7 +684,7 @@ mod tests {
             },
             urls: UrlsSection {
                 homepage: "https://aphrody.com".into(),
-                repository: "https://github.com/aphrody-labs/gpui-os".into(),
+                repository: "https://github.com/aphrody-dev/gpui-os".into(),
                 docs: "https://docs.aphrody.com".into(),
                 server: "https://zed.dev".into(),
                 extension_registry: "https://api.zed.dev".into(),
@@ -696,7 +702,12 @@ mod tests {
             assets: AssetsSection {
                 logo_svg: "assets/images/aphrody_logo.svg".into(),
             },
-        };
+        }
+    }
+
+    #[test]
+    fn test_app_cargo_toml_branding_is_idempotent_and_preserves_zed_scheme() -> Result<()> {
+        let sample_manifest = test_manifest();
 
         let input = r#"[package]
 name = "zed"
@@ -732,6 +743,27 @@ osx_url_schemes = ["zed"]
         assert_eq!(rgba.dimensions(), (256, 256));
         let ico = encode_multi_size_ico(&rgba)?;
         assert!(ico.starts_with(&[0, 0, 1, 0]), "valid ICO magic header");
+        Ok(())
+    }
+
+    #[test]
+    fn test_sync_text_file_is_crlf_resilient() -> Result<()> {
+        let dir = tempfile::tempdir()?;
+        let cargo_path = dir.path().join("Cargo.toml");
+        let lf = "[workspace.package]\nhomepage = \"https://aphrody.com\"\nrepository = \"https://github.com/aphrody-dev/gpui-os\"\n";
+        let manifest = test_manifest();
+        fs::write(&cargo_path, lf.replace('\n', "\r\n"))?;
+        let mut drifted = Vec::new();
+        sync_text_file(
+            &cargo_path,
+            |current| render_root_cargo_toml(current, &manifest),
+            false,
+            &mut drifted,
+        )?;
+        assert!(
+            drifted.is_empty(),
+            "CRLF checkout must not report brand drift"
+        );
         Ok(())
     }
 }

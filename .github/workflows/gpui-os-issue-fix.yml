@@ -3,7 +3,7 @@ name: gpui-os Issue Triage & Fix Ops
 on:
   issues:
     types: [opened, reopened]
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize]
   issue_comment:
     types: [created]
@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   triage-and-link:
-    if: github.event_name == 'issues' || github.event_name == 'pull_request'
+    if: github.event_name == 'issues' || github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
       - name: Auto-label issue or PR by subsystem and fix links
@@ -89,6 +89,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUM: ${{ inputs.pr_number || github.event.issue.number }}
         run: |
+          if [ -z "$PR_NUM" ]; then
+            echo "No PR number provided; skipping autofix."
+            exit 0
+          fi
           gh pr checkout "$PR_NUM" --repo "${{ github.repository }}"
           cargo fmt --all
           cargo xtask brand apply
