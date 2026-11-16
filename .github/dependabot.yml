@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Security updates only: the vendored submodules under vendor/ are nested Cargo
+  # workspaces with glob members, which the Cargo file fetcher cannot expand
+  # relative to the nested root, so they are excluded from fetching.
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    exclude-paths:
+      - vendor/**

@@ -1,0 +1,17 @@
+name: Checkout vendored path-dependency submodules
+description: Initialise only the submodules that a Cargo manifest references through a `path = "<submodule>"` dependency.
+
+runs:
+  using: composite
+  steps:
+    - name: Initialise referenced submodules
+      shell: bash
+      run: |
+        set -euo pipefail
+        manifests=$(find . -name Cargo.toml -not -path './vendor/*' -not -path '*/target/*' -not -path './.git/*')
+        paths=$(git config -f .gitmodules --get-regexp '\.path$' | awk '{print $2}' | while read -r p; do
+          if echo "$manifests" | xargs grep -lE "path *= *\"$p[/\"]" > /dev/null 2>&1; then echo "$p"; fi
+        done)
+        echo "Submodules referenced by path dependencies:"
+        echo "$paths"
+        [ -z "$paths" ] || echo "$paths" | xargs git submodule update --init --depth 1 --

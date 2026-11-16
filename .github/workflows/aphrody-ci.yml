@@ -67,6 +67,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: false
+      - uses: ./.github/actions/vendor-submodules
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
@@ -124,6 +125,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: false
+      - uses: ./.github/actions/vendor-submodules
       - uses: oven-sh/setup-bun@v2
       - name: Read toolchain and workspace config via Bun
         id: cfg
