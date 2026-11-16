@@ -1,12 +1,12 @@
-# WebGPU & WGSL Architecture in gpui-os
+# WebGPU & WGSL Architecture in aphrody
 
-This directory documents the WebGPU, WGSL, and cross-backend GPU rendering and compute architecture within `gpui-os`.
+This directory documents the WebGPU, WGSL, and cross-backend GPU rendering and compute architecture within `aphrody`.
 
 ---
 
 ## Architecture Overview
 
-`gpui-os` features a unified GPU foundation built upon `gfx-rs/wgpu` v30.0.0 and `naga` v30.0.0 (vendored in `vendor/wgpu` at revision `cddb2f5d80dc0009b2ef6767635140cacf90a007`).
+`aphrody` features a unified GPU foundation built upon `gfx-rs/wgpu` v30.0.0 and `naga` v30.0.0 (vendored in `vendor/wgpu` at revision `cddb2f5d80dc0009b2ef6767635140cacf90a007`).
 
 The GPU stack spans three key domains:
 1. **Desktop UI Rendering (`crates/gpui_wgpu`)**:
@@ -29,7 +29,7 @@ The GPU stack spans three key domains:
 
 ## Tooling & Command Line Interface
 
-`gpui-os` includes production command-line utilities for validating shaders, cross-compiling, inspecting GPU adapters, and running headless renders:
+`aphrody` includes production command-line utilities for validating shaders, cross-compiling, inspecting GPU adapters, and running headless renders:
 
 ### 1. `gpui-wgpu` (`.\target\debug\gpui-wgpu.exe`)
 ```powershell
@@ -78,7 +78,7 @@ The GPU stack spans three key domains:
 ## Detailed References
 
 For exhaustive deep-dives, consult the skill references:
-- [W3C WebGPU & WGSL Specification Reference](../../../.agents/plugins/gpui-os/skills/webgpu/references/webgpu-and-wgsl-spec.md)
-- [GPUI WGPU & Web Rendering Pipeline Architecture](../../../.agents/plugins/gpui-os/skills/webgpu/references/gpui-wgpu-and-web-pipeline.md)
-- [NSH Custom Shader Architecture](../../../.agents/plugins/gpui-os/skills/webgpu/references/nsh-shader-architecture.md)
-- [Dawn & Cross-Backend Compilation Matrix](../../../.agents/plugins/gpui-os/skills/webgpu/references/dawn-and-cross-backend-matrix.md)
+- [W3C WebGPU & WGSL Specification Reference](../../../.agents/plugins/aphrody/skills/webgpu/references/webgpu-and-wgsl-spec.md)
+- [GPUI WGPU & Web Rendering Pipeline Architecture](../../../.agents/plugins/aphrody/skills/webgpu/references/gpui-wgpu-and-web-pipeline.md)
+- [NSH Custom Shader Architecture](../../../.agents/plugins/aphrody/skills/webgpu/references/nsh-shader-architecture.md)
+- [Dawn & Cross-Backend Compilation Matrix](../../../.agents/plugins/aphrody/skills/webgpu/references/dawn-and-cross-backend-matrix.md)

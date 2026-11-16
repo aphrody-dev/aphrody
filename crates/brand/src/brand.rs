@@ -10,10 +10,26 @@ use std::ffi::OsString;
 
 include!(concat!(env!("OUT_DIR"), "/product_constants.rs"));
 
+/// Format `{ENV_PREFIX}_{suffix}` for diagnostics and user-facing override hints.
+pub fn env_key(suffix: &str) -> String {
+    format!("{ENV_PREFIX}_{suffix}")
+}
+
+/// Join `DOCS_URL` and a relative documentation slug (`"multibuffers"`, `"linux#..."`).
+pub fn docs_page_url(slug: &str) -> String {
+    let base = DOCS_URL.trim_end_matches('/');
+    let trimmed = slug.trim_start_matches('/');
+    if trimmed.is_empty() {
+        base.to_owned()
+    } else {
+        format!("{base}/{trimmed}")
+    }
+}
+
 /// Read `{ENV_PREFIX}_{suffix}` first (e.g. `APHRODY_LOG`), falling back to
 /// `{LEGACY_ENV_PREFIX}_{suffix}` (e.g. `ZED_LOG`) for seamless Zed compatibility.
 pub fn env_var(suffix: &str) -> Result<String, env::VarError> {
-    let primary_key = format!("{ENV_PREFIX}_{suffix}");
+    let primary_key = env_key(suffix);
     match env::var(&primary_key) {
         Ok(value) => Ok(value),
         Err(env::VarError::NotPresent) if ENV_PREFIX != LEGACY_ENV_PREFIX => {
@@ -118,10 +134,19 @@ mod tests {
             strip_cli_url_scheme("aphrody-cli://pipe-123"),
             Some("pipe-123")
         );
-        assert_eq!(
-            strip_cli_url_scheme("zed-cli://pipe-123"),
-            Some("pipe-123")
-        );
+        assert_eq!(strip_cli_url_scheme("zed-cli://pipe-123"), Some("pipe-123"));
         assert_eq!(strip_app_url_scheme("https://example.com"), None);
+        assert_eq!(
+            env_key("ALLOW_EMULATED_GPU"),
+            format!("{ENV_PREFIX}_ALLOW_EMULATED_GPU")
+        );
+        assert_eq!(
+            docs_page_url("/multibuffers"),
+            format!("{}/multibuffers", DOCS_URL.trim_end_matches('/'))
+        );
+        assert!(!PLUGIN_NAME.is_empty());
+        assert!(!PLUGIN_SCOPE.is_empty());
+        assert!(!GIT_DEFAULT_BRANCH.is_empty());
+        assert!(!UPSTREAM_ZED_BRANCH.is_empty());
     }
 }

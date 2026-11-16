@@ -1,0 +1,82 @@
+name: aphrody Wiki Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'product.toml'
+      - 'docs/wgpu/**'
+      - 'docs/gpu/**'
+      - 'docs/nsh/**'
+      - '.agents/plugins/aphrody/**'
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - name: Read product metadata via Bun
+        id: cfg
+        run: |
+          bun -e '
+            import { readFileSync } from "node:fs";
+            const pm = Bun.TOML.parse(readFileSync("product.toml", "utf8")) as any;
+            console.log(`plugin_name=${pm.plugin.name}`);
+            console.log(`app_name=${pm.product.name}`);
+          ' >> "$GITHUB_OUTPUT"
+      - name: Clone or initialize GitHub Wiki and sync pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          WIKI_URL="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.wiki.git"
+          rm -rf /tmp/wiki
+          if ! git clone "$WIKI_URL" /tmp/wiki 2>/dev/null; then
+            echo "Wiki repository not initialized yet; skipping push until initial Wiki page is created in GitHub UI."
+            exit 0
+          fi
+          git -C /tmp/wiki config user.name "github-actions[bot]"
+          git -C /tmp/wiki config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          PLUGIN_NAME="${{ steps.cfg.outputs.plugin_name }}"
+          APP_NAME="${{ steps.cfg.outputs.app_name }}"
+          PLUGIN_DIR=".agents/plugins/${PLUGIN_NAME}"
+
+          cp README.md /tmp/wiki/Home.md
+          [ -f docs/wgpu/llms.txt ] && cp docs/wgpu/llms.txt /tmp/wiki/WGPU-and-Naga.md
+          [ -f docs/wgpu/llms-full.txt ] && cp docs/wgpu/llms-full.txt /tmp/wiki/WGPU-Reference.md
+          [ -f docs/gpu/vulkan/README.md ] && cp docs/gpu/vulkan/README.md /tmp/wiki/GPU-Vulkan.md
+          [ -f docs/gpu/directx/README.md ] && cp docs/gpu/directx/README.md /tmp/wiki/GPU-DirectX12.md
+          [ -f docs/gpu/webgpu/README.md ] && cp docs/gpu/webgpu/README.md /tmp/wiki/GPU-WebGPU.md
+          [ -f docs/nsh/README.md ] && cp docs/nsh/README.md /tmp/wiki/NSH-Overview.md
+          [ -f "${PLUGIN_DIR}/docs/INDEX.md" ] && cp "${PLUGIN_DIR}/docs/INDEX.md" /tmp/wiki/Plugin-and-Skills.md
+          [ -f "${PLUGIN_DIR}/docs/gpui-kit/ARCHITECTURE.md" ] && cp "${PLUGIN_DIR}/docs/gpui-kit/ARCHITECTURE.md" /tmp/wiki/GPUI-Kit-Architecture.md
+          [ -f "${PLUGIN_DIR}/skills/github-ops/SKILL.md" ] && cp "${PLUGIN_DIR}/skills/github-ops/SKILL.md" /tmp/wiki/GitHub-Automation.md
+
+          printf '%s\n' \
+            "### ${APP_NAME} / ${PLUGIN_NAME} Wiki" \
+            '- [[Home]]' \
+            '- [[Plugin and Skills|Plugin-and-Skills]]' \
+            '- [[GPUI Kit Architecture|GPUI-Kit-Architecture]]' \
+            '- [[NSH Overview|NSH-Overview]]' \
+            '- [[WGPU & Naga|WGPU-and-Naga]]' \
+            '- [[WGPU Full Reference|WGPU-Reference]]' \
+            '- [[Vulkan Backend|GPU-Vulkan]]' \
+            '- [[DirectX 12 Backend|GPU-DirectX12]]' \
+            '- [[WebGPU Backend|GPU-WebGPU]]' \
+            '- [[GitHub Automation|GitHub-Automation]]' > /tmp/wiki/_Sidebar.md
+
+          git -C /tmp/wiki add -A
+          if ! git -C /tmp/wiki diff --cached --quiet; then
+            git -C /tmp/wiki commit -m "docs(wiki): synchronize documentation from ${PLUGIN_NAME} main"
+            git -C /tmp/wiki push -u origin HEAD
+          fi

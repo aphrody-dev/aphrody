@@ -31,7 +31,10 @@ pub struct BrandApplyArgs {
 pub struct BrandCheckArgs {}
 
 #[derive(Debug, Clone, Deserialize)]
-#[allow(dead_code, reason = "Validates all required sections of root product.toml")]
+#[allow(
+    dead_code,
+    reason = "Validates all required sections of root product.toml"
+)]
 pub struct ProductManifest {
     pub product: ProductSection,
     pub paths: PathsSection,
@@ -39,10 +42,17 @@ pub struct ProductManifest {
     pub env: EnvSection,
     pub fonts: FontsSection,
     pub assets: AssetsSection,
+    pub plugin: PluginSection,
+    pub git: GitSection,
+    pub features: FeaturesSection,
+    pub colors: ColorsSection,
 }
 
 #[derive(Debug, Clone, Deserialize)]
-#[allow(dead_code, reason = "Validates all required fields of [product] in product.toml")]
+#[allow(
+    dead_code,
+    reason = "Validates all required fields of [product] in product.toml"
+)]
 pub struct ProductSection {
     pub name: String,
     pub slug: String,
@@ -78,6 +88,8 @@ pub struct UrlsSection {
     pub homepage: String,
     pub repository: String,
     pub docs: String,
+    pub status: String,
+    pub store: String,
     pub server: String,
     pub extension_registry: String,
 }
@@ -101,6 +113,56 @@ pub struct FontsSection {
 #[derive(Debug, Clone, Deserialize)]
 pub struct AssetsSection {
     pub logo_svg: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct PluginSection {
+    pub name: String,
+    pub version: String,
+    pub scope: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct GitSection {
+    pub default_branch: String,
+    pub upstream_zed: String,
+    pub upstream_zed_branch: String,
+    pub upstream_nsh: String,
+    pub upstream_gpui_kit: String,
+    pub upstream_wgpu: String,
+    pub submodule_bun: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct FeaturesSection {
+    pub default_app_features: Vec<String>,
+    pub modular_ui_crate: String,
+    pub modular_ui_features: String,
+    pub modular_code_crate: String,
+    pub modular_shell_crate: String,
+    pub modular_shell_features: String,
+    pub wgpu_cli_package: String,
+    pub wgpu_cli_bin: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ColorsSection {
+    pub channels: ChannelsColorSection,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ChannelsColorSection {
+    pub stable: ChannelPaletteConfig,
+    pub preview: ChannelPaletteConfig,
+    pub nightly: ChannelPaletteConfig,
+    pub dev: ChannelPaletteConfig,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ChannelPaletteConfig {
+    pub top: [u8; 4],
+    pub bottom: [u8; 4],
+    pub foreground: [u8; 4],
 }
 
 #[derive(Clone, Copy)]
@@ -150,18 +212,15 @@ impl ChannelVariant {
         }
     }
 
-    /// Background gradient top/bottom RGBA and foreground glyph tint per release channel.
-    fn palette(self) -> ([u8; 4], [u8; 4], [u8; 4]) {
-        match self {
-            // Stable: deep obsidian-indigo surface with crisp ice-white glyph
-            Self::Stable => ([18, 22, 36, 255], [10, 12, 20, 255], [236, 244, 255, 255]),
-            // Preview: royal violet surface with soft lavender-white glyph
-            Self::Preview => ([38, 20, 62, 255], [18, 10, 32, 255], [233, 213, 255, 255]),
-            // Nightly: warm midnight-amber surface with golden-amber glyph
-            Self::Nightly => ([42, 28, 14, 255], [20, 14, 8, 255], [253, 224, 138, 255]),
-            // Dev: slate-emerald surface with mint-cyan glyph
-            Self::Dev => ([14, 38, 36, 255], [8, 20, 20, 255], [153, 246, 228, 255]),
-        }
+    /// Background gradient top/bottom RGBA and foreground glyph tint configured per channel in `product.toml`.
+    fn palette(self, channels: &ChannelsColorSection) -> ([u8; 4], [u8; 4], [u8; 4]) {
+        let cfg = match self {
+            Self::Stable => &channels.stable,
+            Self::Preview => &channels.preview,
+            Self::Nightly => &channels.nightly,
+            Self::Dev => &channels.dev,
+        };
+        (cfg.top, cfg.bottom, cfg.foreground)
     }
 }
 
@@ -178,41 +237,137 @@ pub fn run_brand(command: BrandCommand) -> Result<()> {
 
 pub fn load_product_manifest(workspace_root: &Path) -> Result<ProductManifest> {
     let path = workspace_root.join("product.toml");
-    let raw = fs::read_to_string(&path)
-        .with_context(|| format!("failed to read {}", path.display()))?;
+    let raw =
+        fs::read_to_string(&path).with_context(|| format!("failed to read {}", path.display()))?;
     toml::from_str(&raw).with_context(|| format!("failed to parse {}", path.display()))
 }
 
-fn apply_brand(root: &Path, manifest: &ProductManifest, generate_icons: bool) -> Result<()> {
-    let mut updated_files = Vec::new();
-
+fn sync_manifest_files(
+    root: &Path,
+    manifest: &ProductManifest,
+    write_changes: bool,
+    changed: &mut Vec<PathBuf>,
+) -> Result<()> {
     sync_text_file(
         &root.join("Cargo.toml"),
         |current| render_root_cargo_toml(current, manifest),
-        true,
-        &mut updated_files,
+        write_changes,
+        changed,
     )?;
 
     sync_text_file(
         &root.join("crates/zed/Cargo.toml"),
         |current| render_app_cargo_toml(current, manifest),
-        true,
-        &mut updated_files,
+        write_changes,
+        changed,
     )?;
 
     sync_text_file(
         &root.join("crates/zed/resources/zed.desktop.in"),
         |current| Ok(render_desktop_entry(current, manifest)),
-        true,
-        &mut updated_files,
+        write_changes,
+        changed,
     )?;
 
     sync_text_file(
         &root.join("crates/zed/resources/windows/zed.iss"),
         |current| Ok(render_inno_setup(current, manifest)),
-        true,
-        &mut updated_files,
+        write_changes,
+        changed,
     )?;
+
+    let plugin_json = root.join(format!(
+        ".agents/plugins/{}/plugin.json",
+        manifest.plugin.name
+    ));
+    if plugin_json.is_file() {
+        sync_text_file(
+            &plugin_json,
+            |current| render_plugin_manifest(current, manifest),
+            write_changes,
+            changed,
+        )?;
+    }
+
+    let issue_config = root.join(".github/ISSUE_TEMPLATE/config.yml");
+    if issue_config.is_file() {
+        sync_text_file(
+            &issue_config,
+            |current| Ok(render_issue_template_config(current, manifest)),
+            write_changes,
+            changed,
+        )?;
+    }
+
+    Ok(())
+}
+
+fn validate_manifest(manifest: &ProductManifest) -> Result<()> {
+    let required = [
+        ("urls.status", manifest.urls.status.as_str()),
+        ("urls.store", manifest.urls.store.as_str()),
+        ("plugin.name", manifest.plugin.name.as_str()),
+        ("plugin.version", manifest.plugin.version.as_str()),
+        ("plugin.scope", manifest.plugin.scope.as_str()),
+        ("git.default_branch", manifest.git.default_branch.as_str()),
+        ("git.upstream_zed", manifest.git.upstream_zed.as_str()),
+        (
+            "git.upstream_zed_branch",
+            manifest.git.upstream_zed_branch.as_str(),
+        ),
+        ("git.upstream_nsh", manifest.git.upstream_nsh.as_str()),
+        (
+            "git.upstream_gpui_kit",
+            manifest.git.upstream_gpui_kit.as_str(),
+        ),
+        ("git.upstream_wgpu", manifest.git.upstream_wgpu.as_str()),
+        ("git.submodule_bun", manifest.git.submodule_bun.as_str()),
+        (
+            "features.modular_ui_crate",
+            manifest.features.modular_ui_crate.as_str(),
+        ),
+        (
+            "features.modular_ui_features",
+            manifest.features.modular_ui_features.as_str(),
+        ),
+        (
+            "features.modular_code_crate",
+            manifest.features.modular_code_crate.as_str(),
+        ),
+        (
+            "features.modular_shell_crate",
+            manifest.features.modular_shell_crate.as_str(),
+        ),
+        (
+            "features.modular_shell_features",
+            manifest.features.modular_shell_features.as_str(),
+        ),
+        (
+            "features.wgpu_cli_package",
+            manifest.features.wgpu_cli_package.as_str(),
+        ),
+        (
+            "features.wgpu_cli_bin",
+            manifest.features.wgpu_cli_bin.as_str(),
+        ),
+    ];
+    for (field, value) in required {
+        anyhow::ensure!(
+            !value.trim().is_empty(),
+            "product.toml field '{field}' cannot be empty"
+        );
+    }
+    anyhow::ensure!(
+        !manifest.features.default_app_features.is_empty(),
+        "product.toml field 'features.default_app_features' cannot be empty"
+    );
+    Ok(())
+}
+
+fn apply_brand(root: &Path, manifest: &ProductManifest, generate_icons: bool) -> Result<()> {
+    validate_manifest(manifest)?;
+    let mut updated_files = Vec::new();
+    sync_manifest_files(root, manifest, true, &mut updated_files)?;
 
     if generate_icons {
         let icon_paths = generate_all_channel_icons(root, manifest)?;
@@ -229,35 +384,9 @@ fn apply_brand(root: &Path, manifest: &ProductManifest, generate_icons: bool) ->
 }
 
 fn check_brand(root: &Path, manifest: &ProductManifest) -> Result<()> {
+    validate_manifest(manifest)?;
     let mut drifted = Vec::new();
-
-    sync_text_file(
-        &root.join("Cargo.toml"),
-        |current| render_root_cargo_toml(current, manifest),
-        false,
-        &mut drifted,
-    )?;
-
-    sync_text_file(
-        &root.join("crates/zed/Cargo.toml"),
-        |current| render_app_cargo_toml(current, manifest),
-        false,
-        &mut drifted,
-    )?;
-
-    sync_text_file(
-        &root.join("crates/zed/resources/zed.desktop.in"),
-        |current| Ok(render_desktop_entry(current, manifest)),
-        false,
-        &mut drifted,
-    )?;
-
-    sync_text_file(
-        &root.join("crates/zed/resources/windows/zed.iss"),
-        |current| Ok(render_inno_setup(current, manifest)),
-        false,
-        &mut drifted,
-    )?;
+    sync_manifest_files(root, manifest, false, &mut drifted)?;
 
     let svg_path = root.join(&manifest.assets.logo_svg);
     if !svg_path.is_file() {
@@ -333,7 +462,10 @@ pub fn render_root_cargo_toml(current: &str, manifest: &ProductManifest) -> Resu
         .and_then(|ws| ws.get_mut("package"))
         .and_then(Item::as_table_like_mut)
     {
-        ws_pkg.insert("homepage", toml_edit::value(manifest.urls.homepage.as_str()));
+        ws_pkg.insert(
+            "homepage",
+            toml_edit::value(manifest.urls.homepage.as_str()),
+        );
         ws_pkg.insert(
             "repository",
             toml_edit::value(manifest.urls.repository.as_str()),
@@ -453,7 +585,11 @@ fn render_desktop_entry(current: &str, manifest: &ProductManifest) -> String {
 }
 
 fn render_inno_setup(current: &str, manifest: &ProductManifest) -> String {
-    let line_ending = if current.contains("\r\n") { "\r\n" } else { "\n" };
+    let line_ending = if current.contains("\r\n") {
+        "\r\n"
+    } else {
+        "\n"
+    };
     let mut out_lines = Vec::new();
     for line in current.lines() {
         if line.starts_with("AppPublisher=") {
@@ -475,6 +611,78 @@ fn render_inno_setup(current: &str, manifest: &ProductManifest) -> String {
     joined
 }
 
+fn render_plugin_manifest(current: &str, manifest: &ProductManifest) -> Result<String> {
+    let mut json: serde_json::Value =
+        serde_json::from_str(current).context("failed to parse plugin.json")?;
+    if let Some(obj) = json.as_object_mut() {
+        obj.insert(
+            "name".to_owned(),
+            serde_json::Value::String(manifest.plugin.name.clone()),
+        );
+        obj.insert(
+            "version".to_owned(),
+            serde_json::Value::String(manifest.plugin.version.clone()),
+        );
+        obj.insert(
+            "homepage".to_owned(),
+            serde_json::Value::String(manifest.urls.homepage.clone()),
+        );
+        let author = obj.entry("author").or_insert_with(|| serde_json::json!({}));
+        if let Some(author_obj) = author.as_object_mut() {
+            author_obj.insert(
+                "name".to_owned(),
+                serde_json::Value::String(manifest.product.company_name.clone()),
+            );
+            author_obj.insert(
+                "url".to_owned(),
+                serde_json::Value::String(manifest.urls.homepage.clone()),
+            );
+        }
+        let repo = obj
+            .entry("repository")
+            .or_insert_with(|| serde_json::json!({"type": "git"}));
+        if let Some(repo_obj) = repo.as_object_mut() {
+            repo_obj.insert(
+                "type".to_owned(),
+                serde_json::Value::String("git".to_owned()),
+            );
+            repo_obj.insert(
+                "url".to_owned(),
+                serde_json::Value::String(manifest.urls.repository.clone()),
+            );
+        }
+    }
+    let mut rendered = serde_json::to_string_pretty(&json)?;
+    rendered.push('\n');
+    Ok(rendered)
+}
+
+fn render_issue_template_config(current: &str, manifest: &ProductManifest) -> String {
+    let repo = manifest.urls.repository.trim_end_matches('/');
+    let mut out_lines = Vec::new();
+    let mut last_name = String::new();
+    for line in current.lines() {
+        let trimmed = line.trim();
+        if let Some(name) = trimmed.strip_prefix("- name:") {
+            last_name = name.trim().to_owned();
+            out_lines.push(line.to_owned());
+        } else if trimmed.starts_with("url:") && last_name.eq_ignore_ascii_case("Discussions") {
+            let indent = &line[..line.len() - line.trim_start().len()];
+            out_lines.push(format!("{indent}url: {repo}/discussions"));
+        } else if trimmed.starts_with("url:") && last_name.eq_ignore_ascii_case("Project Wiki") {
+            let indent = &line[..line.len() - line.trim_start().len()];
+            out_lines.push(format!("{indent}url: {repo}/wiki"));
+        } else {
+            out_lines.push(line.to_owned());
+        }
+    }
+    let mut joined = out_lines.join("\n");
+    if current.ends_with('\n') {
+        joined.push('\n');
+    }
+    joined
+}
+
 fn generate_all_channel_icons(root: &Path, manifest: &ProductManifest) -> Result<Vec<PathBuf>> {
     let svg_path = root.join(&manifest.assets.logo_svg);
     let svg_bytes = fs::read(&svg_path)
@@ -484,7 +692,8 @@ fn generate_all_channel_icons(root: &Path, manifest: &ProductManifest) -> Result
 
     for channel in ChannelVariant::ALL {
         let suffix = channel.file_suffix();
-        let img_1024 = render_channel_icon_rgba(&svg_bytes, 1024, channel)?;
+        let img_1024 =
+            render_channel_icon_rgba(&svg_bytes, 1024, channel, &manifest.colors.channels)?;
         let img_512 = imageops::resize(&img_1024, 512, 512, imageops::FilterType::Lanczos3);
 
         let png_1x_path = root.join(format!("crates/zed/resources/app-icon{suffix}.png"));
@@ -511,8 +720,9 @@ pub fn render_channel_icon_rgba(
     svg_bytes: &[u8],
     canvas_size: u32,
     channel: ChannelVariant,
+    channels: &ChannelsColorSection,
 ) -> Result<RgbaImage> {
-    let (bg_top, bg_bottom, fg_tint) = channel.palette();
+    let (bg_top, bg_bottom, fg_tint) = channel.palette(channels);
     let mut canvas = RgbaImage::new(canvas_size, canvas_size);
 
     let size_f = canvas_size as f32;
@@ -600,13 +810,8 @@ pub fn encode_multi_size_ico(base_rgba: &RgbaImage) -> Result<Vec<u8>> {
     let mut frames = Vec::with_capacity(sizes.len());
     for size in sizes {
         let resized = imageops::resize(base_rgba, size, size, imageops::FilterType::Lanczos3);
-        let frame = IcoFrame::as_png(
-            resized.as_raw(),
-            size,
-            size,
-            ExtendedColorType::Rgba8,
-        )
-        .with_context(|| format!("failed to encode {size}x{size} ICO frame"))?;
+        let frame = IcoFrame::as_png(resized.as_raw(), size, size, ExtendedColorType::Rgba8)
+            .with_context(|| format!("failed to encode {size}x{size} ICO frame"))?;
         frames.push(frame);
     }
 
@@ -617,11 +822,7 @@ pub fn encode_multi_size_ico(base_rgba: &RgbaImage) -> Result<Vec<u8>> {
     Ok(buffer.into_inner())
 }
 
-fn write_png_if_changed(
-    path: &Path,
-    img: &RgbaImage,
-    written: &mut Vec<PathBuf>,
-) -> Result<()> {
+fn write_png_if_changed(path: &Path, img: &RgbaImage, written: &mut Vec<PathBuf>) -> Result<()> {
     let mut png_bytes = Vec::new();
     PngEncoder::new(&mut png_bytes)
         .write_image(
@@ -634,11 +835,7 @@ fn write_png_if_changed(
     write_bytes_if_changed(path, &png_bytes, written)
 }
 
-fn write_bytes_if_changed(
-    path: &Path,
-    bytes: &[u8],
-    written: &mut Vec<PathBuf>,
-) -> Result<()> {
+fn write_bytes_if_changed(path: &Path, bytes: &[u8], written: &mut Vec<PathBuf>) -> Result<()> {
     let unchanged = fs::read(path).is_ok_and(|existing| existing == bytes);
     if !unchanged {
         if let Some(parent) = path.parent() {
@@ -684,8 +881,10 @@ mod tests {
             },
             urls: UrlsSection {
                 homepage: "https://aphrody.com".into(),
-                repository: "https://github.com/aphrody-dev/gpui-os".into(),
+                repository: "https://github.com/aphrody-dev/aphrody".into(),
                 docs: "https://docs.aphrody.com".into(),
+                status: "https://status.aphrody.com".into(),
+                store: "https://aphrody.com/store".into(),
                 server: "https://zed.dev".into(),
                 extension_registry: "https://api.zed.dev".into(),
             },
@@ -701,6 +900,54 @@ mod tests {
             },
             assets: AssetsSection {
                 logo_svg: "assets/images/aphrody_logo.svg".into(),
+            },
+            plugin: PluginSection {
+                name: "aphrody".into(),
+                version: "1.30.0".into(),
+                scope: "@aphrody".into(),
+            },
+            git: GitSection {
+                default_branch: "main".into(),
+                upstream_zed: "https://github.com/zed-industries/zed.git".into(),
+                upstream_zed_branch: "main".into(),
+                upstream_nsh: "https://github.com/longbridge/nsh.git".into(),
+                upstream_gpui_kit: "https://github.com/longbridge/gpui-kit.git".into(),
+                upstream_wgpu: "https://github.com/gfx-rs/wgpu.git".into(),
+                submodule_bun: "https://github.com/aphrody-labs/bun".into(),
+            },
+            features: FeaturesSection {
+                default_app_features: vec!["full".into()],
+                modular_ui_crate: "gpui_ui".into(),
+                modular_ui_features: "nsh-full".into(),
+                modular_code_crate: "gpui_code".into(),
+                modular_shell_crate: "gpui_app_shell".into(),
+                modular_shell_features: "nsh".into(),
+                wgpu_cli_package: "wgpu_cli".into(),
+                wgpu_cli_bin: "gpui-wgpu".into(),
+            },
+            colors: ColorsSection {
+                channels: ChannelsColorSection {
+                    stable: ChannelPaletteConfig {
+                        top: [18, 22, 36, 255],
+                        bottom: [10, 12, 20, 255],
+                        foreground: [236, 244, 255, 255],
+                    },
+                    preview: ChannelPaletteConfig {
+                        top: [38, 20, 62, 255],
+                        bottom: [18, 10, 32, 255],
+                        foreground: [233, 213, 255, 255],
+                    },
+                    nightly: ChannelPaletteConfig {
+                        top: [42, 28, 14, 255],
+                        bottom: [20, 14, 8, 255],
+                        foreground: [253, 224, 138, 255],
+                    },
+                    dev: ChannelPaletteConfig {
+                        top: [14, 38, 36, 255],
+                        bottom: [8, 20, 20, 255],
+                        foreground: [153, 246, 228, 255],
+                    },
+                },
             },
         }
     }
@@ -739,7 +986,13 @@ osx_url_schemes = ["zed"]
     #[test]
     fn test_svg_to_rgba_and_ico_generation() -> Result<()> {
         let minimal_svg = br#"<svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><circle cx="48" cy="48" r="32" fill="black"/></svg>"#;
-        let rgba = render_channel_icon_rgba(minimal_svg, 256, ChannelVariant::Stable)?;
+        let manifest = test_manifest();
+        let rgba = render_channel_icon_rgba(
+            minimal_svg,
+            256,
+            ChannelVariant::Stable,
+            &manifest.colors.channels,
+        )?;
         assert_eq!(rgba.dimensions(), (256, 256));
         let ico = encode_multi_size_ico(&rgba)?;
         assert!(ico.starts_with(&[0, 0, 1, 0]), "valid ICO magic header");
@@ -747,10 +1000,30 @@ osx_url_schemes = ["zed"]
     }
 
     #[test]
+    fn test_plugin_and_issue_config_render_from_manifest() -> Result<()> {
+        let manifest = test_manifest();
+        validate_manifest(&manifest)?;
+        let plugin = render_plugin_manifest(
+            r#"{"name":"old","version":"0.0.1","author":{"name":"Old","url":"https://old"},"homepage":"https://old","repository":{"type":"git","url":"https://old"}}"#,
+            &manifest,
+        )?;
+        assert!(plugin.contains("https://github.com/aphrody-dev/aphrody"));
+        assert!(plugin.contains("Aphrody Labs"));
+
+        let issue_cfg = render_issue_template_config(
+            "contact_links:\n  - name: Discussions\n    url: https://old/discussions\n  - name: Project Wiki\n    url: https://old/wiki\n",
+            &manifest,
+        );
+        assert!(issue_cfg.contains("https://github.com/aphrody-dev/aphrody/discussions"));
+        assert!(issue_cfg.contains("https://github.com/aphrody-dev/aphrody/wiki"));
+        Ok(())
+    }
+
+    #[test]
     fn test_sync_text_file_is_crlf_resilient() -> Result<()> {
         let dir = tempfile::tempdir()?;
         let cargo_path = dir.path().join("Cargo.toml");
-        let lf = "[workspace.package]\nhomepage = \"https://aphrody.com\"\nrepository = \"https://github.com/aphrody-dev/gpui-os\"\n";
+        let lf = "[workspace.package]\nhomepage = \"https://aphrody.com\"\nrepository = \"https://github.com/aphrody-dev/aphrody\"\n";
         let manifest = test_manifest();
         fs::write(&cargo_path, lf.replace('\n', "\r\n"))?;
         let mut drifted = Vec::new();

@@ -74,9 +74,13 @@ pub struct StandaloneThemeSettings {
 
 impl Default for StandaloneThemeSettings {
     fn default() -> Self {
+        let ui_font_name =
+            brand::env_var("UI_FONT").unwrap_or_else(|_| brand::FONT_SANS_ALIAS.to_owned());
+        let buffer_font_name =
+            brand::env_var("MONO_FONT").unwrap_or_else(|_| brand::FONT_MONO_ALIAS.to_owned());
         Self {
-            ui_font: gpui::font(".ZedSans"),
-            buffer_font: gpui::font(".ZedMono"),
+            ui_font: gpui::font(ui_font_name),
+            buffer_font: gpui::font(buffer_font_name),
             ui_font_size: gpui::px(14.0),
             buffer_font_size: gpui::px(13.0),
             ui_density: theme::UiDensity::Default,

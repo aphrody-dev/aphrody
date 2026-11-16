@@ -122,9 +122,9 @@ use zed_actions::{
     OpenServerSettings, OpenSettingsFile, OpenStatusPage, OpenZedUrl, Quit,
 };
 
-const DOCS_URL: &str = "https://zed.dev/docs/";
-const STATUS_URL: &str = "https://status.zed.dev";
-const MERCH_URL: &str = "https://merch.zed.dev/";
+const DOCS_URL: &str = brand::DOCS_URL;
+const STATUS_URL: &str = brand::STATUS_URL;
+const MERCH_URL: &str = brand::STORE_URL;
 
 #[cfg(feature = "crash-reporting")]
 pub struct CrashHandler(pub Arc<crashes::Client>);
@@ -690,13 +690,14 @@ pub fn initialize_workspace(app_state: Arc<AppState>, cx: &mut App) {
 #[allow(unused)]
 fn initialize_file_watcher(fs: &dyn Fs, window: &mut Window, cx: &mut Context<Workspace>) {
     if let Err(e) = fs.start_native_watcher() {
+        let linux_docs = brand::docs_page_url("linux");
         let message = format!(
             db::indoc! {r#"
             inotify_init returned {}
 
-            This may be due to system-wide limits on inotify instances. For troubleshooting see: https://zed.dev/docs/linux
+            This may be due to system-wide limits on inotify instances. For troubleshooting see: {}
             "#},
-            e
+            e, linux_docs
         );
         let prompt = window.prompt(
             PromptLevel::Critical,
@@ -708,7 +709,7 @@ fn initialize_file_watcher(fs: &dyn Fs, window: &mut Window, cx: &mut Context<Wo
         cx.spawn(async move |_, cx| {
             if prompt.await == Ok(0) {
                 cx.update(|cx| {
-                    cx.open_url("https://zed.dev/docs/linux#could-not-start-inotify");
+                    cx.open_url(&brand::docs_page_url("linux#could-not-start-inotify"));
                     cx.quit();
                 });
             }
@@ -721,13 +722,14 @@ fn initialize_file_watcher(fs: &dyn Fs, window: &mut Window, cx: &mut Context<Wo
 #[allow(unused)]
 fn initialize_file_watcher(fs: &dyn Fs, window: &mut Window, cx: &mut Context<Workspace>) {
     if let Err(e) = fs.start_native_watcher() {
+        let windows_docs = brand::docs_page_url("windows");
         let message = format!(
             db::indoc! {r#"
             ReadDirectoryChangesW initialization failed: {}
 
-            This may occur on network filesystems and WSL paths. For troubleshooting see: https://zed.dev/docs/windows
+            This may occur on network filesystems and WSL paths. For troubleshooting see: {}
             "#},
-            e
+            e, windows_docs
         );
         let prompt = window.prompt(
             PromptLevel::Critical,
@@ -739,7 +741,7 @@ fn initialize_file_watcher(fs: &dyn Fs, window: &mut Window, cx: &mut Context<Wo
         cx.spawn(async move |_, cx| {
             if prompt.await == Ok(0) {
                 cx.update(|cx| {
-                    cx.open_url("https://zed.dev/docs/windows");
+                    cx.open_url(&windows_docs);
                     cx.quit()
                 });
             }
@@ -753,31 +755,29 @@ fn show_software_emulation_warning_if_needed(
     window: &mut Window,
     cx: &mut Context<Workspace>,
 ) {
-    if specs.is_software_emulated && std::env::var("ZED_ALLOW_EMULATED_GPU").is_err() {
+    if specs.is_software_emulated && brand::env_var("ALLOW_EMULATED_GPU").is_err() {
         let (graphics_api, docs_url, open_url) = if cfg!(target_os = "windows") {
-            (
-                "DirectX",
-                "https://zed.dev/docs/windows",
-                "https://zed.dev/docs/windows",
-            )
+            let url = brand::docs_page_url("windows");
+            ("DirectX", url.clone(), url)
         } else {
             (
                 "Vulkan",
-                "https://zed.dev/docs/linux",
-                "https://zed.dev/docs/linux#zed-fails-to-open-windows",
+                brand::docs_page_url("linux"),
+                brand::docs_page_url("linux#zed-fails-to-open-windows"),
             )
         };
+        let env_override = brand::env_key("ALLOW_EMULATED_GPU");
         let message = format!(
             db::indoc! {r#"
-            Zed uses {} for rendering and requires a compatible GPU.
+            {} uses {} for rendering and requires a compatible GPU.
 
             Currently you are using a software emulated GPU ({}) which
             will result in awful performance.
 
             For troubleshooting see: {}
-            Set ZED_ALLOW_EMULATED_GPU=1 env var to permanently override.
+            Set {}=1 env var to permanently override.
             "#},
-            graphics_api, specs.device_name, docs_url
+            brand::APP_NAME, graphics_api, specs.device_name, docs_url, env_override
         );
         let prompt = window.prompt(
             PromptLevel::Critical,
@@ -789,7 +789,7 @@ fn show_software_emulation_warning_if_needed(
         cx.spawn(async move |_, cx| {
             if prompt.await == Ok(1) {
                 cx.update(|cx| {
-                    cx.open_url(open_url);
+                    cx.open_url(&open_url);
                     cx.quit();
                 });
             }

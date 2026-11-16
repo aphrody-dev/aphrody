@@ -143,7 +143,7 @@ fn read_mapped_buffer_helper(
 }
 
 fn main() -> Result<()> {
-    println!("=== gpui-os Vulkan Backend Probe ===");
+    println!("=== aphrody Vulkan Backend Probe ===");
 
     // 1. Initialize Vulkan instance using exact wgpu v30 descriptor API
     let mut instance_descriptor = wgpu::InstanceDescriptor::new_without_display_handle();

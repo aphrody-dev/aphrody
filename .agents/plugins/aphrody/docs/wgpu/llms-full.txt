@@ -1,0 +1,1097 @@
+# WGPU v30.0.0 & Naga v30.0.0 — Complete Technical Reference (`aphrody`)
+
+> Authoritative source-verified reference for `wgpu` v30.0.0 and `naga` v30.0.0 vendored at `vendor/wgpu` (upstream `gfx-rs/wgpu` commit `cddb2f5d80dc0009b2ef6767635140cacf90a007`), `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/wgpu_cli` (`gpui-wgpu`).
+
+---
+
+## 1. Vendored Stack Overview & Workspace Architecture
+
+### 1.1 Why Commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` Is Pinned
+`aphrody` pins `wgpu` and `naga` to commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` (v30.0.0 branch with critical post-release fixes). Upstream crates.io `30.0.1` lacks two fixes required by `aphrody`:
+1. **Vulkan surface-drop ordering fix** (`wgpu#10230`) preventing driver crashes when windows close or recreate surfaces.
+2. **WebGL2 canvas resize fix** (`wgpu#10348`) required by `gpui_web`.
+
+All GPU crates in `aphrody` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from `vendor/wgpu` so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `wgpu_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
+
+### 1.2 Directory & Crate Map (`vendor/wgpu/`)
+
+| Crate | Path | MSRV / Edition | Role |
+| :--- | :--- | :--- | :--- |
+| `wgpu` | `vendor/wgpu/wgpu/` | 1.87 / 2021 (`#![no_std]` + `alloc` + `std`) | Safe high-level Rust API (`Instance`, `Adapter`, `Device`, `Queue`, `Surface`, `Buffer`, `Texture`, `RenderPipeline`, `ComputePipeline`, `CommandEncoder`). Dispatches via `dispatch::Dispatch*` to `ContextWgpuCore`, `ContextWebGpu` (WASM), or `custom` traits. |
+| `wgpu-core` | `vendor/wgpu/wgpu-core/` | 1.87 / 2021 (`#![no_std]`) | State machine, validation, generational `Hub`/`Registry` IDs, `SnatchLock` deferred destruction, resource `Tracker` state transitions, automatic barrier generation, indirect draw/dispatch compute validation, API trace recording. |
+| `wgpu-hal` | `vendor/wgpu/wgpu-hal/` | 1.87 / 2021 (`#![no_std]`) | Unsafe, zero-validation, statically-dispatched hardware abstraction (`Api` trait). Backends: `dx12`, `vulkan`, `metal`, `gles`, `noop`. |
+| `wgpu-types` | `vendor/wgpu/wgpu-types/` | 1.87 / 2021 (`#![no_std]`) | Shared descriptors, `Features` (`[u64; 2]`), `Limits`, `DownlevelCapabilities`, `TextureFormat`, `BufferUsages`, `TextureUsages`, `PollType`, `MemoryHints`, `Backends`, alignment constants. |
+| `naga` | `vendor/wgpu/naga/` | 1.87 / 2021 (`#![no_std]`, `#![forbid(unsafe_code)]`) | Shader frontend (`wgsl`, `glsl`, `spv`), arena-based SSA-like expression/statement IR (`Module`), `Validator` (types, layouts, bindings, uniformity), `proc` (`Layouter`, `Typifier`, `ConstantEvaluator`, `BoundsCheckPolicies`), and backends (`wgsl`, `hlsl`, `msl`, `spv`, `glsl`, `dot`). |
+| `naga-types` | `vendor/wgpu/naga-types/` | 1.87 / 2021 (`#![no_std]`) | Shared shader stage, resource binding, vertex format, GLSL version/profile, and SPIR-V binding types shared by `naga` and `wgpu-types`. |
+| `wgpu-naga-bridge` | `vendor/wgpu/wgpu-naga-bridge/` | 1.87 / 2021 | Converts `wgpu_types::Features` + `DownlevelFlags` into `naga::valid::Capabilities` and `Validator` configs (`create_validator`). |
+| `wgpu-sync` | `vendor/wgpu/wgpu-sync/` | 1.87 / 2021 | `Mutex`, `RwLock`, `OnceCell`, `Condvar`, and `portable-atomic` wrappers supporting `std`, `no_std`, and non-atomic WASM. |
+| `wgpu-core-deps-*` | `vendor/wgpu/wgpu-core/platform-deps/*` | 1.87 / 2021 | Platform-conditional feature-forwarding shims (`windows`, `linux-android-bsd`, `apple`, `wasm`, `emscripten`) solving Cargo target-specific feature unification (`wgpu#3514`, `wgpu#7076`). |
+| `wgpu-info` | `vendor/wgpu/wgpu-info/` | 1.93 / 2021 | Upstream GPU capability dump tool (`GpuReport`). |
+| `player` | `vendor/wgpu/player/` | 1.93 / 2021 | Replays `wgpu-core` API traces captured via `Trace::Directory`. |
+| `cts_runner` / `deno_webgpu` | `vendor/wgpu/cts_runner/`, `deno_webgpu/` | 1.93 / 2021 | WebGPU Conformance Test Suite runner & Deno WebGPU bindings. |
+
+### 1.3 Native Dependency Matrix in `vendor/wgpu/Cargo.toml`
+When wiring `vendor/wgpu` into a workspace `Cargo.toml`, note exact crate versions used by `wgpu-hal`:
+- **`windows`**: `0.62` (`default-features = false`). `wgpu-hal` `dx12` enables:
+  - `Win32_Devices_DeviceAndDriverInstallation`, `Win32_Devices_Display`
+  - `Win32_Graphics_Direct3D`, `Win32_Graphics_Direct3D12`, `Win32_Graphics_Direct3D_Dxc`, `Win32_Graphics_Direct3D_Fxc`
+  - `Win32_Graphics_DirectComposition`, `Win32_Graphics_Dxgi_Common`, `Win32_Graphics_Gdi`
+  - `Win32_Security`, `Win32_System_Diagnostics_Debug`, `Win32_System_Kernel`, `Win32_System_Performance`, `Win32_System_Threading`, `Win32_UI_WindowsAndMessaging`
+  - `vulkan` on Windows additionally enables `Win32`, `Win32_Foundation`, `Win32_Graphics_Dxgi`.
+  - `gles` on Windows enables `Win32_Graphics_OpenGL`, `Win32_System_LibraryLoader`.
+- **`windows-core`**: `0.62`, **`windows-result`**: `0.4` (`std` enabled by `gles`).
+- **`gpu-allocator`**: `0.28` (`default-features = false`, `features = ["hashbrown"]`, plus `"d3d12"` under `dx12` and `"vulkan"` under `vulkan`).
+- **`range-alloc`**: `0.1`, **`bit-set`**: `0.11`, **`ash`**: `0.38`, **`glow`**: `0.18`, **`khronos-egl`**: `6` (patched in `aphrody` `[patch.crates-io]`), **`objc2`**: `0.6.3`, **`objc2-metal`** / **`objc2-foundation`** / **`objc2-quartz-core`**: `0.3.2`, **`raw-window-metal`**: `1.0`.
+- **`mach-dxcompiler-rs`**: `>=0.1.0, <=0.1.4` (only when optional `static-dxc` feature is enabled on x86/x86_64 Windows MSVC).
+- **`spirv`**: `0.4` (enabled by `naga/spv-in` and `naga/spv-out`).
+- **`rustc-hash`**: `vendor/wgpu` uses `1.1` (`default-features = false`) while `aphrody` uses `2.1.0` (Cargo resolves both cleanly in `Cargo.lock` when `wgpu` is referenced by path).
+
+---
+
+## 2. `wgpu` v30.0.0 High-Level Rust API Reference
+
+### 2.1 `Instance`, `Backends`, and `InstanceDescriptor`
+Source: `vendor/wgpu/wgpu/src/api/instance.rs`, `vendor/wgpu/wgpu-types/src/instance.rs`, `vendor/wgpu/wgpu-types/src/backend.rs`.
+
+```rust
+pub struct InstanceDescriptor {
+    pub backends: wgpu::Backends,
+    pub flags: wgpu::InstanceFlags,
+    pub memory_budget_thresholds: wgpu::MemoryBudgetThresholds,
+    pub backend_options: wgpu::BackendOptions,
+    pub display: Option<Box<dyn wgpu::wgt::WgpuHasDisplayHandle>>,
+}
+```
+
+Key constructors and methods on `wgpu::Instance`:
+- `Instance::default()` -> calls `Instance::new(InstanceDescriptor::new_without_display_handle())`.
+- `Instance::new(desc: InstanceDescriptor) -> Self` (Note: takes `InstanceDescriptor` **by value** in v30, NOT `&InstanceDescriptor`!).
+- `InstanceDescriptor::new_without_display_handle() -> Self`
+- `InstanceDescriptor::new_with_display_handle(display: Box<dyn WgpuHasDisplayHandle>) -> Self`
+- `InstanceDescriptor::with_env(self) -> Self` (reads `WGPU_BACKEND`, `WGPU_VALIDATION`, `WGPU_DEBUG`, `WGPU_GPU_BASED_VALIDATION`, `WGPU_DX12_COMPILER`, `WGPU_GL_BACKEND`).
+- `Instance::enabled_backend_features() -> Backends` (compile-time check).
+- `instance.enumerate_adapters(backends: Backends) -> impl Future<Output = Vec<Adapter>>` (Note: **async** in v30!).
+- `instance.request_adapter(options: &RequestAdapterOptions<'_, '_>) -> impl Future<Output = Result<Adapter, RequestAdapterError>>` (returns `Result<Adapter, RequestAdapterError>` in v30, NOT `Option<Adapter>`!).
+- `instance.create_surface<'window>(target: impl Into<SurfaceTarget<'window>>) -> Result<Surface<'window>, CreateSurfaceError>`
+- `unsafe fn instance.create_surface_unsafe<'window>(target: SurfaceTargetUnsafe) -> Result<Surface<'window>, CreateSurfaceError>`
+- `instance.poll_all(force_wait: bool) -> bool`
+- `instance.wgsl_language_features() -> WgslLanguageFeatures`
+
+`Backends` bitflags:
+- `Backends::VULKAN`, `Backends::METAL`, `Backends::DX12`, `Backends::GL`, `Backends::BROWSER_WEBGPU`, `Backends::NOOP`
+- `Backends::PRIMARY = VULKAN | METAL | DX12 | BROWSER_WEBGPU`
+- `Backends::SECONDARY = GL`
+- `Backends::from_comma_list("vulkan,dx12")`
+
+`BackendOptions`:
+- `dx12: Dx12BackendOptions { shader_compiler: Dx12Compiler, presentation_system: Dx12SwapchainKind, latency_waitable_object: Dx12UseFrameLatencyWaitableObject }`
+  - `Dx12Compiler::Fxc` (default, uses `d3dcompiler_47.dll`, Shader Model 5.1)
+  - `Dx12Compiler::DynamicDxc { dxc_path: String, max_shader_model: DxcShaderModel }`
+  - `Dx12Compiler::StaticDxc` (requires `static-dxc` Cargo feature)
+- `gl: GlBackendOptions { gles_minor_version: Gles3MinorVersion, fence_behavior: GlFenceBehavior, debug_fns: GlDebugFns }`
+- `noop: NoopBackendOptions { enable: bool }`
+
+### 2.2 `Adapter`, `RequestAdapterOptions`, and `DeviceDescriptor`
+Source: `vendor/wgpu/wgpu/src/api/adapter.rs`, `vendor/wgpu/wgpu-types/src/adapter.rs`, `vendor/wgpu/wgpu-types/src/device.rs`.
+
+```rust
+pub struct RequestAdapterOptions<S> {
+    pub power_preference: wgpu::PowerPreference, // None, LowPower, HighPerformance
+    pub force_fallback_adapter: bool,
+    pub compatible_surface: Option<S>,
+    pub apply_limit_buckets: bool,
+}
+
+pub struct AdapterInfo {
+    pub name: String,
+    pub vendor: u32,
+    pub device: u32,
+    pub device_type: wgpu::DeviceType, // DiscreteGpu, IntegratedGpu, VirtualGpu, Cpu, Other
+    pub device_pci_bus_id: String,
+    pub driver: String,
+    pub driver_info: String,
+    pub backend: wgpu::Backend,        // Noop, Vulkan, Metal, Dx12, Gl, BrowserWebGpu
+    pub subgroup_min_size: u32,        // >= 4
+    pub subgroup_max_size: u32,        // <= 128
+    pub transient_saves_memory: Option<bool>,
+    pub limit_bucket: Option<AdapterLimitBucketInfo>,
+}
+
+pub struct DeviceDescriptor<L> {
+    pub label: L,
+    pub required_features: wgpu::Features,
+    pub required_limits: wgpu::Limits,
+    pub default_queue: wgpu::QueueDescriptor<L>,
+    pub experimental_features: wgpu::ExperimentalFeatures, // ExperimentalFeatures::disabled() or unsafe { ExperimentalFeatures::enabled() }
+    pub memory_hints: wgpu::MemoryHints,                   // Performance, MemoryUsage, Manual { suballocated_device_memory_block_size: Range<u64> }
+    pub trace: wgpu::Trace,                                // Trace::Off, Trace::Directory(PathBuf), Trace::Memory
+}
+```
+
+Adapter methods:
+- `adapter.request_device(&DeviceDescriptor) -> impl Future<Output = Result<(Device, Queue), RequestDeviceError>>`
+- `adapter.get_info() -> AdapterInfo`
+- `adapter.features() -> Features`
+- `adapter.limits() -> Limits`
+- `adapter.get_downlevel_capabilities() -> DownlevelCapabilities { flags: DownlevelFlags, limits: DownlevelLimits, shader_model: ShaderModel }`
+- `adapter.get_texture_format_features(format: TextureFormat) -> TextureFormatFeatures { allowed_usages: TextureUsages, flags: TextureFormatFeatureFlags }`
+- `adapter.is_surface_supported(&surface) -> bool`
+- `adapter.cooperative_matrix_properties() -> Vec<CooperativeMatrixProperties>`
+
+### 2.3 `Device`, Polling (`PollType`), Error Scopes, and Resource Creation
+Source: `vendor/wgpu/wgpu/src/api/device.rs`, `vendor/wgpu/wgpu-types/src/lib.rs`.
+
+**v30 `Device::poll` Signature** (changed from older `Maintain` enum):
+```rust
+pub enum PollType<T> {
+    Wait {
+        submission_index: Option<T>, // Option<wgpu::SubmissionIndex>
+        timeout: Option<std::time::Duration>,
+    },
+    Poll,
+}
+// Convenience constructor:
+let status: Result<wgpu::PollStatus, wgpu::PollError> =
+    device.poll(wgpu::PollType::wait_indefinitely());
+// Bounded wait for a specific queue submission:
+device.poll(wgpu::PollType::Wait {
+    submission_index: Some(submission),
+    timeout: Some(std::time::Duration::from_secs(10)),
+})?;
+```
+
+**Error Handling & Device Loss** (no panics on runtime validation errors when scoped or handled):
+- `let scope = device.push_error_scope(wgpu::ErrorFilter::Validation);` (`Validation`, `OutOfMemory`, `Internal`) -> `let err: Option<wgpu::Error> = scope.pop().await;` (Note: `push_error_scope` returns an `ErrorScopeGuard` whose `.pop()` is awaited!).
+- `device.on_uncaptured_error(Arc::new(|err: wgpu::Error| { ... }));` (takes `Arc<dyn UncapturedErrorHandler>` in v30!).
+- `device.set_device_lost_callback(|reason: DeviceLostReason, message: String| { ... });`
+
+**Pipeline Layout v30 Changes**:
+```rust
+let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+    label: Some("my_layout"),
+    bind_group_layouts: &[Some(&bind_group_layout)], // &[Option<&BindGroupLayout>] in v30!
+    immediate_size: 0,                               // renamed from push_constant_ranges in v30!
+});
+```
+
+**Render Pipeline DepthState v30 Changes**:
+In `wgpu::DepthStencilState`:
+- `depth_write_enabled: Option<bool>` (wrapped in `Option` in v30!)
+- `depth_compare: Option<wgpu::CompareFunction>` (wrapped in `Option` in v30!)
+In `wgpu::RenderPipelineDescriptor`:
+- `multiview_mask: Option<NonZeroU32>` (renamed from `multiview`)
+- `cache: Option<&PipelineCache>`
+
+### 2.4 `Buffer`, Mapping, and Transfers (`TexelCopy*`)
+Source: `vendor/wgpu/wgpu/src/api/buffer.rs`, `vendor/wgpu/wgpu/src/api/command_encoder.rs`, `vendor/wgpu/wgpu/src/api/queue.rs`.
+
+**v30 Buffer Mapping (`get_mapped_range` returns `Result`!)**:
+```rust
+let slice = staging_buffer.slice(..);
+let (tx, rx) = std::sync::mpsc::channel();
+slice.map_async(wgpu::MapMode::Read, move |res| {
+    let _ = tx.send(res);
+});
+device.poll(wgpu::PollType::Wait {
+    submission_index: Some(submission),
+    timeout: Some(std::time::Duration::from_secs(30)),
+})?;
+rx.recv()??;
+
+let view: wgpu::BufferView = slice.get_mapped_range()?; // Returns Result<BufferView, MapRangeError> in v30!
+let floats: &[f32] = bytemuck::cast_slice(&view);
+drop(view); // MUST drop BufferView before unmap()!
+staging_buffer.unmap();
+```
+Also available in v30: `encoder.map_buffer_on_submit(&staging_buffer, wgpu::MapMode::Read, .., callback)` to schedule mapping atomically on submission without a separate `map_async` call after `queue.submit`.
+
+**v30 Image Copy Types** (renamed from `ImageCopyTexture` / `ImageCopyBuffer` / `ImageDataLayout` to match WebGPU spec):
+- `wgpu::TexelCopyTextureInfo<'a>`: `{ texture: &'a Texture, mip_level: u32, origin: Origin3d, aspect: TextureAspect }` (or `texture.as_image_copy()`).
+- `wgpu::TexelCopyBufferLayout`: `{ offset: BufferAddress, bytes_per_row: Option<u32>, rows_per_image: Option<u32> }`.
+- `wgpu::TexelCopyBufferInfo<'a>`: `{ buffer: &'a Buffer, layout: TexelCopyBufferLayout }`.
+
+**Row Padding Rule (`COPY_BYTES_PER_ROW_ALIGNMENT = 256`)**:
+- `CommandEncoder::copy_texture_to_buffer` and `copy_buffer_to_texture` REQUIRE `bytes_per_row` to be a multiple of `256` whenever `height > 1` or `depth_or_array_layers > 1`.
+- Formula:
+  ```rust
+  let unpadded_bytes_per_row = width * bytes_per_pixel;
+  let padded_bytes_per_row = unpadded_bytes_per_row.next_multiple_of(wgpu::COPY_BYTES_PER_ROW_ALIGNMENT);
+  ```
+- When reading back to an image file, iterate `mapped_data.chunks_exact(padded_bytes_per_row as usize).take(height as usize)` and copy `&row[..unpadded_bytes_per_row as usize]`.
+- `Queue::write_texture` does **NOT** require 256-byte row alignment; `bytes_per_row: Some(width * bytes_per_pixel)` is valid directly.
+
+### 2.5 `Surface` Presentation Lifecycle in v30
+Source: `vendor/wgpu/wgpu/src/api/surface.rs`, `crates/gpui_wgpu/src/wgpu_renderer.rs`.
+
+In `wgpu` v30, `surface.get_current_texture()` returns `wgpu::CurrentSurfaceTexture` (an enum, NOT `Result<SurfaceTexture, SurfaceError>`!) and presentation uses `queue.present(frame)` (or `frame.present()`):
+```rust
+match surface.get_current_texture() {
+    wgpu::CurrentSurfaceTexture::Success(frame) => {
+        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        // encode render pass into view...
+        queue.submit(std::iter::once(encoder.finish()));
+        queue.present(frame);
+    }
+    wgpu::CurrentSurfaceTexture::Suboptimal(frame) => {
+        drop(frame); // MUST drop texture before reconfiguring surface!
+        surface.configure(&device, &surface_config);
+    }
+    wgpu::CurrentSurfaceTexture::Lost | wgpu::CurrentSurfaceTexture::Outdated => {
+        surface.configure(&device, &surface_config);
+    }
+    wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {}
+    wgpu::CurrentSurfaceTexture::Validation => { /* observe error */ }
+}
+```
+Note `SurfaceConfiguration` in v30 also includes `color_space: wgpu::SurfaceColorSpace::Auto` alongside `usage`, `format`, `width`, `height`, `present_mode`, `desired_maximum_frame_latency`, `alpha_mode`, and `view_formats`.
+
+---
+
+## 3. `wgpu-types` `Features`, `Limits`, & `DownlevelFlags` Reference
+
+### 3.1 `Limits` Tiers (`vendor/wgpu/wgpu-types/src/limits.rs`)
+
+| Limit Field | `Limits::default()` (WebGPU Core) | `Limits::downlevel_defaults()` | `Limits::downlevel_webgl2_defaults()` | Direction |
+| :--- | :--- | :--- | :--- | :--- |
+| `max_texture_dimension_1d` | `8192` | `2048` | `2048` | Max |
+| `max_texture_dimension_2d` | `8192` | `2048` | `2048` | Max |
+| `max_texture_dimension_3d` | `2048` | `256` | `256` | Max |
+| `max_texture_array_layers` | `256` | `256` | `256` | Max |
+| `max_bind_groups` | `4` | `4` | `4` | Max |
+| `max_bindings_per_bind_group` | `1000` | `1000` | `1000` | Max |
+| `max_dynamic_uniform_buffers_per_pipeline_layout` | `8` | `8` | `8` | Max |
+| `max_dynamic_storage_buffers_per_pipeline_layout` | `4` | `4` | `0` | Max |
+| `max_sampled_textures_per_shader_stage` | `16` | `16` | `16` | Max |
+| `max_samplers_per_shader_stage` | `16` | `16` | `16` | Max |
+| `max_storage_buffers_per_shader_stage` | `8` | `4` | `0` | Max |
+| `max_storage_textures_per_shader_stage` | `4` | `4` | `0` | Max |
+| `max_uniform_buffers_per_shader_stage` | `12` | `12` | `11` | Max |
+| `max_uniform_buffer_binding_size` | `65_536` (64 KiB) | `16_384` (16 KiB) | `16_384` (16 KiB) | Max |
+| `max_storage_buffer_binding_size` | `134_217_728` (128 MiB) | `134_217_728` | `0` | Max |
+| `max_buffer_size` | `268_435_456` (256 MiB) | `268_435_456` | `268_435_456` | Max |
+| `min_uniform_buffer_offset_alignment` | `256` | `256` | `256` | **Min** (lower is better) |
+| `min_storage_buffer_offset_alignment` | `256` | `256` | `256` | **Min** (lower is better) |
+| `max_vertex_buffers` | `8` | `8` | `8` | Max |
+| `max_vertex_attributes` | `16` | `16` | `16` | Max |
+| `max_vertex_buffer_array_stride` | `2048` | `2048` | `255` | Max |
+| `max_inter_stage_shader_variables` | `16` | `15` | `15` | Max |
+| `max_color_attachments` | `8` | `4` | `4` | Max |
+| `max_color_attachment_bytes_per_sample` | `32` | `32` | `32` | Max |
+| `max_compute_workgroup_storage_size` | `16_384` (16 KiB) | `16_384` | `0` | Max |
+| `max_compute_invocations_per_workgroup` | `256` | `256` | `0` | Max |
+| `max_compute_workgroup_size_x / y / z` | `256 / 256 / 64` | `256 / 256 / 64` | `0 / 0 / 0` | Max |
+| `max_compute_workgroups_per_dimension` | `65_535` | `65_535` | `0` | Max |
+| `max_immediate_size` | `0` | `0` | `0` | Max |
+| `max_non_sampler_bindings` | `1_000_000` | `1_000_000` | `1_000_000` | Max |
+
+**Best Practice for Portable Device Creation**:
+```rust
+let required_limits = wgpu::Limits::downlevel_defaults()
+    .using_resolution(adapter.limits())
+    .using_alignment(adapter.limits());
+```
+- `.using_resolution(adapter.limits())` upgrades texture dimension limits (`1d`, `2d`, `3d`, `array_layers`) to the hardware maximum.
+- `.using_alignment(adapter.limits())` adopts the adapter's required `min_uniform_buffer_offset_alignment` and `min_storage_buffer_offset_alignment` (prevents device request failure on hardware requiring e.g. 256B when defaults differ).
+- On Windows DX12, `max_non_sampler_bindings` defaults to `1_000_000`, causing DX12 to allocate a 1M-descriptor CBV/SRV/UAV heap upfront (~32–64 MB). Setting `max_non_sampler_bindings: 65_536` (as `nsh-engine` does) slashes idle GPU/driver memory for lightweight UI contexts.
+
+### 3.2 Key `Features` (`vendor/wgpu/wgpu-types/src/features.rs`)
+`Features` combines WebGPU standard flags (`FeaturesWebGPU`) and native WGPU extensions (`FeaturesWGPU`) in a `[u64; 2]` bitset:
+- **Standard WebGPU Features**:
+  - `DEPTH_CLIP_CONTROL`, `DEPTH32FLOAT_STENCIL8`
+  - `TEXTURE_COMPRESSION_BC`, `TEXTURE_COMPRESSION_BC_SLICED_3D`, `TEXTURE_COMPRESSION_ETC2`, `TEXTURE_COMPRESSION_ASTC`, `TEXTURE_COMPRESSION_ASTC_SLICED_3D`
+  - `TIMESTAMP_QUERY` (render/compute pass `timestamp_writes`)
+  - `INDIRECT_FIRST_INSTANCE`, `SHADER_F16`, `RG11B10UFLOAT_RENDERABLE`, `BGRA8UNORM_STORAGE`
+  - `FLOAT32_FILTERABLE`, `FLOAT32_BLENDABLE`
+  - `DUAL_SOURCE_BLENDING` (used by `gpui_wgpu` for subpixel LCD glyph rendering via `enable dual_source_blending;` and `@blend_src(0)`/`@blend_src(1)`)
+  - `CLIP_DISTANCES`, `IMMEDIATES` (`var<immediate>` replacing push constants in v30!), `PRIMITIVE_INDEX`, `SUBGROUP`, `TEXTURE_COMPONENT_SWIZZLE`
+- **Native `FeaturesWGPU` Extensions**:
+  - `TIMESTAMP_QUERY_INSIDE_ENCODERS`, `TIMESTAMP_QUERY_INSIDE_PASSES`, `PIPELINE_STATISTICS_QUERY`
+  - `MAPPABLE_PRIMARY_BUFFERS` (combine `MAP_READ`/`MAP_WRITE` with `STORAGE`/`UNIFORM` on UMA GPUs; avoid relying on this for cross-platform code)
+  - `TEXTURE_BINDING_ARRAY`, `BUFFER_BINDING_ARRAY`, `STORAGE_RESOURCE_BINDING_ARRAY`, `SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING`, `PARTIALLY_BOUND_BINDING_ARRAY`
+  - `TEXTURE_FORMAT_16BIT_NORM`, `TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES`, `CLEAR_TEXTURE`
+  - `POLYGON_MODE_LINE`, `POLYGON_MODE_POINT`, `CONSERVATIVE_RASTERIZATION`, `VERTEX_WRITABLE_STORAGE`
+  - `SHADER_F64`, `SHADER_I16`, `SHADER_INT64`, `SHADER_FLOAT32_ATOMIC`, `SHADER_INT64_ATOMIC_MIN_MAX`, `SHADER_INT64_ATOMIC_ALL_OPS`, `TEXTURE_ATOMIC`
+  - `SUBGROUP_VERTEX`, `SUBGROUP_BARRIER`, `MULTIVIEW`, `PASSTHROUGH_SHADERS`
+  - Experimental (require `unsafe { ExperimentalFeatures::enabled() }`): `EXPERIMENTAL_RAY_QUERY`, `EXPERIMENTAL_RAY_TRACING_ACCELERATION_STRUCTURE`, `EXPERIMENTAL_MESH_SHADER`, `EXPERIMENTAL_COOPERATIVE_MATRIX`.
+
+---
+
+## 4. `wgpu-core` & `wgpu-hal` Deep Internals
+
+### 4.1 `wgpu-core` Architecture (`vendor/wgpu/wgpu-core/src/`)
+1. **Hub & Generational IDs** (`id.rs`, `storage.rs`, `instance.rs`):
+   - Every GPU object (`Device`, `Buffer`, `Texture`, `BindGroup`, `RenderPipeline`, etc.) is stored in `Registry<T>` indexed by a packed 64-bit `Id<T>` (`index: u32`, `epoch: NonZeroU32`).
+   - Eliminates ABA bugs across FFI/multithreaded usage and allows cheap handle cloning.
+2. **Snatchable Resources** (`snatch.rs`, `lock.rs`):
+   - Explicit `.destroy()` calls (`buffer.destroy()`, `texture.destroy()`) must release underlying `wgpu-hal` memory immediately even while `Arc<Buffer>` references still exist in bind groups or command trackers.
+   - `Snatchable<T>` protected by a per-device `SnatchLock` (reader-writer lock with strict rank ordering enforced in `lock/`) lets `wgpu-core` snatch the HAL handle once while normal command encoding takes shared read locks.
+3. **Resource State Tracking & Barriers** (`track/`):
+   - Tracks `BufferUses` (`COPY_SRC`, `COPY_DST`, `UNIFORM`, `STORAGE_READ_ONLY`, `STORAGE_READ_WRITE`, `INDEX`, `VERTEX`, `INDIRECT`) and per-mip/per-layer `TextureUses` (`UNINITIALIZED`, `COPY_SRC`, `COPY_DST`, `RESOURCE`, `COLOR_TARGET`, `DEPTH_STENCIL_READ`, `DEPTH_STENCIL_WRITE`, `STORAGE_READ_ONLY`, `STORAGE_READ_WRITE`).
+   - Merges per-pass `BindGroupStates` with device-level trackers at `queue.submit()`, emitting minimal `hal::CommandEncoder::transition_buffers` and `transition_textures` barriers.
+4. **Lazy Zero-Initialization** (`init_tracker/`):
+   - WebGPU forbids reading uninitialized VRAM. `wgpu-core` tracks initialized byte ranges per `Buffer` and initialized mip/layer subresources per `Texture`, automatically inserting zero-clears before the first read if the caller did not overwrite or clear the region.
+5. **Indirect Validation** (`indirect_validation/`):
+   - Injects internal WGSL compute passes prior to `draw_indirect` / `dispatch_workgroups_indirect` to clamp out-of-bounds buffer/workgroup arguments to no-ops and populate DX12 `@builtin(num_workgroups)` / `first_instance` constants. (Requires compute shaders; note on NVIDIA OpenGL contexts without compute, device creation fails if indirect validation is required, which is why `nsh-engine` falls back to Vulkan when GL device creation errors).
+
+### 4.2 `wgpu-hal` Backend Specifics (`vendor/wgpu/wgpu-hal/src/`)
+- **Direct3D 12 (`src/dx12/`)**:
+  - Dynamically loads `d3d12.dll`, `dxgi.dll`, and `dcomp.dll` (`DynLib`).
+  - **Descriptor Heaps** (`descriptor.rs`): D3D12 allows only one shader-visible CBV/SRV/UAV heap and one Sampler heap bound simultaneously, with a hard hardware limit of **2,048 samplers** in a shader-visible sampler heap. `wgpu-hal` binds all unique samplers (up to 2,048) in one global sampler heap (`register(s0, space0)` and `register(s2048, space1)`) and passes per-bind-group `StructuredBuffer<uint> nagaGroupXSamplerIndexArray` tables so Naga HLSL indexes samplers indirectly!
+  - **Memory Allocation** (`suballocation.rs`): Uses `gpu-allocator::d3d12` for placed-resource suballocation according to `MemoryHints` (`Performance` uses 128–256 MB blocks; `MemoryUsage` uses smaller blocks or committed allocations).
+  - **Root Signatures**: Changing `PipelineLayout` invalidates root parameters; `CommandEncoder::update_root_elements` tracks dirty root slots and rebinds all groups on root signature switch.
+  - **Shader Compilation** (`shader_compilation.rs`): Uses FXC (`D3DCompile` from `d3dcompiler_47.dll`) by default for SM 5.1, or DXC (`dxcompiler.dll` / `mach-dxcompiler-rs`) when Shader Model 6.0+ features (subgroups, `f16`, `i64`, ray query, mesh shaders) are enabled.
+- **Vulkan (`src/vulkan/`)**:
+  - Built on `ash` `0.38` + `gpu-allocator::vulkan`.
+  - Uses `VK_KHR_timeline_semaphore` 1:1 with `hal::Fence` where available, falling back to pooled `VkFence` binaries (`semaphore_list.rs`).
+  - Caches `VkRenderPass` permanently and `VkFramebuffer` (using `VK_KHR_imageless_framebuffer` when supported so framebuffers don't key on individual `VkImageView`s).
+  - Emits `VkImageMemoryBarrier` / `VkBufferMemoryBarrier` directly from `wgpu-core` `TextureTransition` / `BufferTransition` iterators.
+- **Metal (`src/metal/`)**:
+  - Built on `objc2-metal` `0.3.2` and `CAMetalLayer` (`objc2-quartz-core`).
+  - Flattens immediates, bind groups `0..N`, and vertex buffers into Metal's flat per-stage `[[buffer(n)]]`, `[[texture(n)]]`, and `[[sampler(n)]]` tables (`EntryPointResources`), with an optional `sizes_buffer` carrying runtime-sized storage array lengths (`arrayLength(&arr)`).
+  - Enables Naga's `vertex_pulling_transform` by default to bounds-check vertex buffer accesses in MSL.
+  - Supports zero-copy `MTLTexture` creation backed by `IOSurfaceRef` (used by `nsh-engine` `shader_surfaces` on macOS/iOS).
+- **GLES / WebGL2 (`src/gles/`)**:
+  - Built on `glow` `0.18` over EGL (Linux/Android/Wayland/X11/ANGLE), WGL (Windows native GL), or `WebGl2RenderingContext` (WASM).
+  - Linearizes WebGPU bind groups into flat GL UBO/SSBO/texture units and resolves separate WebGPU `texture_2d` + `sampler` bindings into combined GLSL `sampler2D` pairs via `SamplerBindMap`.
+  - Emulates `first_instance` on GLES 3.0 / WebGL2 via vertex pointer byte-offset adjustment and `uniform uint naga_vs_first_instance;`.
+
+---
+
+## 5. `naga` v30.0.0 Shader Compiler, Validator, Layout & Transpilation Reference
+
+### 5.1 Cargo Features (`vendor/wgpu/naga/Cargo.toml`)
+`naga` has `#![no_std]` and `#![forbid(unsafe_code)]`. Its Cargo features are:
+- **Frontends**:
+  - `wgsl-in` (enables `dep:unicode-ident`)
+  - `glsl-in` (enables `dep:pp-rs`)
+  - `spv-in` (enables `dep:petgraph`, `dep:spirv`)
+- **Backends**:
+  - `wgsl-out` (zero extra deps)
+  - `glsl-out` (zero extra deps)
+  - `hlsl-out` / `hlsl-out-if-target-windows` (zero extra deps)
+  - `msl-out` / `msl-out-if-target-apple` (zero extra deps)
+  - `spv-out` (enables `dep:spirv`)
+  - `dot-out` (GraphViz DOT IR/CFG dump, zero extra deps)
+- **Diagnostics & Serialization**:
+  - `stderr` (`codespan-reporting/std`), `termcolor` (`codespan-reporting/termcolor`), `serialize`, `deserialize`, `arbitrary`.
+
+### 5.2 Parsing & Validating WGSL with Source-Span Diagnostics
+Source: `vendor/wgpu/naga/src/front/wgsl/mod.rs`, `vendor/wgpu/naga/src/valid/mod.rs`, `vendor/wgpu/naga/src/span.rs`.
+
+```rust
+use naga::front::wgsl;
+use naga::valid::{Capabilities, SubgroupOperationSet, ShaderStages, ValidationFlags, Validator};
+
+// 1. Parse WGSL into naga::Module
+let module: naga::Module = match wgsl::parse_str(wgsl_source) {
+    Ok(m) => m,
+    Err(parse_err) => {
+        // Rich rustc-style multi-line source snippet with line/col & notes:
+        let formatted: String = parse_err.emit_to_string_with_path(wgsl_source, "shader.wgsl");
+        // Structured primary location (1-based line_number, 1-based byte line_position):
+        let loc: Option<naga::SourceLocation> = parse_err.location(wgsl_source);
+        anyhow::bail!("{formatted}");
+    }
+};
+
+// 2. Validate IR (types, constants, struct layouts, bindings, control-flow uniformity)
+let mut validator = Validator::new(ValidationFlags::all(), Capabilities::all());
+validator
+    .subgroup_stages(ShaderStages::all())
+    .subgroup_operations(SubgroupOperationSet::all());
+
+let module_info: naga::valid::ModuleInfo = match validator.validate(&module) {
+    Ok(info) => info,
+    Err(val_err) => {
+        // WithSpan<ValidationError> also supports emit_to_string_with_path!
+        let formatted = val_err.emit_to_string_with_path(wgsl_source, "shader.wgsl");
+        let loc = val_err.location(wgsl_source);
+        anyhow::bail!("{formatted}");
+    }
+};
+```
+
+### 5.3 Inspecting `Module` IR & Computing Layouts (`naga::proc::Layouter`)
+Source: `vendor/wgpu/naga/src/ir/mod.rs`, `vendor/wgpu/naga/src/proc/layouter.rs`.
+
+- **`module.entry_points`**: `Vec<EntryPoint>` where each `EntryPoint` has:
+  - `name: String`
+  - `stage: naga::ShaderStage` (`Vertex`, `Fragment`, `Compute`, `Task`, `Mesh`, `RayGeneration`, `AnyHit`, `ClosestHit`, `Miss`)
+  - `workgroup_size: [u32; 3]` (for `Compute` / `Task` / `Mesh`)
+  - `early_depth_test: Option<EarlyDepthTest>`
+  - `function: naga::Function` (`arguments: Vec<FunctionArgument>`, `result: Option<FunctionResult>`)
+- **`module.global_variables`**: `Arena<GlobalVariable>` where each `GlobalVariable` has:
+  - `name: Option<String>`
+  - `space: naga::AddressSpace` (`Uniform`, `Storage { access: StorageAccess }`, `Handle` for textures/samplers/accel-structs, `Immediate`, `WorkGroup`, `Private`, `TaskPayload`, etc.)
+  - `binding: Option<naga::ResourceBinding>` (`ResourceBinding { group: u32, binding: u32 }`)
+  - `ty: Handle<naga::Type>`
+- **`module.overrides`**: `Arena<Override>` (`name: Option<String>`, `id: Option<u16>`, `ty: Handle<Type>`, `init: Option<Handle<Expression>>`).
+- **Computing exact byte size, alignment, and struct member offsets**:
+  ```rust
+  let mut layouter = naga::proc::Layouter::default();
+  layouter.update(module.to_ctx())?;
+
+  for (_handle, global) in module.global_variables.iter() {
+      let type_layout: naga::proc::TypeLayout = layouter[global.ty];
+      let size_bytes: u32 = type_layout.size;
+      let align_bytes: u32 = type_layout.alignment * 1u32; // Alignment * u32 -> u32
+      let array_stride: u32 = type_layout.to_stride();
+      if let naga::TypeInner::Struct { ref members, span } = module.types[global.ty].inner {
+          for member in members {
+              let member_layout = layouter[member.ty];
+              // member.offset, member.name, member_layout.size, member_layout.alignment
+          }
+      }
+  }
+  ```
+
+### 5.4 Resolving Pipeline Overrides Before Backend Codegen
+Non-WGSL backends (`hlsl`, `msl`, `spv`, `glsl`) require `override` constants to be folded into concrete `const` expressions first:
+```rust
+let overrides = naga::back::PipelineConstants::default(); // HashMap<String, f64>
+let (module, module_info) = naga::back::pipeline_constants::process_overrides(
+    &module,
+    &module_info,
+    entry_point_filter, // Option<(naga::ShaderStage, &str)>
+    &overrides,
+)?;
+```
+
+### 5.5 Cross-Compiling to Every Target (`naga::back::*`)
+
+1. **WGSL (`naga::back::wgsl`, feature `wgsl-out`)**:
+   ```rust
+   let wgsl_text: String = naga::back::wgsl::write_string(
+       &module,
+       &module_info,
+       naga::back::wgsl::WriterFlags::empty(), // or WriterFlags::EXPLICIT_TYPES
+   )?;
+   ```
+
+2. **HLSL (`naga::back::hlsl`, feature `hlsl-out`)**:
+   ```rust
+   let mut hlsl_text = String::new();
+   let options = naga::back::hlsl::Options {
+       shader_model: naga::back::hlsl::ShaderModel::V6_0, // V5_0, V5_1, V6_0 .. V6_9
+       fake_missing_bindings: true, // auto-maps @group(g) @binding(b) -> register(b, space g)
+       ..Default::default()
+   };
+   let pipeline_options = naga::back::hlsl::PipelineOptions {
+       entry_point: None, // or Some((naga::ShaderStage::Fragment, "fs_main".into()))
+   };
+   let mut writer = naga::back::hlsl::Writer::new(&mut hlsl_text, &options, &pipeline_options);
+   let reflection = writer.write(&module, &module_info, None)?;
+   ```
+
+3. **Metal MSL (`naga::back::msl`, feature `msl-out`)**:
+   ```rust
+   let mut options = naga::back::msl::Options {
+       lang_version: (2, 4),
+       fake_missing_bindings: false,
+       ..Default::default()
+   };
+   // Populate sequential [[buffer(i)]], [[texture(i)]], [[sampler(i)]] per entry point,
+   // or set fake_missing_bindings: true when no explicit slot map is supplied.
+   let pipeline_options = naga::back::msl::PipelineOptions {
+       entry_point: None, // or Some((stage, name))
+       ..Default::default()
+   };
+   let (msl_text, translation_info) =
+       naga::back::msl::write_string(&module, &module_info, &options, &pipeline_options)?;
+   ```
+   *(Important trap: In `naga::back::msl`, `fake_missing_bindings: true` emits `[[user(fake0)]]` placeholders if `per_entry_point_map` is empty. Building a real `EntryPointResources` map assigning sequential buffer/texture/sampler slots produces valid, directly compilable Metal `.metal` shaders!)*
+
+4. **SPIR-V Binary (`naga::back::spv`, feature `spv-out`)**:
+   ```rust
+   let options = naga::back::spv::Options {
+       lang_version: (1, 3),
+       flags: naga::back::spv::WriterFlags::DEBUG
+           | naga::back::spv::WriterFlags::ADJUST_COORDINATE_SPACE
+           | naga::back::spv::WriterFlags::LABEL_VARYINGS,
+       fake_missing_bindings: true, // emits DescriptorSet = group, Binding = binding
+       ..Default::default()
+   };
+   let pipeline_options = selected_ep.map(|(shader_stage, entry_point)| {
+       naga::back::spv::PipelineOptions { shader_stage, entry_point }
+   });
+   let words: Vec<u32> = naga::back::spv::write_vec(
+       &module,
+       &module_info,
+       &options,
+       pipeline_options.as_ref(),
+   )?;
+   let spv_bytes: Vec<u8> = bytemuck::cast_slice(&words).to_vec();
+   ```
+
+5. **GLSL Desktop / GLES / WebGL2 (`naga::back::glsl`, feature `glsl-out`)**:
+   GLSL translates **one entry point per invocation**:
+   ```rust
+   let options = naga::back::glsl::Options {
+       // Desktop: Version::Desktop(450)
+       // GLES 3.1: Version::new_gles(310)
+       // WebGL2: Version::Embedded { version: 300, is_webgl: true }
+       version: naga::back::glsl::Version::Desktop(450),
+       writer_flags: naga::back::glsl::WriterFlags::ADJUST_COORDINATE_SPACE,
+       binding_map: Default::default(),
+       zero_initialize_workgroup_memory: true,
+   };
+   let pipeline_options = naga::back::glsl::PipelineOptions {
+       shader_stage: naga::ShaderStage::Fragment,
+       entry_point: "fs_main".to_string(),
+       multiview: None,
+   };
+   let mut glsl_text = String::new();
+   let mut writer = naga::back::glsl::Writer::new(
+       &mut glsl_text,
+       &module,
+       &module_info,
+       &options,
+       &pipeline_options,
+       naga::proc::BoundsCheckPolicies::default(),
+   )?;
+   let reflection: naga::back::glsl::ReflectionInfo = writer.write()?;
+   ```
+
+---
+
+## 6. `gpui_wgpu` Architecture (`crates/gpui_wgpu/src/`)
+
+### 6.1 Context Initialization & Hybrid GPU Selection (`wgpu_context.rs`)
+- **Shared Multi-Window Context**: `GpuContext = Rc<RefCell<Option<WgpuContext>>>`. The first window initializes `WgpuContext` (`Instance`, `Adapter`, `Arc<Device>`, `Arc<Queue>`, `DeviceErrorState`); subsequent windows share the same device/queue after verifying `check_compatible_with_surface`.
+- **Hybrid GPU Sorting (`sort_adapters`)**:
+  1. `ZED_DEVICE_ID` hex PCI device ID user override (`0xABCD`).
+  2. `CompositorGpuHint { vendor_id, device_id }` matching the GPU driving the Wayland/X11 compositor.
+  3. `DeviceType`: `DiscreteGpu` (0) > `IntegratedGpu` (1) > `Other` (2, OpenGL) > `VirtualGpu` (3) > `Cpu` (4, software Lavapipe/WARP).
+  4. `Backend`: `Vulkan | Metal | Dx12` (0) > `Gl` (1).
+- **Live Surface Verification (`try_adapter_with_surface`)**: On multi-GPU Linux/Windows laptops, `surface.get_capabilities(&adapter)` can report non-empty formats even when `surface.configure()` fails at the driver level. `WgpuContext` opens the candidate device, pushes `ErrorFilter::Validation`, configures the surface, and pops the scope — falling back to the next adapter on failure.
+- **Web Initialization (`new_web`)**: Uses `wgpu::util::new_instance_with_webgpu_detection` with a unit `WebDisplaySource` (`DisplayHandle::web()`) to satisfy `wgpu-core`'s display handle requirement when falling back to WebGL2 on `HtmlCanvasElement`.
+
+### 6.2 Batched Single-Pass Renderer (`wgpu_renderer.rs`)
+- **Shader Variants**:
+  - `STORAGE_BUFFER_SHADERS = shaders.wgsl + shaders_storage.wgsl`: Used on all native backends and Browser WebGPU; reads primitive arrays (`array<Quad>`, `array<Shadow>`, `array<MonochromeSprite>`, etc.) from `@group(1) @binding(0) var<storage, read>`.
+  - `WEBGL_SHADERS = shaders.wgsl + shaders_webgl.wgsl`: Used on WASM WebGL2 (`uses_webgl_instance_data() == true`), which has `max_storage_buffers_per_shader_stage == 0`. Packs all primitive structs into a 2D `Rgba32Uint` texture (`16` bytes/texel) and decodes fields via `textureLoad`!
+  - `SUBPIXEL_SHADERS = "enable dual_source_blending;\n" + shaders.wgsl + shaders_storage.wgsl + shaders_subpixel.wgsl`: Compiled only when `device.features().contains(Features::DUAL_SOURCE_BLENDING)`. Outputs `@location(0) @blend_src(0) foreground` and `@location(0) @blend_src(1) alpha` with `BlendFactor::Src1` / `OneMinusSrc1` per-channel LCD subpixel blending.
+- **9 Render Pipelines (`WgpuPipelines`)**:
+  All pipelines draw `TriangleStrip` `0..4` (`unit_vertex` generated procedurally from `@builtin(vertex_index)` with zero vertex buffers!):
+  1. `opaque_quads`: Drawn **first** across all `scene.quads` with `blend: None`, `depth_write_enabled: Some(true)`, `depth_compare: Some(CompareFunction::Greater)` into a `Depth32Float` attachment (with `TRANSIENT_ATTACHMENT` + `StoreOp::Discard` so depth never hits main VRAM on tile GPUs!). Shaders skip non-opaque/clipped quads by placing them behind the depth clear (`0.0`).
+  2. `quads`: Drawn in scene batch order with alpha blending and `depth_write_enabled: Some(false)`.
+  3. `shadows`: Analytic rounded-box Gaussian-erf drop shadows (`vs_shadow`/`fs_shadow`), depth fixed via `pass.set_viewport(..., depth, depth)`.
+  4. `path_tiles`: GPU vector path rasterizer (`vs_path_tile`/`fs_path_tile`) binding 3 storage slices (`tiles`, `curves`, `paints`) at `@group(1) @binding(0..=2)`.
+  5. `underlines`: Straight and wavy text underlines (`vs_underline`/`fs_underline`).
+  6. `mono_sprites`: Grayscale glyphs & vector icons from `R8Unorm` atlas (`@group(2)` texture + linear sampler) with gamma/contrast correction.
+  7. `subpixel_sprites`: Optional dual-source blended LCD glyphs (`Bgra8Unorm`/`Rgba8Unorm` atlas); falls back to `mono_sprites` if unavailable.
+  8. `poly_sprites`: Color emoji and raster images from `Bgra8Unorm`/`Rgba8Unorm` atlas.
+  9. `surfaces`: External compositor/video texture quad pipeline.
+- **Resilience State Machine (`RendererState`)**:
+  - `Ready { surface, core }` <-> `Unconfigured { core }` (preserves `Device`, pipelines, and `WgpuAtlas` across Android `TerminateWindow` or surface replacement) -> `Released` (eager window teardown or full `recover()` after `DeviceLostReason`).
+- **Headless Rendering (`WgpuHeadlessRenderer`)**:
+  - Caches a process-wide static `(WgpuContext, TextureFormat)` (never dropped, avoiding thread-local teardown panics in `wgpu` queues), renders GPUI `Scene`s into an offscreen `RENDER_ATTACHMENT | COPY_SRC` texture, strips 256-byte row padding, swizzles `Bgra8Unorm` -> RGBA, and returns `image::RgbaImage`.
+
+### 6.3 Texture Atlas (`wgpu_atlas.rs`)
+- `WgpuAtlas` wraps `etagere::BucketedAtlasAllocator` over 3 `AtlasTextureList` pools:
+  - `Monochrome` -> `TextureFormat::R8Unorm` (1 byte/px)
+  - `Subpixel` -> `Bgra8Unorm` (or `Rgba8Unorm` fallback, 4 bytes/px)
+  - `Polychrome` -> `Bgra8Unorm` (or `Rgba8Unorm` fallback, 4 bytes/px)
+- Default page size `1024x1024`, growing up to `max_texture_dimension_2d`.
+- Queues `PendingUpload`s during layout/paint and flushes them in `before_frame()` via `queue.write_texture`. Uses monotonic `generation: u64` counters so `WgpuRenderer` invalidates cached `BindGroup`s when an `AtlasTextureId` slot is freed and recycled.
+
+---
+
+## 7. NSH Shader Integration (`crates/nsh-core` & `crates/nsh-engine`)
+
+### 7.1 `nsh_core::shader` Compilation Contract
+- Apps write `fn shade(uv: vec2f) -> vec4f` returning straight sRGB + alpha in `0..1` (`uv` `(0,0)` top-left to `(1,1)` bottom-right).
+- `Shader::compile(source)` enforces:
+  - `source.len() <= 64 KiB` (`MAX_SOURCE_BYTES`).
+  - No app-defined `@vertex`/`@fragment`/`@compute` entry points and no `@group`/`@binding` globals (only `var<private>` allowed).
+  - Optional `struct Uniforms { ... }` up to `4096` bytes (`MAX_UNIFORM_BYTES`) with fields of `f32`, `i32`, `u32`, `vec2f`, `vec3f`, `vec4f`, or `array<vec4f, N>`.
+- Wraps source with:
+  - `@group(0) @binding(0) var<uniform> nsh: Nsh;` (`32` bytes, padded with `@size(12) overflow: f32` so GLES/WebGL2 16-byte uniform alignment is always satisfied).
+  - `@group(0) @binding(1) var<uniform> uniforms: Uniforms;` (when declared).
+  - `@group(0) @binding(2) var nsh_sampler: sampler;` + `@binding(3..=6)` `texture_2d<f32>` (`nsh_content`, `nsh_backdrop`, `nsh_from`, `nsh_to`) sampled with `textureSampleLevel(..., 0.0)` and un-premultiplied for `sample_content(uv)`, `sample_backdrop(uv)`, `sample_from(uv)`, `sample_to(uv)`.
+  - `nsh_vertex` (single procedural oversized triangle `0..3` covering `[-1, 1]` plus `overflow` margin) and `nsh_fragment` (clamps `shade(in.uv)` to `0..1` and premultiplies RGB by alpha).
+- Static AST/IR inspection determines `shader.animated()` (whether `nsh.time` is read) and `shader.inputs()` (transitive call graph from `shade` to `nsh_content`/`nsh_backdrop`/`nsh_from`/`nsh_to`).
+
+### 7.2 `nsh_engine::shader` Non-Blocking Offscreen Execution
+- Backend-specific `backend_order()`:
+  - **Linux**: `Backends::GL` first, then `Backends::PRIMARY` (avoids slow 8–17 ms CPU reads from uncached write-combined Vulkan host-visible buffers on Intel Mesa ANV).
+  - **Windows**: `Backends::DX12` first (fast ~5 ms init vs ~200 ms Vulkan loader scan), skipping software WARP unless no hardware GPU exists on `PRIMARY | GL`.
+  - **macOS/iOS**: `PRIMARY | GL`, plus zero-copy `IOSurface` rendering (`show_on_surfaces()`) so pixels stay on GPU for CoreAnimation.
+- Double-buffered `Readback` (`[Readback; 2]`) with atomic state `IDLE -> MAPPING -> MAPPED`: `ShaderView::render` never blocks the UI thread waiting for the GPU; if both readback slots are busy, the frame is skipped cleanly.
+
+---
+
+## 8. WGSL Memory Layout Rules & Troubleshooting Guide
+
+### 8.1 WGSL `uniform` vs `storage` Alignment Rules (`std140` / `std430` Pitfalls)
+
+| WGSL Type | AlignOf | SizeOf | Notes & Common Pitfalls |
+| :--- | :--- | :--- | :--- |
+| `f32`, `i32`, `u32` | `4` | `4` |Note: `bool` is NOT host-shareable (cannot appear in `uniform` or `storage` structs; use `u32`). |
+| `f16` (`enable f16;`) | `2` | `2` | Forbidden in `var<immediate>`. |
+| `vec2<f32>` / `vec2u` / `vec2i` | `8` | `8` | Must start at byte offset multiple of `8`! After a single `f32` (offset 0..4), `vec2f` starts at offset `8` (4 bytes implicit padding). |
+| `vec3<f32>` / `vec3u` / `vec3i` | **`16`** | **`12`** | **#1 GPU BUG**: Alignment is `16`, size is `12`! A trailing `f32` right after `vec3f` packs into bytes `12..16`! In Rust `#[repr(C)]`, `[f32; 3]` has alignment `4` — ALWAYS either use `[f32; 4]`/`vec4f` or explicit `_pad` fields and verify offsets with `gpui-wgpu validate`! |
+| `vec4<f32>` / `vec4u` / `vec4i` | `16` | `16` | Cleanest unit for cross-API uniform buffers. |
+| `mat2x2<f32>` | `8` | `16` | 2 columns of `vec2f`. (Naga auto-decomposes `matCx2` in HLSL/SPIR-V uniforms to avoid std140 16-byte column padding). |
+| `mat3x3<f32>` | `16` | `48` | 3 columns of `vec3f`, each column stride `16` bytes (`3 * 16 = 48` bytes, NOT `36`!). |
+| `mat4x4<f32>` | `16` | `64` | 4 columns of `vec4f`. Column-major in WGSL (`m[col][row]`). |
+| `array<E, N>` in `storage` | `AlignOf(E)` | `N * roundUp(AlignOf(E), SizeOf(E))` | `array<f32, 4>` has stride `4` in `var<storage>`. |
+| `array<E, N>` in `uniform` | **`max(16, AlignOf(E))`** | `N * Stride` | **#2 GPU BUG**: WGSL Uniform address space requires array element stride to be a multiple of **16 bytes**! `array<f32, 4>` in `var<uniform>` is illegal in WGSL — use `array<vec4<f32>, N>` instead! |
+| `struct S` in `uniform` | `roundUp(16, max(AlignOf(members)))` (on GLES/WebGL2 total size multiple of 16) | `roundUp(AlignOf(S), last_end)` | Struct members between nested structs in `var<uniform>` must also have at least 16-byte spacing unless `uniform_buffer_standard_layout` applies; always pad uniform structs to a multiple of `16` bytes for WebGL2/GLES compatibility (`DownlevelFlags::BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED`). |
+
+### 8.2 Troubleshooting Common WGPU & Naga Failures
+
+1. **`Buffer` copy/readback validation error: `Bytes per row (N) is not a multiple of 256`**:
+   - Cause: Passing `width * 4` to `encoder.copy_texture_to_buffer` when `width * 4 % 256 != 0`.
+   - Fix: Pad buffer row stride to `(width * 4).next_multiple_of(wgpu::COPY_BYTES_PER_ROW_ALIGNMENT)`, allocate `padded_stride * height`, and strip row padding after `get_mapped_range()`.
+2. **Panic on `buffer.unmap()`: `Buffer is still mapped` / active `BufferView`**:
+   - Cause: `let data = slice.get_mapped_range()?; buffer.unmap();` while `data` is still in scope.
+   - Fix: Explicitly `drop(data);` before calling `buffer.unmap()`.
+3. **Zero-sized buffer binding error**:
+   - Cause: Creating a `Buffer` or `BufferBinding` of `0` bytes when a scene primitive list is empty.
+   - Fix: Clamp buffer allocation and binding sizes to `.max(16)` (minimum 16 bytes for uniform/storage safety).
+4. **Surface reconfigure panic / Vulkan validation error on `Suboptimal`**:
+   - Cause: Calling `surface.configure(&device, &config)` while `SurfaceTexture` from `CurrentSurfaceTexture::Suboptimal(frame)` is still alive.
+   - Fix: `drop(frame);` before calling `surface.configure(...)`.
+5. **`Device does not exist` panic in `replace_surface` or multi-window setup**:
+   - Cause: Creating a `wgpu::Surface` on a newly constructed `wgpu::Instance` instead of cloning the `wgpu::Instance` stored in `WgpuContext` that created the `Adapter` and `Device`.
+   - Fix: Always reuse `context.instance.clone()`.
+6. **Derivative uniformity error (`dpdx`, `dpdy`, `textureSample` in non-uniform `if` branch)**:
+   - Cause: WGSL forbids implicit-derivative `textureSample` inside branches conditioned on fragment-varying values (unless `DISABLE_UNIFORMITY_REQ_FOR_FRAGMENT_STAGE` applies or in compute/vertex).
+   - Fix: Compute UVs outside the branch, sample unconditionally before `if`/`return` (note how `shaders_subpixel.wgsl` alpha-clips *after* `textureSample`!), or use `textureSampleLevel(..., 0.0)` when mip level 0 is intended (as `nsh-core` does).
+7. **Windows `windows` / `gpu-allocator` version mismatch when patching `wgpu`**:
+   - `vendor/wgpu` v30.0.0 expects `windows = "0.62"`, `windows-core = "0.62"`, `windows-result = "0.4"`, and `gpu-allocator = "0.28"`. Both `aphrody` root `Cargo.toml` and `Cargo.lock` already resolve `windows 0.62.2`, `windows-core 0.62.2`, `windows-result 0.4.1`, and `gpu-allocator 0.28.0`.
+
+
+---
+
+## 9. Complete Production Code Patterns (`wgpu` v30 + `naga` v30)
+
+### 9.1 Headless Offscreen Render Pipeline & 256-Byte Aligned PNG Readback
+```rust
+use anyhow::{Context as _, Result};
+use bytemuck::{Pod, Zeroable};
+
+#[repr(C)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+pub struct FrameUniforms {
+    pub resolution: [f32; 2],
+    pub time: f32,
+    pub _pad: f32,
+}
+
+pub fn render_fullscreen_wgsl_to_rgba(
+    device: &wgpu::Device,
+    queue: &wgpu::Queue,
+    wgsl_source: &str,
+    fragment_entry: &str,
+    width: u32,
+    height: u32,
+    time: f32,
+) -> Result<Vec<u8>> {
+    let error_scope = device.push_error_scope(wgpu::ErrorFilter::Validation);
+
+    let shader_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        label: Some("offscreen_shader"),
+        source: wgpu::ShaderSource::Wgsl(wgsl_source.into()),
+    });
+
+    let uniforms = FrameUniforms {
+        resolution: [width as f32, height as f32],
+        time,
+        _pad: 0.0,
+    };
+    let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("frame_uniforms"),
+        size: std::mem::size_of::<FrameUniforms>() as u64,
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
+    queue.write_buffer(&uniform_buffer, 0, bytemuck::bytes_of(&uniforms));
+
+    let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        label: Some("frame_bgl"),
+        entries: &[wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Uniform,
+                has_dynamic_offset: false,
+                min_binding_size: std::num::NonZeroU64::new(
+                    std::mem::size_of::<FrameUniforms>() as u64,
+                ),
+            },
+            count: None,
+        }],
+    });
+
+    let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+        label: Some("frame_bg"),
+        layout: &bind_group_layout,
+        entries: &[wgpu::BindGroupEntry {
+            binding: 0,
+            resource: uniform_buffer.as_entire_binding(),
+        }],
+    });
+
+    let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        label: Some("offscreen_pipeline_layout"),
+        bind_group_layouts: &[Some(&bind_group_layout)],
+        immediate_size: 0,
+    });
+
+    let target_format = wgpu::TextureFormat::Rgba8Unorm;
+    let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: Some("offscreen_pipeline"),
+        layout: Some(&pipeline_layout),
+        vertex: wgpu::VertexState {
+            module: &shader_module,
+            entry_point: Some("vs_main"),
+            compilation_options: wgpu::PipelineCompilationOptions::default(),
+            buffers: &[],
+        },
+        primitive: wgpu::PrimitiveState::default(),
+        depth_stencil: None,
+        multisample: wgpu::MultisampleState::default(),
+        fragment: Some(wgpu::FragmentState {
+            module: &shader_module,
+            entry_point: Some(fragment_entry),
+            compilation_options: wgpu::PipelineCompilationOptions::default(),
+            targets: &[Some(wgpu::ColorTargetState {
+                format: target_format,
+                blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                write_mask: wgpu::ColorWrites::ALL,
+            })],
+        }),
+        multiview_mask: None,
+        cache: None,
+    });
+
+    if let Some(validation_error) = pollster::block_on(error_scope.pop()) {
+        anyhow::bail!("WGPU pipeline validation failed: {validation_error}");
+    }
+
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("offscreen_target"),
+        size: wgpu::Extent3d {
+            width,
+            height,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: target_format,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+        view_formats: &[],
+    });
+    let texture_view = texture.create_view(&wgpu::TextureViewDescriptor::default());
+
+    let unpadded_bytes_per_row = width
+        .checked_mul(4)
+        .context("image width overflowed byte stride")?;
+    let padded_bytes_per_row =
+        unpadded_bytes_per_row.next_multiple_of(wgpu::COPY_BYTES_PER_ROW_ALIGNMENT);
+    let readback_size = u64::from(padded_bytes_per_row) * u64::from(height);
+
+    let readback_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("offscreen_readback"),
+        size: readback_size,
+        usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
+        mapped_at_creation: false,
+    });
+
+    let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+        label: Some("offscreen_encoder"),
+    });
+    {
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("offscreen_pass"),
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &texture_view,
+                depth_slice: None,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
+                    store: wgpu::StoreOp::Store,
+                },
+            })],
+            depth_stencil_attachment: None,
+            timestamp_writes: None,
+            occlusion_query_set: None,
+            multiview_mask: None,
+        });
+        render_pass.set_pipeline(&pipeline);
+        render_pass.set_bind_group(0, &bind_group, &[]);
+        render_pass.draw(0..3, 0..1);
+    }
+
+    encoder.copy_texture_to_buffer(
+        wgpu::TexelCopyTextureInfo {
+            texture: &texture,
+            mip_level: 0,
+            origin: wgpu::Origin3d::ZERO,
+            aspect: wgpu::TextureAspect::All,
+        },
+        wgpu::TexelCopyBufferInfo {
+            buffer: &readback_buffer,
+            layout: wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(padded_bytes_per_row),
+                rows_per_image: Some(height),
+            },
+        },
+        wgpu::Extent3d {
+            width,
+            height,
+            depth_or_array_layers: 1,
+        },
+    );
+
+    let submission = queue.submit(std::iter::once(encoder.finish()));
+    let (sender, receiver) = std::sync::mpsc::channel();
+    readback_buffer
+        .slice(..)
+        .map_async(wgpu::MapMode::Read, move |res| {
+            let _ = sender.send(res);
+        });
+    device
+        .poll(wgpu::PollType::Wait {
+            submission_index: Some(submission),
+            timeout: Some(std::time::Duration::from_secs(30)),
+        })
+        .context("GPU poll timed out")?;
+    receiver
+        .recv()
+        .context("readback channel closed")?
+        .context("failed to map readback buffer")?;
+
+    let mapped = readback_buffer
+        .slice(..)
+        .get_mapped_range()
+        .context("failed to get mapped range")?;
+    let mut rgba = Vec::with_capacity((unpadded_bytes_per_row * height) as usize);
+    for row in mapped
+        .chunks_exact(padded_bytes_per_row as usize)
+        .take(height as usize)
+    {
+        rgba.extend_from_slice(&row[..unpadded_bytes_per_row as usize]);
+    }
+    drop(mapped);
+    readback_buffer.unmap();
+    Ok(rgba)
+}
+```
+
+### 9.2 Headless Compute Pipeline Dispatch & Storage Buffer Readback
+```rust
+use anyhow::{Context as _, Result};
+
+pub fn dispatch_compute_f32(
+    device: &wgpu::Device,
+    queue: &wgpu::Queue,
+    wgsl_source: &str,
+    entry_point: &str,
+    workgroups: [u32; 3],
+    output_floats: usize,
+) -> Result<Vec<f32>> {
+    let byte_len = (output_floats.max(4) * std::mem::size_of::<f32>()) as u64;
+    let error_scope = device.push_error_scope(wgpu::ErrorFilter::Validation);
+
+    let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        label: Some("compute_shader"),
+        source: wgpu::ShaderSource::Wgsl(wgsl_source.into()),
+    });
+
+    let storage_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("compute_storage"),
+        size: byte_len,
+        usage: wgpu::BufferUsages::STORAGE
+            | wgpu::BufferUsages::COPY_SRC
+            | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
+
+    let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("compute_staging"),
+        size: byte_len,
+        usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
+
+    let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        label: Some("compute_bgl"),
+        entries: &[wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::COMPUTE,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Storage { read_only: false },
+                has_dynamic_offset: false,
+                min_binding_size: None,
+            },
+            count: None,
+        }],
+    });
+
+    let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+        label: Some("compute_bg"),
+        layout: &bind_group_layout,
+        entries: &[wgpu::BindGroupEntry {
+            binding: 0,
+            resource: storage_buffer.as_entire_binding(),
+        }],
+    });
+
+    let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        label: Some("compute_pipeline_layout"),
+        bind_group_layouts: &[Some(&bind_group_layout)],
+        immediate_size: 0,
+    });
+
+    let pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+        label: Some("compute_pipeline"),
+        layout: Some(&pipeline_layout),
+        module: &module,
+        entry_point: Some(entry_point),
+        compilation_options: wgpu::PipelineCompilationOptions::default(),
+        cache: None,
+    });
+
+    if let Some(err) = pollster::block_on(error_scope.pop()) {
+        anyhow::bail!("Compute pipeline validation error: {err}");
+    }
+
+    let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+        label: Some("compute_encoder"),
+    });
+    {
+        let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+            label: Some("compute_pass"),
+            timestamp_writes: None,
+        });
+        pass.set_pipeline(&pipeline);
+        pass.set_bind_group(0, &bind_group, &[]);
+        pass.dispatch_workgroups(workgroups[0], workgroups[1], workgroups[2]);
+    }
+    encoder.copy_buffer_to_buffer(&storage_buffer, 0, &staging_buffer, 0, byte_len);
+
+    let submission = queue.submit(std::iter::once(encoder.finish()));
+    let (sender, receiver) = std::sync::mpsc::channel();
+    staging_buffer
+        .slice(..)
+        .map_async(wgpu::MapMode::Read, move |res| {
+            let _ = sender.send(res);
+        });
+    device
+        .poll(wgpu::PollType::Wait {
+            submission_index: Some(submission),
+            timeout: Some(std::time::Duration::from_secs(30)),
+        })
+        .context("GPU compute poll timed out")?;
+    receiver
+        .recv()
+        .context("staging channel closed")?
+        .context("failed to map compute staging buffer")?;
+
+    let view = staging_buffer
+        .slice(..)
+        .get_mapped_range()
+        .context("failed to read mapped compute range")?;
+    let all_floats: &[f32] = bytemuck::cast_slice(&view);
+    let result = all_floats[..output_floats.min(all_floats.len())].to_vec();
+    drop(view);
+    staging_buffer.unmap();
+    Ok(result)
+}
+```
+
+### 9.3 Hardware Timestamp Queries & `RenderBundle` Pre-Recording
+- **Pass Timestamp Writes (`Features::TIMESTAMP_QUERY`)**:
+  ```rust
+  let query_set = device.create_query_set(&wgpu::QuerySetDescriptor {
+      label: Some("pass_timestamps"),
+      ty: wgpu::QueryType::Timestamp,
+      count: 2,
+  });
+  // Pass RenderPassTimestampWrites / ComputePassTimestampWrites:
+  // timestamp_writes: Some(wgpu::ComputePassTimestampWrites {
+  //     query_set: &query_set,
+  //     beginning_of_pass_write_index: Some(0),
+  //     end_of_pass_write_index: Some(1),
+  // })
+  // Resolve into a QUERY_RESOLVE usage buffer (offset aligned to QUERY_RESOLVE_BUFFER_ALIGNMENT = 256),
+  // copy to MAP_READ buffer, read [u64; 2], and multiply delta by `queue.get_timestamp_period() as f64` (nanoseconds per tick)!
+  ```
+- **`RenderBundle` Pre-Recording**:
+  - `let mut bundle_encoder = device.create_render_bundle_encoder(&wgpu::RenderBundleEncoderDescriptor { label: None, color_formats: &[Some(format)], depth_stencil: None, sample_count: 1, multiview: None });`
+  - Record static pipeline/bindgroup/draw calls once, call `let bundle = bundle_encoder.finish(&wgpu::RenderBundleDescriptor { label: None });`, and replay every frame inside a `RenderPass` via `render_pass.execute_bundles([&bundle]);` to eliminate CPU command-encoding overhead for static geometry.
+
+### 9.4 Unsafe `wgpu-hal` Interop Escape Hatches (`#[cfg(wgpu_core)]`)
+When native interop is needed (e.g., Vulkan external memory, Metal `IOSurfaceRef`, D3D12 shared NT handles):
+- Access raw HAL objects safely under guard:
+  - `unsafe { device.as_hal::<wgpu::hal::api::Vulkan>() }` -> `Option<impl Deref<Target = wgpu::hal::vulkan::Device>>`
+  - `unsafe { device.as_hal::<wgpu::hal::api::Dx12>() }` -> `Option<impl Deref<Target = wgpu::hal::dx12::Device>>`
+  - `unsafe { device.as_hal::<wgpu::hal::api::Metal>() }` -> `Option<impl Deref<Target = wgpu::hal::metal::Device>>`
+  - `unsafe { texture.as_hal::<A>() }` / `unsafe { buffer.as_hal::<A>() }` (Note: holds a read-lock on the device's `SnatchLock` — drop the guard before calling `.destroy()` to avoid deadlocks!).
+- Import raw HAL textures into `wgpu::Device`:
+  - `unsafe { device.create_texture_from_hal::<A>(hal_texture, &texture_desc) }` (or `create_texture_from_hal_with_ state` specifying `TextureUses` and `cleared: bool`).
+
+---
+
+## 10. `gpui-wgpu` CLI Reference (`crates/wgpu_cli`)
+
+Binary name: `gpui-wgpu` (package `wgpu_cli`).
+
+### 10.1 Subcommands & Flags
+
+1. **Enumerate Adapters & Capabilities**
+   ```sh
+   cargo run -p wgpu_cli -- adapters
+   cargo run -p wgpu_cli -- adapters --backends vulkan --limits --features
+   cargo run -p wgpu_cli -- adapters --json
+   ```
+   Outputs adapter name, backend (`vulkan`/`dx12`/`metal`/`gl`), `DeviceType`, PCI `vendor` & `device` hex IDs, PCI bus ID, driver version, subgroup min/max sizes, `DownlevelCapabilities` WebGPU compliance status, core surface/render `TextureFormat` feature matrices (`Rgba8Unorm`, `Bgra8Unorm`, `R8Unorm`, `Rgba16Float`, `Depth32Float`), and optional full `Features` & `Limits`.
+
+2. **Validate & Reflect WGSL Shaders**
+   ```sh
+   cargo run -p wgpu_cli -- validate path/to/shader.wgsl
+   cargo run -p wgpu_cli -- validate path/to/shader.wgsl --json
+   ```
+   Runs `naga::front::wgsl::parse_str` + `naga::valid::Validator::new(ValidationFlags::all(), Capabilities::all())` + `naga::proc::Layouter`. Prints rich source-span diagnostics on parse/validation errors, and on success prints:
+   - Entry points (`Vertex`, `Fragment`, `Compute` + `@workgroup_size(x, y, z)`).
+   - Resource bindings (`@group(g) @binding(b)`, variable name, `AddressSpace`, WGSL type description, byte size, byte alignment, and struct member offsets/sizes).
+   - Pipeline-overridable constants (`override`, `@id(...)`) and `var<immediate>` blocks.
+
+3. **Transpile WGSL to HLSL / MSL / GLSL / SPIR-V / WGSL**
+   ```sh
+   cargo run -p wgpu_cli -- transpile shader.wgsl --target hlsl
+   cargo run -p wgpu_cli -- transpile shader.wgsl --target msl -o shader.metal
+   cargo run -p wgpu_cli -- transpile shader.wgsl --target glsl --stage fragment --entry fs_main
+   cargo run -p wgpu_cli -- transpile shader.wgsl --target glsl-webgl2 --stage fragment --entry fs_main
+   cargo run -p wgpu_cli -- transpile shader.wgsl --target spv -o shader.spv
+   ```
+   Resolves overrides via `naga::back::pipeline_constants::process_overrides` and invokes the corresponding `naga::back::*` writer with clean sequential resource binding maps where needed (so MSL and HLSL compile cleanly without missing-binding errors).
+
+4. **Headless Offscreen Fragment Shader Render to PNG**
+   ```sh
+   cargo run -p wgpu_cli -- render shader.wgsl -o output.png --width 800 --height 600 --time 1.5 --entry fs_main
+   ```
+   Automatically supplies a built-in fullscreen triangle vertex shader (`@builtin(vertex_index)` with `uv` at `@location(0)` if the module has no `@vertex` entry point), inspects the module with `naga` to detect whether `@group(0) @binding(0)` uniform `{ resolution: vec2<f32>, time: f32, _pad: f32 }` is declared (binding it automatically when declared, or using an empty layout when not), renders into an `Rgba8Unorm` attachment, strips 256-byte row padding, and writes `output.png`.
+
+5. **Headless Compute Shader Dispatch & Readback**
+   ```sh
+   cargo run -p wgpu_cli -- compute compute.wgsl --entry main --workgroups 4,1,1 --output-floats 64
+   cargo run -p wgpu_cli -- compute compute.wgsl --json
+   ```
+   Allocates a `STORAGE | COPY_SRC` buffer bound at `@group(0) @binding(0)` (or zero bindings if none declared), dispatches `(x, y, z)` workgroups, copies to a `MAP_READ` staging buffer, and prints the resulting `f32` values.
+
+6. **GPU Micro-Benchmark Suite**
+   ```sh
+   cargo run -p wgpu_cli -- bench --iterations 50 --size 1024
+   cargo run -p wgpu_cli -- bench --json
+   ```
+   Measures and reports:
+   - Adapter enumeration + `request_device` cold-start latency (ms).
+   - `queue.write_buffer` upload bandwidth (GB/s) synchronized via `PollType::Wait`.
+   - Headless compute dispatch latency (avg / min / p95 microseconds per dispatch).
+   - Offscreen `size x size` `Rgba8Unorm` render pass throughput (avg microseconds/frame & FPS equivalent).

@@ -138,7 +138,7 @@ struct ShaderUniforms {
 }
 
 fn main() -> Result<()> {
-    println!("=== gpui-os WebGPU & Naga End-to-End Pipeline ===");
+    println!("=== aphrody WebGPU & Naga End-to-End Pipeline ===");
 
     // Step 1: Validate WGSL Module with Naga
     println!("\n[1/4] Parsing and validating WGSL shader module with Naga v30...");

@@ -73,7 +73,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 "#;
 
 fn main() -> Result<()> {
-    println!("=== gpui-os Multi-Vendor (NVIDIA / AMD / Intel) Hardware Matrix ===");
+    println!("=== aphrody Multi-Vendor (NVIDIA / AMD / Intel) Hardware Matrix ===");
 
     // 1. Enumerate all adapters across all supported WGPU backends
     let instance_desc = wgpu::InstanceDescriptor::new_without_display_handle();

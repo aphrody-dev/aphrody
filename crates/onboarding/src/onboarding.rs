@@ -347,7 +347,10 @@ impl Render for Onboarding {
                                     .child(
                                         h_flex()
                                             .gap_4()
-                                            .child(Vector::square(VectorName::AphrodyLogo, rems(2.5)))
+                                            .child(Vector::square(
+                                                VectorName::AphrodyLogo,
+                                                rems(2.5),
+                                            ))
                                             .child(
                                                 v_flex()
                                                     .child(
@@ -360,15 +363,15 @@ impl Render for Onboarding {
                                                     .child(
                                                         Label::new(brand::TAGLINE)
                                                             .color(Color::Muted)
-                                                            .size(LabelSize::Small)
-                                                            .italic(),
+                                                            .size(LabelSize::Small),
                                                     ),
                                             ),
                                     )
                                     .child({
                                         Button::new("finish_setup", "Finish Setup")
-                                            .style(ButtonStyle::Filled)
-                                            .size(ButtonSize::Medium)
+                                            .style(ButtonStyle::Tinted(ui::TintColor::Accent))
+                                            .size(ButtonSize::Large)
+                                            .tab_index(0isize)
                                             .width(rems_from_px(200_f32))
                                             .key_binding(KeyBinding::for_action_in(
                                                 &Finish,

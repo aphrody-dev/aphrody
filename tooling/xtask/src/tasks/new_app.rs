@@ -52,8 +52,14 @@ pub fn run_new_app(args: NewAppArgs) -> Result<()> {
         );
     }
 
-    let gpui_os_path = normalize_toml_path(workspace_root);
-    generate_app_files(&target_dir, &crate_name, &args.name, &gpui_os_path, args.template)?;
+    let aphrody_path = normalize_toml_path(workspace_root);
+    generate_app_files(
+        &target_dir,
+        &crate_name,
+        &args.name,
+        &aphrody_path,
+        args.template,
+    )?;
 
     println!(
         "Created GPUI application '{}' ({:?} template) at {}",
@@ -72,20 +78,19 @@ pub fn generate_app_files(
     target_dir: &Path,
     crate_name: &str,
     display_title: &str,
-    gpui_os_path: &str,
+    aphrody_path: &str,
     template: AppTemplate,
 ) -> Result<()> {
     let src_dir = target_dir.join("src");
     fs::create_dir_all(&src_dir)
         .with_context(|| format!("failed to create directory {}", src_dir.display()))?;
 
-    let cargo_toml = render_cargo_toml(crate_name, gpui_os_path, template);
+    let cargo_toml = render_cargo_toml(crate_name, aphrody_path, template);
     let main_rs = render_main_rs(crate_name, display_title, template);
     let readme_md = render_readme(crate_name, display_title, template);
     let cargo_config = render_cargo_config();
 
-    fs::write(target_dir.join("Cargo.toml"), cargo_toml)
-        .context("failed to write Cargo.toml")?;
+    fs::write(target_dir.join("Cargo.toml"), cargo_toml).context("failed to write Cargo.toml")?;
     fs::write(src_dir.join("main.rs"), main_rs).context("failed to write src/main.rs")?;
     fs::write(target_dir.join("README.md"), readme_md).context("failed to write README.md")?;
 
@@ -138,24 +143,24 @@ rustflags = ["--cfg", "windows_slim_errors", "-C", "target-feature=+crt-static"]
 "#
 }
 
-fn render_cargo_toml(crate_name: &str, gpui_os_path: &str, template: AppTemplate) -> String {
+fn render_cargo_toml(crate_name: &str, aphrody_path: &str, template: AppTemplate) -> String {
     let dependencies = match template {
-        AppTemplate::Minimal => format!(
-            r#"gpui_ui = {{ path = "{gpui_os_path}/crates/gpui_ui" }}"#
-        ),
+        AppTemplate::Minimal => {
+            format!(r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui" }}"#)
+        }
         AppTemplate::Code => format!(
-            r#"gpui_ui = {{ path = "{gpui_os_path}/crates/gpui_ui" }}
-gpui_code = {{ path = "{gpui_os_path}/crates/gpui_code" }}"#
+            r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui" }}
+gpui_code = {{ path = "{aphrody_path}/crates/gpui_code" }}"#
         ),
         AppTemplate::Studio => format!(
-            r#"gpui_ui = {{ path = "{gpui_os_path}/crates/gpui_ui" }}
-gpui_code = {{ path = "{gpui_os_path}/crates/gpui_code", features = ["full"] }}
-gpui_app_shell = {{ path = "{gpui_os_path}/crates/gpui_app_shell" }}"#
+            r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui" }}
+gpui_code = {{ path = "{aphrody_path}/crates/gpui_code", features = ["full"] }}
+gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell" }}"#
         ),
         AppTemplate::NshStudio => format!(
-            r#"gpui_ui = {{ path = "{gpui_os_path}/crates/gpui_ui", features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }}
-gpui_code = {{ path = "{gpui_os_path}/crates/gpui_code", features = ["full"] }}
-gpui_app_shell = {{ path = "{gpui_os_path}/crates/gpui_app_shell", features = ["nsh"] }}"#
+            r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui", features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }}
+gpui_code = {{ path = "{aphrody_path}/crates/gpui_code", features = ["full"] }}
+gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell", features = ["nsh"] }}"#
         ),
     };
 
@@ -454,7 +459,7 @@ fn render_readme(crate_name: &str, display_title: &str, template: AppTemplate) -
     format!(
         r#"# {display_title} (`{crate_name}`)
 
-Generated with `cargo xtask new-app --template {template:?}` from `gpui-os`.
+Generated with `cargo xtask new-app --template {template:?}` from `aphrody`.
 
 ## Run
 
@@ -471,7 +476,10 @@ mod tests {
 
     #[test]
     fn test_sanitize_crate_name() {
-        assert_eq!(sanitize_crate_name("My-Data Studio").unwrap(), "my_data_studio");
+        assert_eq!(
+            sanitize_crate_name("My-Data Studio").unwrap(),
+            "my_data_studio"
+        );
         assert!(sanitize_crate_name("").is_err());
         assert!(sanitize_crate_name("123app").is_err());
     }
@@ -489,11 +497,16 @@ mod tests {
         .enumerate()
         {
             let app_dir = temp.path().join(format!("sample_{index}"));
+            let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .and_then(|p| p.parent())
+                .expect("xtask crate has workspace root parent");
+            let aphrody_root = normalize_toml_path(repo_root);
             generate_app_files(
                 &app_dir,
                 "sample_app",
                 "Sample App",
-                "C:/gpui-os",
+                &aphrody_root,
                 template,
             )
             .unwrap();

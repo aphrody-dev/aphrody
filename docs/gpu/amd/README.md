@@ -1,6 +1,6 @@
-# AMD Hardware, Architecture & Toolchain Guide (`gpui-os`)
+# AMD Hardware, Architecture & Toolchain Guide (`aphrody`)
 
-Central engineering guide for AMD Radeon GPUs and AMD Zen/EPYC processors in `gpui-os` across Vulkan 1.4, DirectX 12, AGS SDK, and RGA.
+Central engineering guide for AMD Radeon GPUs and AMD Zen/EPYC processors in `aphrody` across Vulkan 1.4, DirectX 12, AGS SDK, and RGA.
 
 ---
 

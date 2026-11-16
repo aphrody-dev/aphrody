@@ -107,8 +107,21 @@ pub fn main() -> std::process::ExitCode {
         }
     }
     let source = source.unwrap_or_else(|| {
+        if let Ok(url) = std::env::var("NSH_DEV_SERVER_URL")
+            && !url.trim().is_empty()
+        {
+            return AppSource::DevServer(url);
+        }
         use nsh_dev::protocol::{DEFAULT_PORT, WS_PATH};
-        AppSource::DevServer(format!("ws://127.0.0.1:{DEFAULT_PORT}{WS_PATH}"))
+        let host = std::env::var("NSH_DEV_HOST")
+            .ok()
+            .filter(|h| !h.trim().is_empty())
+            .unwrap_or_else(|| std::net::Ipv4Addr::LOCALHOST.to_string());
+        let port = std::env::var("NSH_DEV_PORT")
+            .ok()
+            .and_then(|p| p.parse::<u16>().ok())
+            .unwrap_or(DEFAULT_PORT);
+        AppSource::DevServer(format!("ws://{host}:{port}{WS_PATH}"))
     });
     options.title = "nsh".to_owned();
     run_app(source, options)

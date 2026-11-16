@@ -1,11 +1,11 @@
 > [!IMPORTANT]
 > Remove this line to confirm you've reviewed this PR before submitting.
 
-# Aphrody — GPUI OS (`gpui-os`)
+# Aphrody — GPUI OS (`aphrody`)
 
 Modular, local-first, ultra-fast Rust **GPU UI Framework**, **Code Engine**, **Native Shell (TSX/Rust)**, **WGPU Toolkit**, **Application Starter Pack**, and **Aphrody Studio** — with **100% ecosystem compatibility with Zed**.
 
-`gpui-os` unifies the GPUI desktop/mobile/web engine, Native Shell (`nsh`), `vendor/wgpu` (v30.0.0), and `vendor/bun` into composable Rust libraries plus the **Aphrody** studio binary (`aphrody`), driven by a single declarative identity manifest ([`product.toml`](./product.toml)).
+`aphrody` unifies the GPUI desktop/mobile/web engine, Native Shell (`nsh`), `vendor/wgpu` (v30.0.0), and `vendor/bun` into composable Rust libraries plus the **Aphrody** studio binary (`aphrody`), driven by a single declarative identity manifest ([`product.toml`](./product.toml)).
 
 ---
 
@@ -81,7 +81,7 @@ cargo run -p nsh-cli -- test examples/nsh/counter
 
 ### 6. WGPU v30.0.0 CLI (`gpui-wgpu`), GPU Backends & Unified Plugin
 
-Backed by [`vendor/wgpu`](./vendor/wgpu), [`docs/wgpu/llms.txt`](./docs/wgpu/llms.txt), [`docs/wgpu/llms-full.txt`](./docs/wgpu/llms-full.txt), [`docs/gpu/`](./docs/gpu), and the unified agent plugin in [`.agents/plugins/gpui-os/`](./.agents/plugins/gpui-os/plugin.json) (bundling all skills, hooks, rules, and docs for Zed, GPUI, WGPU, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Brand, and GitHub Ops):
+Backed by [`vendor/wgpu`](./vendor/wgpu), [`docs/wgpu/llms.txt`](./docs/wgpu/llms.txt), [`docs/wgpu/llms-full.txt`](./docs/wgpu/llms-full.txt), [`docs/gpu/`](./docs/gpu), and the unified agent plugin in [`.agents/plugins/aphrody/`](./.agents/plugins/aphrody/plugin.json) (bundling all skills, hooks, rules, and docs for Zed, GPUI, WGPU, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Brand, and GitHub Ops):
 
 ```sh
 cargo run -p wgpu_cli -- adapters

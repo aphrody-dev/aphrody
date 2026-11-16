@@ -8463,6 +8463,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "assets",
+ "brand",
  "collections",
  "component",
  "file_icons",
@@ -13497,6 +13498,7 @@ name = "nsh_workspace"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "brand",
  "editor",
  "file_icons",
  "gpui_ui",

@@ -10,7 +10,25 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+
+interface ProductCliMeta {
+  features?: { wgpu_cli_bin?: string };
+}
+
+function resolveWgpuCli(): string {
+  const repoRoot = resolve(import.meta.dir, "../../..");
+  const manifestPath = join(repoRoot, "product.toml");
+  const binName = existsSync(manifestPath)
+    ? ((Bun.TOML.parse(readFileSync(manifestPath, "utf8")) as ProductCliMeta).features?.wgpu_cli_bin ?? "gpui-wgpu")
+    : "gpui-wgpu";
+  const ext = process.platform === "win32" ? ".exe" : "";
+  for (const dir of [join(repoRoot, "target", "debug"), join(repoRoot, "target", "release")]) {
+    const candidate = join(dir, `${binName}${ext}`);
+    if (existsSync(candidate)) return candidate;
+  }
+  return Bun.which(binName) ?? `${binName}${ext}`;
+}
 
 // W3C WebGPU constant constants
 export const COPY_BYTES_PER_ROW_ALIGNMENT = 256;
@@ -132,8 +150,8 @@ async function main() {
 
   // Step 3: Run gpui-wgpu validation
   console.log("\n[3/5] Validating WGSL with gpui-wgpu (Naga v30)...");
-  const gpuiWgpuPath = join(import.meta.dir, "..", "..", "..", "target", "debug", "gpui-wgpu.exe");
-  if (existsSync(gpuiWgpuPath)) {
+  const gpuiWgpuPath = resolveWgpuCli();
+  if (existsSync(gpuiWgpuPath) || Bun.which(gpuiWgpuPath)) {
     const valRes = runCommand(gpuiWgpuPath, ["validate", shaderPath, "--json"]);
     if (valRes.success) {
       const parsed = JSON.parse(valRes.stdout);

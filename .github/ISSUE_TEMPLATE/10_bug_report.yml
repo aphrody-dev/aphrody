@@ -1,11 +1,11 @@
 name: Report a bug
-description: Report a problem with Aphrody / gpui-os.
+description: Report a problem with Aphrody.
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Search existing [issues](https://github.com/aphrody-dev/gpui-os/issues) first. For feature ideas or design feedback, open a [Discussion](https://github.com/aphrody-dev/gpui-os/discussions).
+        Search existing [issues](https://github.com/aphrody-dev/aphrody/issues) first. For feature ideas or design feedback, open a [Discussion](https://github.com/aphrody-dev/aphrody/discussions).
   - type: dropdown
     id: component
     attributes:

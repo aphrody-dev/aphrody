@@ -1,6 +1,6 @@
 //! Native Shell (`nsh`) integration for `gpui_ui`.
 //!
-//! Unifies `longbridge/nsh` with `gpui-os` on a single `gpui` engine:
+//! Unifies `longbridge/nsh` with `aphrody` on a single `gpui` engine:
 //! - Reactive SolidJS-style signals, memos, effects, and Tailwind layout (`nsh_core`)
 //! - 35+ rich controls (`Plot` charts, `RichEditor`, `Calendar`/`DatePicker`, `ColorPicker`,
 //!   `DataTable`, `EmojiPicker`, `TextView` Markdown + KaTeX math, WGSL `Shader`s) (`nsh_base`)
@@ -105,10 +105,7 @@ pub fn nsh_theme_from_gpui(gpui_theme: &GpuiTheme, cx: &App) -> nsh_base::Theme 
     theme.set_color("secondary-foreground", fixed_adaptive_color(colors.text));
 
     theme.set_color("muted", fixed_adaptive_color(colors.panel_background));
-    theme.set_color(
-        "muted-foreground",
-        fixed_adaptive_color(colors.text_muted),
-    );
+    theme.set_color("muted-foreground", fixed_adaptive_color(colors.text_muted));
 
     theme.set_color("accent", fixed_adaptive_color(colors.element_hover));
     theme.set_color("accent-foreground", fixed_adaptive_color(colors.text));

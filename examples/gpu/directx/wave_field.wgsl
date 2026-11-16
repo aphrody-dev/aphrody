@@ -1,5 +1,5 @@
 // WGSL 2D Wave Field Simulation Compute Shader
-// Suitable for transpilation to HLSL SM 6.6 via Naga in gpui-os
+// Suitable for transpilation to HLSL SM 6.6 via Naga in aphrody
 
 struct SimulationParams {
     grid_dim: vec2<u32>,

@@ -1,0 +1,14 @@
+{
+  "name": "aphrody",
+  "version": "1.30.0",
+  "description": "Unified Aphrody engineering plugin bundling all skills, hooks, docs, and architecture references for Zed, GPUI, WGPU/Naga, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Branding, and GitHub automation.",
+  "author": {
+    "name": "Aphrody Labs",
+    "url": "https://aphrody.com"
+  },
+  "homepage": "https://aphrody.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aphrody-dev/aphrody"
+  }
+}

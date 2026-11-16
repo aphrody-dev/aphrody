@@ -1,6 +1,6 @@
 # WebGPU & WGSL Verification Examples
 
-This directory provides working, production-grade examples demonstrating the WebGPU and WGSL architecture in `gpui-os`.
+This directory provides working, production-grade examples demonstrating the WebGPU and WGSL architecture in `aphrody`.
 
 ---
 
@@ -33,36 +33,39 @@ powershell -ExecutionPolicy Bypass -File examples\gpu\webgpu\verify.ps1
 ```
 
 ### 3. Shader Validation with Multiple Compilers
-```powershell
-# Validate with gpui-wgpu (Naga v30)
-.\target\debug\gpui-wgpu.exe validate examples\gpu\webgpu\nsh_ripple_shader.wgsl --json
+```bash
+# Cross-platform full verification runner
+bun examples/gpu/verify.ts webgpu
+
+# Validate with gpui-wgpu (Naga)
+gpui-wgpu validate examples/gpu/webgpu/nsh_ripple_shader.wgsl --json
 
 # Validate with Naga CLI
-naga examples\gpu\webgpu\nsh_ripple_shader.wgsl
+naga examples/gpu/webgpu/nsh_ripple_shader.wgsl
 
 # Validate with Google Dawn Tint
-tint -f wgsl examples\gpu\webgpu\nsh_ripple_shader.wgsl
-tint_info --json examples\gpu\webgpu\nsh_ripple_shader.wgsl
+tint --parse-only true examples/gpu/webgpu/nsh_ripple_shader.wgsl
+tint_info --json examples/gpu/webgpu/nsh_ripple_shader.wgsl
 ```
 
 ### 4. Cross-Backend Transpilation
-```powershell
+```bash
 # SPIR-V (Vulkan)
-.\target\debug\gpui-wgpu.exe transpile examples\gpu\webgpu\nsh_ripple_shader.wgsl --target spv -o nsh_ripple.spv
+gpui-wgpu transpile examples/gpu/webgpu/nsh_ripple_shader.wgsl --target spv -o nsh_ripple.spv
 
 # HLSL (DirectX 12)
-.\target\debug\gpui-wgpu.exe transpile examples\gpu\webgpu\nsh_ripple_shader.wgsl --target hlsl --stage fragment -o nsh_ripple.hlsl
+gpui-wgpu transpile examples/gpu/webgpu/nsh_ripple_shader.wgsl --target hlsl --stage fragment -o nsh_ripple.hlsl
 
 # Metal (macOS/iOS)
-.\target\debug\gpui-wgpu.exe transpile examples\gpu\webgpu\nsh_ripple_shader.wgsl --target msl --stage fragment -o nsh_ripple.metal
+gpui-wgpu transpile examples/gpu/webgpu/nsh_ripple_shader.wgsl --target msl --stage fragment -o nsh_ripple.metal
 
 # GLSL ES 300 (WebGL2)
-.\target\debug\gpui-wgpu.exe transpile examples\gpu\webgpu\nsh_ripple_shader.wgsl --target webgl2 --stage fragment -o nsh_ripple.essl
+gpui-wgpu transpile examples/gpu/webgpu/nsh_ripple_shader.wgsl --target webgl2 --stage fragment -o nsh_ripple.essl
 ```
 
 ### 5. Headless GPU Render Pass
-```powershell
-.\target\debug\gpui-wgpu.exe render examples\gpu\webgpu\nsh_ripple_shader.wgsl --output nsh_ripple.png --width 512 --height 512
+```bash
+gpui-wgpu render examples/gpu/webgpu/nsh_ripple_shader.wgsl --output nsh_ripple.png --width 512 --height 512
 ```
 
 ---

@@ -19,6 +19,7 @@ webview = ["gpui_ui/nsh-webview"]
 
 [dependencies]
 anyhow.workspace = true
+brand.workspace = true
 editor.workspace = true
 file_icons.workspace = true
 gpui_ui = { workspace = true, features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }

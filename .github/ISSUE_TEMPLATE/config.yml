@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Discussions
-    url: https://github.com/aphrody-dev/gpui-os/discussions
-    about: Feature requests, design architecture discussions, and Q&A for gpui-os / Aphrody.
+    url: https://github.com/aphrody-dev/aphrody/discussions
+    about: Feature requests, design architecture discussions, and Q&A for Aphrody.
   - name: Project Wiki
-    url: https://github.com/aphrody-dev/gpui-os/wiki
+    url: https://github.com/aphrody-dev/aphrody/wiki
     about: Browse architecture guides for GPUI, NSH, gpui-kit, WGPU, Vulkan, DirectX 12, WebGPU, and Zed compatibility.

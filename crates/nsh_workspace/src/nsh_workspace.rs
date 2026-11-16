@@ -1,4 +1,4 @@
-//! Unified Native Shell (`nsh`) <-> `gpui-os` Workspace integration.
+//! Unified Native Shell (`nsh`) <-> `aphrody` Workspace integration.
 //!
 //! Shared by both [`gpui_app_shell`] and `zed` (`--features nsh`), providing:
 //! 1. **`GpuiCodeEditorComponent`** (`nativeComponent("GpuiCodeEditor", ...)`): embeds a full
@@ -15,6 +15,7 @@ use std::sync::Arc;
 
 use editor::Editor;
 use file_icons::FileIcons;
+use gpui_ui::ActiveTheme as _;
 use gpui_ui::GlobalTheme;
 use gpui_ui::gpui::{
     self, AnyElement, App, AppContext as _, Context, Entity, EventEmitter, FocusHandle, Focusable,
@@ -24,8 +25,10 @@ use gpui_ui::nsh::{
     AppOptions, AppView, ComponentContext, NativeComponent, ensure_nsh_ui_sets_registered,
     nsh_base, nsh_bundler, nsh_engine, sync_app_view_with_gpui_theme,
 };
-use gpui_ui::ui::{FluentBuilder as _, Icon, IconName, InteractiveElement as _, Label, LabelCommon as _, h_flex, v_flex};
-use gpui_ui::ActiveTheme as _;
+use gpui_ui::ui::{
+    FluentBuilder as _, Icon, IconName, InteractiveElement as _, Label, LabelCommon as _, h_flex,
+    v_flex,
+};
 use language::{Buffer, BufferEvent, LanguageRegistry};
 use serde_json::Value as JsonValue;
 use util::ResultExt as _;
@@ -39,12 +42,32 @@ actions!(
         OpenLiveTsxPreview,
         /// Opens the interactive GPUI + NSH + embedded `GpuiCodeEditor` showcase surface in a new tab.
         OpenShowcaseSurface,
-        /// Connects a new workspace pane surface to a running `nsh dev` server (`ws://127.0.0.1:8790/ws`).
+        /// Connects a new workspace pane surface to a configured `nsh dev` server.
         ConnectDevServer,
     ]
 );
 
-const DEFAULT_DEV_SERVER_URL: &str = "ws://127.0.0.1:8790/ws";
+fn resolve_dev_server_url() -> String {
+    if let Ok(url) = std::env::var("NSH_DEV_SERVER_URL")
+        && !url.trim().is_empty()
+    {
+        return url;
+    }
+    if let Ok(url) = brand::env_var("DEV_SERVER_URL")
+        && !url.trim().is_empty()
+    {
+        return url;
+    }
+    let host = std::env::var("NSH_DEV_HOST")
+        .ok()
+        .filter(|h| !h.trim().is_empty())
+        .unwrap_or_else(|| std::net::Ipv4Addr::LOCALHOST.to_string());
+    let port = std::env::var("NSH_DEV_PORT")
+        .ok()
+        .and_then(|p| p.parse::<u16>().ok())
+        .unwrap_or(8790);
+    format!("ws://{host}:{port}/ws")
+}
 
 const SHOWCASE_TSX_SOURCE: &str = r#"import { mount, signal, Text, View, ScrollView } from "nsh";
 import { nativeComponent } from "nsh/native";
@@ -70,7 +93,7 @@ function ShowcaseApp() {
       <View class="p-6 gap-5">
         <View class="gap-1">
           <Text class="text-2xl font-bold text-foreground">
-            GPUI-OS × Native Shell (NSH) Unified Surface
+            APHRODY × Native Shell (NSH) Unified Surface
           </Text>
           <Text class="text-sm text-muted-foreground">
             Rendered natively by gpui 0.2.2 with live GlobalTheme tokens, Solid-style signals, and an embedded Tree-sitter GpuiCodeEditor.
@@ -246,7 +269,7 @@ pub struct NshSurfaceItem {
 }
 
 impl NshSurfaceItem {
-    /// Create a new [`NshSurfaceItem`] initialized with `gpui-os` theme sync and `GpuiCodeEditor`.
+    /// Create a new [`NshSurfaceItem`] initialized with `aphrody` theme sync and `GpuiCodeEditor`.
     pub fn new(
         title: impl Into<SharedString>,
         options: AppOptions,
@@ -375,11 +398,7 @@ impl NshSurfaceItem {
 
     /// Register all NSH actions (`OpenLiveTsxPreview`, `OpenShowcaseSurface`, `ConnectDevServer`)
     /// on a [`Workspace`].
-    pub fn register(
-        workspace: &mut Workspace,
-        _window: &mut Window,
-        _cx: &mut Context<Workspace>,
-    ) {
+    pub fn register(workspace: &mut Workspace, _window: &mut Window, _cx: &mut Context<Workspace>) {
         workspace.register_action(|workspace, _: &OpenShowcaseSurface, window, cx| {
             let languages = workspace.app_state().languages.clone();
             let item = cx.new(|cx| Self::showcase(languages, window, cx));
@@ -388,7 +407,8 @@ impl NshSurfaceItem {
 
         workspace.register_action(|workspace, _: &ConnectDevServer, window, cx| {
             let languages = workspace.app_state().languages.clone();
-            let item = cx.new(|cx| Self::dev_server(DEFAULT_DEV_SERVER_URL, languages, window, cx));
+            let url = resolve_dev_server_url();
+            let item = cx.new(|cx| Self::dev_server(url, languages, window, cx));
             workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
         });
 

@@ -18,7 +18,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 "#;
 
 fn main() -> Result<()> {
-    println!("=== gpui-os DirectX 12 Backend Probe ===");
+    println!("=== aphrody DirectX 12 Backend Probe ===");
 
     // 1. Initialize WGPU Instance with DX12 backend
     let mut instance_desc = wgpu::InstanceDescriptor::new_without_display_handle();
@@ -67,7 +67,7 @@ fn main() -> Result<()> {
 
     // 4. Request D3D12 Logical Device & Queue
     let (device, queue) = pollster::block_on(adapter.request_device(&wgpu::DeviceDescriptor {
-        label: Some("gpui-os-dx12-probe-device"),
+        label: Some("aphrody-dx12-probe-device"),
         required_features: wgpu::Features::empty(),
         required_limits: wgpu::Limits::default(),
         memory_hints: wgpu::MemoryHints::MemoryUsage,

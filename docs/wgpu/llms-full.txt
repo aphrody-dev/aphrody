@@ -1,4 +1,4 @@
-# WGPU v30.0.0 & Naga v30.0.0 — Complete Technical Reference (`gpui-os`)
+# WGPU v30.0.0 & Naga v30.0.0 — Complete Technical Reference (`aphrody`)
 
 > Authoritative source-verified reference for `wgpu` v30.0.0 and `naga` v30.0.0 vendored at `vendor/wgpu` (upstream `gfx-rs/wgpu` commit `cddb2f5d80dc0009b2ef6767635140cacf90a007`), `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/wgpu_cli` (`gpui-wgpu`).
 
@@ -7,11 +7,11 @@
 ## 1. Vendored Stack Overview & Workspace Architecture
 
 ### 1.1 Why Commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` Is Pinned
-`gpui-os` pins `wgpu` and `naga` to commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` (v30.0.0 branch with critical post-release fixes). Upstream crates.io `30.0.1` lacks two fixes required by `gpui-os`:
+`aphrody` pins `wgpu` and `naga` to commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` (v30.0.0 branch with critical post-release fixes). Upstream crates.io `30.0.1` lacks two fixes required by `aphrody`:
 1. **Vulkan surface-drop ordering fix** (`wgpu#10230`) preventing driver crashes when windows close or recreate surfaces.
 2. **WebGL2 canvas resize fix** (`wgpu#10348`) required by `gpui_web`.
 
-All GPU crates in `gpui-os` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from `vendor/wgpu` so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `wgpu_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
+All GPU crates in `aphrody` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from `vendor/wgpu` so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `wgpu_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
 
 ### 1.2 Directory & Crate Map (`vendor/wgpu/`)
 
@@ -41,10 +41,10 @@ When wiring `vendor/wgpu` into a workspace `Cargo.toml`, note exact crate versio
   - `gles` on Windows enables `Win32_Graphics_OpenGL`, `Win32_System_LibraryLoader`.
 - **`windows-core`**: `0.62`, **`windows-result`**: `0.4` (`std` enabled by `gles`).
 - **`gpu-allocator`**: `0.28` (`default-features = false`, `features = ["hashbrown"]`, plus `"d3d12"` under `dx12` and `"vulkan"` under `vulkan`).
-- **`range-alloc`**: `0.1`, **`bit-set`**: `0.11`, **`ash`**: `0.38`, **`glow`**: `0.18`, **`khronos-egl`**: `6` (patched in `gpui-os` `[patch.crates-io]`), **`objc2`**: `0.6.3`, **`objc2-metal`** / **`objc2-foundation`** / **`objc2-quartz-core`**: `0.3.2`, **`raw-window-metal`**: `1.0`.
+- **`range-alloc`**: `0.1`, **`bit-set`**: `0.11`, **`ash`**: `0.38`, **`glow`**: `0.18`, **`khronos-egl`**: `6` (patched in `aphrody` `[patch.crates-io]`), **`objc2`**: `0.6.3`, **`objc2-metal`** / **`objc2-foundation`** / **`objc2-quartz-core`**: `0.3.2`, **`raw-window-metal`**: `1.0`.
 - **`mach-dxcompiler-rs`**: `>=0.1.0, <=0.1.4` (only when optional `static-dxc` feature is enabled on x86/x86_64 Windows MSVC).
 - **`spirv`**: `0.4` (enabled by `naga/spv-in` and `naga/spv-out`).
-- **`rustc-hash`**: `vendor/wgpu` uses `1.1` (`default-features = false`) while `gpui-os` uses `2.1.0` (Cargo resolves both cleanly in `Cargo.lock` when `wgpu` is referenced by path).
+- **`rustc-hash`**: `vendor/wgpu` uses `1.1` (`default-features = false`) while `aphrody` uses `2.1.0` (Cargo resolves both cleanly in `Cargo.lock` when `wgpu` is referenced by path).
 
 ---
 
@@ -660,7 +660,7 @@ let (module, module_info) = naga::back::pipeline_constants::process_overrides(
    - Cause: WGSL forbids implicit-derivative `textureSample` inside branches conditioned on fragment-varying values (unless `DISABLE_UNIFORMITY_REQ_FOR_FRAGMENT_STAGE` applies or in compute/vertex).
    - Fix: Compute UVs outside the branch, sample unconditionally before `if`/`return` (note how `shaders_subpixel.wgsl` alpha-clips *after* `textureSample`!), or use `textureSampleLevel(..., 0.0)` when mip level 0 is intended (as `nsh-core` does).
 7. **Windows `windows` / `gpu-allocator` version mismatch when patching `wgpu`**:
-   - `vendor/wgpu` v30.0.0 expects `windows = "0.62"`, `windows-core = "0.62"`, `windows-result = "0.4"`, and `gpu-allocator = "0.28"`. Both `gpui-os` root `Cargo.toml` and `Cargo.lock` already resolve `windows 0.62.2`, `windows-core 0.62.2`, `windows-result 0.4.1`, and `gpu-allocator 0.28.0`.
+   - `vendor/wgpu` v30.0.0 expects `windows = "0.62"`, `windows-core = "0.62"`, `windows-result = "0.4"`, and `gpu-allocator = "0.28"`. Both `aphrody` root `Cargo.toml` and `Cargo.lock` already resolve `windows 0.62.2`, `windows-core 0.62.2`, `windows-result 0.4.1`, and `gpu-allocator 0.28.0`.
 
 
 ---

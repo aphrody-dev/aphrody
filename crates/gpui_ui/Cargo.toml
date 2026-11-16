@@ -87,6 +87,7 @@ test-support = ["gpui/test-support", "gpui_platform/test-support", "theme/test-s
 [dependencies]
 anyhow.workspace = true
 assets.workspace = true
+brand.workspace = true
 collections.workspace = true
 component.workspace = true
 file_icons.workspace = true

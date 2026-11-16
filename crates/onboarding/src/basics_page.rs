@@ -252,7 +252,7 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
                 None::<&str>,
                 Some(
                     format!(
-                        "Help improve {} by sending anonymous usage data",
+                        "Share anonymous usage metrics to improve {}",
                         brand::APP_NAME
                     )
                     .into(),
@@ -288,7 +288,7 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
             )
             .tab_index({
                 *tab_index += 1;
-                *tab_index
+                *tab_index - 1
             }),
         )
         .child(
@@ -297,7 +297,7 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
                 None::<&str>,
                 Some(
                     format!(
-                        "Help fix {} by sending crash reports so we can fix critical issues fast",
+                        "Send crash reports to help diagnose startup and stability issues in {}",
                         brand::APP_NAME
                     )
                     .into(),
@@ -333,7 +333,7 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
             )
             .tab_index({
                 *tab_index += 1;
-                *tab_index
+                *tab_index - 1
             }),
         )
 }
@@ -412,7 +412,7 @@ fn render_vim_mode_switch(tab_index: &mut isize, cx: &mut App) -> impl IntoEleme
     SwitchField::new(
         "onboarding-vim-mode",
         Some("Vim Mode"),
-        Some("Coming from Neovim? Use our first-class implementation of Vim Mode".into()),
+        Some("Enable modal Vim keybindings and commands".into()),
         toggle_state,
         {
             let fs = <dyn Fs>::global(cx);
@@ -458,7 +458,7 @@ fn render_worktree_auto_trust_switch(tab_index: &mut isize, cx: &mut App) -> imp
         Some("Trust All Projects By Default"),
         Some(
             format!(
-                "Automatically mark all new projects as trusted to unlock all {} features",
+                "Trust newly opened projects by default so {} language servers and tasks run without confirmation",
                 brand::APP_NAME
             )
             .into(),
@@ -547,7 +547,7 @@ fn render_import_settings_section(tab_index: &mut isize, cx: &mut App) -> impl I
                 .max_w_5_6()
                 .child(Label::new("Import Settings"))
                 .child(
-                    Label::new("Automatically pull your settings from other editors")
+                    Label::new("Copy keybindings and preferences from another editor")
                         .color(Color::Muted),
                 ),
         )
@@ -558,6 +558,7 @@ pub(crate) const FEATURED_AGENT_IDS: &[&str] =
     &["claude-acp", "codex-acp", "github-copilot-cli", "cursor"];
 
 fn render_registry_agent_button(
+    tab_index: isize,
     agent: &RegistryAgent,
     installed: bool,
     cx: &mut App,
@@ -587,6 +588,7 @@ fn render_registry_agent_button(
     };
 
     AgentSetupButton::new(element_id)
+        .tab_index(tab_index)
         .icon(icon)
         .name(agent.name().clone())
         .state(state_element)
@@ -616,7 +618,11 @@ fn render_registry_agent_button(
         })
 }
 
-fn render_zed_agent_button(user_store: &Entity<UserStore>, cx: &mut App) -> impl IntoElement {
+fn render_primary_agent_button(
+    tab_index: isize,
+    user_store: &Entity<UserStore>,
+    cx: &mut App,
+) -> impl IntoElement {
     let client = Client::global(cx);
     let status = *client.status().borrow();
 
@@ -662,13 +668,14 @@ fn render_zed_agent_button(user_store: &Entity<UserStore>, cx: &mut App) -> impl
             .into_any_element()
     };
 
-    AgentSetupButton::new("zed-agent-onboarding")
+    AgentSetupButton::new(format!("{}-agent-onboarding", brand::APP_SLUG))
+        .tab_index(tab_index)
         .icon(
-            Icon::new(IconName::ZedAgent)
+            Icon::new(IconName::Sparkle)
                 .size(IconSize::XSmall)
                 .color(Color::Muted),
         )
-        .name("Zed Agent")
+        .name(format!("{} Agent", brand::APP_NAME))
         .state(state_element)
         .disabled(is_trial || is_pro)
         .map(|this| {
@@ -688,7 +695,11 @@ fn render_zed_agent_button(user_store: &Entity<UserStore>, cx: &mut App) -> impl
         })
 }
 
-fn render_ai_section(user_store: &Entity<UserStore>, cx: &mut App) -> impl IntoElement {
+fn render_ai_section(
+    tab_index: &mut isize,
+    user_store: &Entity<UserStore>,
+    cx: &mut App,
+) -> impl IntoElement {
     let registry_agents = AgentRegistryStore::try_global(cx)
         .map(|store| store.read(cx).agents().to_vec())
         .unwrap_or_default();
@@ -699,6 +710,8 @@ fn render_ai_section(user_store: &Entity<UserStore>, cx: &mut App) -> impl IntoE
         .clone();
 
     let column_count = 1 + FEATURED_AGENT_IDS.len() as u16;
+    let first_tab = *tab_index;
+    *tab_index += 1;
 
     let grid = FEATURED_AGENT_IDS.iter().fold(
         div()
@@ -707,7 +720,7 @@ fn render_ai_section(user_store: &Entity<UserStore>, cx: &mut App) -> impl IntoE
             .grid()
             .grid_cols(column_count)
             .gap_2()
-            .child(render_zed_agent_button(user_store, cx)),
+            .child(render_primary_agent_button(first_tab, user_store, cx)),
         |grid, agent_id| {
             let Some(agent) = registry_agents
                 .iter()
@@ -716,29 +729,33 @@ fn render_ai_section(user_store: &Entity<UserStore>, cx: &mut App) -> impl IntoE
                 return grid;
             };
             let is_installed = installed_agents.contains_key(*agent_id);
-            grid.child(render_registry_agent_button(agent, is_installed, cx))
+            let card_tab = *tab_index;
+            *tab_index += 1;
+            grid.child(render_registry_agent_button(
+                card_tab,
+                agent,
+                is_installed,
+                cx,
+            ))
         },
     );
 
     v_flex()
         .gap_0p5()
         .child(Label::new("Agent Setup"))
-        .child(
-            Label::new("Install your favorite agents and start your first thread.")
-                .color(Color::Muted),
-        )
+        .child(Label::new("Install coding agents and start your first thread").color(Color::Muted))
         .child(grid)
 }
 
 pub(crate) fn render_basics_page(user_store: &Entity<UserStore>, cx: &mut App) -> impl IntoElement {
-    let mut tab_index = 0;
+    let mut tab_index = 1;
 
     v_flex()
         .id("basics-page")
         .gap_6()
         .child(render_theme_section(&mut tab_index, cx))
         .child(render_base_keymap_section(&mut tab_index, cx))
-        .child(render_ai_section(user_store, cx))
+        .child(render_ai_section(&mut tab_index, user_store, cx))
         .child(render_import_settings_section(&mut tab_index, cx))
         .child(render_vim_mode_switch(&mut tab_index, cx))
         .child(render_worktree_auto_trust_switch(&mut tab_index, cx))

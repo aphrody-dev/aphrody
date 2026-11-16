@@ -1,6 +1,6 @@
-# Intel Hardware, SIMD & Xe GPU Architecture Guide (`gpui-os`)
+# Intel Hardware, SIMD & Xe GPU Architecture Guide (`aphrody`)
 
-Central engineering guide for Intel Arc Xe/Xe2 GPUs, Core/Xeon/EPYC SIMD processors, ISPC, and oneAPI Level Zero in `gpui-os`.
+Central engineering guide for Intel Arc Xe/Xe2 GPUs, Core/Xeon/EPYC SIMD processors, ISPC, and oneAPI Level Zero in `aphrody`.
 
 ---
 

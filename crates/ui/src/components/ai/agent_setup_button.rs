@@ -7,6 +7,7 @@ pub struct AgentSetupButton {
     icon: Option<Icon>,
     name: Option<SharedString>,
     state: Option<AnyElement>,
+    tab_index: Option<isize>,
     disabled: bool,
     on_click: Option<Box<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>>,
 }
@@ -18,9 +19,15 @@ impl AgentSetupButton {
             icon: None,
             name: None,
             state: None,
+            tab_index: None,
             disabled: false,
             on_click: None,
         }
+    }
+
+    pub fn tab_index(mut self, tab_index: isize) -> Self {
+        self.tab_index = Some(tab_index);
+        self
     }
 
     pub fn icon(mut self, icon: Icon) -> Self {
@@ -80,6 +87,7 @@ impl RenderOnce for AgentSetupButton {
         let is_clickable = !self.disabled && self.on_click.is_some();
 
         let has_top_section = self.icon.is_some() || self.name.is_some();
+        let aria_label = self.name.clone();
         let top_section = has_top_section.then(|| {
             h_flex()
                 .p_1p5()
@@ -104,15 +112,23 @@ impl RenderOnce for AgentSetupButton {
 
         v_flex()
             .id(self.id)
+            .role(gpui::Role::Button)
+            .when_some(aria_label, |this, label| this.aria_label(label))
+            .when_some(self.tab_index, |this, tab_index| {
+                this.tab_index(tab_index).tab_stop(!self.disabled)
+            })
             .border_1()
             .border_color(cx.theme().colors().border_variant)
             .rounded_sm()
+            .when(self.disabled, |this| this.opacity(0.6).cursor_not_allowed())
             .when(is_clickable, |this| {
-                this.cursor_pointer().hover(|style| {
-                    style
-                        .bg(cx.theme().colors().element_hover)
-                        .border_color(cx.theme().colors().border)
-                })
+                this.cursor_pointer()
+                    .hover(|style| {
+                        style
+                            .bg(cx.theme().colors().element_hover)
+                            .border_color(cx.theme().colors().border)
+                    })
+                    .focus_visible(|style| style.border_color(cx.theme().colors().border_focused))
             })
             .when_some(top_section, |this, section| this.child(section))
             .when_some(bottom_section, |this, section| this.child(section))

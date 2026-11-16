@@ -1,0 +1,105 @@
+name: aphrody Issue Triage & Fix Ops
+
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request_target:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to autofix (fmt + brand)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  triage-and-link:
+    if: github.event_name == 'issues' || github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-label issue or PR by subsystem and fix links
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const isPR = Boolean(context.payload.pull_request);
+            const item = context.payload.pull_request || context.payload.issue;
+            const text = `${item.title || ""}\n${item.body || ""}`.toLowerCase();
+            const labels = new Set();
+
+            const rules = [
+              [/\b(vulkan|spir-?v|glsl)\b/, "gpu/vulkan"],
+              [/\b(dx12|directx|hlsl|dxc)\b/, "gpu/directx"],
+              [/\b(webgpu|wgsl|dawn|tint)\b/, "gpu/webgpu"],
+              [/\b(wgpu|naga|shader)\b/, "wgpu"],
+              [/\b(nsh|native shell|tsx)\b/, "nsh"],
+              [/\b(gpui-kit|gpui-component|widget)\b/, "gpui-kit"],
+              [/\b(zed|keymap|extension|wit|brand|aphrody)\b/, "zed"],
+            ];
+
+            for (const [re, label] of rules) {
+              if (re.test(text)) labels.add(label);
+            }
+
+            if (isPR && /\b(closes|fixes|resolves)\s+#\d+/i.test(text)) {
+              labels.add("issue-fix");
+              if (item.head?.repo?.full_name === context.payload.repository.full_name) {
+                labels.add("auto-merge");
+              }
+            }
+
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: item.number,
+                labels: Array.from(labels),
+              });
+            }
+
+  autofix-pr:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request &&
+        contains(github.event.comment.body, '/autofix')
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Read toolchain from rust-toolchain.toml
+        id: rt
+        shell: bash
+        run: echo "toolchain=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.rt.outputs.toolchain }}
+      - name: Checkout target PR and apply fmt + brand sync
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ inputs.pr_number || github.event.issue.number }}
+        run: |
+          if [ -z "$PR_NUM" ]; then
+            echo "No PR number provided; skipping autofix."
+            exit 0
+          fi
+          gh pr checkout "$PR_NUM" --repo "${{ github.repository }}"
+          cargo fmt --all
+          cargo xtask brand apply
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -A
+            git commit -m "style: apply cargo fmt and xtask brand sync"
+            git push
+          fi

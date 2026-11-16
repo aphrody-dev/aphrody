@@ -1,14 +1,14 @@
 # DirectX 12 & HLSL Architecture Guide
 
-Welcome to the DirectX 12 GPU Architecture documentation for `gpui-os`. This guide documents the native Windows graphics and compute infrastructure, compiler toolchains, Agility SDK runtime, and WGPU D3D12 backend.
+Welcome to the DirectX 12 GPU Architecture documentation for `aphrody`. This guide documents the native Windows graphics and compute infrastructure, compiler toolchains, Agility SDK runtime, and WGPU D3D12 backend.
 
 ---
 
 ## 1. Directory Structure
 
 ```
-gpui-os/
-├── .agents/plugins/gpui-os/skills/directx/
+aphrody/
+├── .agents/plugins/aphrody/skills/directx/
 │   ├── SKILL.md                          # DirectX 12 skill definition
 │   └── references/
 │       ├── d3d12-architecture.md         # Enhanced Barriers, Root Signatures, Descriptors

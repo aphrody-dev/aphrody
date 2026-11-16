@@ -1,0 +1,25 @@
+{
+  "aphrody-session-context": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bun ./hooks/session-start.ts",
+        "timeout": 10
+      }
+    ]
+  },
+  "aphrody-file-conformity": {
+    "PostToolUse": [
+      {
+        "matcher": "write_file|edit_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ./hooks/post-edit-check.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
-# NVIDIA Hardware, Architecture & Toolchain Guide (`gpui-os`)
+# NVIDIA Hardware, Architecture & Toolchain Guide (`aphrody`)
 
-Central engineering guide for NVIDIA GPUs in `gpui-os` across Vulkan 1.4, DirectX 12, CUDA 13.x, and WGPU.
+Central engineering guide for NVIDIA GPUs in `aphrody` across Vulkan 1.4, DirectX 12, CUDA 13.x, and WGPU.
 
 ---
 

@@ -48,7 +48,7 @@
 
 ### `nsh check`, `nsh fmt`, and `nsh lint` (Bun-native)
 
-The bundler strips types without checking them (Oxc). In `gpui-os`, TypeScript checking, formatting, and linting are unified directly on **Bun** (`vendor/bun/docs/`), eliminating npm tarball downloads, Node.js, Prettier, and ESLint:
+The bundler strips types without checking them (Oxc). In `aphrody`, TypeScript checking, formatting, and linting are unified directly on **Bun** (`vendor/bun/docs/`), eliminating npm tarball downloads, Node.js, Prettier, and ESLint:
 
 - `nsh check` (`crates/nsh-cli/src/check.rs`) writes `.nsh/types` and `.nsh/tsconfig.json`, then runs `bun check --no-script -p <app dir>` across all CPU cores using Bun's built-in TypeScript 7 checker and built-in `lib.*.d.ts` declarations (`vendor/bun/docs/runtime/check.mdx`). Arguments after `--` pass through to `bun check`, and `--bun <path>` / `NSH_BUN` override the `bun` executable. An app with Rust crates (`nsh.json` `"rust"`) runs `cargo check --all-targets` on each crate first (`check::cargo_check`); a pure Rust app (`"root"`) runs `bun check` only if a `tsconfig.json` is present for its `.test.tsx` suite.
 - `nsh fmt` runs `bun fmt` (`--check` in CI), formatting TS/TSX/JSON/Markdown and automatically sorting imports and Tailwind CSS classes (`vendor/bun/docs/format/index.mdx`).

@@ -70,6 +70,8 @@ fn main() {
     let homepage = get_str(&parsed, "urls", "homepage");
     let repository = get_str(&parsed, "urls", "repository");
     let docs = get_str(&parsed, "urls", "docs");
+    let status = get_str(&parsed, "urls", "status");
+    let store = get_str(&parsed, "urls", "store");
     let server = get_str(&parsed, "urls", "server");
     let extension_registry = get_str(&parsed, "urls", "extension_registry");
 
@@ -82,6 +84,20 @@ fn main() {
     let legacy_mono_alias = get_str(&parsed, "fonts", "legacy_mono_alias");
 
     let logo_svg = get_str(&parsed, "assets", "logo_svg");
+
+    let plugin_name = get_str(&parsed, "plugin", "name");
+    let plugin_version = get_str(&parsed, "plugin", "version");
+    let plugin_scope = get_str(&parsed, "plugin", "scope");
+
+    let git_default_branch = get_str(&parsed, "git", "default_branch");
+    let upstream_zed = get_str(&parsed, "git", "upstream_zed");
+    let upstream_zed_branch = get_str(&parsed, "git", "upstream_zed_branch");
+    let upstream_nsh = get_str(&parsed, "git", "upstream_nsh");
+    let upstream_gpui_kit = get_str(&parsed, "git", "upstream_gpui_kit");
+    let upstream_wgpu = get_str(&parsed, "git", "upstream_wgpu");
+    let submodule_bun = get_str(&parsed, "git", "submodule_bun");
+
+    let wgpu_cli_bin = get_str(&parsed, "features", "wgpu_cli_bin");
 
     let legacy_schemes_slice = legacy_url_schemes
         .iter()
@@ -148,6 +164,8 @@ pub const LEGACY_REMOTE_WSL_SERVER_FOLDER: &str = {legacy_remote_wsl_server_fold
 pub const HOMEPAGE_URL: &str = {homepage};
 pub const REPOSITORY_URL: &str = {repository};
 pub const DOCS_URL: &str = {docs};
+pub const STATUS_URL: &str = {status};
+pub const STORE_URL: &str = {store};
 pub const DEFAULT_SERVER_URL: &str = {server};
 pub const EXTENSION_REGISTRY_URL: &str = {extension_registry};
 
@@ -162,6 +180,20 @@ pub const DEFAULT_ICON_THEME_NAME: &str = "{raw_name} (Default)";
 pub const LEGACY_DEFAULT_ICON_THEME_NAME: &str = "Zed (Default)";
 
 pub const LOGO_SVG_PATH: &str = {logo_svg};
+
+pub const PLUGIN_NAME: &str = {plugin_name};
+pub const PLUGIN_VERSION: &str = {plugin_version};
+pub const PLUGIN_SCOPE: &str = {plugin_scope};
+
+pub const GIT_DEFAULT_BRANCH: &str = {git_default_branch};
+pub const UPSTREAM_ZED_REPO: &str = {upstream_zed};
+pub const UPSTREAM_ZED_BRANCH: &str = {upstream_zed_branch};
+pub const UPSTREAM_NSH_REPO: &str = {upstream_nsh};
+pub const UPSTREAM_GPUI_KIT_REPO: &str = {upstream_gpui_kit};
+pub const UPSTREAM_WGPU_REPO: &str = {upstream_wgpu};
+pub const SUBMODULE_BUN_REPO: &str = {submodule_bun};
+
+pub const WGPU_CLI_BIN: &str = {wgpu_cli_bin};
 "#,
         name = rust_str_literal(name),
         slug = rust_str_literal(slug),
@@ -189,6 +221,8 @@ pub const LOGO_SVG_PATH: &str = {logo_svg};
         homepage = rust_str_literal(homepage),
         repository = rust_str_literal(repository),
         docs = rust_str_literal(docs),
+        status = rust_str_literal(status),
+        store = rust_str_literal(store),
         server = rust_str_literal(server),
         extension_registry = rust_str_literal(extension_registry),
         env_prefix = rust_str_literal(env_prefix),
@@ -198,6 +232,17 @@ pub const LOGO_SVG_PATH: &str = {logo_svg};
         legacy_sans_alias = rust_str_literal(legacy_sans_alias),
         legacy_mono_alias = rust_str_literal(legacy_mono_alias),
         logo_svg = rust_str_literal(logo_svg),
+        plugin_name = rust_str_literal(plugin_name),
+        plugin_version = rust_str_literal(plugin_version),
+        plugin_scope = rust_str_literal(plugin_scope),
+        git_default_branch = rust_str_literal(git_default_branch),
+        upstream_zed = rust_str_literal(upstream_zed),
+        upstream_zed_branch = rust_str_literal(upstream_zed_branch),
+        upstream_nsh = rust_str_literal(upstream_nsh),
+        upstream_gpui_kit = rust_str_literal(upstream_gpui_kit),
+        upstream_wgpu = rust_str_literal(upstream_wgpu),
+        submodule_bun = rust_str_literal(submodule_bun),
+        wgpu_cli_bin = rust_str_literal(wgpu_cli_bin),
     );
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR"));

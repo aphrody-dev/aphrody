@@ -39,15 +39,21 @@ Use this checklist when your changes affect UI.
 
 ## Consistency {#consistency}
 
-- Does it match Zed’s design language (spacing, typography, icons)?
-  - Make sure to visit [the icon design guidelines](https://github.com/zed-industries/zed/blob/main/crates/icons/README.md)
-- Are terminology, labels, and tone consistent with the rest of Zed?
-- Are interactions consistent (e.g., how tabs close, how modals dismiss, how errors show)?
+- Does it match Aphrody's design language (semantic `cx.theme()` / `@aphrody/design` tokens, spacing rhythm, typography, Material/GPUI icons)?
+  - Visit [the icon design guidelines](https://github.com/aphrody-dev/aphrody/blob/main/crates/icons/README.md)
+- Is there one unmistakable primary CTA per screen, with secondary actions visually subordinate?
+- Are interactions consistent (how tabs close, how modals dismiss on Escape with focus restoration, how errors show)?
+
+## Accessibility & Contrast {#accessibility-contrast}
+
+- Do text and active controls meet >= 4.5:1 contrast (3:1 for large text/non-text icons) independently in both dark and light themes?
+- Does keyboard Tab order match visual order (`tab_index` / `tab_stop`), with visible focus rings (`border_focused` / `focus_visible`) on every interactive card and control?
+- Are reduced-motion preferences respected so non-essential animations never block interaction?
 
 ## Internationalization & Text {#internationalization-text}
 
-- Are strings concise, clear, and unambiguous?
-- Do we avoid internal Zed jargon that only insiders would know?
+- Are strings concise, humanized, in active voice, and free of AI filler words or terminal punctuation on short labels?
+- Do we avoid internal jargon that only insiders would know?
 
 ## User Paths & Edge Cases {#user-paths-edge-cases}
 
@@ -56,7 +62,7 @@ Use this checklist when your changes affect UI.
 - How does it work in offline vs. online states?
 - How does it work in unauthenticated vs. authenticated states?
 - How does it behave if data is missing, corrupted, or delayed?
-- Are error messages actionable and consistent with Zed’s voice?
+- Are error messages actionable, naming what failed and how to recover?
 
 ## Discoverability & Learning {#discoverability-learning}
 
@@ -65,4 +71,4 @@ Use this checklist when your changes affect UI.
 - Are power features discoverable but not intrusive?
 - Is there a path from beginner → expert usage (progressive disclosure)?
 
-See the [contribution guidelines](https://github.com/zed-industries/zed/blob/main/CONTRIBUTING.md) for preparing your pull request.
+See the [contribution guidelines](https://github.com/aphrody-dev/aphrody/blob/main/CONTRIBUTING.md) for preparing your pull request.

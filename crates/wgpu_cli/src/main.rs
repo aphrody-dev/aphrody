@@ -13,7 +13,7 @@ use clap::{Parser, Subcommand, ValueEnum};
 #[derive(Debug, Parser)]
 #[command(
     name = "gpui-wgpu",
-    about = "WGPU & Naga GPU adapter, shader validation/transpilation, headless render/compute, and benchmark CLI for gpui-os",
+    about = "WGPU & Naga GPU adapter, shader validation/transpilation, headless render/compute, and benchmark CLI for aphrody",
     version
 )]
 struct Cli {

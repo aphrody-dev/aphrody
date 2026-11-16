@@ -1,5 +1,5 @@
 name: Report a crash
-description: Aphrody / gpui-os application or GPU pipeline crashed or panicked.
+description: Aphrody application or GPU pipeline crashed or panicked.
 labels: ["bug"]
 body:
   - type: textarea

@@ -1,12 +1,12 @@
-# Contributing to Aphrody (`gpui-os`)
+# Contributing to Aphrody (`aphrody`)
 
-Thank you for contributing to **Aphrody** (`aphrody-dev/gpui-os`), unifying GPUI, Native Shell (`crates/nsh-*`), `gpui-kit`, WGPU/Naga v30 (`vendor/wgpu`, `crates/gpui_wgpu`, `crates/wgpu_cli`), and Bun (`vendor/bun`) with full Zed ecosystem compatibility.
+Thank you for contributing to **Aphrody** (`aphrody-dev/aphrody`), unifying GPUI, Native Shell (`crates/nsh-*`), `gpui-kit`, WGPU/Naga v30 (`vendor/wgpu`, `crates/gpui_wgpu`, `crates/wgpu_cli`), and Bun (`vendor/bun`) with full Zed ecosystem compatibility.
 
 ## Before You Start
 
-- **Use Discussions for architecture proposals**: Open a thread in [gpui-os Discussions](https://github.com/aphrody-dev/gpui-os/discussions) or check existing [Issues](https://github.com/aphrody-dev/gpui-os/issues) before large cross-crate refactors.
-- **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, `gfx-rs/wgpu`, and `aphrody-labs/bun` is managed through [`.github/workflows/gpui-os-upstream-sync.yml`](./.github/workflows/gpui-os-upstream-sync.yml).
-- **Plugin, coding rules & design guides**: Read [`.agents/plugins/gpui-os/rules/AGENTS.md`](./.agents/plugins/gpui-os/rules/AGENTS.md) and [`.agents/plugins/gpui-os/docs/INDEX.md`](./.agents/plugins/gpui-os/docs/INDEX.md).
+- **Use Discussions for architecture proposals**: Open a thread in [aphrody Discussions](https://github.com/aphrody-dev/aphrody/discussions) or check existing [Issues](https://github.com/aphrody-dev/aphrody/issues) before large cross-crate refactors.
+- **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, `gfx-rs/wgpu`, and `aphrody-labs/bun` is managed through [`.github/workflows/aphrody-upstream-sync.yml`](./.github/workflows/aphrody-upstream-sync.yml).
+- **Plugin, coding rules & design guides**: Read [`.agents/plugins/aphrody/rules/AGENTS.md`](./.agents/plugins/aphrody/rules/AGENTS.md) and [`.agents/plugins/aphrody/docs/INDEX.md`](./.agents/plugins/aphrody/docs/INDEX.md).
 
 ## Engineering Standards
 

@@ -1,10 +1,10 @@
-# WGPU & Naga in gpui-os (v30.0.0)
+# WGPU & Naga in aphrody (v30.0.0)
 
 > Pure-Rust WebGPU graphics/compute stack (`wgpu` v30.0.0, rev `cddb2f5d80dc0009b2ef6767635140cacf90a007`) and `naga` v30.0.0 shader compiler vendored in `vendor/wgpu`, driving GPU UI rendering in `crates/gpui_wgpu`, live WGSL shader views/effects/transitions in `crates/nsh-core` + `crates/nsh-engine`, and CLI diagnostics/transpilation/headless execution in `crates/wgpu_cli` (`gpui-wgpu`).
 
 ## Core Facts & Revision Invariants
 
-- **Pinned Revision**: `cddb2f5d80dc0009b2ef6767635140cacf90a007` (`wgpu` 30.0.0 + `naga` 30.0.0). Note: crates.io `30.0.1` lacks the Vulkan surface-drop fix (`wgpu#10230`) and WebGL resize fix (`wgpu#10348`), so `gpui-os` vendors this exact commit.
+- **Pinned Revision**: `cddb2f5d80dc0009b2ef6767635140cacf90a007` (`wgpu` 30.0.0 + `naga` 30.0.0). Note: crates.io `30.0.1` lacks the Vulkan surface-drop fix (`wgpu#10230`) and WebGL resize fix (`wgpu#10348`), so `aphrody` vendors this exact commit.
 - **Shared Naga/WGPU Invariant**: `wgpu`, `wgpu-core`, `wgpu-hal`, and `naga` MUST resolve from the exact same `vendor/wgpu` tree so `ShaderSource::Wgsl`, `naga::Module`, `Capabilities`, and runtime bounds-check policies remain binary- and semantically identical across compile-time validation and GPU execution.
 - **Coordinate System**: D3D/Metal conventions — NDC X in `[-1, 1]`, NDC Y in `[-1, 1]` (Y up in clip space), NDC Z (depth) in `[0, 1]`, texture UV origin `(0, 0)` at top-left (`Y` down).
 - **Critical Alignment Constants** (`wgpu_types`):
@@ -52,4 +52,4 @@
 ## Detailed Reference Documentation
 
 - [Complete Technical Reference (`docs/wgpu/llms-full.txt`)](llms-full.txt): Deep API signatures for WGPU v30 & Naga v30, `Features`/`Limits` tables, `wgpu-hal` backend internals (DX12, Vulkan, Metal, GLES), Naga cross-compilation recipes, `gpui_wgpu` & `nsh` architecture, and WGSL alignment/surface/dependency troubleshooting.
-- [Agent Skill (`SKILL.md`)](../../.agents/plugins/gpui-os/skills/wgpu/SKILL.md): Operational rules, workflows, and references in `.agents/plugins/gpui-os/skills/wgpu/references/`.
+- [Agent Skill (`SKILL.md`)](../../.agents/plugins/aphrody/skills/wgpu/SKILL.md): Operational rules, workflows, and references in `.agents/plugins/aphrody/skills/wgpu/references/`.
