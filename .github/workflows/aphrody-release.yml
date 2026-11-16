@@ -1,0 +1,245 @@
+name: aphrody Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '*-v*'
+      - 'lts-*'
+      - 'canary-*'
+      - 'nightly-*'
+  schedule:
+    # Daily Canary & Nightly snapshots at 03:15 UTC when main moved
+    - cron: '15 3 * * *'
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Release channel (lts, stable, preview, canary, nightly)'
+        required: true
+        default: 'canary'
+        type: choice
+        options:
+          - lts
+          - stable
+          - preview
+          - canary
+          - nightly
+      version:
+        description: 'Override semver (defaults to tag or yyyy.mm.dd-sha)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: release-${{ github.event.inputs.channel || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  resolve-metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.meta.outputs.channel }}
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - name: Resolve channel and version
+        id: meta
+        run: |
+          bun -e '
+            const fs = require("node:fs");
+            const ref = process.env.GITHUB_REF_NAME || "main";
+            const inputChannel = process.env.INPUT_CHANNEL || "";
+            const inputVersion = process.env.INPUT_VERSION || "";
+            const sha = (process.env.GITHUB_SHA || "0000000").slice(0, 7);
+            const date = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
+            let channel = inputChannel;
+            if (!channel) {
+              if (ref.startsWith("lts-")) channel = "lts";
+              else if (ref.startsWith("canary-")) channel = "canary";
+              else if (ref.startsWith("nightly-")) channel = "nightly";
+              else if (ref.includes("-pre") || ref.includes("-preview") || ref.startsWith("preview-")) channel = "preview";
+              else if (ref.startsWith("v")) channel = "stable";
+              else channel = "canary";
+            }
+            const cleanTagVer = ref.replace(/^(lts-|stable-|preview-|canary-|nightly-)?v?/, "");
+            const version = inputVersion || (ref === "main" ? `${date}-${sha}` : cleanTagVer);
+            const tag = ref.startsWith("v") || /^(lts|canary|nightly|preview)-/.test(ref) ? ref : `${channel}-v${version}`;
+            const out = process.env.GITHUB_OUTPUT;
+            fs.appendFileSync(out, `channel=${channel}\nversion=${version}\ntag=${tag}\n`);
+          '
+        env:
+          INPUT_CHANNEL: ${{ github.event.inputs.channel }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+
+  build:
+    needs: resolve-metadata
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu.2.28
+            platform_os: linux
+            arch: x86_64
+            driver: zigbuild
+            asset: aphrody-x86_64.tar.gz
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu.2.28
+            platform_os: linux
+            arch: aarch64
+            driver: zigbuild
+            asset: aphrody-aarch64.tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform_os: windows
+            arch: x86_64
+            driver: cargo
+            asset: Aphrody-Setup-x64.exe
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            platform_os: macos
+            arch: aarch64
+            driver: cargo
+            asset: Aphrody-arm64.dmg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/vendor-submodules
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        if: matrix.driver == 'zigbuild'
+        with:
+          tool: cargo-zigbuild,zig
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install Rust target
+        run: |
+          BASE_TARGET=$(echo "${{ matrix.target }}" | cut -d. -f1)
+          rustup target add "$BASE_TARGET"
+        shell: bash
+
+      - name: Build release binary
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.driver }}" = "zigbuild" ]; then
+            cargo zigbuild --release -p zed --bin aphrody --target "${{ matrix.target }}"
+            BASE_TARGET=$(echo "${{ matrix.target }}" | cut -d. -f1)
+            tar -czf "dist/${{ matrix.asset }}" -C "target/${BASE_TARGET}/release" aphrody
+          elif [ "${{ matrix.platform_os }}" = "windows" ]; then
+            cargo build --release -p zed --bin aphrody --target "${{ matrix.target }}"
+            cp "target/${{ matrix.target }}/release/aphrody.exe" "dist/${{ matrix.asset }}"
+          else
+            cargo build --release -p zed --bin aphrody --target "${{ matrix.target }}"
+            tar -czf "dist/${{ matrix.asset }}" -C "target/${{ matrix.target }}/release" aphrody
+          fi
+        shell: bash
+
+      - name: Compute SHA-256 and update manifest JSON
+        run: |
+          bun -e '
+            const fs = require("node:fs");
+            const crypto = require("node:crypto");
+            const asset = process.env.ASSET;
+            const channel = process.env.CHANNEL;
+            const version = process.env.VERSION;
+            const osName = process.env.PLATFORM_OS;
+            const arch = process.env.ARCH;
+            const data = fs.readFileSync(`dist/${asset}`);
+            const sha256 = crypto.createHash("sha256").update(data).digest("hex");
+            fs.writeFileSync(`dist/${asset}.sha256`, `${sha256}  ${asset}\n`);
+            const manifest = {
+              version,
+              channel,
+              os: osName,
+              arch,
+              url: `https://releases.aphrody.com/assets/${channel}/${version}/${asset}`,
+              sha256,
+            };
+            fs.mkdirSync("dist/manifests", { recursive: true });
+            fs.writeFileSync(`dist/manifests/${osName}-${arch}.json`, JSON.stringify(manifest, null, 2));
+          '
+        env:
+          ASSET: ${{ matrix.asset }}
+          CHANNEL: ${{ needs.resolve-metadata.outputs.channel }}
+          VERSION: ${{ needs.resolve-metadata.outputs.version }}
+          PLATFORM_OS: ${{ matrix.platform_os }}
+          ARCH: ${{ matrix.arch }}
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/${{ matrix.asset }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.platform_os }}-${{ matrix.arch }}
+          path: dist/
+
+  publish:
+    needs: [resolve-metadata, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.resolve-metadata.outputs.tag }}
+          CHANNEL: ${{ needs.resolve-metadata.outputs.channel }}
+          VERSION: ${{ needs.resolve-metadata.outputs.version }}
+        run: |
+          PRERELEASE=""
+          if [ "$CHANNEL" = "preview" ] || [ "$CHANNEL" = "canary" ] || [ "$CHANNEL" = "nightly" ]; then
+            PRERELEASE="--prerelease"
+          fi
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" \
+            --title "Aphrody $VERSION ($CHANNEL)" \
+            --notes "Automated 24/7 release on channel **$CHANNEL**." \
+            $PRERELEASE
+          shopt -s nullglob
+          ASSETS=(artifacts/*.exe artifacts/*.dmg artifacts/*.tar.gz artifacts/*.sha256)
+          gh release upload "$TAG" "${ASSETS[@]}" --clobber
+        shell: bash
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Sync artifacts and manifests to Cloudflare R2 bucket
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CHANNEL: ${{ needs.resolve-metadata.outputs.channel }}
+          VERSION: ${{ needs.resolve-metadata.outputs.version }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Cloudflare R2 credentials not configured; skipping R2 mirror."
+            exit 0
+          fi
+          set -e
+          for f in artifacts/*.exe artifacts/*.dmg artifacts/*.tar.gz artifacts/*.sha256; do
+            [ -f "$f" ] || continue
+            name=$(basename "$f")
+            bunx wrangler r2 object put "aphrody-releases/$CHANNEL/$VERSION/$name" --file "$f"
+            bunx wrangler r2 object put "aphrody-releases/$CHANNEL/latest/$name" --file "$f"
+          done
+          for m in artifacts/manifests/*.json; do
+            [ -f "$m" ] || continue
+            name=$(basename "$m")
+            bunx wrangler r2 object put "aphrody-releases/manifests/$CHANNEL/$VERSION/$name" --file "$m" --content-type application/json
+            bunx wrangler r2 object put "aphrody-releases/channels/$CHANNEL/$name" --file "$m" --content-type application/json
+          done
+          if [ -f artifacts/manifests/linux-x86_64.json ]; then
+            bunx wrangler r2 object put "aphrody-releases/channels/$CHANNEL/latest.json" --file artifacts/manifests/linux-x86_64.json --content-type application/json
+          fi

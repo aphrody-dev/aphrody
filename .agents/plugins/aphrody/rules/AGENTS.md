@@ -8,7 +8,7 @@ Single authoritative operating contract for agents working inside `<repo-root>` 
 - **Modularity boundaries**:
   - Keep `gpui_ui` free of `settings_content`, `cloud_llm_client`, and `language_model_core`.
   - Keep `gpui_code --no-default-features` free of `buffer_diff`, `language`, `rpc`, and `proto`.
-  - Always resolve WGPU/Naga from `vendor/wgpu` (rev `cddb2f5d80dc0009b2ef6767635140cacf90a007`) so validation and runtime semantics match identically.
+  - Always resolve WGPU/Naga from the `vendor/wgpu` submodule ([`.gitmodules`](../../../../.gitmodules)) so validation and runtime semantics match identically.
 
 ## Coding Standards (`.rules` & Tooling)
 
@@ -16,8 +16,9 @@ Single authoritative operating contract for agents working inside `<repo-root>` 
 2. **Error Handling**: Never use `.unwrap()`, `.expect()` (except documented invariant tests), or `let _ = <fallible>`. Return `anyhow::Result` or handle explicitly.
 3. **README Line Guard**: Never remove lines 1–2 (`> [!IMPORTANT]` header) of root `README.md`.
 4. **Bun First for JS/TS**: Use `bun` (`bun test`, `bun check`, `bun fmt`, `bun build`) for all TypeScript/TSX/hook tooling — never `node`, `npm`, `npx`, or `tsc`.
-5. **Reproducible Brand**: Never hardcode product strings; consume `brand::*` or run `cargo xtask brand apply` + `cargo xtask brand check` after editing `product.toml` or SVG icons.
-6. **GPU & Shader Pipeline**:
+5. **Repo-Native Artifacts & Typed CLI Tooling Only**: Never store architecture plans, repeatable scripts, or guides inside `~/.gemini/antigravity-cli/brain/`, `%TEMP%`, or `/tmp`. Version architectural blueprints in [`docs/architecture/README.md`](../../../../docs/architecture/README.md) with repo-relative links, put repeatable workflows in [`tooling/bun/`](../../../../tooling/bun/) (exposed via root [`package.json`](../../../../package.json)) or `tooling/xtask/`, direct ephemeral outputs to gitignored `target/`, and enforce via `bun tooling/bun/repo-hygiene.ts`.
+6. **Reproducible Brand**: Never hardcode product strings; consume `brand::*` or run `cargo xtask brand apply` + `cargo xtask brand check` after editing `product.toml` or SVG icons.
+7. **GPU & Shader Pipeline**:
    - Validate WGSL with `gpui-wgpu validate` (`naga` v30) and test backends across Vulkan (`glslangValidator`, `spirv-val`), DirectX 12 (`dxc.exe` SM 6.x), and WebGPU.
    - Respect `COPY_BYTES_PER_ROW_ALIGNMENT = 256` on texture readbacks and D3D/Metal clip-space depth `[0, 1]`.
 

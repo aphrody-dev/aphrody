@@ -2,14 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    ":semanticCommitsDisabled",
+    ":semanticCommitsEnabled",
     ":separateMultipleMajorReleases",
     "helpers:pinGitHubActionDigests",
     "group:serdeMonorepo"
   ],
   "dependencyDashboard": true,
   "timezone": "UTC",
-  "schedule": ["before 6am on Monday"],
+  "schedule": ["at any time"],
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": true,

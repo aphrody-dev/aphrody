@@ -431,6 +431,72 @@ fn craft_anything_discovery_json() -> Value {
 }
 
 #[cfg(not(target_family = "wasm"))]
+fn is_loopback_host(raw: &str) -> bool {
+    let trimmed = raw.trim().to_ascii_lowercase();
+    let host = if trimmed.starts_with('[') {
+        trimmed
+            .strip_prefix('[')
+            .and_then(|s| s.split(']').next())
+            .unwrap_or("")
+    } else {
+        trimmed.split(':').next().unwrap_or("")
+    };
+    matches!(host, "localhost" | "127.0.0.1" | "::1")
+}
+
+#[cfg(not(target_family = "wasm"))]
+fn validate_local_http_headers(
+    headers_block: &str,
+    expected_token: Option<&str>,
+) -> Result<(), (&'static str, &'static str)> {
+    let mut host_header: Option<&str> = None;
+    let mut origin_header: Option<&str> = None;
+    let mut auth_header: Option<&str> = None;
+
+    for line in headers_block.lines().skip(1) {
+        let Some((name, val)) = line.split_once(':') else {
+            continue;
+        };
+        let lower = name.trim().to_ascii_lowercase();
+        let val = val.trim();
+        match lower.as_str() {
+            "host" => host_header = Some(val),
+            "origin" => origin_header = Some(val),
+            "authorization" => auth_header = Some(val),
+            _ => {}
+        }
+    }
+
+    if let Some(host) = host_header
+        && !is_loopback_host(host)
+    {
+        return Err(("403 Forbidden", "forbidden non-loopback Host header"));
+    }
+
+    if let Some(origin) = origin_header {
+        let origin_lower = origin.to_ascii_lowercase();
+        let scheme_ok = origin_lower.starts_with(&format!("{}://", brand::URL_SCHEME))
+            || origin_lower.starts_with("http://localhost")
+            || origin_lower.starts_with("http://127.0.0.1")
+            || origin_lower.starts_with("http://[::1]");
+        if !scheme_ok {
+            return Err(("403 Forbidden", "forbidden cross-origin Origin header"));
+        }
+    }
+
+    if let Some(token) = expected_token {
+        let provided = auth_header
+            .and_then(|v| v.strip_prefix("Bearer ").or_else(|| v.strip_prefix("bearer ")))
+            .map(str::trim);
+        if provided != Some(token) {
+            return Err(("401 Unauthorized", "missing or invalid bearer token"));
+        }
+    }
+
+    Ok(())
+}
+
+#[cfg(not(target_family = "wasm"))]
 fn handle_http_conn(
     mut stream: TcpStream,
     state: &Arc<Mutex<McpServerState>>,
@@ -441,34 +507,41 @@ fn handle_http_conn(
         return Ok(());
     }
     let req_str = String::from_utf8_lossy(&buf[..n]);
-    let mut lines = req_str.split("\r\n");
+    let (headers_block, body_raw) = req_str.split_once("\r\n\r\n").unwrap_or((&req_str, ""));
+    let mut lines = headers_block.lines();
     let request_line = lines.next().unwrap_or("");
     let mut parts = request_line.split_whitespace();
     let method = parts.next().unwrap_or("GET");
     let path = parts.next().unwrap_or("/");
-    let body = req_str
-        .split_once("\r\n\r\n")
-        .map(|(_, b)| b.trim())
-        .unwrap_or("");
+    let body = body_raw.trim();
+    let expected_token = brand::env_var("MCP_TOKEN")
+        .ok()
+        .filter(|s| !s.is_empty());
 
-    let (status, payload) = match (method, path) {
-        ("GET", "/health") => (
-            "200 OK",
-            json!({ "ok": true, "service": brand::APP_SLUG }).to_string(),
-        ),
-        ("GET", "/.well-known/webmcp.json") => {
-            ("200 OK", json!({ "tools": builtin_tools() }).to_string())
+    let (status, payload) = if let Err((err_status, reason)) =
+        validate_local_http_headers(headers_block, expected_token.as_deref())
+    {
+        (err_status, json!({ "error": reason }).to_string())
+    } else {
+        match (method, path) {
+            ("GET", "/health") => (
+                "200 OK",
+                json!({ "ok": true, "service": brand::APP_SLUG }).to_string(),
+            ),
+            ("GET", "/.well-known/webmcp.json") => {
+                ("200 OK", json!({ "tools": builtin_tools() }).to_string())
+            }
+            ("POST", "/mcp") => {
+                let out = handle_json_rpc_line(state, body)
+                    .unwrap_or_else(|| json!({ "ok": true }).to_string());
+                ("200 OK", out)
+            }
+            _ => ("404 Not Found", json!({ "error": "not found" }).to_string()),
         }
-        ("POST", "/mcp") => {
-            let out = handle_json_rpc_line(state, body)
-                .unwrap_or_else(|| json!({ "ok": true }).to_string());
-            ("200 OK", out)
-        }
-        _ => ("404 Not Found", json!({ "error": "not found" }).to_string()),
     };
 
     let response = format!(
-        "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{payload}",
+        "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{payload}",
         payload.len()
     );
     stream.write_all(response.as_bytes())?;
@@ -507,5 +580,30 @@ mod tests {
         )
         .expect("switch workspace responds");
         assert!(switched.contains("\"active_workspace\":2"));
+    }
+
+    #[cfg(not(target_family = "wasm"))]
+    #[test]
+    fn mcp_http_blocks_dns_rebinding_cross_origin_and_bad_bearer_token() {
+        let rebind = "POST /mcp HTTP/1.1\r\nHost: evil-rebinder.example:4195\r\n";
+        assert!(matches!(
+            validate_local_http_headers(rebind, None),
+            Err(("403 Forbidden", _))
+        ));
+
+        let bad_origin = "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1:4195\r\nOrigin: https://evil.example\r\n";
+        assert!(matches!(
+            validate_local_http_headers(bad_origin, None),
+            Err(("403 Forbidden", _))
+        ));
+
+        let unauth = "POST /mcp HTTP/1.1\r\nHost: localhost:4195\r\n";
+        assert!(matches!(
+            validate_local_http_headers(unauth, Some("secret-token")),
+            Err(("401 Unauthorized", _))
+        ));
+
+        let valid = "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1:4195\r\nOrigin: http://127.0.0.1:4195\r\nAuthorization: Bearer secret-token\r\n";
+        assert!(validate_local_http_headers(valid, Some("secret-token")).is_ok());
     }
 }

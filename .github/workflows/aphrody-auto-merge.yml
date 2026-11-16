@@ -3,6 +3,8 @@ name: aphrody Auto Merge
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, labeled, ready_for_review]
+  merge_group:
+    types: [checks_requested]
   workflow_run:
     workflows: [aphrody CI]
     types: [completed]
@@ -33,9 +35,19 @@ jobs:
         )
       )
     steps:
+      - name: Generate GitHub App token (when configured)
+        id: app-token
+        if: vars.APHRODY_APP_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.APHRODY_APP_ID }}
+          private-key: ${{ secrets.APHRODY_APP_PRIVATE_KEY }}
+
+      - uses: oven-sh/setup-bun@v2
+
       - name: Approve and enable auto-merge for qualifying PRs
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           OWNER: ${{ github.repository_owner }}
           RUN_SHA: ${{ github.event.workflow_run.head_sha }}
@@ -43,26 +55,28 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request_target" ]; then
             PR="${{ github.event.pull_request.number }}"
             gh pr review "$PR" --repo "$REPO" --approve --body "Automated approval via aphrody auto-merge workflow (waiting for aphrody CI completion before merge)." || true
+          elif [ "${{ github.event_name }}" = "merge_group" ]; then
+            echo "Merge group check requested; passing through to aphrody CI checks."
           else
-            PR_NUMBERS=$(gh pr list --repo "$REPO" --state open --json number,isDraft,headRefOid,labels,headRepositoryOwner,author | python3 -c '
-          import json, os, sys
-          prs = json.load(sys.stdin)
-          owner = os.environ["OWNER"]
-          run_sha = os.environ.get("RUN_SHA", "")
-          allowed = {"auto-merge", "upstream-sync", "issue-fix", "dependencies"}
-          bots = {"renovate[bot]", "dependabot[bot]", "app/renovate", "app/dependabot"}
-          for pr in prs:
-            if pr.get("isDraft"):
-              continue
-            if (pr.get("headRepositoryOwner") or {}).get("login") != owner:
-              continue
-            if run_sha and pr.get("headRefOid") != run_sha:
-              continue
-            labels = {l["name"] for l in pr.get("labels", [])}
-            author = (pr.get("author") or {}).get("login", "")
-            if labels & allowed or author in bots:
-              print(pr["number"])
-          ')
+            PR_NUMBERS=$(gh pr list --repo "$REPO" --state open --json number,isDraft,headRefOid,labels,headRepositoryOwner,author | bun -e '
+              const fs = require("node:fs");
+              const prs = JSON.parse(fs.readFileSync(0, "utf8"));
+              const owner = process.env.OWNER || "";
+              const runSha = process.env.RUN_SHA || "";
+              const allowed = new Set(["auto-merge", "upstream-sync", "issue-fix", "dependencies"]);
+              const bots = new Set(["renovate[bot]", "dependabot[bot]", "app/renovate", "app/dependabot"]);
+              for (const pr of prs) {
+                if (pr.isDraft) continue;
+                if ((pr.headRepositoryOwner?.login || "") !== owner) continue;
+                if (runSha && pr.headRefOid !== runSha) continue;
+                const labels = new Set((pr.labels || []).map((l) => l.name));
+                const author = pr.author?.login || "";
+                const hasAllowedLabel = [...labels].some((l) => allowed.has(l));
+                if (hasAllowedLabel || bots.has(author)) {
+                  console.log(pr.number);
+                }
+              }
+            ')
             for PR in $PR_NUMBERS; do
               gh pr review "$PR" --repo "$REPO" --approve --body "Automated approval via aphrody auto-merge workflow." || true
               gh pr merge "$PR" --repo "$REPO" --auto --squash --delete-branch \

@@ -5,7 +5,8 @@ on:
     branches: ['**']
   push:
     branches: [main]
-  merge_group: {}
+  merge_group:
+    types: [checks_requested]
   workflow_dispatch:
 
 concurrency:
@@ -60,6 +61,9 @@ jobs:
           cd "$PLUGIN_DIR"
           echo '{"cwd":"'"$GITHUB_WORKSPACE"'"}' | bun ./hooks/session-start.ts
           echo '{"toolCall":{"name":"write_file","args":{"Path":"crates/example/src/lib.rs"}}}' | bun ./hooks/post-edit-check.ts
+          cd "$GITHUB_WORKSPACE"
+          bun run hygiene
+          bun run test:tooling
 
   brand-and-sdk-linux:
     runs-on: ubuntu-latest

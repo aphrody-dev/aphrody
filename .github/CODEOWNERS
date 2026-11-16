@@ -1,0 +1,9 @@
+# Codeowners for merge queue, Renovate auto-merge, and domain stewardship
+*                               @Aphrody-Dev
+/.github/                       @Aphrody-Dev
+/.cloudflare/                   @Aphrody-Dev
+/product.toml                   @Aphrody-Dev
+/crates/auto_update/            @Aphrody-Dev
+/crates/release_channel/        @Aphrody-Dev
+/crates/os_craft/               @Aphrody-Dev
+/tooling/bun/                   @Aphrody-Dev

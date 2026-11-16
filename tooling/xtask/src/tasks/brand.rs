@@ -92,6 +92,10 @@ pub struct UrlsSection {
     pub store: String,
     pub server: String,
     pub extension_registry: String,
+    #[serde(default)]
+    pub releases: Option<String>,
+    #[serde(default)]
+    pub download: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -152,8 +156,12 @@ pub struct ColorsSection {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ChannelsColorSection {
+    #[serde(default)]
+    pub lts: Option<ChannelPaletteConfig>,
     pub stable: ChannelPaletteConfig,
     pub preview: ChannelPaletteConfig,
+    #[serde(default)]
+    pub canary: Option<ChannelPaletteConfig>,
     pub nightly: ChannelPaletteConfig,
     pub dev: ChannelPaletteConfig,
 }
@@ -239,7 +247,20 @@ pub fn load_product_manifest(workspace_root: &Path) -> Result<ProductManifest> {
     let path = workspace_root.join("product.toml");
     let raw =
         fs::read_to_string(&path).with_context(|| format!("failed to read {}", path.display()))?;
-    toml::from_str(&raw).with_context(|| format!("failed to parse {}", path.display()))
+    let manifest: ProductManifest =
+        toml::from_str(&raw).with_context(|| format!("failed to parse {}", path.display()))?;
+    for (name, palette) in [
+        ("lts", manifest.colors.channels.lts.as_ref()),
+        ("canary", manifest.colors.channels.canary.as_ref()),
+    ] {
+        if let Some(cfg) = palette {
+            anyhow::ensure!(
+                cfg.top[3] > 0 && cfg.bottom[3] > 0 && cfg.foreground[3] > 0,
+                "[colors.channels.{name}] alpha channels must be non-zero"
+            );
+        }
+    }
+    Ok(manifest)
 }
 
 fn sync_manifest_files(
@@ -765,7 +786,7 @@ pub fn render_channel_icon_rgba(
     let transform = tiny_skia::Transform::from_scale(scale_x, scale_y);
     resvg::render(&tree, transform, &mut glyph_pixmap.as_mut());
 
-    let offset = ((canvas_size - target_glyph_px) / 2) as u32;
+    let offset = (canvas_size - target_glyph_px) / 2;
     let glyph_data = glyph_pixmap.data();
     for gy in 0..target_glyph_px {
         for gx in 0..target_glyph_px {

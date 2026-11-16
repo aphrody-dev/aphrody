@@ -1428,6 +1428,7 @@ name = "auto_update"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "brand",
  "client",
  "clock",
  "ctor",
@@ -1435,6 +1436,7 @@ dependencies = [
  "futures 0.3.34",
  "futures-lite 2.6.1",
  "gpui",
+ "hex",
  "http_client",
  "log",
  "parking_lot",
@@ -1444,6 +1446,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
+ "sha2 0.10.9",
  "smol",
  "tempfile",
  "util",

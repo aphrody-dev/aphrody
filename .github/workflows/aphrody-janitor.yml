@@ -1,0 +1,52 @@
+name: aphrody Janitor
+
+on:
+  schedule:
+    # Weekly cleanup on Sunday at 04:00 UTC
+    - cron: '0 4 * * 0'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale-items:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v11
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-issue-stale: 45
+          days-before-issue-close: 14
+          days-before-pr-stale: 21
+          days-before-pr-close: 7
+          exempt-issue-labels: 'pinned,security,lts,tracking'
+          exempt-pr-labels: 'pinned,security,dependencies'
+          close-issue-reason: not_planned
+          stale-issue-message: 'Closing stale inactive issue automatically in 14 days unless updated.'
+          stale-pr-message: 'Closing stale inactive PR automatically in 7 days unless rebased.'
+
+  prune-merged-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+      - name: Prune merged bot/sync/worktree branches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bun -e '
+            const res = Bun.spawnSync(["git", "branch", "-r", "--merged", "origin/main"], { stdout: "pipe" });
+            const branches = new TextDecoder().decode(res.stdout)
+              .split(/\r?\n/)
+              .map((b) => b.trim().replace(/^origin\//, ""))
+              .filter((b) => /^(sync|bot|wt|autofix)\//.test(b));
+            for (const br of branches) {
+              console.log(`Pruning merged remote branch: ${br}`);
+              Bun.spawnSync(["git", "push", "origin", "--delete", br], { stdio: "inherit" });
+            }
+          '

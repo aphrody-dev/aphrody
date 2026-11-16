@@ -284,9 +284,90 @@ impl FromStr for ReleaseChannel {
     }
 }
 
+/// Six-tier distribution track extending the core 4-variant [`ReleaseChannel`]
+/// enum for automated LTS, Canary, and nightly release pipelines without
+/// breaking exhaustive matches in downstream workspace crates.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ReleaseTrack {
+    /// Long-Term Support track pinned for stability and security fixes.
+    Lts,
+    /// General-availability stable releases.
+    Stable,
+    /// Release-candidate preview builds ahead of stable promotion.
+    Preview,
+    /// Automated daily canary snapshots built from `main`.
+    Canary,
+    /// Unfrozen bleeding-edge nightly builds.
+    Nightly,
+    /// Local developer workspace builds.
+    Dev,
+}
+
+impl ReleaseTrack {
+    /// All six release tracks ordered from longest-lived to fastest-moving.
+    pub const ALL: [Self; 6] = [
+        Self::Lts,
+        Self::Stable,
+        Self::Preview,
+        Self::Canary,
+        Self::Nightly,
+        Self::Dev,
+    ];
+
+    /// Parses a case-insensitive track name (`lts`, `stable`, `preview`, `canary`, `nightly`, `dev`).
+    pub fn parse(track: &str) -> Result<Self, InvalidReleaseChannel> {
+        match track.trim().to_ascii_lowercase().as_str() {
+            "lts" => Ok(Self::Lts),
+            "stable" => Ok(Self::Stable),
+            "preview" => Ok(Self::Preview),
+            "canary" => Ok(Self::Canary),
+            "nightly" => Ok(Self::Nightly),
+            "dev" => Ok(Self::Dev),
+            _ => Err(InvalidReleaseChannel),
+        }
+    }
+
+    /// Returns the lowercase canonical identifier used in release URLs and manifests.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Lts => "lts",
+            Self::Stable => "stable",
+            Self::Preview => "preview",
+            Self::Canary => "canary",
+            Self::Nightly => "nightly",
+            Self::Dev => "dev",
+        }
+    }
+
+    /// Returns `true` when this track ships pre-release artifacts.
+    pub const fn is_prerelease(self) -> bool {
+        matches!(self, Self::Preview | Self::Canary | Self::Nightly | Self::Dev)
+    }
+
+    /// Maps a core 4-variant [`ReleaseChannel`] onto its corresponding [`ReleaseTrack`].
+    pub const fn from_channel(channel: ReleaseChannel) -> Self {
+        match channel {
+            ReleaseChannel::Stable => Self::Stable,
+            ReleaseChannel::Preview => Self::Preview,
+            ReleaseChannel::Nightly => Self::Nightly,
+            ReleaseChannel::Dev => Self::Dev,
+        }
+    }
+
+    /// Maps a [`ReleaseTrack`] onto the closest binary-compatible [`ReleaseChannel`].
+    pub const fn to_channel(self) -> ReleaseChannel {
+        match self {
+            Self::Lts | Self::Stable => ReleaseChannel::Stable,
+            Self::Preview => ReleaseChannel::Preview,
+            Self::Canary | Self::Nightly => ReleaseChannel::Nightly,
+            Self::Dev => ReleaseChannel::Dev,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::ReleaseChannel;
+    use super::{ReleaseChannel, ReleaseTrack};
 
     #[test]
     fn test_docs_url_for_release_channel() {
@@ -306,6 +387,24 @@ mod tests {
         assert_eq!(
             ReleaseChannel::Stable.docs_url("settings"),
             format!("{base}/settings")
+        );
+    }
+
+    #[test]
+    fn test_six_tier_release_track_mapping() {
+        assert_eq!(ReleaseTrack::ALL.len(), 6);
+        assert_eq!(ReleaseTrack::parse("LTS"), Ok(ReleaseTrack::Lts));
+        assert_eq!(ReleaseTrack::parse("canary"), Ok(ReleaseTrack::Canary));
+        assert!(ReleaseTrack::parse("unknown").is_err());
+
+        assert_eq!(ReleaseTrack::Lts.to_channel(), ReleaseChannel::Stable);
+        assert_eq!(ReleaseTrack::Canary.to_channel(), ReleaseChannel::Nightly);
+        assert!(!ReleaseTrack::Lts.is_prerelease());
+        assert!(!ReleaseTrack::Stable.is_prerelease());
+        assert!(ReleaseTrack::Canary.is_prerelease());
+        assert_eq!(
+            ReleaseTrack::from_channel(ReleaseChannel::Preview),
+            ReleaseTrack::Preview
         );
     }
 }

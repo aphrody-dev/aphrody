@@ -12,6 +12,7 @@ use release_channel::{AppCommitSha, ReleaseChannel};
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use settings::{RegisterSetting, Settings, SettingsStore};
+use sha2::{Digest, Sha256};
 use smol::fs::File;
 use smol::{
     fs,
@@ -193,6 +194,8 @@ pub struct AutoUpdater {
 pub struct ReleaseAsset {
     pub version: String,
     pub url: String,
+    #[serde(default)]
+    pub sha256: Option<String>,
 }
 
 struct MacOsUnmounter<'a> {
@@ -356,9 +359,9 @@ pub fn release_notes_url(cx: &mut App) -> Option<String> {
             auto_updater.client.http_client().build_url(&path)
         }
         ReleaseChannel::Nightly => {
-            "https://github.com/zed-industries/zed/commits/nightly/".to_string()
+            format!("{}/commits/nightly/", brand::REPOSITORY_URL)
         }
-        ReleaseChannel::Dev => "https://github.com/zed-industries/zed/commits/main/".to_string(),
+        ReleaseChannel::Dev => format!("{}/commits/main/", brand::REPOSITORY_URL),
     };
     Some(url)
 }
@@ -370,7 +373,7 @@ pub fn view_release_notes(_: &ViewReleaseNotes, cx: &mut App) -> Option<()> {
 }
 
 #[cfg(not(target_os = "windows"))]
-const INSTALLER_DIR_PREFIX: &str = "zed-auto-update";
+const INSTALLER_DIR_PREFIX: &str = "aphrody-auto-update";
 
 #[cfg(not(target_os = "windows"))]
 struct InstallerDir(tempfile::TempDir);
@@ -398,7 +401,7 @@ impl InstallerDir {
     async fn new() -> Result<Self> {
         let installer_dir = std::env::current_exe()?
             .parent()
-            .context("No parent dir for Zed.exe")?
+            .context("No parent dir for running executable")?
             .join("updates");
         if smol::fs::metadata(&installer_dir).await.is_ok() {
             smol::fs::remove_dir_all(&installer_dir).await?;
@@ -922,9 +925,9 @@ impl AutoUpdater {
 
     async fn target_path(installer_dir: &InstallerDir) -> Result<PathBuf> {
         let filename = match OS {
-            "macos" => anyhow::Ok("Zed.dmg"),
-            "linux" => Ok("zed.tar.gz"),
-            "windows" => Ok("Zed.exe"),
+            "macos" => anyhow::Ok("Aphrody.dmg"),
+            "linux" => Ok("aphrody.tar.gz"),
+            "windows" => Ok("Aphrody.exe"),
             unsupported_os => anyhow::bail!("not supported: {unsupported_os}"),
         }?;
 
@@ -1097,6 +1100,7 @@ async fn download_release(
 
     let mut downloaded_bytes: u64 = 0;
     let mut last_reported_percent: Option<u8> = None;
+    let mut hasher = Sha256::new();
     let mut buffer = [0u8; 8192];
     let body = response.body_mut();
     loop {
@@ -1105,6 +1109,7 @@ async fn download_release(
             break;
         }
         target_file.write_all(&buffer[..bytes_read]).await?;
+        hasher.update(&buffer[..bytes_read]);
         downloaded_bytes += bytes_read as u64;
 
         if let Some(total_bytes) = total_bytes {
@@ -1118,6 +1123,20 @@ async fn download_release(
         }
     }
     target_file.flush().await?;
+    drop(target_file);
+
+    if let Some(expected_sha256) = release.sha256.as_deref() {
+        let actual_sha256 = hex::encode(hasher.finalize());
+        if !actual_sha256.eq_ignore_ascii_case(expected_sha256.trim()) {
+            let _ = smol::fs::remove_file(target_path).await;
+            anyhow::bail!(
+                "update checksum mismatch: expected {}, got {}",
+                expected_sha256.trim(),
+                actual_sha256
+            );
+        }
+    }
+
     if total_bytes.is_some() && last_reported_percent != Some(100) {
         on_progress(Some(1.0));
     }
@@ -1299,7 +1318,7 @@ async fn cleanup_stale_installer_dirs() {
 async fn cleanup_windows() -> Result<()> {
     let parent = std::env::current_exe()?
         .parent()
-        .context("No parent dir for Zed.exe")?
+        .context("No parent dir for running executable")?
         .to_owned();
 
     // keep in sync with crates/auto_update_helper/src/updater.rs
@@ -1326,7 +1345,7 @@ async fn install_release_windows(downloaded_installer: &Path) -> Result<Option<P
     // deleting the old one, and launching the new binary.
     let helper_path = std::env::current_exe()?
         .parent()
-        .context("No parent dir for Zed.exe")?
+        .context("No parent dir for running executable")?
         .join("tools")
         .join("auto_update_helper.exe");
     Ok(Some(helper_path))
@@ -1361,7 +1380,7 @@ mod tests {
     use client::Client;
     use clock::FakeSystemClock;
     use futures::channel::oneshot;
-    use gpui::TestAppContext;
+    use gpui::{BorrowAppContext, TestAppContext};
     use http_client::{FakeHttpClient, Response};
     use settings::default_settings;
     use std::{
@@ -1541,6 +1560,7 @@ mod tests {
         let release = ReleaseAsset {
             version: "1.0.0".to_string(),
             url: "https://test.example/download".to_string(),
+            sha256: None,
         };
 
         let reported = Rc::new(std::cell::RefCell::new(Vec::<f32>::new()));
@@ -1601,6 +1621,7 @@ mod tests {
         let release = ReleaseAsset {
             version: "1.0.0".to_string(),
             url: "https://test.example/download".to_string(),
+            sha256: None,
         };
 
         let reported = Rc::new(std::cell::RefCell::new(Vec::<Option<f32>>::new()));
@@ -1887,6 +1908,62 @@ mod tests {
         assert_eq!(
             newer_version.unwrap(),
             Some(fetched_version.parse().unwrap())
+        );
+    }
+
+    #[gpui::test]
+    async fn test_download_release_verifies_valid_sha256(cx: &mut TestAppContext) {
+        cx.background_executor.allow_parking();
+        let payload = b"<verified-aphrody-payload>".to_vec();
+        let expected_sha = hex::encode(Sha256::digest(&payload));
+
+        let client = FakeHttpClient::create(move |_req| {
+            let payload = payload.clone();
+            async move { Ok(Response::builder().status(200).body(payload.into()).unwrap()) }
+        });
+
+        let temp_dir = tempdir().unwrap();
+        let target_path = temp_dir.path().join("aphrody-verified");
+        let release = ReleaseAsset {
+            version: "1.0.0".to_string(),
+            url: "https://test.example/verified".to_string(),
+            sha256: Some(expected_sha.to_uppercase()),
+        };
+
+        download_release(&target_path, release, client, |_| {})
+            .await
+            .expect("matching SHA-256 checksum should succeed");
+        assert!(target_path.exists());
+    }
+
+    #[gpui::test]
+    async fn test_download_release_rejects_mismatched_sha256(cx: &mut TestAppContext) {
+        cx.background_executor.allow_parking();
+        let payload = b"<tampered-aphrody-payload>".to_vec();
+
+        let client = FakeHttpClient::create(move |_req| {
+            let payload = payload.clone();
+            async move { Ok(Response::builder().status(200).body(payload.into()).unwrap()) }
+        });
+
+        let temp_dir = tempdir().unwrap();
+        let target_path = temp_dir.path().join("aphrody-tampered");
+        let release = ReleaseAsset {
+            version: "1.0.0".to_string(),
+            url: "https://test.example/tampered".to_string(),
+            sha256: Some("0".repeat(64)),
+        };
+
+        let result = download_release(&target_path, release, client, |_| {}).await;
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("update checksum mismatch")
+        );
+        assert!(
+            !target_path.exists(),
+            "corrupted payload should be removed after checksum mismatch"
         );
     }
 }

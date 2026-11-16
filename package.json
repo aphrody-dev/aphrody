@@ -1,0 +1,29 @@
+{
+  "name": "aphrody-tooling",
+  "private": true,
+  "description": "Typed Bun CLI automation, WebGPU/Wasm build & verification, skill generation, and fleet orchestration for the Aphrody monorepo.",
+  "scripts": {
+    "submodules:status": "bun tooling/bun/submodules.ts status",
+    "submodules:check": "bun tooling/bun/submodules.ts check",
+    "submodules:sync": "bun tooling/bun/submodules.ts sync --jobs 8",
+    "web:matrix": "bun tooling/bun/web-build.ts matrix",
+    "web:audit": "bun tooling/bun/web-build.ts audit",
+    "web:check": "bun tooling/bun/web-build.ts check",
+    "web:build": "bun tooling/bun/web-build.ts build --package os_desktop --opt",
+    "web:build:release": "bun tooling/bun/web-build.ts build --package os_desktop --release --opt",
+    "web:verify": "bun tooling/bun/web-verify.ts --package os_desktop",
+    "web:serve": "bun tooling/bun/web-build.ts serve --port 4195",
+    "skill:crate": "bun tooling/bun/crate-to-skill.ts",
+    "fleet:sync": "bun tooling/bun/fleet-sync.ts sync --host fr1",
+    "fleet:verify": "bun tooling/bun/fleet-sync.ts verify --host fr1 --pull-shots",
+    "worktree:list": "bun tooling/bun/worktree.ts list",
+    "worktree:create": "bun tooling/bun/worktree.ts create",
+    "worktree:prune": "bun tooling/bun/worktree.ts prune",
+    "cross:doctor": "bun tooling/bun/cross-build.ts doctor",
+    "cross:matrix": "bun tooling/bun/cross-build.ts matrix",
+    "cross:check": "bun tooling/bun/cross-build.ts check",
+    "cf:dev:releases": "wrangler dev --config .cloudflare/aphrody-releases/wrangler.toml",
+    "hygiene": "bun tooling/bun/repo-hygiene.ts",
+    "test:tooling": "bun test tooling/bun"
+  }
+}

@@ -1,0 +1,16 @@
+name = "aphrody-releases"
+main = "src/worker.ts"
+compatibility_date = "2026-03-01"
+workers_dev = true
+
+[[routes]]
+pattern = "releases.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[routes]]
+pattern = "aphrody.com/download*"
+zone_name = "aphrody.com"
+
+[[r2_buckets]]
+binding = "RELEASES_BUCKET"
+bucket_name = "aphrody-releases"
