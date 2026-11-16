@@ -21,7 +21,6 @@ static QPC_TICKS_PER_SECOND: LazyLock<u64> = LazyLock::new(|| {
 });
 
 const VSYNC_INTERVAL_THRESHOLD: Duration = Duration::from_millis(1);
-const DEFAULT_VSYNC_INTERVAL: Duration = Duration::from_micros(16_666); // ~60Hz
 
 pub(crate) struct VSyncProvider {
     interval: Duration,
@@ -33,7 +32,7 @@ impl VSyncProvider {
         let interval = get_dwm_interval()
             .context("Failed to get DWM interval")
             .log_err()
-            .unwrap_or(DEFAULT_VSYNC_INTERVAL);
+            .unwrap_or_else(gpui::preferred_frame_interval);
         let f = Box::new(|| unsafe { DwmFlush().is_ok() });
         Self { interval, f }
     }

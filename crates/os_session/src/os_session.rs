@@ -13,6 +13,6 @@ pub use compositor::{
 };
 pub use discovery::{AppEntry, AppOrigin, DistBundleSpec, DistFormat, discover_system_apps};
 pub use session::{
-    RestartPolicy, SessionEnvironment, SessionError, SessionManifest, SessionSettings,
-    SessionSupervisor, SessionUnitConfig, SessionUnitStatus, UnitKind, UnitPhase,
+    HardwareCapabilities, RestartPolicy, SessionEnvironment, SessionError, SessionManifest,
+    SessionSettings, SessionSupervisor, SessionUnitConfig, SessionUnitStatus, UnitKind, UnitPhase,
 };

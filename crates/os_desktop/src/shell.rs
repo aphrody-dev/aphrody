@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::time::Instant;
 
 use gpui::{
     AnyElement, App, Context, ElementId, Entity, FocusHandle, Focusable, KeyDownEvent, Render,
@@ -8,9 +9,9 @@ use gpui::{
 };
 use os_craft::CraftCatalog;
 use os_session::{
-    AppEntry, CompositorState, LayerAnchor, LayerKind, LayerSurface, PlacedWindow, Rect,
-    SessionManifest, SessionSupervisor, TilingMode, ToplevelId, UnitPhase, WorkspaceId,
-    discover_system_apps,
+    AppEntry, CompositorState, HardwareCapabilities, LayerAnchor, LayerKind, LayerSurface,
+    PlacedWindow, Rect, SessionManifest, SessionSupervisor, TilingMode, ToplevelId, UnitPhase,
+    WorkspaceId, discover_system_apps,
 };
 use os_ui::{
     AppearanceMode, AppletSlot, ImmediateUi, OsConfigStore, OsTheme, OsThemeCatalog, PanelApplet,
@@ -63,6 +64,8 @@ pub struct OsDesktopShell {
     pub launcher_open: bool,
     pub launcher_query: String,
     pub drawer_open: bool,
+    hardware: HardwareCapabilities,
+    last_render_at: Instant,
     frame_samples: Vec<f32>,
 }
 
@@ -70,7 +73,7 @@ impl OsDesktopShell {
     pub fn new(options: DesktopOptions, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let mut theme_catalog = OsThemeCatalog::bundled().unwrap_or_else(|err| {
             log::warn!("failed to load bundled themes JSON: {err:#}");
-            OsThemeCatalog::from_json_str("{}").unwrap_or_else(|_| unreachable!())
+            OsThemeCatalog::default()
         });
         theme_catalog.load_user_overrides();
 
@@ -85,14 +88,13 @@ impl OsDesktopShell {
         let theme = theme_catalog
             .resolve(&prefs_store.value.theme_id, Some(prefs_store.value.mode))
             .or_else(|| theme_catalog.resolve("aphrody", Some(prefs_store.value.mode)))
-            .unwrap_or_else(|| {
+            .or_else(|| {
                 let ids = theme_catalog.ids();
-                ids.first()
-                    .and_then(|id| theme_catalog.resolve(id, None))
-                    .unwrap_or_else(|| {
-                        log::warn!("OsThemeCatalog is empty");
-                        unreachable!()
-                    })
+                ids.first().and_then(|id| theme_catalog.resolve(id, None))
+            })
+            .unwrap_or_else(|| {
+                log::warn!("OsThemeCatalog is empty, using default theme");
+                OsTheme::default()
             });
         theme.apply_to_gpui(cx);
 
@@ -112,21 +114,12 @@ impl OsDesktopShell {
             log::warn!("failed to load SessionManifest: {err:#}");
             SessionManifest {
                 schema_version: 1,
-                session: os_session::SessionSettings {
-                    name: brand::APP_NAME.to_owned(),
-                    default_shell: "aphrody-os".to_owned(),
-                    default_theme: "aphrody".to_owned(),
-                    default_appearance: "dark".to_owned(),
-                    focus_follows_mouse: false,
-                    autotile_default: "dwindle".to_owned(),
-                },
-                environment: BTreeMap::new(),
-                units: Vec::new(),
+                ..SessionManifest::default()
             }
         });
         let mut supervisor = SessionSupervisor::new(manifest).unwrap_or_else(|err| {
             log::warn!("failed to plan session topology: {err:#}");
-            unreachable!()
+            SessionSupervisor::default()
         });
         supervisor.activate_session();
 
@@ -193,6 +186,8 @@ impl OsDesktopShell {
             shell.apply_preferences(new_prefs, cx);
         });
 
+        let hardware = HardwareCapabilities::detect();
+        let baseline_ms = (hardware.frame_budget_ms * 0.62).max(2.0);
         let focus_handle = cx.focus_handle();
         window.focus(&focus_handle, cx);
 
@@ -213,7 +208,9 @@ impl OsDesktopShell {
             launcher_open: false,
             launcher_query: String::new(),
             drawer_open: false,
-            frame_samples: vec![5.4, 5.8, 5.2, 6.1, 5.9, 5.5, 5.3, 6.0, 5.7, 5.4],
+            hardware,
+            last_render_at: Instant::now(),
+            frame_samples: vec![baseline_ms; 8],
         }
     }
 
@@ -294,21 +291,59 @@ impl OsDesktopShell {
 
     pub fn toggle_drawer(&mut self, cx: &mut Context<Self>) {
         self.drawer_open = !self.drawer_open;
-        self.sync_drawer_layer();
+        let screen = self.compositor.screen;
+        self.sync_chrome_layers(screen.w, screen.h);
         cx.notify();
     }
 
-    fn sync_drawer_layer(&mut self) {
+    fn panel_heights(viewport_h: f32) -> (f32, f32) {
+        if viewport_h < 680.0 {
+            (38.0, 54.0)
+        } else {
+            (TOP_PANEL_HEIGHT, BOTTOM_DOCK_HEIGHT)
+        }
+    }
+
+    fn sync_chrome_layers(&mut self, viewport_w: f32, viewport_h: f32) -> (f32, f32) {
+        let (top_h, dock_h) = Self::panel_heights(viewport_h);
+        self.compositor.layers.set_surface(LayerSurface {
+            id: 1,
+            name: "top-panel".to_owned(),
+            kind: LayerKind::Top,
+            anchor: LayerAnchor::TOP | LayerAnchor::LEFT | LayerAnchor::RIGHT,
+            exclusive_zone: top_h,
+        });
+        self.compositor.layers.set_surface(LayerSurface {
+            id: 2,
+            name: "bottom-dock".to_owned(),
+            kind: LayerKind::Top,
+            anchor: LayerAnchor::BOTTOM | LayerAnchor::LEFT | LayerAnchor::RIGHT,
+            exclusive_zone: dock_h,
+        });
         if self.drawer_open {
+            let drawer_w = (viewport_w * 0.36).clamp(220.0, DRAWER_WIDTH);
             self.compositor.layers.set_surface(LayerSurface {
                 id: 3,
                 name: "context-drawer".to_owned(),
                 kind: LayerKind::Top,
                 anchor: LayerAnchor::RIGHT | LayerAnchor::TOP | LayerAnchor::BOTTOM,
-                exclusive_zone: DRAWER_WIDTH,
+                exclusive_zone: drawer_w,
             });
         } else {
             self.compositor.layers.remove_surface(3);
+        }
+        (top_h, dock_h)
+    }
+
+    fn record_frame_sample(&mut self) {
+        let elapsed_ms = self.last_render_at.elapsed().as_secs_f32() * 1_000.0;
+        self.last_render_at = Instant::now();
+        if (0.2..=40.0).contains(&elapsed_ms) {
+            self.frame_samples.push(elapsed_ms);
+            if self.frame_samples.len() > 32 {
+                let overflow = self.frame_samples.len() - 32;
+                self.frame_samples.drain(..overflow);
+            }
         }
     }
 
@@ -335,7 +370,12 @@ impl OsDesktopShell {
         }
     }
 
-    fn render_top_panel(&self, window: &mut Window, cx: &mut Context<Self>) -> AnyElement {
+    fn render_top_panel(
+        &self,
+        top_h: f32,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> AnyElement {
         let entity = cx.entity();
         let active_ws = self.compositor.active_workspace;
         let ws_mode = self
@@ -399,6 +439,7 @@ impl OsDesktopShell {
             mode: self.theme.mode,
             unit_running,
             unit_total: snapshot.len(),
+            target_fps: self.hardware.target_fps,
             latest_frame_ms: latest_frame,
             drawer_open: self.drawer_open,
             on_toggle_mode: Arc::new(move |_w, cx| {
@@ -427,7 +468,7 @@ impl OsDesktopShell {
             .role(Role::Toolbar)
             .aria_label("Desktop Top Panel")
             .w_full()
-            .h(px(TOP_PANEL_HEIGHT))
+            .h(px(top_h))
             .px_3()
             .justify_between()
             .items_center()
@@ -440,7 +481,12 @@ impl OsDesktopShell {
             .into_any_element()
     }
 
-    fn render_placed_window(&self, placed: &PlacedWindow, cx: &mut Context<Self>) -> AnyElement {
+    fn render_placed_window(
+        &self,
+        placed: &PlacedWindow,
+        top_h: f32,
+        cx: &mut Context<Self>,
+    ) -> AnyElement {
         let kind = self
             .window_kinds
             .get(&placed.id)
@@ -491,7 +537,7 @@ impl OsDesktopShell {
             .aria_label(SharedString::from(title.clone()))
             .absolute()
             .left(px(placed.rect.x))
-            .top(px((placed.rect.y - TOP_PANEL_HEIGHT).max(0.0)))
+            .top(px((placed.rect.y - top_h).max(0.0)))
             .w(px(placed.rect.w))
             .h(px(placed.rect.h))
             .rounded(px(self.theme.layout.window_radius))
@@ -707,6 +753,7 @@ impl OsDesktopShell {
         let e = cx.entity();
         render_monitor_window(
             &self.supervisor,
+            &self.hardware,
             &self.frame_samples,
             &self.theme,
             Arc::new(move |_w, cx| {
@@ -768,7 +815,7 @@ impl OsDesktopShell {
         )
     }
 
-    fn render_launcher_modal(&self, cx: &mut Context<Self>) -> AnyElement {
+    fn render_launcher_modal(&self, vw: f32, vh: f32, cx: &mut Context<Self>) -> AnyElement {
         let query = self.launcher_query.trim().to_ascii_lowercase();
         let close_entity = cx.entity();
 
@@ -832,6 +879,10 @@ impl OsDesktopShell {
             shown += 1;
         }
 
+        let modal_w = (vw - 32.0).clamp(280.0, 580.0);
+        let modal_h = (vh - 108.0).clamp(240.0, 620.0);
+        let modal_top = if vh < 680.0 { 44.0 } else { 72.0 };
+
         div()
             .id("launcher-backdrop")
             .role(Role::Dialog)
@@ -841,7 +892,7 @@ impl OsDesktopShell {
             .flex()
             .items_start()
             .justify_center()
-            .pt(px(72.0))
+            .pt(px(modal_top))
             .bg(gpui::Hsla {
                 h: 0.0,
                 s: 0.0,
@@ -850,8 +901,8 @@ impl OsDesktopShell {
             })
             .child(
                 v_flex()
-                    .w(px(580.0))
-                    .max_h(px(620.0))
+                    .w(px(modal_w))
+                    .max_h(px(modal_h))
                     .p_4()
                     .gap_3()
                     .rounded(px(14.0))
@@ -906,71 +957,125 @@ impl OsDesktopShell {
             .into_any_element()
     }
 
-    fn render_dock(&self, cx: &mut Context<Self>) -> AnyElement {
+    fn render_dock(&self, dock_h: f32, vw: f32, cx: &mut Context<Self>) -> AnyElement {
+        let compact_dock = vw < 640.0;
         let items: Vec<(
             &'static str,
             IconName,
             SharedString,
             Option<WindowKind>,
             Option<&'static str>,
-        )> = vec![
-            (
-                "dock-launcher",
-                IconName::Command,
-                SharedString::from("Launcher"),
-                None,
-                None,
-            ),
-            (
-                "dock-studio",
-                IconName::Image,
-                SharedString::from("ArtCraft Studio"),
-                Some(WindowKind::Studio),
-                None,
-            ),
-            (
-                "dock-photocraft",
-                IconName::Sparkle,
-                SharedString::from("PhotoCraft"),
-                None,
-                Some("photocraft"),
-            ),
-            (
-                "dock-vectorcraft",
-                IconName::Pencil,
-                SharedString::from("VectorCraft"),
-                None,
-                Some("vectorcraft"),
-            ),
-            (
-                "dock-craft-anything",
-                IconName::Binary,
-                SharedString::from("Craft Anything"),
-                None,
-                Some("craft-anything"),
-            ),
-            (
-                "dock-files",
-                IconName::FolderOpen,
-                SharedString::from("Files"),
-                Some(WindowKind::Files),
-                None,
-            ),
-            (
-                "dock-settings",
-                IconName::Settings,
-                SharedString::from("Settings"),
-                Some(WindowKind::Settings),
-                None,
-            ),
-            (
-                "dock-monitor",
-                IconName::Server,
-                SharedString::from("Monitor"),
-                Some(WindowKind::Monitor),
-                None,
-            ),
-        ];
+        )> = if compact_dock {
+            vec![
+                (
+                    "dock-launcher",
+                    IconName::Command,
+                    SharedString::from("Launcher"),
+                    None,
+                    None,
+                ),
+                (
+                    "dock-studio",
+                    IconName::Image,
+                    SharedString::from("ArtCraft Studio"),
+                    Some(WindowKind::Studio),
+                    None,
+                ),
+                (
+                    "dock-craft-anything",
+                    IconName::Binary,
+                    SharedString::from("Craft Anything"),
+                    None,
+                    Some("craft-anything"),
+                ),
+                (
+                    "dock-files",
+                    IconName::FolderOpen,
+                    SharedString::from("Files"),
+                    Some(WindowKind::Files),
+                    None,
+                ),
+                (
+                    "dock-settings",
+                    IconName::Settings,
+                    SharedString::from("Settings"),
+                    Some(WindowKind::Settings),
+                    None,
+                ),
+                (
+                    "dock-monitor",
+                    IconName::Server,
+                    SharedString::from("Monitor"),
+                    Some(WindowKind::Monitor),
+                    None,
+                ),
+            ]
+        } else {
+            vec![
+                (
+                    "dock-launcher",
+                    IconName::Command,
+                    SharedString::from("Launcher"),
+                    None,
+                    None,
+                ),
+                (
+                    "dock-studio",
+                    IconName::Image,
+                    SharedString::from("ArtCraft Studio"),
+                    Some(WindowKind::Studio),
+                    None,
+                ),
+                (
+                    "dock-photocraft",
+                    IconName::Sparkle,
+                    SharedString::from("PhotoCraft"),
+                    None,
+                    Some("photocraft"),
+                ),
+                (
+                    "dock-vectorcraft",
+                    IconName::Pencil,
+                    SharedString::from("VectorCraft"),
+                    None,
+                    Some("vectorcraft"),
+                ),
+                (
+                    "dock-craft-anything",
+                    IconName::Binary,
+                    SharedString::from("Craft Anything"),
+                    None,
+                    Some("craft-anything"),
+                ),
+                (
+                    "dock-files",
+                    IconName::FolderOpen,
+                    SharedString::from("Files"),
+                    Some(WindowKind::Files),
+                    None,
+                ),
+                (
+                    "dock-settings",
+                    IconName::Settings,
+                    SharedString::from("Settings"),
+                    Some(WindowKind::Settings),
+                    None,
+                ),
+                (
+                    "dock-monitor",
+                    IconName::Server,
+                    SharedString::from("Monitor"),
+                    Some(WindowKind::Monitor),
+                    None,
+                ),
+            ]
+        };
+
+        let tile_size = if compact_dock {
+            38.0
+        } else {
+            self.theme.layout.min_touch_target
+        };
 
         let active_kind = self
             .compositor
@@ -1016,8 +1121,8 @@ impl OsDesktopShell {
             dock_row = dock_row.child(
                 div()
                     .id(id)
-                    .min_w(px(self.theme.layout.min_touch_target))
-                    .min_h(px(self.theme.layout.min_touch_target))
+                    .min_w(px(tile_size))
+                    .min_h(px(tile_size))
                     .flex()
                     .flex_col()
                     .items_center()
@@ -1064,7 +1169,7 @@ impl OsDesktopShell {
             .role(Role::Toolbar)
             .aria_label("Desktop Application Dock")
             .w_full()
-            .h(px(BOTTOM_DOCK_HEIGHT))
+            .h(px(dock_h))
             .justify_center()
             .items_center()
             .bg(self.theme.colors.background)
@@ -1081,25 +1186,23 @@ impl Focusable for OsDesktopShell {
 
 impl Render for OsDesktopShell {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        self.record_frame_sample();
         let viewport = window.viewport_size();
+        let vw = f32::from(viewport.width).max(320.0);
+        let vh = f32::from(viewport.height).max(240.0);
         if f32::from(viewport.width) > 100.0 && f32::from(viewport.height) > 100.0 {
-            self.compositor.screen = Rect::new(
-                0.0,
-                0.0,
-                f32::from(viewport.width),
-                f32::from(viewport.height),
-            );
+            self.compositor.screen = Rect::new(0.0, 0.0, vw, vh);
         }
-        self.sync_drawer_layer();
+        let (top_h, dock_h) = self.sync_chrome_layers(vw, vh);
 
         let placed_windows = self.compositor.arrange_active_workspace();
         let stage_children: Vec<AnyElement> = placed_windows
             .iter()
-            .map(|placed| self.render_placed_window(placed, cx))
+            .map(|placed| self.render_placed_window(placed, top_h, cx))
             .collect();
 
-        let top_panel = self.render_top_panel(window, cx);
-        let dock = self.render_dock(cx);
+        let top_panel = self.render_top_panel(top_h, window, cx);
+        let dock = self.render_dock(dock_h, vw, cx);
 
         v_flex()
             .id("os-desktop-root")
@@ -1118,7 +1221,8 @@ impl Render for OsDesktopShell {
             .on_action(cx.listener(|this, _: &CloseOverlays, _w, cx| {
                 this.launcher_open = false;
                 this.drawer_open = false;
-                this.sync_drawer_layer();
+                let screen = this.compositor.screen;
+                this.sync_chrome_layers(screen.w, screen.h);
                 cx.notify();
             }))
             .on_action(cx.listener(|_, _: &FocusNext, window, cx| window.focus_next(cx)))
@@ -1150,7 +1254,7 @@ impl Render for OsDesktopShell {
             )
             .child(dock)
             .when(self.launcher_open, |el| {
-                el.child(self.render_launcher_modal(cx))
+                el.child(self.render_launcher_modal(vw, vh, cx))
             })
     }
 }

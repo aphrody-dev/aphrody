@@ -3,7 +3,10 @@ use std::sync::Arc;
 
 use gpui::{AnyElement, App, Context, ElementId, SharedString, Window, prelude::*, px};
 use os_craft::{CraftCatalog, InspectionReport, inspect_path};
-use os_session::{DistBundleSpec, SessionEnvironment, SessionSupervisor, TilingMode, UnitPhase};
+use os_session::{
+    DistBundleSpec, HardwareCapabilities, SessionEnvironment, SessionSupervisor, TilingMode,
+    UnitPhase,
+};
 use os_ui::{
     AppearanceMode, ImmediateUi, OsConfigStore, OsTheme, OsThemeCatalog, ReactiveHost,
     ReactiveProgram, StatusTone, SubscriptionSpec, TaskCommand, focusable_action_chip,
@@ -471,6 +474,7 @@ pub fn render_files_window(
 
 pub fn render_monitor_window(
     supervisor: &SessionSupervisor,
+    hardware: &HardwareCapabilities,
     frame_samples: &[f32],
     theme: &OsTheme,
     on_activate_session: Arc<dyn Fn(&mut Window, &mut App) + Send + Sync>,
@@ -480,7 +484,7 @@ pub fn render_monitor_window(
     let dist = DistBundleSpec::from_brand(env!("CARGO_PKG_VERSION"));
 
     let mut ui = ImmediateUi::new(theme);
-    ui.heading("Session Supervisor & Telemetry");
+    ui.heading("Session Supervisor & 120 FPS Hardware Profile");
     ui.button(
         "monitor-activate-session",
         IconName::PlayFilled,
@@ -499,6 +503,35 @@ pub fn render_monitor_window(
         running as f32 / total as f32,
         theme,
     ));
+
+    ui.section("Adaptive Hardware, CPU/GPU & 120 FPS", |sec| {
+        sec.kv_row(
+            "Target OS / Arch",
+            format!("{} / {}", hardware.os, hardware.arch),
+        );
+        sec.kv_row(
+            "CPU Threads / Jobs",
+            format!(
+                "{} cores ({} parallel)",
+                hardware.cpu_threads, hardware.recommended_build_jobs
+            ),
+        );
+        sec.kv_row(
+            "Frame Budget",
+            format!(
+                "{} FPS ({:.2} ms)",
+                hardware.target_fps, hardware.frame_budget_ms
+            ),
+        );
+        sec.kv_row("GPU Backends", hardware.gpu_backend_hint.clone());
+        sec.kv_row("Present Mode", hardware.present_mode_hint.clone());
+        let tools = if hardware.detected_toolchains.is_empty() {
+            "none detected".to_owned()
+        } else {
+            hardware.detected_toolchains.join(", ")
+        };
+        sec.kv_row("Toolchains", tools);
+    });
 
     ui.section("Environment & Pop!_OS Dist Bundle", |sec| {
         let session_type = env_info

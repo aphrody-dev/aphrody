@@ -505,7 +505,6 @@ open_router = { path = "crates/open_router", features = ["schemars"] }
 openai_subscribed = { path = "crates/openai_subscribed" }
 opencode = { path = "crates/opencode" }
 os_craft = { path = "crates/os_craft" }
-os_desktop = { path = "crates/os_desktop" }
 os_session = { path = "crates/os_session" }
 os_ui = { path = "crates/os_ui" }
 outline = { path = "crates/outline" }

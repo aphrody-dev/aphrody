@@ -464,22 +464,62 @@ impl WgpuRenderer {
             );
         }
 
+        let present_mode =
+            Self::select_present_mode(config.preferred_present_mode, &surface_caps.present_modes);
+
         let surface_config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
             color_space: wgpu::SurfaceColorSpace::Auto,
             width: clamped_width.max(1),
             height: clamped_height.max(1),
-            present_mode: config
-                .preferred_present_mode
-                .filter(|mode| surface_caps.present_modes.contains(mode))
-                .unwrap_or(wgpu::PresentMode::Fifo),
+            present_mode,
             desired_maximum_frame_latency: 2,
             alpha_mode,
             view_formats: vec![],
         };
 
         Ok((surface_config, transparent_alpha_mode, opaque_alpha_mode))
+    }
+
+    fn select_present_mode(
+        preferred: Option<wgpu::PresentMode>,
+        supported: &[wgpu::PresentMode],
+    ) -> wgpu::PresentMode {
+        for key in [
+            "APHRODY_PRESENT_MODE",
+            "GPUI_PRESENT_MODE",
+            "ZED_PRESENT_MODE",
+        ] {
+            if let Ok(raw) = std::env::var(key) {
+                let requested = match raw.trim().to_ascii_lowercase().as_str() {
+                    "mailbox" => Some(wgpu::PresentMode::Mailbox),
+                    "fifo" | "vsync" => Some(wgpu::PresentMode::Fifo),
+                    "fifo_relaxed" | "adaptive" => Some(wgpu::PresentMode::FifoRelaxed),
+                    "immediate" | "unlocked" => Some(wgpu::PresentMode::Immediate),
+                    _ => None,
+                };
+                if let Some(mode) = requested
+                    && supported.contains(&mode)
+                {
+                    return mode;
+                }
+            }
+        }
+
+        if let Some(pref) = preferred
+            && supported.contains(&pref)
+        {
+            return pref;
+        }
+
+        if supported.contains(&wgpu::PresentMode::Mailbox) {
+            wgpu::PresentMode::Mailbox
+        } else if supported.contains(&wgpu::PresentMode::FifoRelaxed) {
+            wgpu::PresentMode::FifoRelaxed
+        } else {
+            wgpu::PresentMode::Fifo
+        }
     }
 
     fn new_internal(

@@ -4,7 +4,8 @@ use std::sync::{Arc, Mutex};
 use clap::{Parser, Subcommand};
 use os_craft::{CraftCatalog, McpServerState, inspect_path, serve_http, serve_stdio};
 use os_session::{
-    DistBundleSpec, DistFormat, SessionEnvironment, SessionManifest, discover_system_apps,
+    DistBundleSpec, DistFormat, HardwareCapabilities, SessionEnvironment, SessionManifest,
+    discover_system_apps,
 };
 use os_ui::{AppearanceMode, OsThemeCatalog};
 
@@ -137,9 +138,11 @@ fn main() -> anyhow::Result<()> {
             let catalog = CraftCatalog::load_with_user_override()?;
             let system_apps = discover_system_apps(16);
             if json {
+                let hardware = HardwareCapabilities::detect();
                 let payload = serde_json::json!({
                     "brand": brand::APP_NAME,
                     "version": env!("CARGO_PKG_VERSION"),
+                    "hardware": hardware,
                     "environment": env_info,
                     "theme_ids": themes.ids(),
                     "craft_app_count": catalog.apps.len(),

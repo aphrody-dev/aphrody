@@ -14,10 +14,10 @@ fn screenshot_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/os_screenshots")
 }
 
-fn assert_non_blank_png(img: &image::RgbaImage, path: &std::path::Path) {
+fn assert_non_blank_png(img: &image::RgbaImage, min_w: u32, min_h: u32, path: &std::path::Path) {
     assert!(
-        img.width() >= 1440 && img.height() >= 900,
-        "expected at least 1440x900 pixels for {} (got {}x{})",
+        img.width() >= min_w && img.height() >= min_h,
+        "expected at least {min_w}x{min_h} pixels for {} (got {}x{})",
         path.display(),
         img.width(),
         img.height()
@@ -90,7 +90,7 @@ fn desktop_headless_renders_and_interacts() {
             .expect("capture Aphrody Dark studio screenshot");
         let p_dark = out_dir.join("aphrody_os_studio_dark.png");
         shot_dark.save(&p_dark).expect("save dark studio PNG");
-        assert_non_blank_png(&shot_dark, &p_dark);
+        assert_non_blank_png(&shot_dark, 1440, 900, &p_dark);
     }
 
     // Mutate state through real desktop commands: tile multiple windows, switch light theme, toggle drawer.
@@ -115,7 +115,7 @@ fn desktop_headless_renders_and_interacts() {
         shot_tiled_light
             .save(&p_light)
             .expect("save light tiled PNG");
-        assert_non_blank_png(&shot_tiled_light, &p_light);
+        assert_non_blank_png(&shot_tiled_light, 1440, 900, &p_light);
     }
 
     // Switch to COSMIC dark theme + open Craft Anything + Launcher modal + ContextDrawer.
@@ -140,7 +140,48 @@ fn desktop_headless_renders_and_interacts() {
         shot_cosmic
             .save(&p_cosmic)
             .expect("save cosmic launcher PNG");
-        assert_non_blank_png(&shot_cosmic, &p_cosmic);
+        assert_non_blank_png(&shot_cosmic, 1440, 900, &p_cosmic);
+    }
+
+    // Verify adaptive layout at compact 800x600 viewport (handheld / small screen).
+    let compact_bounds = Bounds::new(gpui::point(px(0.0), px(0.0)), size(px(800.0), px(600.0)));
+    let compact_handle = cx
+        .update(|app| {
+            app.open_window(
+                WindowOptions {
+                    window_bounds: Some(WindowBounds::Windowed(compact_bounds)),
+                    ..Default::default()
+                },
+                |window, app| {
+                    app.new(|cx| {
+                        OsDesktopShell::new(
+                            DesktopOptions {
+                                initial_theme: Some("aphrody".to_owned()),
+                                initial_mode: Some(AppearanceMode::Dark),
+                                initial_app: Some("soundcraft".to_owned()),
+                                width: 800.0,
+                                height: 600.0,
+                                ..Default::default()
+                            },
+                            window,
+                            cx,
+                        )
+                    })
+                },
+            )
+        })
+        .expect("compact 800x600 window must open");
+    cx.run_until_parked();
+
+    if can_capture_gpu {
+        let shot_compact = cx
+            .capture_screenshot(compact_handle.into())
+            .expect("capture compact 800x600 adaptive screenshot");
+        let p_compact = out_dir.join("aphrody_os_compact_800x600.png");
+        shot_compact
+            .save(&p_compact)
+            .expect("save compact 800x600 PNG");
+        assert_non_blank_png(&shot_compact, 800, 600, &p_compact);
     }
 
     #[cfg(target_os = "linux")]

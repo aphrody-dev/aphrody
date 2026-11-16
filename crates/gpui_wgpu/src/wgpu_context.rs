@@ -324,18 +324,27 @@ impl WgpuContext {
 
     #[cfg(not(target_family = "wasm"))]
     fn device_id_filter() -> Option<u32> {
-        match std::env::var("ZED_DEVICE_ID") {
-            Ok(value) => parse_pci_id(&value)
-                .context("Failed to parse device ID from `ZED_DEVICE_ID` environment variable")
-                .log_err(),
-            Err(std::env::VarError::NotPresent) => None,
-            error => {
-                error
-                    .context("Failed to read value of `ZED_DEVICE_ID` environment variable")
-                    .log_err();
-                None
+        for key in ["APHRODY_DEVICE_ID", "GPUI_DEVICE_ID", "ZED_DEVICE_ID"] {
+            match std::env::var(key) {
+                Ok(value) => {
+                    return parse_pci_id(&value)
+                        .with_context(|| {
+                            format!("Failed to parse device ID from `{key}` environment variable")
+                        })
+                        .log_err();
+                }
+                Err(std::env::VarError::NotPresent) => continue,
+                error => {
+                    error
+                        .with_context(|| {
+                            format!("Failed to read value of `{key}` environment variable")
+                        })
+                        .log_err();
+                    return None;
+                }
             }
         }
+        None
     }
 
     pub fn supports_transient_attachments(&self) -> bool {
@@ -490,8 +499,10 @@ impl WgpuContext {
 
     #[cfg(not(target_family = "wasm"))]
     pub fn instance(display: Option<Box<dyn wgpu::wgt::WgpuHasDisplayHandle>>) -> wgpu::Instance {
+        let backends =
+            wgpu::Backends::from_env().unwrap_or(wgpu::Backends::PRIMARY | wgpu::Backends::GL);
         wgpu::Instance::new(wgpu::InstanceDescriptor {
-            backends: wgpu::Backends::VULKAN | wgpu::Backends::GL,
+            backends,
             flags: wgpu::InstanceFlags::default(),
             backend_options: wgpu::BackendOptions::default(),
             memory_budget_thresholds: wgpu::MemoryBudgetThresholds::default(),

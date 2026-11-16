@@ -157,6 +157,7 @@ where
     v_flex()
         .id("os-context-drawer")
         .w(px(320.0))
+        .max_w(gpui::relative(0.45))
         .h_full()
         .bg(theme.colors.surface_container)
         .border_l_1()

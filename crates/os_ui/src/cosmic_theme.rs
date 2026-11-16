@@ -154,10 +154,28 @@ pub struct OsThemeEntry {
 }
 
 /// Runtime catalog of all loaded Material 3 + COSMIC + user override themes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct OsThemeCatalog {
     pub layout: OsLayoutTokens,
     pub entries: BTreeMap<String, OsThemeEntry>,
+}
+
+impl Default for OsColorTokens {
+    fn default() -> Self {
+        parse_token_map(&BTreeMap::new(), AppearanceMode::Dark)
+    }
+}
+
+impl Default for OsTheme {
+    fn default() -> Self {
+        Self {
+            id: brand::APP_SLUG.to_owned(),
+            name: brand::APP_NAME.to_owned(),
+            mode: AppearanceMode::Dark,
+            colors: OsColorTokens::default(),
+            layout: OsLayoutTokens::default(),
+        }
+    }
 }
 
 impl OsThemeCatalog {

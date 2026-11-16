@@ -173,7 +173,8 @@ pub fn render_studio_window(
         .collect();
 
     let compact_rail = window_width < 920.0;
-    let inspector_width = if compact_rail { 236.0 } else { 292.0 };
+    let stacked_inspector = window_width < 680.0;
+    let inspector_width = if compact_rail { 228.0 } else { 292.0 };
     let on_select_app = Arc::clone(&cb.on_select_app);
     let rail = render_nav_rail(
         "studio-catalog-rail",
@@ -190,6 +191,7 @@ pub fn render_studio_window(
         active_app,
         frame_samples,
         inspector_width,
+        stacked_inspector,
         theme,
         &cb,
     );
@@ -200,8 +202,18 @@ pub fn render_studio_window(
         .min_h(px(0.0))
         .overflow_hidden()
         .child(rail)
-        .child(center_pane)
-        .child(inspector_pane)
+        .child(
+            div()
+                .flex_1()
+                .h_full()
+                .min_w(px(0.0))
+                .flex()
+                .when(stacked_inspector, |el| el.flex_col())
+                .when(!stacked_inspector, |el| el.flex_row())
+                .overflow_hidden()
+                .child(center_pane)
+                .child(inspector_pane),
+        )
         .into_any_element()
 }
 
@@ -583,6 +595,7 @@ fn render_inspector_pane(
     active_app: Option<&CraftAppSpec>,
     frame_samples: &[f32],
     inspector_width: f32,
+    stacked: bool,
     theme: &OsTheme,
     cb: &StudioCallbacks,
 ) -> AnyElement {
@@ -702,12 +715,13 @@ fn render_inspector_pane(
 
     v_flex()
         .id("studio-inspector-pane")
-        .w(px(inspector_width))
-        .h_full()
+        .when(!stacked, |el| {
+            el.w(px(inspector_width)).h_full().border_l_1()
+        })
+        .when(stacked, |el| el.w_full().h(px(210.0)).border_t_1())
         .p_2p5()
         .overflow_y_scroll()
         .bg(theme.colors.surface_container)
-        .border_l_1()
         .border_color(theme.colors.outline_variant)
         .child(ui.finish())
         .into_any_element()

@@ -81,6 +81,30 @@ use crate::util::{
 };
 pub use prompts::*;
 
+/// Default target frame rate (`120 FPS`) when a display does not report an explicit hardware
+/// refresh cadence. Overridable at runtime via `APHRODY_TARGET_FPS`, `GPUI_TARGET_FPS`, or
+/// `ZED_TARGET_FPS`.
+pub const DEFAULT_TARGET_FPS: u64 = 120;
+
+/// Resolves the runtime target refresh rate (clamped `[24, 360]` FPS, defaulting to `120`).
+#[must_use]
+pub fn target_fps() -> u64 {
+    for key in ["APHRODY_TARGET_FPS", "GPUI_TARGET_FPS", "ZED_TARGET_FPS"] {
+        if let Ok(raw) = std::env::var(key)
+            && let Ok(parsed) = raw.trim().parse::<u64>()
+        {
+            return parsed.clamp(24, 360);
+        }
+    }
+    DEFAULT_TARGET_FPS
+}
+
+/// Returns the target frame interval derived from [`target_fps`] (`~8.33 ms` at `120 FPS`).
+#[must_use]
+pub fn preferred_frame_interval() -> Duration {
+    Duration::from_micros((1_000_000 / target_fps()).max(1))
+}
+
 /// Default window size used when no explicit size is provided.
 pub const DEFAULT_WINDOW_SIZE: Size<Pixels> = size(px(1536.), px(1095.));
 
@@ -1615,9 +1639,15 @@ fn default_bounds(
         ),
     };
 
+    let clamped_size = size(
+        base_size.width.min(display_bounds.size.width.max(px(320.))),
+        base_size
+            .height
+            .min(display_bounds.size.height.max(px(240.))),
+    );
     let cascade_offset = point(px(CASCADE_OFFSET), px(CASCADE_OFFSET));
     let proposed_origin = base_origin + cascade_offset;
-    let proposed_bounds = Bounds::new(proposed_origin, base_size);
+    let proposed_bounds = Bounds::new(proposed_origin, clamped_size);
 
     let display_right = display_bounds.origin.x + display_bounds.size.width;
     let display_bottom = display_bounds.origin.y + display_bounds.size.height;
@@ -1629,11 +1659,17 @@ fn default_bounds(
 
     let final_origin = match (fits_horizontally, fits_vertically) {
         (true, true) => proposed_origin,
-        (false, true) => point(display_bounds.origin.x, base_origin.y),
-        (true, false) => point(base_origin.x, display_bounds.origin.y),
+        (false, true) => point(
+            display_bounds.origin.x,
+            base_origin.y.min(display_bottom - clamped_size.height),
+        ),
+        (true, false) => point(
+            base_origin.x.min(display_right - clamped_size.width),
+            display_bounds.origin.y,
+        ),
         (false, false) => display_bounds.origin,
     };
-    window_bounds_ctor(Bounds::new(final_origin, base_size))
+    window_bounds_ctor(Bounds::new(final_origin, clamped_size))
 }
 
 impl Window {

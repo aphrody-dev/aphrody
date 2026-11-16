@@ -2026,11 +2026,12 @@ impl X11ClientState {
                 let refresh_rate = match mode_info {
                     Some(mode_info) => mode_refresh_rate(mode_info),
                     None => {
-                        log::error!(
-                            "Failed to get screen mode info from xrandr, \
-                            defaulting to 60hz refresh rate."
+                        let fallback = gpui::preferred_frame_interval();
+                        log::warn!(
+                            "Failed to get screen mode info from xrandr, defaulting to {}us refresh interval.",
+                            fallback.as_micros()
                         );
-                        Duration::from_micros(1_000_000 / 60)
+                        fallback
                     }
                 };
 
@@ -2223,12 +2224,15 @@ impl X11ClientState {
 // https://docs.rs/winit/0.29.11/src/winit/platform_impl/linux/x11/monitor.rs.html#103-111
 pub fn mode_refresh_rate(mode: &randr::ModeInfo) -> Duration {
     if mode.dot_clock == 0 || mode.htotal == 0 || mode.vtotal == 0 {
-        return Duration::from_millis(16);
+        return gpui::preferred_frame_interval();
     }
 
-    let millihertz = mode.dot_clock as u64 * 1_000 / (mode.htotal as u64 * mode.vtotal as u64);
-    let micros = 1_000_000_000 / millihertz;
-    log::info!("Refreshing every {}ms", micros / 1_000);
+    let millihertz = (mode.dot_clock as u64 * 1_000) / (mode.htotal as u64 * mode.vtotal as u64);
+    if millihertz == 0 {
+        return gpui::preferred_frame_interval();
+    }
+    let micros = (1_000_000_000 / millihertz).max(1_000);
+    log::info!("Refreshing every {}us", micros);
     Duration::from_micros(micros)
 }
 

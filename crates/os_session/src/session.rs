@@ -65,6 +65,19 @@ fn default_tiling() -> String {
     "dwindle".to_owned()
 }
 
+impl Default for SessionSettings {
+    fn default() -> Self {
+        Self {
+            name: brand::APP_NAME.to_owned(),
+            default_shell: format!("{}-os", brand::APP_SLUG),
+            default_theme: brand::APP_SLUG.to_owned(),
+            default_appearance: "dark".to_owned(),
+            focus_follows_mouse: false,
+            autotile_default: default_tiling(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SessionUnitConfig {
     pub id: String,
@@ -105,7 +118,7 @@ impl SessionUnitConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SessionManifest {
     pub schema_version: u32,
     pub session: SessionSettings,
@@ -219,7 +232,7 @@ pub struct SessionUnitStatus {
 }
 
 /// Live COSMIC-compatible session state machine and environment builder.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct SessionSupervisor {
     pub manifest: SessionManifest,
     pub units: BTreeMap<String, SessionUnitStatus>,
@@ -363,6 +376,93 @@ impl SessionEnvironment {
     pub fn config_path(&self, file_name: &str) -> PathBuf {
         Path::new(&self.config_dir).join(file_name)
     }
+}
+
+/// Live host hardware, CPU/GPU, display target cadence (`120 FPS` default), and toolchain profile
+/// discovered dynamically across Linux, Windows, macOS, BSD, and WebAssembly targets.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HardwareCapabilities {
+    pub os: String,
+    pub arch: String,
+    pub family: String,
+    pub cpu_threads: usize,
+    pub recommended_build_jobs: usize,
+    pub target_fps: u32,
+    pub frame_budget_ms: f32,
+    pub gpu_backend_hint: String,
+    pub present_mode_hint: String,
+    pub detected_toolchains: Vec<String>,
+}
+
+impl HardwareCapabilities {
+    #[must_use]
+    pub fn detect() -> Self {
+        let cpu_threads = std::thread::available_parallelism()
+            .map(std::num::NonZeroUsize::get)
+            .unwrap_or(1);
+        let recommended_build_jobs = cpu_threads.clamp(1, 16);
+
+        let target_fps = ["APHRODY_TARGET_FPS", "GPUI_TARGET_FPS", "ZED_TARGET_FPS"]
+            .into_iter()
+            .find_map(|key| std::env::var(key).ok())
+            .and_then(|raw| raw.trim().parse::<u32>().ok())
+            .map_or(120, |fps| fps.clamp(24, 360));
+        let frame_budget_ms = 1_000.0 / target_fps as f32;
+
+        let gpu_backend_hint = std::env::var("WGPU_BACKEND")
+            .ok()
+            .filter(|v| !v.trim().is_empty())
+            .unwrap_or_else(|| match std::env::consts::OS {
+                "windows" => "dx12,vulkan,gl".to_owned(),
+                "macos" | "ios" => "metal".to_owned(),
+                "linux" | "freebsd" => "vulkan,gl".to_owned(),
+                _ => "webgpu,webgl".to_owned(),
+            });
+
+        let present_mode_hint = [
+            "APHRODY_PRESENT_MODE",
+            "GPUI_PRESENT_MODE",
+            "ZED_PRESENT_MODE",
+        ]
+        .into_iter()
+        .find_map(|key| std::env::var(key).ok())
+        .filter(|v| !v.trim().is_empty())
+        .unwrap_or_else(|| "mailbox->fifo_relaxed->fifo".to_owned());
+
+        let detected_toolchains = discover_host_toolchains();
+
+        Self {
+            os: std::env::consts::OS.to_owned(),
+            arch: std::env::consts::ARCH.to_owned(),
+            family: std::env::consts::FAMILY.to_owned(),
+            cpu_threads,
+            recommended_build_jobs,
+            target_fps,
+            frame_budget_ms,
+            gpu_backend_hint,
+            present_mode_hint,
+            detected_toolchains,
+        }
+    }
+}
+
+fn discover_host_toolchains() -> Vec<String> {
+    let mut found = Vec::new();
+    let Some(path_var) = std::env::var_os("PATH") else {
+        return found;
+    };
+    let dirs: Vec<PathBuf> = std::env::split_paths(&path_var).collect();
+    for tool in ["rustc", "cargo", "bun", "clang", "lld", "git", "vulkaninfo"] {
+        let exe_name = if cfg!(windows) {
+            format!("{tool}.exe")
+        } else {
+            tool.to_owned()
+        };
+        if dirs.iter().any(|dir| dir.join(&exe_name).is_file()) {
+            found.push(tool.to_owned());
+        }
+    }
+    found
 }
 
 #[cfg(test)]

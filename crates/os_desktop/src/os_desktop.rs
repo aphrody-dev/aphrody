@@ -64,12 +64,22 @@ pub fn bind_desktop_keys(cx: &mut App) {
 
 /// Launches the live native GPU window hosting [`OsDesktopShell`].
 pub fn run_desktop_app(options: DesktopOptions) -> anyhow::Result<()> {
-    let bounds_size = size(px(options.width), px(options.height));
+    let requested = size(px(options.width), px(options.height));
     gpui_ui::application().run(move |cx: &mut App| {
         gpui_ui::init(cx);
         bind_desktop_keys(cx);
 
-        let bounds = Bounds::centered(None, bounds_size, cx);
+        let adaptive_size = cx
+            .primary_display()
+            .map(|display| {
+                let vis = display.visible_bounds().size;
+                size(
+                    requested.width.min(vis.width.max(px(360.0))),
+                    requested.height.min(vis.height.max(px(480.0))),
+                )
+            })
+            .unwrap_or(requested);
+        let bounds = Bounds::centered(None, adaptive_size, cx);
         if let Err(err) = cx.open_window(
             WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
