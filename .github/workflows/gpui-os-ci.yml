@@ -88,7 +88,7 @@ jobs:
           cargo check -j 4 -p gpui_ui --features nsh-full
           cargo check -j 4 -p gpui_code --no-default-features
           cargo check -j 4 -p gpui_app_shell --features nsh
-          cargo test -j 4 -p wgpu_cli --lib
+          cargo test -j 4 -p wgpu_cli --bins
           cargo check -j 4 -p wgpu_cli --examples
 
   windows-aphrody-and-gpu:
@@ -110,7 +110,7 @@ jobs:
         run: |
           cargo xtask brand check
           cargo test -j 4 -p brand
-          cargo test -j 4 -p wgpu_cli --lib
+          cargo test -j 4 -p wgpu_cli --bins
           cargo check -j 4 -p wgpu_cli --examples
           cargo check -j 4 -p zed --bin aphrody --features full
           cargo check -j 4 -p cli --bin cli
