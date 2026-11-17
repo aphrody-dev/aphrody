@@ -10,7 +10,14 @@ mkdir -p "$dst"
 cp -a --reflink=auto /lane/rootfs/base "$root"
 # arch-chroot wants the root to be a mountpoint, or pacman cannot size its cache.
 mount --bind "$root" "$root"
-if [ "$SOURCE" = repo ]; then
+if [ "$SOURCE" = tree ]; then
+  # A kernel built from a source tree and staged by kconfig/stage.sh: modules under usr/, the image as bzImage, the release string.
+  kver=$(cat "$dst/pkgs/release")
+  cp -a --reflink=auto "$dst/pkgs/usr/." "$root/usr/"
+  install -m644 "$dst/pkgs/bzImage" "$root/usr/lib/modules/$kver/vmlinuz"
+  echo "$PACKAGE" > "$root/usr/lib/modules/$kver/pkgbase"
+  arch-chroot "$root" depmod "$kver"
+elif [ "$SOURCE" = repo ]; then
   arch-chroot "$root" pacman -Sy --noconfirm "$PACKAGE" >/dev/null
 else
   # arch-chroot mounts a tmpfs on /tmp, so the packages go elsewhere; the glob must expand inside the chroot.
@@ -28,7 +35,8 @@ arch-chroot "$root" mkinitcpio -S autodetect -k "$kver" -g /boot/initramfs-lane.
 install -m644 "$root/usr/lib/modules/$kver/vmlinuz" "$dst/vmlinuz"
 install -m644 "$root/boot/initramfs-lane.img" "$dst/initramfs.img"
 echo "$kver" > "$dst/kernel-release"
-echo "$(arch-chroot "$root" pacman -Qqo "/usr/lib/modules/$kver/vmlinuz" | head -1) $(arch-chroot "$root" pacman -Q "$(arch-chroot "$root" pacman -Qqo "/usr/lib/modules/$kver/vmlinuz" | head -1)" | cut -d' ' -f2)" > "$dst/kernel-package"
+if [ "$SOURCE" = tree ]; then echo "$PACKAGE $(cut -d' ' -f1 "$dst/pkgs/source")" > "$dst/kernel-package"
+else echo "$(arch-chroot "$root" pacman -Qqo "/usr/lib/modules/$kver/vmlinuz" | head -1) $(arch-chroot "$root" pacman -Q "$(arch-chroot "$root" pacman -Qqo "/usr/lib/modules/$kver/vmlinuz" | head -1)" | cut -d' ' -f2)" > "$dst/kernel-package"; fi
 
 install -m755 "$(dirname "$0")/smoke.sh" "$root/usr/local/bin/lane-smoke"
 install -m644 "$(dirname "$0")/lane-smoke.service" "$root/etc/systemd/system/lane-smoke.service"

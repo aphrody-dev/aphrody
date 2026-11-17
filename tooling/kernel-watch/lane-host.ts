@@ -7,7 +7,7 @@
 //   bun lane-host.ts status        --root DIR   latest record per kernel
 //   bun lane-host.ts install-timer --root DIR   user systemd timer running "run --if-new" on the lanes.toml schedule
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { dmesgFrom, finalizeChecks, judgeKselftest, laneSummary, overall, parseSerial, type LaneRecord } from "./lane.ts";
 import { loadLanes, type LaneConfig, type LaneKernel, type Lanes } from "./lanes.ts";
 import { parseArchApi, parseCachyosIndex } from "./probe.ts";
@@ -149,8 +149,20 @@ class Lane {
   }
 
   /** Resolves where the kernel comes from, fetching or building the package; returns what the assemble step needs. */
-  async acquire(k: LaneKernel): Promise<{ source: "repo" | "file"; version: string; origin: string; buildSeconds: number | null }> {
+  async acquire(k: LaneKernel): Promise<{ source: "repo" | "file" | "tree"; version: string; origin: string; buildSeconds: number | null }> {
     if (k.source === "repo") return { source: "repo", version: await this.archRepoVersion(k), origin: `Arch repository (pacman -S ${k.package} in the guest root filesystem)`, buildSeconds: null };
+    if (k.source === "tree") {
+      // The staged kernel (kconfig/stage.sh) lives in out/<id>; this lane only boots it.
+      const staged = join(this.out, k.id);
+      if (!existsSync(join(staged, "bzImage"))) throw new Error(`no staged kernel in ${staged}; build the tree and run kconfig/stage.sh first`);
+      const stage = join(this.work, k.id, "pkgs");
+      rmSync(stage, { recursive: true, force: true });
+      mkdirSync(dirname(stage), { recursive: true });
+      Bun.spawnSync(["cp", "-a", "--reflink=auto", staged, stage]);
+      const release = readFileSync(join(staged, "release"), "utf8").trim();
+      const source = readFileSync(join(staged, "source"), "utf8").trim();
+      return { source: "tree", version: release, origin: `tree ${source} built with LLVM=1 and the config fragments of kconfig/fragments`, buildSeconds: null };
+    }
     const pkgDir = join(this.out, k.package);
     mkdirSync(pkgDir, { recursive: true });
     const stage = join(this.work, k.id, "pkgs");
@@ -194,7 +206,7 @@ class Lane {
     Bun.spawnSync(["cp", file, dir]);
   }
 
-  async assemble(k: LaneKernel, source: "repo" | "file"): Promise<void> {
+  async assemble(k: LaneKernel, source: "repo" | "file" | "tree"): Promise<void> {
     this.log("assembling", k.id);
     await this.docker(`assemble-${k.id}`, "assemble.sh", { ID: k.id, SOURCE: source, PACKAGE: k.package, DISK_GB: String(this.config.diskGb), HOST_UID: String(process.getuid?.() ?? 1000) }, { privileged: true, timeout: 1800 });
   }

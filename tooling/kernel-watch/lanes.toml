@@ -77,3 +77,12 @@ kselftest_targets = ["exec", "membarrier", "clone3", "kcmp", "mincore", "sigalts
   source = "cachyos"
   package = "linux-cachyos-rc"
   repos = ["cachyos-v3", "cachyos"]
+
+  # source = "tree": a kernel built from a source tree (kconfig/merge.sh, make LLVM=1) and staged with kconfig/stage.sh into <root>/out/<id>.
+  [[lane.kernel]]
+  id = "next-aphrody"
+  name = "linux-next, aphrody config fragments"
+  kernel = "linux"
+  channel = "next"
+  source = "tree"
+  package = "linux-next-aphrody"

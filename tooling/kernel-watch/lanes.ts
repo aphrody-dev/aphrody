@@ -23,7 +23,7 @@ export interface LaneKernel {
   /** Kernel id and channel of the versions table this lane kernel reports its test status to. */
   kernel: string;
   channel: string;
-  source: "repo" | "aur" | "cachyos";
+  source: "repo" | "aur" | "cachyos" | "tree";
   package: string;
   repos: string[];
 }
@@ -97,7 +97,7 @@ export function parseLanes(source: string): Lanes {
       kselftestTargets: list(l, "kselftest_targets", "lane"),
       kernels: rows(l, "kernel", "lane").map((r, i): LaneKernel => {
         const source = text(r, "source", `lane.kernel[${i}]`);
-        if (source !== "repo" && source !== "aur" && source !== "cachyos") throw new Error(`lanes.toml: lane.kernel[${i}].source must be repo, aur or cachyos`);
+        if (source !== "repo" && source !== "aur" && source !== "cachyos" && source !== "tree") throw new Error(`lanes.toml: lane.kernel[${i}].source must be repo, aur, cachyos or tree`);
         return { id: text(r, "id", `lane.kernel[${i}]`), name: text(r, "name", `lane.kernel[${i}]`), kernel: text(r, "kernel", `lane.kernel[${i}]`), channel: text(r, "channel", `lane.kernel[${i}]`), source, package: text(r, "package", `lane.kernel[${i}]`), repos: r.repos === undefined ? [] : list(r, "repos", `lane.kernel[${i}]`) };
       }),
     },

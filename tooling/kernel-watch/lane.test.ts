@@ -21,7 +21,7 @@ function record(overrides: Partial<LaneRecord> = {}): LaneRecord {
 
 describe("lane", () => {
   test("lanes.toml lists the three kernels and a schedule", () => {
-    expect(lanes.lane.kernels.map((k) => k.id)).toEqual(["arch-baseline", "arch-mainline", "cachyos-rc"]);
+    expect(lanes.lane.kernels.map((k) => k.id)).toEqual(["arch-baseline", "arch-mainline", "cachyos-rc", "next-aphrody"]);
     expect(lanes.lane.timer).toBeTruthy();
     expect(readFileSync(join(import.meta.dir, "lanes.toml"), "utf8")).not.toMatch(/\b\d{1,3}(\.\d{1,3}){3}\b/);
   });
