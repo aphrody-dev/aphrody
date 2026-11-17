@@ -1,0 +1,39 @@
+[package]
+name = "bevy_gpui"
+version = "0.20.0"
+edition.workspace = true
+publish.workspace = true
+license = "Apache-2.0"
+description = "Unreal Engine 5.8-class ECS, Nanite meshlets, Solari GI, MaterialX->Naga WGSL compiler, USD/Mocap loader, and bevy_egui 0.37 viewport engine for Zed GPUI."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/bevy_gpui.rs"
+doctest = false
+
+[[example]]
+name = "unreal_solari_showcase"
+path = "examples/unreal_solari_showcase.rs"
+
+[features]
+default = []
+wgpu = ["egui_gpui/wgpu", "dep:gpui_wgpu", "dep:wgpu"]
+
+[dependencies]
+anyhow.workspace = true
+bytemuck = { workspace = true, features = ["derive"] }
+craft-materialx.workspace = true
+craft-timeline.workspace = true
+craft-usd.workspace = true
+egui_gpui = { workspace = true, default-features = false }
+gpui.workspace = true
+gpui_wgpu = { workspace = true, optional = true }
+naga.workspace = true
+os_ui.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+web-time.workspace = true
+wgpu = { workspace = true, optional = true }

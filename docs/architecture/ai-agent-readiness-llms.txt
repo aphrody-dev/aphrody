@@ -18,7 +18,7 @@
 - `gpui-wgpu mcp` — 24-tool JSON-RPC MCP server for Wasm/WGPU/Google Design/Lighthouse/Starter Pack
 
 ## Audited Stacks (17 entries)
-- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,os_ui,gpui_wgpu,google_design_stitch} (395 source modules)
+- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,os_ui,gpui_wgpu,google_design_stitch} (396 source modules)
 - bun: Bun (aphrody-labs/bun) -> vendor/bun (254 source modules)
 - wgpu: WGPU v30 + Naga (aphrody-labs/wgpu) -> vendor/wgpu (500 source modules)
 - taffy: Taffy Layout (aphrody-labs/taffy) -> vendor/taffy (115 source modules)

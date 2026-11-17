@@ -27,6 +27,9 @@ enum CliCommand {
     /// Inspect the GPUI publish plan and its dependencies.
     #[command(subcommand)]
     Gpui(tasks::gpui::GpuiCommand),
+    /// Consolidated Google Design, Storytold 82-repo, egui/Bevy parity & NSH session studio workflows.
+    #[command(subcommand)]
+    Studio(tasks::studio::StudioCommand),
     /// Runs the Linux Bubblewrap sandboxing NixOS VM tests.
     SandboxTests(tasks::sandbox_tests::SandboxTestsArgs),
     /// Runs the Windows WSL Bubblewrap sandbox behavior tests.
@@ -52,6 +55,7 @@ fn main() -> Result<()> {
         CliCommand::NewApp(args) => tasks::new_app::run_new_app(args),
         CliCommand::Brand(cmd) => tasks::brand::run_brand(cmd),
         CliCommand::Gpui(args) => tasks::gpui::run_gpui(args),
+        CliCommand::Studio(cmd) => tasks::studio::run_studio(cmd),
         CliCommand::SandboxTests(args) => tasks::sandbox_tests::run_sandbox_tests(args),
         CliCommand::WslSandboxTests(args) => tasks::wsl_sandbox_tests::run_wsl_sandbox_tests(args),
         CliCommand::SetupWebrtc(args) => tasks::setup_webrtc::run_setup_webrtc(args),

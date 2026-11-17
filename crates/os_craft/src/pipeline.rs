@@ -129,7 +129,7 @@ pub fn inspect_bytes(
             dimensions = Some((psd.header.width, psd.header.height));
             for layer in psd.layers() {
                 layers.push(LayerSummary {
-                    name: layer.name().to_owned(),
+                    name: layer.name(),
                     visible: layer.is_visible(),
                     width: layer.rect.right.saturating_sub(layer.rect.left).max(0) as u32,
                     height: layer.rect.bottom.saturating_sub(layer.rect.top).max(0) as u32,

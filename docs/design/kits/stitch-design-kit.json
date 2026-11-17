@@ -1,8 +1,62 @@
 {
-  "name": "Google Design · Stitch Design Kit",
-  "platform": "stitch",
-  "version": "1.0.0",
-  "sourceUrl": "https://stitch.withgoogle.com",
-  "tokensRef": "../tokens.css",
-  "components": ["SessionStudioShell", "TimelineRow", "InspectorDrawer", "KpiGrid"]
+  "name": "Aphrody · Google Stitch & Multi-Studio Design Kit",
+  "version": "2.0.0",
+  "sourceUrl": "https://stitch.withgoogle.com/",
+  "designMdRef": "../DESIGN.md",
+  "preserveDataStitchId": true,
+  "screens": [
+    {
+      "id": "stitch-screen-figcraft-google",
+      "stitchId": "stitch-figcraft-root",
+      "title": "Google FigCraft & Stitch Vector/Token Studio",
+      "deviceType": "DESKTOP",
+      "gpuiAction": "google_design_studio::OpenGoogleFigCraftStudio",
+      "dualParityTarget": "craft_studio::StudioPillar::FigCraftGoogle",
+      "slots": [
+        "stitch-figcraft-root",
+        "stitch-figcraft-omnibar",
+        "stitch-figcraft-cta"
+      ]
+    },
+    {
+      "id": "stitch-screen-craft-anything-google",
+      "stitchId": "stitch-craft-anything-root",
+      "title": "Google Craft Anything Clean-Room Disassembly & AST Workbench",
+      "deviceType": "DESKTOP",
+      "gpuiAction": "google_design_studio::OpenGoogleCraftAnythingStudio",
+      "dualParityTarget": "craft_studio::StudioPillar::CraftAnythingGoogle",
+      "slots": [
+        "stitch-ca-disasm-grid",
+        "stitch-ca-oxc-ast",
+        "stitch-ca-evidence-ledger"
+      ]
+    },
+    {
+      "id": "stitch-screen-unreal-bevy-58",
+      "stitchId": "stitch-unreal-bevy-root",
+      "title": "Unreal Engine 5.8 Bevy Viewport (Nanite Meshlets + Solari GI + MaterialX)",
+      "deviceType": "DESKTOP",
+      "gpuiAction": "google_design_studio::OpenUnrealBevyStudio",
+      "dualParityTarget": "craft_studio::StudioPillar::UnrealBevy58",
+      "slots": [
+        "stitch-bevy-viewport",
+        "stitch-bevy-outliner",
+        "stitch-bevy-solari-controls"
+      ]
+    },
+    {
+      "id": "stitch-screen-agy-session-studio",
+      "stitchId": "stitch-agy-studio-root",
+      "title": "AGY & Gemini Live Auto-Reload Session Studio",
+      "deviceType": "DESKTOP",
+      "gpuiAction": "nsh_workspace::OpenShowcaseSurface",
+      "dualParityTarget": "examples/nsh/agy-session-studio",
+      "slots": [
+        "stitch-agy-rail",
+        "stitch-agy-kpis",
+        "stitch-agy-timeline",
+        "stitch-agy-inspector"
+      ]
+    }
+  ]
 }

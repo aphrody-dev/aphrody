@@ -30,6 +30,10 @@ nsh = [
     "gpui_ui/nsh-math",
     "gpui_ui/nsh-tui",
 ]
+studio = [
+    "nsh",
+    "nsh_workspace/studio",
+]
 nsh-webview = [
     "nsh",
     "nsh_workspace/webview",

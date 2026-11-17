@@ -1,0 +1,6 @@
+{
+  "name": "AGY & Storytold Parity Studio",
+  "id": "dev.aphrody.agy-session-studio",
+  "version": "1.0.0",
+  "entry": "App.tsx"
+}

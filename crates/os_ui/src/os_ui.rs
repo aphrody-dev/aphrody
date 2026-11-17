@@ -7,6 +7,7 @@
 pub mod cosmic_shell;
 pub mod cosmic_theme;
 pub mod google_design;
+pub mod google_design_components;
 pub mod i18n;
 pub mod immediate;
 pub mod reactive;
@@ -37,6 +38,10 @@ pub use reactive::{
 pub use google_design::{
     BUNDLED_GOOGLE_DESIGN_TOKENS_TOML, GoogleDesignTokens, GoogleSansFlexAxes, ShapeScale,
     SpringSpec, StateLayerOpacities, WindowSizeClass,
+};
+pub use google_design_components::{
+    CascadingPopoverCard, ExpressiveOmnibar, GroundingSourceCard, PopoverMenuItem,
+    SegmentedStudioBar, ThinkingAuraBadge,
 };
 pub use starter_pack::{
     AgentSlotMeta, BUNDLED_SUBMODULE_PARITY_TOML, CoreWebVitalsBudgetSpec, MonorepoAuditSummary,

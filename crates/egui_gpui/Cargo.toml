@@ -1,0 +1,38 @@
+[package]
+name = "egui_gpui"
+version = "0.37.0"
+edition.workspace = true
+publish.workspace = true
+license = "Apache-2.0"
+description = "Native GPUI + WGPU v30 bridge for egui 0.37, Craft Studio controls, and Google Design Material 3 Expressive themes."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/egui_gpui.rs"
+doctest = false
+
+[[example]]
+name = "google_design_egui"
+path = "examples/google_design_egui.rs"
+
+[features]
+default = []
+wgpu = ["dep:egui-wgpu", "dep:gpui_wgpu", "dep:wgpu"]
+
+[dependencies]
+anyhow.workspace = true
+ecolor.workspace = true
+egui = { workspace = true, features = ["bytemuck", "default_fonts", "serde"] }
+egui-wgpu = { workspace = true, optional = true }
+egui_extras.workspace = true
+emath.workspace = true
+epaint.workspace = true
+gpui.workspace = true
+gpui_wgpu = { workspace = true, optional = true }
+os_ui.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+wgpu = { workspace = true, optional = true }
+web-time.workspace = true

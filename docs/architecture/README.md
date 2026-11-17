@@ -26,8 +26,12 @@
 - [`WebAssembly` Org Ecosystem (`llms.txt`)](./webassembly-org-ecosystem.md) ([`llms.txt`](./webassembly-org-llms.txt)): Top 100 `github.com/orgs/WebAssembly` repos by stars (`design`, `binaryen`, `wabt`, `WASI`, `spec`) mapped onto Wasm Core 2.0, WASI P2, and AOT.
 - [Awesome Wasm, WebGPU & GPUI Unified Toolchain](./awesome-wasm-wgpu-gpui.md): `[profile.web-lto]`, `[profile.aot]`, `gpui-wgpu` CLI + 24-tool MCP, `os_craft` Wasm inspection, and 5 standalone starter templates.
 - [GPUI Starter Pack, Web Standards & Submodule Parity Matrix](./gpui-starterpack-and-parity-matrix.md) ([`ai-agent-readiness-llms.txt`](./ai-agent-readiness-llms.txt)): Core Web Vitals, 4-category Lighthouse scoring, W3C, Google Style Guides, Vercel UI, shadcn/Base UI/Tailwind v4 -> Pure-Rust [`os_ui::starter_pack`](../../crates/os_ui/src/starter_pack.rs), and 17-stack submodule parity matrix.
+- [Storytold 82-Repository Ecosystem, `egui 0.37` & Bevy Unreal 5.8 Unification](./storytold-egui-bevy-zed-unification.md): Complete `storytold` 82-repo integration (`vendor/craft-libs` + `vendor/craft-anything`), `egui_gpui` 0.37 bridge, `bevy_gpui` Unreal 5.8 pipeline (Nanite meshlets, MaterialX -> Naga v30 WGSL, Solari GI), and `craft_studio` GPUI-vs-`egui` parity studio.
+- [Monorepo Consolidation & Alignment with Zed Upstream](./monorepo-zed-consolidation.md): Canonical repository layout, additive `crates/zed` feature tree (`nsh` -> `studio` -> `full`), crate-owned `examples/*.rs`, `cargo xtask studio`, and unified [`tooling/bun/cli.ts`](../../tooling/bun/cli.ts) domain router.
 
 ## Reproducible Tooling CLI (`package.json`)
+
+- [`tooling/bun/cli.ts`](../../tooling/bun/cli.ts): Unified 7-domain CLI router (`workspace`, `design`, `storytold`, `web`, `session`, `ingest`, `fleet`) paired with [`cargo xtask studio`](../../tooling/xtask/src/tasks/studio.rs).
 
 - [`tooling/bun/submodules.ts`](../../tooling/bun/submodules.ts): Parallel submodule inspection and `--depth 1 --jobs 8` sync driven by [`.gitmodules`](../../.gitmodules).
 - [`tooling/bun/worktree.ts`](../../tooling/bun/worktree.ts): Out-of-tree parallel Git worktree & isolated `CARGO_TARGET_DIR` manager preserving a clean `main` checkout.
@@ -51,4 +55,7 @@
 - [`tooling/bun/webassembly-org-ingest.ts`](../../tooling/bun/webassembly-org-ingest.ts): Live `orgs/WebAssembly` repository ingest and skill/catalog emitter.
 - [`tooling/bun/zed-wasm-wgpu-issues.ts`](../../tooling/bun/zed-wasm-wgpu-issues.ts): Tracks WebAssembly/WebGPU Zed parity fixes in `gpui_wgpu` and `extension_host` while keeping non-Wasm legacy issue scripts purged.
 - [`tooling/bun/prod-standards-starterpack.ts`](../../tooling/bun/prod-standards-starterpack.ts): Fork submodule parity matrix generator, deterministic Bun micro-benchmarks, and TS + Pure-Rust AI-agent readiness auditor.
+- [`tooling/bun/storytold-unify.ts`](../../tooling/bun/storytold-unify.ts): Synchronizes and audits all 82 `storytold` GitHub repositories, submodule crate counts, and Cargo dependency deduplication.
+- [`tooling/bun/design-docs-pack.ts`](../../tooling/bun/design-docs-pack.ts): Builds and validates the complete [`docs/design/`](../design/manifest.json) Google Design Neural Expressive SVG, CSS, Figma DTCG, Stitch kit, and MDX specification pack.
+- [`tooling/bun/agy-session-studio.ts`](../../tooling/bun/agy-session-studio.ts): Live SSE auto-reload Chrome & portable single-file HTML converter for AGY/Gemini sessions and Storytold/GPUI/`egui`/Bevy parity telemetry.
 - [`tooling/bun/repo-hygiene.ts`](../../tooling/bun/repo-hygiene.ts): Enforces `README.md` guard, zero ephemeral non-repo path leaks, relative doc link integrity, and manifest validity.

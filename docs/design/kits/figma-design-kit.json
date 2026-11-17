@@ -1,8 +1,679 @@
 {
-  "name": "Google Design · Material 3 Expressive Figma Kit",
-  "platform": "figma",
-  "version": "1.0.0",
+  "$schema": "https://tr.designtokens.org/format/",
+  "name": "Aphrody · Google Design Material 3 Expressive + Neural Figma Kit",
+  "version": "2.0.0",
   "sourceUrl": "https://design.google/?home",
-  "tokensRef": "../tokens.css",
-  "components": ["Card", "Button", "Tabs", "Sheet", "Sidebar", "Badge", "Input"]
+  "collections": {
+    "Sys/Color": {
+      "background": {
+        "$type": "color",
+        "$value": "#0E141B",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#0E141B",
+            "Light": "#F7F9FF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-background": {
+        "$type": "color",
+        "$value": "#E0E6F0",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#E0E6F0",
+            "Light": "#161C24"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "#0E141B",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#0E141B",
+            "Light": "#F7F9FF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-dim": {
+        "$type": "color",
+        "$value": "#0B1016",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#0B1016",
+            "Light": "#D5DBE4"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-bright": {
+        "$type": "color",
+        "$value": "#343B44",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#343B44",
+            "Light": "#FFFFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-container-lowest": {
+        "$type": "color",
+        "$value": "#080D13",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#080D13",
+            "Light": "#FFFFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-container-low": {
+        "$type": "color",
+        "$value": "#161D25",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#161D25",
+            "Light": "#EEF3FA"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-container": {
+        "$type": "color",
+        "$value": "#1B222B",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#1B222B",
+            "Light": "#E7EDF6"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-container-high": {
+        "$type": "color",
+        "$value": "#252C36",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#252C36",
+            "Light": "#E0E7F1"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "surface-container-highest": {
+        "$type": "color",
+        "$value": "#303843",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#303843",
+            "Light": "#D9E1EC"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-surface": {
+        "$type": "color",
+        "$value": "#E0E6F0",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#E0E6F0",
+            "Light": "#161C24"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-surface-variant": {
+        "$type": "color",
+        "$value": "#C0CAD7",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#C0CAD7",
+            "Light": "#3D4754"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "outline": {
+        "$type": "color",
+        "$value": "#8A94A2",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#8A94A2",
+            "Light": "#6E7886"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "outline-variant": {
+        "$type": "color",
+        "$value": "#404956",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#404956",
+            "Light": "#BEC7D4"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary": {
+        "$type": "color",
+        "$value": "#8FD0FF",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#8FD0FF",
+            "Light": "#006399"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-primary": {
+        "$type": "color",
+        "$value": "#003352",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#003352",
+            "Light": "#FFFFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary-container": {
+        "$type": "color",
+        "$value": "#004B75",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#004B75",
+            "Light": "#CEE5FF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-primary-container": {
+        "$type": "color",
+        "$value": "#CEE5FF",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#CEE5FF",
+            "Light": "#004972"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "secondary": {
+        "$type": "color",
+        "$value": "#B4C9E5",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#B4C9E5",
+            "Light": "#4B6078"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-secondary": {
+        "$type": "color",
+        "$value": "#1D3248",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#1D3248",
+            "Light": "#FFFFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "secondary-container": {
+        "$type": "color",
+        "$value": "#34485F",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#34485F",
+            "Light": "#D2E4FF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-secondary-container": {
+        "$type": "color",
+        "$value": "#D2E4FF",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#D2E4FF",
+            "Light": "#34485F"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "tertiary": {
+        "$type": "color",
+        "$value": "#C6C2FF",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#C6C2FF",
+            "Light": "#5B5891"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-tertiary": {
+        "$type": "color",
+        "$value": "#2C295F",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#2C295F",
+            "Light": "#FFFFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "tertiary-container": {
+        "$type": "color",
+        "$value": "#434077",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#434077",
+            "Light": "#E2DFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-tertiary-container": {
+        "$type": "color",
+        "$value": "#E2DFFF",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#E2DFFF",
+            "Light": "#434077"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "error": {
+        "$type": "color",
+        "$value": "#FFB4AB",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#FFB4AB",
+            "Light": "#BA1A1A"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-error": {
+        "$type": "color",
+        "$value": "#690005",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#690005",
+            "Light": "#FFFFFF"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "error-container": {
+        "$type": "color",
+        "$value": "#93000A",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#93000A",
+            "Light": "#FFDAD6"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "on-error-container": {
+        "$type": "color",
+        "$value": "#FFDAD6",
+        "$extensions": {
+          "com.figma.modes": {
+            "Dark": "#FFDAD6",
+            "Light": "#93000A"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      }
+    },
+    "Sys/Shape": {
+      "none_px": {
+        "$type": "dimension",
+        "$value": "0px"
+      },
+      "extra_small_px": {
+        "$type": "dimension",
+        "$value": "4px"
+      },
+      "small_px": {
+        "$type": "dimension",
+        "$value": "8px"
+      },
+      "medium_px": {
+        "$type": "dimension",
+        "$value": "12px"
+      },
+      "large_px": {
+        "$type": "dimension",
+        "$value": "16px"
+      },
+      "large_increased_px": {
+        "$type": "dimension",
+        "$value": "20px"
+      },
+      "extra_large_px": {
+        "$type": "dimension",
+        "$value": "28px"
+      },
+      "full_px": {
+        "$type": "dimension",
+        "$value": "9999px"
+      }
+    },
+    "Sys/Typography": {
+      "display_large": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "57px",
+          "lineHeight": "64px",
+          "fontWeight": 400
+        }
+      },
+      "display_medium": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "45px",
+          "lineHeight": "52px",
+          "fontWeight": 400
+        }
+      },
+      "display_small": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "36px",
+          "lineHeight": "44px",
+          "fontWeight": 400
+        }
+      },
+      "headline_large": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "32px",
+          "lineHeight": "40px",
+          "fontWeight": 500
+        }
+      },
+      "headline_medium": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "28px",
+          "lineHeight": "36px",
+          "fontWeight": 500
+        }
+      },
+      "headline_small": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "24px",
+          "lineHeight": "32px",
+          "fontWeight": 500
+        }
+      },
+      "title_large": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Flex",
+          "fontSize": "22px",
+          "lineHeight": "28px",
+          "fontWeight": 500
+        }
+      },
+      "title_medium": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "16px",
+          "lineHeight": "24px",
+          "fontWeight": 600
+        }
+      },
+      "title_small": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "fontWeight": 600
+        }
+      },
+      "body_large": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "16px",
+          "lineHeight": "24px",
+          "fontWeight": 400
+        }
+      },
+      "body_medium": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "fontWeight": 400
+        }
+      },
+      "body_small": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "12px",
+          "lineHeight": "16px",
+          "fontWeight": 400
+        }
+      },
+      "label_large": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "fontWeight": 600
+        }
+      },
+      "label_medium": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "12px",
+          "lineHeight": "16px",
+          "fontWeight": 600
+        }
+      },
+      "label_small": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "Google Sans Text",
+          "fontSize": "11px",
+          "lineHeight": "16px",
+          "fontWeight": 600
+        }
+      }
+    },
+    "Sys/MotionSprings": {
+      "spatial_fast": {
+        "stiffness": 1400,
+        "damping_ratio": 0.9
+      },
+      "spatial_default": {
+        "stiffness": 700,
+        "damping_ratio": 0.9
+      },
+      "spatial_slow": {
+        "stiffness": 300,
+        "damping_ratio": 0.9
+      },
+      "effects_fast": {
+        "stiffness": 3800,
+        "damping_ratio": 1
+      },
+      "effects_default": {
+        "stiffness": 1600,
+        "damping_ratio": 1
+      },
+      "effects_slow": {
+        "stiffness": 800,
+        "damping_ratio": 1
+      }
+    }
+  },
+  "componentSets": [
+    {
+      "id": "ExpressiveAppShell",
+      "variants": [
+        "ExpandedRail",
+        "CollapsedRail",
+        "MobileSheet"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "large_px"
+    },
+    {
+      "id": "NeuralOmnibar",
+      "variants": [
+        "Idle",
+        "Focused",
+        "AttachmentMenuOpen"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "full_px"
+    },
+    {
+      "id": "CascadingPopoverMenu",
+      "variants": [
+        "RootMenu",
+        "SubMenu"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "large_increased_px"
+    },
+    {
+      "id": "GroundingCardStack",
+      "variants": [
+        "Collapsed3",
+        "ExpandedAll"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "extra_large_px"
+    },
+    {
+      "id": "ExpressivePillButton",
+      "variants": [
+        "Primary",
+        "Secondary",
+        "Outline",
+        "Ghost",
+        "Destructive"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "full_px"
+    },
+    {
+      "id": "FigCraftCanvasNode",
+      "variants": [
+        "Frame",
+        "Component",
+        "TokenBound"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "medium_px"
+    },
+    {
+      "id": "CraftAnythingDisasmTable",
+      "variants": [
+        "X64",
+        "A64",
+        "Wasm"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "medium_px"
+    },
+    {
+      "id": "UnrealBevyViewportHud",
+      "variants": [
+        "LitPbrSolari",
+        "NaniteMeshlets",
+        "WorldNormals"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "large_px"
+    }
+  ]
 }

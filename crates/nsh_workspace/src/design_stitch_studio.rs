@@ -5,6 +5,9 @@
 
 use std::path::PathBuf;
 
+use craft_studio::{
+    CraftStudioSession, ParityRenderMode, StudioPillar, render_gpui_studio_panel,
+};
 use google_design_stitch::design_md::{
     DesignMdDocument, DesignMdLintReport, export_css_variables, export_shadcn_tailwind_css,
     lint_design_md, load_bundled_root_design_md,
@@ -45,6 +48,14 @@ actions!(
         OpenStitchStudio,
         /// Opens the Core Web Vitals, Lighthouse, W3C, Vercel & shadcn/Base UI/Tailwind GPUI Starter Pack studio tab.
         OpenGpuiStarterPack,
+        /// Opens the Google FigCraft + Stitch Studio tab (shared GUI core: GPUI Google Design vs egui 0.37).
+        OpenGoogleFigCraftStudio,
+        /// Opens the Google Craft Anything Workbench tab (clean-room X64/A64 disasm, oxc JS AST & SHA-256 evidence).
+        OpenGoogleCraftAnythingStudio,
+        /// Opens the Unreal Engine 5.8 (Bevy 0.20 + Nanite Meshlets + Solari GI + MaterialX->WGSL) studio tab.
+        OpenUnrealBevyStudio,
+        /// Cycles the active Studio GUI parity mode between GPUI Google Design, egui 0.37/bevy_egui, and 50/50 Split.
+        ToggleStudioGuiParity,
         /// Renders and saves an offscreen PNG screen capture of the active Google Design / Stitch studio surface.
         CaptureDesignScreen,
     ]
@@ -55,6 +66,9 @@ pub enum StudioMode {
     GoogleDesignMirror,
     StitchStudio,
     GpuiStarterPack,
+    GoogleFigCraftStudio,
+    GoogleCraftAnythingStudio,
+    UnrealBevyStudio,
 }
 
 struct LiveMirrorPayload {
@@ -76,6 +90,7 @@ pub struct DesignStitchStudioItem {
     guidance_findings: Vec<WebGuidanceFinding>,
     lighthouse_report: Option<LighthouseAuditReport>,
     parity_matrix: Option<SubmoduleParityMatrix>,
+    craft_session: Option<CraftStudioSession>,
     status_message: SharedString,
     last_capture: Option<PathBuf>,
     is_busy: bool,
@@ -114,6 +129,18 @@ impl DesignStitchStudioItem {
             .as_ref()
             .map(|s| audit_html_standards("stitch.html", &s.html_code, &design_md, Some(96_000)));
         let parity_matrix = SubmoduleParityMatrix::bundled().ok();
+        let mut craft_session = CraftStudioSession::bootstrap(AppearanceMode::Dark).ok();
+        if let Some(ref mut session) = craft_session {
+            session.active_pillar = match mode {
+                StudioMode::GoogleFigCraftStudio => StudioPillar::FigCraftGoogle,
+                StudioMode::GoogleCraftAnythingStudio => StudioPillar::CraftAnythingGoogle,
+                StudioMode::UnrealBevyStudio => StudioPillar::UnrealBevy58,
+                _ => StudioPillar::StorytoldSuiteCatalog,
+            };
+            if let Err(err) = session.run_parity_benchmark(640, 420) {
+                log::warn!("Initial studio parity benchmark warning: {err}");
+            }
+        }
 
         let status_message = SharedString::from(format!(
             "Synced from {} ({} sitemap routes, WCAG {})",
@@ -135,6 +162,7 @@ impl DesignStitchStudioItem {
             guidance_findings,
             lighthouse_report,
             parity_matrix,
+            craft_session,
             status_message,
             last_capture: None,
             is_busy: false,
@@ -223,6 +251,9 @@ impl DesignStitchStudioItem {
             StudioMode::GoogleDesignMirror => "design-google-mirror.png",
             StudioMode::StitchStudio => "stitch-studio-capture.png",
             StudioMode::GpuiStarterPack => "gpui-starter-pack-capture.png",
+            StudioMode::GoogleFigCraftStudio => "google-figcraft-studio.png",
+            StudioMode::GoogleCraftAnythingStudio => "google-craft-anything-studio.png",
+            StudioMode::UnrealBevyStudio => "unreal-bevy-58-studio.png",
         };
         let out_path = out_dir.join(slug);
         self.is_busy = true;
@@ -288,6 +319,53 @@ impl DesignStitchStudioItem {
             workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
         });
 
+        workspace.register_action(|workspace, _: &OpenGoogleFigCraftStudio, window, cx| {
+            let root = workspace
+                .worktrees(cx)
+                .next()
+                .map(|w| w.read(cx).abs_path().to_path_buf());
+            let item = cx.new(|cx| Self::new(StudioMode::GoogleFigCraftStudio, root, cx));
+            workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
+        });
+
+        workspace.register_action(|workspace, _: &OpenGoogleCraftAnythingStudio, window, cx| {
+            let root = workspace
+                .worktrees(cx)
+                .next()
+                .map(|w| w.read(cx).abs_path().to_path_buf());
+            let item = cx.new(|cx| Self::new(StudioMode::GoogleCraftAnythingStudio, root, cx));
+            workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
+        });
+
+        workspace.register_action(|workspace, _: &OpenUnrealBevyStudio, window, cx| {
+            let root = workspace
+                .worktrees(cx)
+                .next()
+                .map(|w| w.read(cx).abs_path().to_path_buf());
+            let item = cx.new(|cx| Self::new(StudioMode::UnrealBevyStudio, root, cx));
+            workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
+        });
+
+        workspace.register_action(|workspace, _: &ToggleStudioGuiParity, _window, cx| {
+            if let Some(active) = workspace.active_item(cx)
+                && let Some(studio) = active.act_as::<Self>(cx)
+            {
+                studio.update(cx, |studio, cx| {
+                    if let Some(ref mut session) = studio.craft_session {
+                        session.parity_mode = match session.parity_mode {
+                            ParityRenderMode::GpuiGoogleDesign => ParityRenderMode::EguiNative037,
+                            ParityRenderMode::EguiNative037 => ParityRenderMode::SplitSideBySide,
+                            ParityRenderMode::SplitSideBySide => ParityRenderMode::GpuiGoogleDesign,
+                        };
+                        if let Err(err) = session.run_parity_benchmark(640, 420) {
+                            log::warn!("Parity benchmark refresh warning: {err}");
+                        }
+                        cx.notify();
+                    }
+                });
+            }
+        });
+
         workspace.register_action(|workspace, _: &CaptureDesignScreen, _window, cx| {
             if let Some(active) = workspace.active_item(cx)
                 && let Some(studio) = active.act_as::<Self>(cx)
@@ -318,6 +396,15 @@ impl Render for DesignStitchStudioItem {
             StudioMode::StitchStudio => "Google Stitch & DESIGN.md Studio",
             StudioMode::GpuiStarterPack => {
                 "GPUI Starter Pack (CWV + Lighthouse + W3C + Vercel + shadcn/Base UI/Tailwind)"
+            }
+            StudioMode::GoogleFigCraftStudio => {
+                "Google FigCraft + Stitch Studio (.fig + Sketch + Penpot + GPUI vs egui 0.37)"
+            }
+            StudioMode::GoogleCraftAnythingStudio => {
+                "Google Craft Anything Workbench (X64/A64 Disasm + oxc JS AST + GPUI vs egui 0.37)"
+            }
+            StudioMode::UnrealBevyStudio => {
+                "Unreal Engine 5.8 Studio (Bevy 0.20 + Nanite Meshlets + Solari GI + MaterialX->WGSL)"
             }
         };
         let tsx_preview = self
@@ -489,6 +576,9 @@ impl Render for DesignStitchStudioItem {
                         ),
                 )
             })
+            .when_some(self.craft_session.as_ref(), |col, session| {
+                col.child(render_gpui_studio_panel(session))
+            })
             .when_some(self.lighthouse_report.as_ref(), |col, lh| {
                 col.child(
                     StarterCard::new("Lighthouse & Core Web Vitals Readiness", &starter_theme)
@@ -569,6 +659,9 @@ impl Item for DesignStitchStudioItem {
             StudioMode::GoogleDesignMirror => SharedString::from("Google Design Mirror"),
             StudioMode::StitchStudio => SharedString::from("Stitch DESIGN.md Studio"),
             StudioMode::GpuiStarterPack => SharedString::from("GPUI Starter Pack"),
+            StudioMode::GoogleFigCraftStudio => SharedString::from("Google FigCraft Studio"),
+            StudioMode::GoogleCraftAnythingStudio => SharedString::from("Google Craft Anything"),
+            StudioMode::UnrealBevyStudio => SharedString::from("Unreal Bevy 5.8"),
         }
     }
 

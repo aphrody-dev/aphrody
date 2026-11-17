@@ -1,0 +1,56 @@
+{
+  "sourceOfTruth": "https://design.google/",
+  "system": "Material 3 Neural Expressive",
+  "typography": {
+    "sans": "Google Sans Flex",
+    "mono": "JetBrains Mono"
+  },
+  "radii": {
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "full": 9999
+  },
+  "motion": {
+    "spatialFastMs": 180,
+    "spatialDefaultMs": 280,
+    "effectsFastMs": 120,
+    "easingSpatial": "cubic-bezier(0.2, 0.9, 0.2, 1.05)",
+    "easingEffects": "cubic-bezier(0.2, 0.0, 0.0, 1.0)"
+  },
+  "light": {
+    "background": "#F8FAFD",
+    "foreground": "#0F172A",
+    "card": "#F0F4F9",
+    "cardForeground": "#0F172A",
+    "popover": "#E9EEF6",
+    "popoverForeground": "#0F172A",
+    "primary": "#0B57D0",
+    "primaryForeground": "#FFFFFF",
+    "secondary": "#D3E3FD",
+    "secondaryForeground": "#041E49",
+    "muted": "#E3E8EF",
+    "mutedForeground": "#444746",
+    "accent": "#C2E7FF",
+    "accentForeground": "#001D35",
+    "border": "#C4C7C5"
+  },
+  "dark": {
+    "background": "#0E141B",
+    "foreground": "#E3E8EF",
+    "card": "#161E27",
+    "cardForeground": "#E3E8EF",
+    "popover": "#1E2834",
+    "popoverForeground": "#E3E8EF",
+    "primary": "#A8C7FA",
+    "primaryForeground": "#062E6F",
+    "secondary": "#0842A0",
+    "secondaryForeground": "#D3E3FD",
+    "muted": "#1B2430",
+    "mutedForeground": "#9AA5B4",
+    "accent": "#004A77",
+    "accentForeground": "#C2E7FF",
+    "border": "#334155"
+  }
+}

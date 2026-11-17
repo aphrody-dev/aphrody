@@ -16,6 +16,8 @@ pub enum AppTemplate {
     Studio,
     /// Multi-workspace studio fused with Native Shell (`nsh` TSX/Rust surfaces + live TSX preview + `GpuiCodeEditor`).
     NshStudio,
+    /// Unified Google Design + Storytold Craft Studio + Dual-GUI (`GPUI` + `egui 0.37`) + Unreal Bevy 5.8 application.
+    CraftStudio,
 }
 
 #[derive(Parser, Debug)]
@@ -161,6 +163,13 @@ gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell" }}"#
             r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui", features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }}
 gpui_code = {{ path = "{aphrody_path}/crates/gpui_code", features = ["full"] }}
 gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell", features = ["nsh"] }}"#
+        ),
+        AppTemplate::CraftStudio => format!(
+            r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui", features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }}
+gpui_code = {{ path = "{aphrody_path}/crates/gpui_code", features = ["full"] }}
+gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell", features = ["studio"] }}
+craft_studio = {{ path = "{aphrody_path}/crates/craft_studio" }}
+os_ui = {{ path = "{aphrody_path}/crates/os_ui" }}"#
         ),
     };
 
@@ -452,6 +461,16 @@ fn main() {{
 }}
 "#
         ),
+        AppTemplate::CraftStudio => format!(
+            r#"use gpui_app_shell::{{AppShell, NshModule}};
+
+fn main() {{
+    AppShell::new("{display_title}")
+        .with_module(NshModule::with_showcase())
+        .run();
+}}
+"#
+        ),
     }
 }
 
@@ -492,6 +511,7 @@ mod tests {
             AppTemplate::Code,
             AppTemplate::Studio,
             AppTemplate::NshStudio,
+            AppTemplate::CraftStudio,
         ]
         .into_iter()
         .enumerate()

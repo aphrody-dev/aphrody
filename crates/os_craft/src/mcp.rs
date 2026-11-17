@@ -194,6 +194,28 @@ pub fn builtin_tools() -> Vec<McpToolDescriptor> {
                 "additionalProperties": false
             }),
         },
+        McpToolDescriptor {
+            name: "storytold_ecosystem_status".to_owned(),
+            description: "Return the 82-repository storytold unification ledger, craft-libs crate count, and Cargo deduplication rules.".to_owned(),
+            input_schema: json!({
+                "type": "object",
+                "properties": { "studio_app_id": { "type": "string" } },
+                "additionalProperties": false
+            }),
+        },
+        McpToolDescriptor {
+            name: "craft_anything_js_analyze".to_owned(),
+            description: "Run pure-Rust oxc static AST & bundle analysis on JavaScript/TypeScript/TSX source.".to_owned(),
+            input_schema: json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string" },
+                    "source": { "type": "string" }
+                },
+                "required": ["source"],
+                "additionalProperties": false
+            }),
+        },
     ];
     for pt in builtin_pilot_tools() {
         tools.push(McpToolDescriptor {
@@ -374,6 +396,38 @@ fn call_tool(state: &Arc<Mutex<McpServerState>>, params: &Value) -> Result<Value
                 .map_err(|err| (-32002, err.to_string()))?;
             guard.compositor = guard.pilot.gpui.export_compositor();
             val
+        }
+        "storytold_ecosystem_status" => {
+            let ledger = crate::storytold_suite::StorytoldEcosystemLedger::bundled()
+                .map_err(|e| (-32003, e.to_string()))?;
+            if let Some(app_id) = args.get("studio_app_id").and_then(Value::as_str) {
+                json!({
+                    "total_repositories": ledger.total_repositories,
+                    "studio_app_id": app_id,
+                    "matching_repositories": ledger.by_studio_app(app_id),
+                    "deduplication_rules": ledger.deduplication_rules,
+                })
+            } else {
+                serde_json::to_value(&ledger).map_err(|e| (-32003, e.to_string()))?
+            }
+        }
+        "craft_anything_js_analyze" => {
+            let path = args
+                .get("path")
+                .and_then(Value::as_str)
+                .unwrap_or("bundle.tsx");
+            let src = args
+                .get("source")
+                .and_then(Value::as_str)
+                .ok_or_else(|| (-32602, "missing `source` string".to_owned()))?;
+            #[cfg(feature = "storytold-suite")]
+            {
+                crate::storytold_suite::analyze_js_bundle_source(path, src)
+            }
+            #[cfg(not(feature = "storytold-suite"))]
+            {
+                json!({ "path": path, "bytes": src.len(), "mode": "storytold-suite-disabled" })
+            }
         }
         other => return Err((-32601, format!("unknown tool '{other}'"))),
     };

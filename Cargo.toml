@@ -23,6 +23,7 @@ members = [
     "crates/bedrock",
     "crates/bench_metrics",
     "crates/benchmarks",
+    "crates/bevy_gpui",
     "crates/brand",
     "crates/breadcrumbs",
     "crates/buffer_diff",
@@ -46,6 +47,7 @@ members = [
     "crates/copilot",
     "crates/copilot_chat",
     "crates/copilot_ui",
+    "crates/craft_studio",
     "crates/crashes",
     "crates/credentials_provider",
     "crates/dap",
@@ -65,6 +67,7 @@ members = [
     "crates/edit_prediction_ui",
     "crates/editor",
     "crates/editor_benchmarks",
+    "crates/egui_gpui",
     "crates/encoding_selector",
     "crates/env_var",
     "crates/etw_tracing",
@@ -341,7 +344,7 @@ exclude = [
     "vendor/winit",
     "templates/wasm-wgpu/*",
 ]
-default-members = ["crates/gpui_wgpu", "crates/gpui_web", "crates/gpui_ui", "crates/gpui_code", "crates/gpui_store", "crates/google_design_stitch", "crates/os_session", "crates/os_craft", "crates/os_pilot", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
+default-members = ["crates/gpui_wgpu", "crates/gpui_web", "crates/gpui_ui", "crates/gpui_code", "crates/gpui_store", "crates/google_design_stitch", "crates/egui_gpui", "crates/bevy_gpui", "crates/craft_studio", "crates/os_session", "crates/os_craft", "crates/os_pilot", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
 
 [workspace.package]
 version = "0.5.0"
@@ -378,6 +381,7 @@ auto_update = { path = "crates/auto_update" }
 auto_update_ui = { path = "crates/auto_update_ui" }
 aws_http_client = { path = "crates/aws_http_client" }
 bedrock = { path = "crates/bedrock" }
+bevy_gpui = { path = "crates/bevy_gpui" }
 brand = { path = "crates/brand" }
 breadcrumbs = { path = "crates/breadcrumbs" }
 buffer_diff = { path = "crates/buffer_diff" }
@@ -402,6 +406,7 @@ context_server = { path = "crates/context_server" }
 copilot = { path = "crates/copilot" }
 copilot_chat = { path = "crates/copilot_chat" }
 copilot_ui = { path = "crates/copilot_ui" }
+craft_studio = { path = "crates/craft_studio" }
 crashes = { path = "crates/crashes" }
 credentials_provider = { path = "crates/credentials_provider" }
 dap = { path = "crates/dap" }
@@ -420,6 +425,7 @@ edit_prediction_metrics = { path = "crates/edit_prediction_metrics", features = 
 edit_prediction_types = { path = "crates/edit_prediction_types" }
 edit_prediction_ui = { path = "crates/edit_prediction_ui" }
 editor = { path = "crates/editor" }
+egui_gpui = { path = "crates/egui_gpui" }
 encoding_selector = { path = "crates/encoding_selector" }
 env_var = { path = "crates/env_var" }
 etw_tracing = { path = "crates/etw_tracing" }
@@ -712,10 +718,60 @@ core-services = "1"
 core-text = "21"
 coreaudio-rs = { version = "0.12", default-features = false }
 cosmic-text = { path = "vendor/cosmic-text" }
+craft-anicraft-format = { path = "vendor/craft-libs/crates/anicraft-format" }
+craft-anything-analysis = { path = "vendor/craft-anything/crates/analysis" }
+craft-anything-disasm = { path = "vendor/craft-anything/crates/disasm" }
+craft-anything-evidence = { path = "vendor/craft-anything/crates/evidence" }
+craft-anything-formats = { path = "vendor/craft-anything/crates/formats" }
+craft-anything-js = { path = "vendor/craft-anything/crates/js" }
+craft-color = { path = "vendor/craft-libs/crates/color" }
+craft-csv = { path = "vendor/craft-libs/crates/csv" }
+craft-dds = { path = "vendor/craft-libs/crates/dds" }
+craft-deckcraft-format = { path = "vendor/craft-libs/crates/deckcraft-format" }
+craft-docx = { path = "vendor/craft-libs/crates/docx" }
+craft-dxf = { path = "vendor/craft-libs/crates/dxf" }
+craft-ecproj-format = { path = "vendor/craft-libs/crates/ecproj-format" }
+craft-elf = { path = "vendor/craft-libs/crates/elf" }
 craft-exr = { path = "vendor/craft-libs/crates/exr" }
+craft-fcproj-format = { path = "vendor/craft-libs/crates/fcproj-format" }
+craft-fig = { path = "vendor/craft-libs/crates/fig" }
+craft-figcraft-format = { path = "vendor/craft-libs/crates/figcraft-format" }
+craft-figma-rest = { path = "vendor/craft-libs/crates/figma-rest" }
+craft-gcode = { path = "vendor/craft-libs/crates/gcode" }
+craft-gridcraft-format = { path = "vendor/craft-libs/crates/gridcraft-format" }
+craft-hdr = { path = "vendor/craft-libs/crates/hdr" }
+craft-i18n = { path = "vendor/craft-libs/crates/i18n" }
+craft-kiwi = { path = "vendor/craft-libs/crates/kiwi" }
+craft-kra = { path = "vendor/craft-libs/crates/kra" }
+craft-lottie = { path = "vendor/craft-libs/crates/lottie" }
+craft-macho = { path = "vendor/craft-libs/crates/macho" }
+craft-materialx = { path = "vendor/craft-libs/crates/materialx" }
+craft-math = { path = "vendor/craft-libs/crates/math" }
+craft-mcmat = { path = "vendor/craft-libs/crates/mcmat" }
+craft-mesh = { path = "vendor/craft-libs/crates/mesh" }
+craft-midi = { path = "vendor/craft-libs/crates/midi" }
+craft-ora = { path = "vendor/craft-libs/crates/ora" }
+craft-pcraft-format = { path = "vendor/craft-libs/crates/pcraft-format" }
+craft-pe = { path = "vendor/craft-libs/crates/pe" }
+craft-penpot = { path = "vendor/craft-libs/crates/penpot" }
 craft-plist = { path = "vendor/craft-libs/crates/plist" }
+craft-pptx = { path = "vendor/craft-libs/crates/pptx" }
 craft-psd = { path = "vendor/craft-libs/crates/psd" }
+craft-sf2 = { path = "vendor/craft-libs/crates/sf2" }
+craft-sheet = { path = "vendor/craft-libs/crates/sheet" }
+craft-sketch = { path = "vendor/craft-libs/crates/sketch" }
 craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
+craft-tar = { path = "vendor/craft-libs/crates/tar" }
+craft-tcraft = { path = "vendor/craft-libs/crates/tcraft" }
+craft-tga = { path = "vendor/craft-libs/crates/tga" }
+craft-timeline = { path = "vendor/craft-libs/crates/timeline" }
+craft-usd = { path = "vendor/craft-libs/crates/usd" }
+craft-vectorcraft-format = { path = "vendor/craft-libs/crates/vectorcraft-format" }
+craft-wordmodel = { path = "vendor/craft-libs/crates/wordmodel" }
+craft-xcf = { path = "vendor/craft-libs/crates/xcf" }
+craft-xlsx = { path = "vendor/craft-libs/crates/xlsx" }
+craft-xml = { path = "vendor/craft-libs/crates/xml" }
+craft-zip = { path = "vendor/craft-libs/crates/zip" }
 cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7" }
 crash-handler = "0.8"
 criterion = { version = "0.8.2", features = ["html_reports"] }
@@ -732,7 +788,13 @@ documented = "0.10"
 dotenvy = "0.15.0"
 dunce = "1.0"
 ec4rs = { version = "1.2", features = ["allow-empty-values"] }
+ecolor = { path = "vendor/egui/crates/ecolor", default-features = false }
+egui = { path = "vendor/egui/crates/egui", default-features = false }
+egui-wgpu = { path = "vendor/egui/crates/egui-wgpu", default-features = false }
+egui_extras = { path = "vendor/egui/crates/egui_extras", default-features = false }
+emath = { path = "vendor/egui/crates/emath", default-features = false }
 emojis = "0.9"
+epaint = { path = "vendor/egui/crates/epaint", default-features = false }
 encoding_rs = "0.8"
 env_logger = "0.11"
 etagere = "0.2"
@@ -791,6 +853,7 @@ jsonschema = { version = "0.51", default-features = false }
 jsonwebtoken = { version = "10.0", default-features = false }
 jupyter-protocol = "2.0.3"
 jupyter-websocket-client = "3.0.0"
+kurbo = "0.13"
 libc = "0.2"
 libsqlite3-sys = { version = "0.30.1", features = ["bundled"] }
 libwebrtc = "0.3.26"
@@ -1529,6 +1592,13 @@ accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
 accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
 accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
 accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
+ecolor = { path = "vendor/egui/crates/ecolor" }
+emath = { path = "vendor/egui/crates/emath" }
+epaint = { path = "vendor/egui/crates/epaint" }
+epaint_default_fonts = { path = "vendor/egui/crates/epaint_default_fonts" }
+egui = { path = "vendor/egui/crates/egui" }
+egui-wgpu = { path = "vendor/egui/crates/egui-wgpu" }
+egui_extras = { path = "vendor/egui/crates/egui_extras" }
 cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7" }
 # Unify `tree_sitter_language::LanguageFn` between crates.io grammar crates and
 # the git tree-sitter above; two instances of the crate would make grammar
@@ -1562,6 +1632,10 @@ crash-context = { git = "https://github.com/rust-minidump/minidump-writer", rev 
 # https://github.com/dtolnay/cxx/issues/1752
 scratch = { path = "tooling/corgi/patches/scratch" }
 msvc_spectre_libs = { path = "tooling/corgi/patches/msvc_spectre_libs" }
+
+[patch."https://github.com/storytold/craft-libs"]
+craft-plist = { path = "vendor/craft-libs/crates/plist" }
+craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
 
 [profile.dev]
 split-debuginfo = "unpacked"

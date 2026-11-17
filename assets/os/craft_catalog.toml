@@ -207,3 +207,15 @@ extensions = ["exe", "dll", "so", "dylib", "wasm", "elf", "apk", "ipa", "js", "a
 sniff_families = ["executable", "archive"]
 tools = ["sniff", "disasm", "sections", "strings", "evidence_mcp"]
 inspector_groups = ["header_abi", "entropy_sections", "evidence_ledger"]
+
+[[apps]]
+id = "unrealcraft"
+name = "Unreal Bevy 5.8"
+tagline = "ECS 3D/2D world editor, Nanite meshlets, Solari GI, MaterialX->WGSL, OpenUSD, and Mocap"
+category = "engineering"
+icon = "box"
+upstream = "https://github.com/bevyengine/bevy"
+extensions = ["usd", "usda", "usdc", "usdz", "gltf", "glb", "mtlx", "bvh"]
+sniff_families = ["model", "text"]
+tools = ["select_actor", "translate_gizmo", "nanite_meshlets", "solari_gi", "materialx_wgsl", "mocap_play"]
+inspector_groups = ["world_outliner", "transform_ecs", "solari_lighting", "nanite_clusters"]

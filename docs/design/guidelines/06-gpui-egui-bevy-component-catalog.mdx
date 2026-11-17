@@ -1,0 +1,14 @@
+---
+title: "Unified GPUI, NSH, egui 0.37 & Bevy UE5.8 Component Catalog"
+source: "https://design.google/?home"
+---
+
+# Unified GPUI, NSH, `egui 0.37` & Bevy UE5.8 Component Catalog
+
+| Component Contract | GPUI Symbol | `egui 0.37` / Bevy Symbol | NSH Element |
+| --- | --- | --- | --- |
+| `expressive-app-shell` | `os_ui::render_nav_rail` + `Workspace` | `egui::SidePanel` + `CentralPanel` | `<NavStack>` + `<View>` |
+| `expressive-pill-button` | `os_ui::starter_pack::StarterButton` | `egui::Button` (M3 `CornerRadius`) | `<Press>` / `<Button>` |
+| `surface-kpi-card` | `os_ui::starter_pack::StarterKpiCard` | `egui::Frame::group` | `<SurfaceCard>` |
+| `figcraft-canvas` | `craft_studio::render_gpui_studio_panel` | `craft_studio::CraftStudioSession::run_egui_equivalent` | `<FigCraftGoogleScreen>` |
+| `unreal-bevy-viewport` | `bevy_gpui::render_viewport_rgba8` | `bevy_gpui::render_bevy_egui_inspector` | `<Shader>` / `<Canvas>` |

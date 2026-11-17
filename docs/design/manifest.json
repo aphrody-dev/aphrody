@@ -1,46 +1,406 @@
 {
-  "$schema": "./schema.ts",
-  "name": "aphrody-google-design",
-  "version": "1.0.0",
-  "source": "https://design.google/?home",
-  "tokensStylesheet": "./tokens.css",
-  "designDoc": "./design.md",
+  "schemaVersion": 2,
+  "name": "aphrody-google-neural-expressive-design-pack",
+  "sourceOfTruth": "https://design.google/",
+  "homeUrl": "https://design.google/?home",
+  "codeAsMaterialUrl": "https://design.google/library/code-is-a-design-material",
+  "stitchUrl": "https://stitch.withgoogle.com/",
+  "stylesheetPath": "./stylesheet.css",
+  "designMdPath": "./DESIGN.md",
+  "wcagContrastDarkPrimary": 7.92,
+  "wcagContrastLightPrimary": 6.47,
+  "referenceCaptures": [
+    {
+      "id": "gemini-home",
+      "path": "./gemini-home.png",
+      "bytes": 631827,
+      "sha256": "7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2",
+      "surfaceFamily": "gemini-neural-home",
+      "keyPatterns": [
+        "260px rail",
+        "indigo radial glow",
+        "Account preferences 20px popover",
+        "Carbon High selector"
+      ]
+    },
+    {
+      "id": "gemini-opions",
+      "path": "./gemini-opions.png",
+      "bytes": 560591,
+      "sha256": "b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0",
+      "surfaceFamily": "gemini-cascading-menu",
+      "keyPatterns": [
+        "Cascading + attachment menu",
+        "Import code & Notebooks submenu"
+      ]
+    },
+    {
+      "id": "google-ai-mode",
+      "path": "./google-ai-mode.png",
+      "bytes": 121621,
+      "sha256": "b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9",
+      "surfaceFamily": "google-ai-mode",
+      "keyPatterns": [
+        "48px collapsed rail",
+        "Mode IA segmented bar",
+        "4-color thinking aura"
+      ]
+    },
+    {
+      "id": "google-in-chrome",
+      "path": "./google-in-chrome.png",
+      "bytes": 61310,
+      "sha256": "5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75",
+      "surfaceFamily": "chrome-omnibar",
+      "keyPatterns": [
+        "Pill attachment composer",
+        "Thumbnail chips",
+        "Primary circular submit"
+      ]
+    },
+    {
+      "id": "win11-chrome157",
+      "path": "./win11-chrome157.png",
+      "bytes": 631406,
+      "sha256": "648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa",
+      "surfaceFamily": "chrome-157-grounding",
+      "keyPatterns": [
+        "24px source grounding card stack",
+        "64x64 rounded media thumb",
+        "Modern Web Guidance 1.0"
+      ]
+    }
+  ],
   "svgs": [
-    { "id": "design-google-1", "path": "./svg/design-google-1.svg", "optimized": true },
-    { "id": "design-google-2", "path": "./svg/design-google-2.svg", "optimized": true },
-    { "id": "design-google-3", "path": "./svg/design-google-3.svg", "optimized": true },
-    { "id": "design-google-4", "path": "./svg/design-google-4.svg", "optimized": true },
-    { "id": "design-google-5", "path": "./svg/design-google-5.svg", "optimized": true },
-    { "id": "design-google-6", "path": "./svg/design-google-6.svg", "optimized": true }
+    {
+      "id": "google-g-4color",
+      "title": "Google 4-Color Neural Mark",
+      "path": "./svg/google-g-4color.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 706,
+      "sha256": "34ee1a25fde3b33d6952d858a635e4873d024ef5c2963bbfa478fe08e295f95c",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "gemini-neural-spark",
+      "title": "Gemini Neural Expressive Four-Point Spark",
+      "path": "./svg/gemini-neural-spark.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 483,
+      "sha256": "ee059920e19a7b8af4be1a9db518680b17e511e406f944f5113fb36f2e578f1c",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "code-as-material",
+      "title": "Code is a Design Material Emblem",
+      "path": "./svg/code-as-material.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 396,
+      "sha256": "cfedd77c6f3ce2242d4743b18c1c407b62a5d208d1a36ded4fd9bd28de043151",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "figcraft-stitch-frame",
+      "title": "Google FigCraft & Stitch Auto-Layout Frame",
+      "path": "./svg/figcraft-stitch-frame.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 442,
+      "sha256": "96fdc4dd96b65abb1ecda10fdaa8fd873ce0cd37e1318a8674669a4ac60b1b59",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "craft-anything-hex",
+      "title": "Google Craft Anything Clean-Room Disassembly & Wasm",
+      "path": "./svg/craft-anything-hex.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 346,
+      "sha256": "b3c94a5dcf73f5d7c6ce6004592d2a59619f93e8be2944d04a27d59c4e9e9464",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "bevy-unreal-solari",
+      "title": "Unreal Engine 5.8 Bevy Solari GI & Nanite Meshlets",
+      "path": "./svg/bevy-unreal-solari.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 354,
+      "sha256": "c93e2eec8eba84a9f4d4c1348bd7a2415dc7e31a4a896206bd1eceba2284a360",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "parity-split-compare",
+      "title": "GPUI Google Design vs egui 0.37 Side-by-Side Split",
+      "path": "./svg/parity-split-compare.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 327,
+      "sha256": "b7325f69ced9c912b8eb499de2619a24c6fa70c9cb0c775114d9d23e4e2478e7",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "omnibar-plus",
+      "title": "Neural Omnibar Attachment Trigger",
+      "path": "./svg/omnibar-plus.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 227,
+      "sha256": "9956b44f0ad49f407b4c95ec772ae88d8254531c5105b3129ab3510450251246",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-1",
+      "title": "Google Design Home Vector (design-google-1)",
+      "path": "./svg/design-google-1.svg",
+      "viewBox": "0 0 130 22",
+      "bytes": 10176,
+      "sha256": "083ba7e43ff1ef9659269bda6fdd475c1d5f00b641c8531c4df1f4f1a6832b9d",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-2",
+      "title": "Google Design Home Vector (design-google-2)",
+      "path": "./svg/design-google-2.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 881,
+      "sha256": "9f60bb3a9d6c95ff6fb85f56f63e9ceea1864718f21bbe8f989c535f7fdde555",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-3",
+      "title": "Google Design Home Vector (design-google-3)",
+      "path": "./svg/design-google-3.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 283,
+      "sha256": "e92b73c94c15e7487690dd8917dda498e90c065e2b211acc81927865517aad94",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-4",
+      "title": "Google Design Home Vector (design-google-4)",
+      "path": "./svg/design-google-4.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 294,
+      "sha256": "e53e5d3fbcbd28dde74b9f2b15e33e4fe42dc820f1d7bc836bdf0ae1da47dcfa",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-5",
+      "title": "Google Design Home Vector (design-google-5)",
+      "path": "./svg/design-google-5.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 881,
+      "sha256": "7307db7ff80a6741a9e73ff78eee45abd6f1f396364b65e5afef392c123a0994",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-6",
+      "title": "Google Design Home Vector (design-google-6)",
+      "path": "./svg/design-google-6.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 519,
+      "sha256": "145f1bbdc831d8553813c8a8982b5acbde55ff8ff48373da77e78befb2f1075b",
+      "a11yRoleImg": true
+    }
   ],
   "guidelines": [
-    { "id": "code-is-a-design-material", "path": "./guidelines/code-is-a-design-material.mdx", "format": "mdx" }
+    {
+      "id": "01-code-is-a-design-material",
+      "title": "Code is a Design Material",
+      "path": "./guidelines/01-code-is-a-design-material.mdx",
+      "sourceUrl": "https://design.google/library/code-is-a-design-material",
+      "bytes": 824,
+      "sha256": "1b620d6c8ba269a394898ff60d54d3c2cd97ad476c4c091af17e2e777ba5c6ab"
+    },
+    {
+      "id": "02-material-3-expressive-and-neural-surfaces",
+      "title": "Material 3 Expressive & Neural Surfaces",
+      "path": "./guidelines/02-material-3-expressive-and-neural-surfaces.mdx",
+      "sourceUrl": "https://design.google/?home",
+      "bytes": 788,
+      "sha256": "2b9497bd1a7a40459492941d2dceb9a686d746caab9094fd79d2836c8236ffef"
+    },
+    {
+      "id": "03-google-sans-flex-and-code-typography",
+      "title": "Google Sans Flex & Monospace Code Pairing",
+      "path": "./guidelines/03-google-sans-flex-and-code-typography.mdx",
+      "sourceUrl": "https://design.google/library/google-sans-flex-font",
+      "bytes": 542,
+      "sha256": "687b8ef65ad47a66259c6a478c6d7e92e5f05e392120f44420420b47ab5274d4"
+    },
+    {
+      "id": "04-spatial-and-effects-spring-motion",
+      "title": "Spatial vs Effects Spring Motion Physics",
+      "path": "./guidelines/04-spatial-and-effects-spring-motion.mdx",
+      "sourceUrl": "https://m3.material.io/",
+      "bytes": 653,
+      "sha256": "2e76735acf2288db0057629c74a58e63cc9bfb01fb2d62de8a8c8031dc543f91"
+    },
+    {
+      "id": "05-modern-web-and-wasm-webgpu-baseline",
+      "title": "Modern Web Guidance & Wasm/WebGPU Baseline",
+      "path": "./guidelines/05-modern-web-and-wasm-webgpu-baseline.mdx",
+      "sourceUrl": "https://github.com/GoogleChrome/modern-web-guidance-src",
+      "bytes": 606,
+      "sha256": "a960896ead5e8be00bf3c77c6e969775db2af7dcdd3d79b7f9c5f52633f68a16"
+    },
+    {
+      "id": "06-gpui-egui-bevy-component-catalog",
+      "title": "Unified GPUI, NSH, egui 0.37 & Bevy UE5.8 Component Catalog",
+      "path": "./guidelines/06-gpui-egui-bevy-component-catalog.mdx",
+      "sourceUrl": "https://design.google/?home",
+      "bytes": 933,
+      "sha256": "cff29b0b43d5a9e44494e5e7c0079fc7040e42b504afc0fefd8302d535774827"
+    }
   ],
   "kits": {
-    "figma": "./kits/figma-design-kit.json",
-    "stitch": "./kits/stitch-design-kit.json"
+    "figma": {
+      "path": "./kits/figma-design-kit.json",
+      "sha256": "b055e3b37718a096ef1f6c00f440da4076b76028e17aceeeed3a6b11590ad04d",
+      "collectionCount": 4,
+      "componentCount": 8
+    },
+    "stitch": {
+      "path": "./kits/stitch-design-kit.json",
+      "sha256": "6d8b5eb34b45827c0adde1256edbbaee0bd9a6f28dee21c49b5254187b9b57dd",
+      "screenCount": 4,
+      "preserveDataStitchId": true
+    }
   },
-  "gpuiComponents": [
+  "components": [
     {
-      "id": "surface-card",
-      "crate": "gpui_kit",
-      "symbol": "gpui_kit::component::Card",
-      "tokensUsed": ["--gd-surface-elevated", "--gd-border-subtle", "--gd-radius-md"],
-      "states": ["default", "hover", "focused"]
+      "id": "expressive-app-shell",
+      "category": "shell",
+      "gpuiSymbol": "os_ui::cosmic_shell::render_nav_rail",
+      "eguiEquivalentSymbol": "egui::SidePanel",
+      "nshElement": "AppShell",
+      "stitchSlotId": "stitch-agy-rail",
+      "tokensConsumed": [
+        "--md-sys-color-surface",
+        "--md-sys-color-surface-container-low"
+      ],
+      "states": [
+        "default",
+        "selected",
+        "focused"
+      ]
     },
     {
-      "id": "expressive-button",
-      "crate": "gpui_kit",
-      "symbol": "gpui_kit::component::Button",
-      "tokensUsed": ["--gd-accent-primary", "--gd-accent-container", "--gd-radius-full", "--gd-ease-expressive"],
-      "states": ["default", "hover", "pressed", "focused", "disabled"]
+      "id": "expressive-pill-button",
+      "category": "navigation",
+      "gpuiSymbol": "os_ui::starter_pack::StarterButton",
+      "eguiEquivalentSymbol": "egui::Button",
+      "nshElement": "PillButton",
+      "stitchSlotId": "stitch-figcraft-cta",
+      "tokensConsumed": [
+        "--md-sys-color-primary",
+        "--md-sys-color-on-primary",
+        "--md-sys-shape-corner-full"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "pressed",
+        "focused",
+        "disabled"
+      ]
     },
     {
-      "id": "session-inspector-drawer",
-      "crate": "nsh_base",
-      "symbol": "nsh_base::Sheet",
-      "tokensUsed": ["--gd-surface-elevated", "--gd-ink-primary", "--gd-ease-expressive"],
-      "states": ["default", "selected"]
+      "id": "neural-omnibar-composer",
+      "category": "composer",
+      "gpuiSymbol": "ui_input::InputField",
+      "eguiEquivalentSymbol": "egui::TextEdit::singleline",
+      "nshElement": "NeuralOmnibar",
+      "stitchSlotId": "stitch-figcraft-omnibar",
+      "tokensConsumed": [
+        "--md-sys-color-surface-container",
+        "--md-sys-shape-corner-full"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "focused"
+      ]
+    },
+    {
+      "id": "cascading-menu-popover",
+      "category": "overlay",
+      "gpuiSymbol": "ui::ContextMenu",
+      "eguiEquivalentSymbol": "egui::MenuBar",
+      "nshElement": "CascadingPopover",
+      "stitchSlotId": "stitch-menu-popover",
+      "tokensConsumed": [
+        "--md-sys-color-surface-container-high",
+        "--md-sys-shape-corner-lg-inc"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "selected",
+        "focused"
+      ]
+    },
+    {
+      "id": "grounding-card-stack",
+      "category": "data_display",
+      "gpuiSymbol": "os_ui::starter_pack::StarterCard",
+      "eguiEquivalentSymbol": "egui::Frame",
+      "nshElement": "GroundingCard",
+      "stitchSlotId": "stitch-grounding-stack",
+      "tokensConsumed": [
+        "--md-sys-color-surface-container-low",
+        "--md-sys-shape-corner-xl"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "selected"
+      ]
+    },
+    {
+      "id": "telemetry-kpi-strip",
+      "category": "data_display",
+      "gpuiSymbol": "os_ui::starter_pack::StarterKpiCard",
+      "eguiEquivalentSymbol": "egui_gpui::EguiFrameStats",
+      "nshElement": "KpiTile",
+      "stitchSlotId": "stitch-agy-kpis",
+      "tokensConsumed": [
+        "--md-sys-color-primary",
+        "--md-ref-typeface-mono"
+      ],
+      "states": [
+        "default"
+      ]
+    },
+    {
+      "id": "figcraft-auto-layout-frame",
+      "category": "data_display",
+      "gpuiSymbol": "craft_studio::FigCraftFrameNode",
+      "eguiEquivalentSymbol": "egui_gpui::EguiGpuiHost",
+      "nshElement": "FigCraftGoogleScreen",
+      "stitchSlotId": "stitch-figcraft-root",
+      "tokensConsumed": [
+        "--md-sys-color-surface",
+        "--md-sys-color-primary-container"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "selected"
+      ]
+    },
+    {
+      "id": "unreal-bevy-solari-viewport",
+      "category": "viewport_3d",
+      "gpuiSymbol": "bevy_gpui::render_viewport_rgba8",
+      "eguiEquivalentSymbol": "bevy_gpui::render_bevy_egui_inspector",
+      "nshElement": "ViewportCanvas",
+      "stitchSlotId": "stitch-bevy-viewport",
+      "tokensConsumed": [
+        "--md-sys-color-surface-dim",
+        "--md-sys-color-tertiary"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "selected"
+      ]
     }
   ]
 }

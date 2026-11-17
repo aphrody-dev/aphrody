@@ -1030,6 +1030,10 @@ mod tests {
                 upstream_awesome_gpui: "https://github.com/zed-industries/awesome-gpui.git".into(),
                 upstream_extensions: "https://github.com/zed-industries/extensions.git".into(),
                 upstream_winget_pkgs: "https://github.com/zed-industries/winget-pkgs.git".into(),
+                upstream_modern_web_guidance: "https://github.com/GoogleChrome/modern-web-guidance-src.git".into(),
+                upstream_design_md: "https://github.com/google-labs-code/design-md.git".into(),
+                upstream_stitch_sdk: "https://github.com/google-labs-code/stitch-sdk.git".into(),
+                upstream_stitch_skills: "https://github.com/google-labs-code/stitch-skills.git".into(),
                 submodule_bun: "https://github.com/aphrody-labs/bun".into(),
             },
             features: FeaturesSection {
@@ -1041,6 +1045,19 @@ mod tests {
                 modular_shell_features: "nsh".into(),
                 wgpu_cli_package: "wgpu_cli".into(),
                 wgpu_cli_bin: "gpui-wgpu".into(),
+            },
+            design: DesignSection {
+                source_of_truth: "https://design.google/".into(),
+                system: "Material 3 Expressive".into(),
+                spec_url: "https://m3.material.io/".into(),
+                fonts_url: "https://fonts.google.com/".into(),
+                stitch_url: "https://stitch.withgoogle.com/".into(),
+                sans_flex_family: "Google Sans Flex".into(),
+                design_md: "DESIGN.md".into(),
+                tokens_manifest: "assets/os/google_design_tokens.toml".into(),
+                themes_manifest: "assets/os/themes.json".into(),
+                seed_hex: "#135B82".into(),
+                variant: "expressive".into(),
             },
             colors: ColorsSection {
                 channels: ChannelsColorSection {

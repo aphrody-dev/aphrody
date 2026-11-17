@@ -17,8 +17,8 @@ gpui_input_latency_ms = 8
 wasm_critical_brotli_bytes = 358400
 
 [monorepo_audit_summary]
-ts_files_scanned = 45
-rust_files_scanned = 43
+ts_files_scanned = 52
+rust_files_scanned = 45
 ts_compile_errors = 0
 rust_mod_rs_violations = 0
 rust_prod_unwrap_violations = 0
@@ -39,7 +39,7 @@ accesskit_aria = true
 google_design_tailwind = true
 shadcn_base_ui_starter = true
 ai_agent_mcp = true
-module_file_count = 395
+module_file_count = 396
 role = "Unified Core Web Vitals, Lighthouse, W3C, Google Design, Vercel, and shadcn/Base UI/Tailwind GPUI starter stack"
 
 [[frameworks]]
@@ -228,7 +228,7 @@ label = "Egui (aphrody-labs/egui)"
 repo_or_submodule = "vendor/egui"
 present_on_disk = true
 manifest_present = true
-cargo_patched = false
+cargo_patched = true
 wasm32_unknown = true
 wasip2_aot = false
 wgpu_v30_webgpu = true

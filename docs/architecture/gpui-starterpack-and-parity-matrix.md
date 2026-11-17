@@ -27,7 +27,7 @@
 | Blitz HTML5/CSS (aphrody-labs/blitz) | - | YES | - | YES | YES | YES | - | - | - |
 | AnyRender (aphrody-labs/anyrender) | - | YES | - | YES | - | - | - | - | - |
 | Iced (aphrody-labs/iced) | - | YES | - | YES | - | YES | - | - | - |
-| Egui (aphrody-labs/egui) | - | YES | - | YES | - | YES | - | - | - |
+| Egui (aphrody-labs/egui) | YES | YES | - | YES | - | YES | - | - | - |
 | Libcosmic (aphrody-labs/libcosmic) | - | - | - | YES | - | YES | - | - | - |
 | Tauri v3 (aphrody-labs/tauri) | - | YES | YES | - | - | YES | - | - | - |
 | Craft Libs (aphrody-labs/craft-libs) | - | YES | YES | - | - | - | - | - | YES |
@@ -38,15 +38,15 @@
 
 | Benchmark | Iterations | Throughput (ops/sec) | p50 (us) | p95 (us) |
 | --- | ---: | ---: | ---: | ---: |
-| `design_md_frontmatter_parse` | 200 | 208442 | 5.7 | 11 |
-| `shadcn_tailwind_v4_css_emit` | 200 | 97456 | 9.2 | 18.4 |
-| `cwv_lighthouse_w3c_html_audit` | 200 | 746826 | 0.7 | 5.3 |
-| `submodule_parity_graph_resolve` | 50 | 16180 | 60.4 | 77.2 |
+| `design_md_frontmatter_parse` | 200 | 379147 | 2.9 | 4.6 |
+| `shadcn_tailwind_v4_css_emit` | 200 | 172771 | 5.2 | 9.1 |
+| `cwv_lighthouse_w3c_html_audit` | 200 | 1366120 | 0.4 | 2.2 |
+| `submodule_parity_graph_resolve` | 50 | 27420 | 35.9 | 46.2 |
 
 ## Monorepo TS -> Rust AI-Agent Readiness Audit
 
-- TypeScript files checked via `Bun.Transpiler`: **45** (syntax errors: 0, explicit `any` warnings: 7)
-- Pure-Rust core crate files checked: **43** (`mod.rs` violations: 0, production `.unwrap()`: 0)
+- TypeScript files checked via `Bun.Transpiler`: **52** (syntax errors: 0, explicit `any` warnings: 8)
+- Pure-Rust core crate files checked: **45** (`mod.rs` violations: 0, production `.unwrap()`: 0)
 - Machine path leaks across TS + Rust: **0**
 
 ## Key Source Files

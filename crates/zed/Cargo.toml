@@ -73,6 +73,10 @@ crash-reporting = [
 nsh = [
     "dep:nsh_workspace",
 ]
+studio = [
+    "nsh",
+    "nsh_workspace/studio",
+]
 grammars = [
     "languages/load-grammars",
 ]
@@ -85,6 +89,7 @@ full = [
     "updater",
     "crash-reporting",
     "nsh",
+    "studio",
     "grammars",
 ]
 tracy = ["ztracing/tracy"]
