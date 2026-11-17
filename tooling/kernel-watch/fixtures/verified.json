@@ -1,0 +1,767 @@
+{
+  "verifiedAt": "2026-11-17T04:52:22Z",
+  "sources": [
+    {
+      "id": "alpine-lts-commits",
+      "url": "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/commits?path=main/linux-lts&per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 21201,
+      "shape": "30 items; first commit: main/linux-lts: upgrade to 7.3.4"
+    },
+    {
+      "id": "alpine-lts-version",
+      "url": "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/files/main%2Flinux-lts%2FAPKBUILD/raw?ref=master",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 14009,
+      "shape": "1 items; versions edge/linux-lts=7.3.4; first version: alpine edge/linux-lts: 7.3.4"
+    },
+    {
+      "id": "alpine-rpi-version",
+      "url": "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/files/main%2Flinux-rpi%2FAPKBUILD/raw?ref=master",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 8568,
+      "shape": "1 items; versions edge/linux-rpi=6.18.63; first version: alpine edge/linux-rpi: 6.18.63"
+    },
+    {
+      "id": "android-gki-version",
+      "url": "https://android.googlesource.com/kernel/common/+refs/heads?format=JSON",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 68210,
+      "shape": "1 items; versions gki (android18-7.3)=7.3.0; first version: android gki (android18-7.3): 7.3.0"
+    },
+    {
+      "id": "android-mainline-log",
+      "url": "https://android.googlesource.com/kernel/common/+log/refs/heads/android-mainline?format=JSON&n=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 55501,
+      "shape": "50 items; first commit: ANDROID: gki_defconfig: Remove CONFIG_DM_SNAPSHOT"
+    },
+    {
+      "id": "android-mainline-version",
+      "url": "https://android.googlesource.com/kernel/common/+/refs/heads/android-mainline/Makefile?format=TEXT",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 112660,
+      "shape": "1 items; versions android-mainline=7.3.0; first version: android android-mainline: 7.3.0"
+    },
+    {
+      "id": "arch-aur-mainline",
+      "url": "https://aur.archlinux.org/rpc/v5/info?arg[]=linux-mainline",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1043,
+      "shape": "1 items; versions aur/linux-mainline=7.4rc3-1; first version: arch aur/linux-mainline: 7.4rc3-1"
+    },
+    {
+      "id": "arch-linux",
+      "url": "https://archlinux.org/packages/core/x86_64/linux/json/",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1321,
+      "shape": "1 items; versions core/linux=7.3.4.arch1; first version: arch core/linux: 7.3.4.arch1"
+    },
+    {
+      "id": "arch-linux-lts",
+      "url": "https://archlinux.org/packages/core/x86_64/linux-lts/json/",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 2065,
+      "shape": "1 items; versions core/linux-lts=6.18.63; first version: arch core/linux-lts: 6.18.63"
+    },
+    {
+      "id": "arch-linux-zen",
+      "url": "https://archlinux.org/packages/extra/x86_64/linux-zen/json/",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1282,
+      "shape": "1 items; versions extra/linux-zen=7.3.4.zen2; first version: arch extra/linux-zen: 7.3.4.zen2"
+    },
+    {
+      "id": "arch-packaging-tags",
+      "url": "https://gitlab.archlinux.org/api/v4/projects/archlinux%2Fpackaging%2Fpackages%2Flinux/repository/tags?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 33911,
+      "shape": "30 items; first tag: 7.3.4.arch1-2"
+    },
+    {
+      "id": "asterinas-commits",
+      "url": "https://api.github.com/repos/asterinas/asterinas/commits?per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 352036,
+      "shape": "100 items; first commit: Fix cache aligment check"
+    },
+    {
+      "id": "asterinas-counts",
+      "url": "https://api.github.com/search/issues?q=repo:asterinas/asterinas+is:open+is:pr&per_page=1",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 4687,
+      "shape": "0 items; metrics open_prs=160, open_issues=267"
+    },
+    {
+      "id": "asterinas-discussions",
+      "url": "https://github.com/asterinas/asterinas/discussions.atom",
+      "status": 200,
+      "contentType": "application/atom+xml",
+      "bytes": 62013,
+      "shape": "25 items; first discussion: How much of your code is written in Claude?"
+    },
+    {
+      "id": "asterinas-issues",
+      "url": "https://api.github.com/repos/asterinas/asterinas/issues?state=all&sort=updated&direction=desc&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 668494,
+      "shape": "34 items; first issue: Introduce DRM subsystem and migrate graphics stack from fbdev"
+    },
+    {
+      "id": "asterinas-org-repos",
+      "url": "https://api.github.com/orgs/asterinas/repos?per_page=100&sort=pushed",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 329994,
+      "shape": "61 items; first repo: asterinas/asterinas"
+    },
+    {
+      "id": "asterinas-pulls",
+      "url": "https://api.github.com/repos/asterinas/asterinas/pulls?state=all&sort=updated&direction=desc&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1902626,
+      "shape": "100 items; first pr: Ext4 support: Add basic writable EXT4 extent support"
+    },
+    {
+      "id": "asterinas-releases",
+      "url": "https://api.github.com/repos/asterinas/asterinas/releases?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 22901,
+      "shape": "6 items; first release: v0.19.0"
+    },
+    {
+      "id": "asterinas-repo",
+      "url": "https://api.github.com/repos/asterinas/asterinas",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 6463,
+      "shape": "0 items; metrics stars=5110, forks=420, size_kb=19567"
+    },
+    {
+      "id": "cachyos-commits",
+      "url": "https://api.github.com/repos/CachyOS/linux-cachyos/commits?per_page=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 218091,
+      "shape": "50 items; first commit: config: build applesmc (#1155)"
+    },
+    {
+      "id": "cachyos-kernel-releases",
+      "url": "https://api.github.com/repos/CachyOS/linux/releases?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 536017,
+      "shape": "30 items; first release: CachyOS Linux 7.4-rc3-1"
+    },
+    {
+      "id": "cachyos-org-repos",
+      "url": "https://api.github.com/orgs/CachyOS/repos?per_page=100&sort=pushed",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 544934,
+      "shape": "100 items; first repo: CachyOS/cachyos-aur-derived"
+    },
+    {
+      "id": "cachyos-rc-version",
+      "url": "https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos-rc/.SRCINFO",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 2992,
+      "shape": "1 items; versions linux-cachyos-rc=7.4.rc3; first version: cachyos linux-cachyos-rc: 7.4.rc3"
+    },
+    {
+      "id": "cachyos-stable-version",
+      "url": "https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos/.SRCINFO",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 3089,
+      "shape": "1 items; versions linux-cachyos=7.3.4; first version: cachyos linux-cachyos: 7.3.4"
+    },
+    {
+      "id": "chromiumos-log",
+      "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel/+log/refs/heads/chromeos-6.12?format=JSON&n=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 122718,
+      "shape": "50 items; first commit: CHROMIUM: intel_gna: clear page tables on request error in gna_score"
+    },
+    {
+      "id": "chromiumos-newest-branch",
+      "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel/+refs/heads?format=JSON",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1541950,
+      "shape": "1 items; versions newest-branch (chromeos-6.12)=6.12.100; first version: chromiumos newest-branch (chromeos-6.12): 6.12.100"
+    },
+    {
+      "id": "fedora-ark-commits",
+      "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/repository/commits?per_page=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 85932,
+      "shape": "50 items; first commit: Merge branch 'makefile_cleanups_1' into 'os-build'"
+    },
+    {
+      "id": "fedora-ark-merge-requests",
+      "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/merge_requests?state=all&order_by=updated_at&per_page=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 203846,
+      "shape": "50 items; first pr: redhat/configs: Update powerpc CONFIG_HZ_1000 config"
+    },
+    {
+      "id": "fedora-ark-tags",
+      "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/repository/tags?per_page=30&order_by=updated",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 37741,
+      "shape": "30 items; versions kernel-ark=7.4.0-0.rc3.26; first tag: kernel-7.4.0-0.rc3.26"
+    },
+    {
+      "id": "fedora-bodhi",
+      "url": "https://bodhi.fedoraproject.org/updates/?packages=kernel&status=stable&rows_per_page=40",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 385637,
+      "shape": "28 items; versions F46=7.4.0-0.rc3.26.fc46, F44=7.3.4-200.fc44, F43=7.3.4-100.fc43, F45=7.3.4-300.fc45; first package: kernel-7.4.0-0.rc3.26.fc46 (F46, stable)"
+    },
+    {
+      "id": "libernt-commits",
+      "url": "https://api.github.com/repos/LiberNT/LiberNT/commits?sha=main-nt10&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 415334,
+      "shape": "100 items; first commit: [DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CP"
+    },
+    {
+      "id": "libernt-counts",
+      "url": "https://api.github.com/search/issues?q=repo:LiberNT/LiberNT+is:open+is:pr&per_page=1",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 5576,
+      "shape": "0 items; metrics open_prs=31, open_issues=74"
+    },
+    {
+      "id": "libernt-discussions",
+      "url": "https://github.com/LiberNT/LiberNT/discussions.atom",
+      "status": 200,
+      "contentType": "application/atom+xml",
+      "bytes": 19234,
+      "shape": "6 items; first discussion: Boot Liber NT on the Raspbarry pi zero 2 w"
+    },
+    {
+      "id": "libernt-issues",
+      "url": "https://api.github.com/repos/LiberNT/LiberNT/issues?state=all&sort=updated&direction=desc&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 598031,
+      "shape": "20 items; first issue: You are repeating the same mistakes as Microsoft when it comes to the "
+    },
+    {
+      "id": "libernt-org-repos",
+      "url": "https://api.github.com/orgs/LiberNT/repos?per_page=100&sort=pushed",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 36378,
+      "shape": "7 items; first repo: LiberNT/LiberNT"
+    },
+    {
+      "id": "libernt-pulls",
+      "url": "https://api.github.com/repos/LiberNT/LiberNT/pulls?state=all&sort=updated&direction=desc&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 2049436,
+      "shape": "100 items; first pr: [MSCTFIME][IMM32_APITEST] Draw the composition window with the text se"
+    },
+    {
+      "id": "libernt-releases",
+      "url": "https://api.github.com/repos/LiberNT/LiberNT/releases?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 156556,
+      "shape": "10 items; first release: ICU payload 72.1-1"
+    },
+    {
+      "id": "libernt-repo",
+      "url": "https://api.github.com/repos/LiberNT/LiberNT",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 6223,
+      "shape": "0 items; metrics stars=1173, forks=0, size_kb=953350"
+    },
+    {
+      "id": "libernt-sitemap",
+      "url": "https://libernt.com/sitemap.xml",
+      "status": 200,
+      "contentType": "application/xml",
+      "bytes": 672702,
+      "shape": "100 items; first page: /compatibility/google-chrome/"
+    },
+    {
+      "id": "linux-lkml",
+      "url": "https://lore.kernel.org/lkml/new.atom",
+      "status": 200,
+      "contentType": "application/atom+xml",
+      "bytes": 213915,
+      "shape": "25 items; first mail: Re: [PATCH v4 2/3] selftests/mm: test userspace MFR for HugeTLB hugepa"
+    },
+    {
+      "id": "linux-mainline-commits",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/atom/?h=master",
+      "status": 200,
+      "contentType": "text/xml",
+      "bytes": 19845,
+      "shape": "10 items; first commit: Merge tag 'assoc-array-fixes-v2'"
+    },
+    {
+      "id": "linux-next-commits",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/atom/?h=master",
+      "status": 200,
+      "contentType": "text/xml",
+      "bytes": 6025,
+      "shape": "10 items; first commit: Add linux-next specific files for 20261116"
+    },
+    {
+      "id": "linux-releases",
+      "url": "https://www.kernel.org/releases.json",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 8428,
+      "shape": "9 items; versions mainline=7.4-rc3, stable=7.3.4, longterm-6.18=6.18.63, longterm-6.12=6.12.117; first release: Linux 7.4-rc3 (mainline)"
+    },
+    {
+      "id": "linux-rust-for-linux-list",
+      "url": "https://lore.kernel.org/rust-for-linux/new.atom",
+      "status": 200,
+      "contentType": "application/atom+xml",
+      "bytes": 133655,
+      "shape": "25 items; first mail: Re: [RFC PATCH v2] rust: i2c: Remove use of bindings::i2c_match_id"
+    },
+    {
+      "id": "linux-stable-commits",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/atom/?h=linux-rolling-stable",
+      "status": 200,
+      "contentType": "text/xml",
+      "bytes": 19324,
+      "shape": "10 items; first commit: Merge v7.3.4"
+    },
+    {
+      "id": "linux-tags",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/refs/tags",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 357140,
+      "shape": "715 items; first tag: v7.4-rc3"
+    },
+    {
+      "id": "nixos-kernel-commits",
+      "url": "https://api.github.com/repos/NixOS/nixpkgs/commits?path=pkgs/os-specific/linux/kernel&per_page=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 184991,
+      "shape": "50 items; first commit: linux_testing: 7.4-rc2 -> 7.4-rc3"
+    },
+    {
+      "id": "nixos-kernels",
+      "url": "https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/os-specific/linux/kernel/kernels-org.json",
+      "status": 200,
+      "contentType": "text/plain",
+      "bytes": 904,
+      "shape": "6 items; versions testing=7.4-rc3, 6.1 lts=6.1.192, 6.6 lts=6.6.162, 6.12 lts=6.12.117; first version: nixos testing: 7.4-rc3"
+    },
+    {
+      "id": "redox-commits",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/repository/commits?per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 71633,
+      "shape": "100 items; first commit: refactor: Use args() and defaults for Sqe initialization"
+    },
+    {
+      "id": "redox-counts",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=opened&per_page=1",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 1805,
+      "shape": "0 items; metrics open_prs=16, open_issues=66"
+    },
+    {
+      "id": "redox-group-projects",
+      "url": "https://gitlab.redox-os.org/api/v4/groups/redox-os/projects?per_page=100&order_by=last_activity_at",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 381407,
+      "shape": "100 items; first repo: redox-os/relibc"
+    },
+    {
+      "id": "redox-issues",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/issues?state=all&order_by=updated_at&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 295373,
+      "shape": "100 items; first issue: Add a description comment in all feature flags at Cargo.toml"
+    },
+    {
+      "id": "redox-merge-requests",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=all&order_by=updated_at&per_page=100",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 298957,
+      "shape": "100 items; first pr: Draft: IPC priority queue for SIGKILL and SIGSTOP"
+    },
+    {
+      "id": "redox-news",
+      "url": "https://www.redox-os.org/news/index.xml",
+      "status": 200,
+      "contentType": "application/xml",
+      "bytes": 240036,
+      "shape": "160 items; first news: Virtualized Redox: from Virtio-FS to Cloud Hypervisor, and beyond"
+    },
+    {
+      "id": "redox-project",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 884,
+      "shape": "0 items; metrics stars=37, forks=97"
+    },
+    {
+      "id": "redox-releases",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/releases?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 2,
+      "shape": "0 items"
+    },
+    {
+      "id": "redox-sitemap",
+      "url": "https://www.redox-os.org/sitemap.xml",
+      "status": 200,
+      "contentType": "application/xml",
+      "bytes": 21545,
+      "shape": "100 items; first page: /"
+    },
+    {
+      "id": "redox-tags",
+      "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/repository/tags?per_page=50",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 4879,
+      "shape": "6 items; first tag: syscall-v0.9.5"
+    },
+    {
+      "id": "rhel-c10s-commits",
+      "url": "https://gitlab.com/api/v4/projects/redhat%2Fcentos-stream%2Fsrc%2Fkernel%2Fcentos-stream-10/repository/commits?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 83340,
+      "shape": "30 items; versions centos-stream-10=6.12.0; first commit: [redhat] kernel-6.12.0-284.el10"
+    },
+    {
+      "id": "rhel-c9s-commits",
+      "url": "https://gitlab.com/api/v4/projects/redhat%2Fcentos-stream%2Fsrc%2Fkernel%2Fcentos-stream-9/repository/commits?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 84212,
+      "shape": "30 items; versions centos-stream-9=5.14.0; first commit: [redhat] kernel-5.14.0-765.el9"
+    },
+    {
+      "id": "ubuntu-launchpad",
+      "url": "https://api.launchpad.net/devel/ubuntu/+archive/primary?ws.op=getPublishedSources&source_name=linux&exact_match=true&order_by_date=true&ws.size=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 41603,
+      "shape": "30 items; versions noble/proposed=6.8.0-151.151, resolute/security=7.0.0-43.43, stonking/proposed=7.3.0-11.12, jammy/security=5.15.0-203.213; first package: linux 6.8.0-151.151 (noble/Proposed)"
+    },
+    {
+      "id": "ubuntu-mainline-builds",
+      "url": "https://kernel.ubuntu.com/mainline/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 305513,
+      "shape": "8 items; versions mainline-ppa=7.4-rc3; first build: mainline build v7.4-rc3"
+    }
+  ],
+  "sites": [
+    {
+      "id": "alpine/packages",
+      "url": "https://pkgs.alpinelinux.org/packages",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 289049,
+      "shape": "Package index - Alpine Linux packages"
+    },
+    {
+      "id": "android/googlesource",
+      "url": "https://android.googlesource.com/kernel/common",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 26207,
+      "shape": "kernel/common - Git at Google"
+    },
+    {
+      "id": "android/source-android",
+      "url": "https://source.android.com/docs/core/architecture/kernel/android-common",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 207933,
+      "shape": "Android common kernels &nbsp;|&nbsp; Android OS core topics &nbsp;|&nbsp; Androi"
+    },
+    {
+      "id": "arch/packaging",
+      "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/linux",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 53120,
+      "shape": "Arch Linux / Packaging / Packages / linux · GitLab"
+    },
+    {
+      "id": "arch/wiki",
+      "url": "https://wiki.archlinux.org/title/Kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 86385,
+      "shape": "Kernel - ArchWiki"
+    },
+    {
+      "id": "asterinas/asterinas",
+      "url": "https://github.com/asterinas",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 243640,
+      "shape": "Asterinas · GitHub"
+    },
+    {
+      "id": "asterinas/book",
+      "url": "https://asterinas.github.io/book/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 24789,
+      "shape": "Introduction - The Asterinas Book"
+    },
+    {
+      "id": "asterinas/linux-compatibility",
+      "url": "https://asterinas.github.io/book/kernel/linux-compatibility/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 51351,
+      "shape": "Linux Compatibility - The Asterinas Book"
+    },
+    {
+      "id": "asterinas/site",
+      "url": "https://asterinas.github.io/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 41812,
+      "shape": "Asterinas"
+    },
+    {
+      "id": "cachyos/cachyos",
+      "url": "https://github.com/CachyOS",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 273469,
+      "shape": "CachyOS · GitHub"
+    },
+    {
+      "id": "cachyos/site",
+      "url": "https://cachyos.org/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 43911,
+      "shape": "CachyOS — Blazingly Fast OS based on Arch Linux — CachyOS"
+    },
+    {
+      "id": "chromiumos/docs",
+      "url": "https://www.chromium.org/chromium-os/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 10247,
+      "shape": "Developer Library"
+    },
+    {
+      "id": "chromiumos/googlesource",
+      "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 23842,
+      "shape": "chromiumos/third_party/kernel - Git at Google"
+    },
+    {
+      "id": "fedora/dist-git",
+      "url": "https://src.fedoraproject.org/rpms/kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 39078,
+      "shape": "Overview - rpms/kernel - src.fedoraproject.org"
+    },
+    {
+      "id": "fedora/kernel-ark",
+      "url": "https://gitlab.com/cki-project/kernel-ark",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 62508,
+      "shape": "cki-project / kernel-ark · GitLab"
+    },
+    {
+      "id": "libernt/libernt",
+      "url": "https://github.com/LiberNT",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 218244,
+      "shape": "LiberNT · GitHub"
+    },
+    {
+      "id": "libernt/site",
+      "url": "https://libernt.com/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 14628,
+      "shape": "LiberNT · A free NT operating system."
+    },
+    {
+      "id": "linux/doc-html",
+      "url": "https://www.kernel.org/doc/html/latest/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 18375,
+      "shape": "The Linux Kernel documentation &#8212; The Linux Kernel  documentation"
+    },
+    {
+      "id": "linux/docs",
+      "url": "https://docs.kernel.org/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 18375,
+      "shape": "The Linux Kernel documentation &#8212; The Linux Kernel  documentation"
+    },
+    {
+      "id": "linux/kernel-org",
+      "url": "https://www.kernel.org/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 20436,
+      "shape": "The Linux Kernel Archives"
+    },
+    {
+      "id": "linux/lore",
+      "url": "https://lore.kernel.org/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 19170,
+      "shape": "public-inbox listing"
+    },
+    {
+      "id": "linux/rust-for-linux",
+      "url": "https://rust-for-linux.com/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 27235,
+      "shape": "Rust for Linux"
+    },
+    {
+      "id": "linux/rust-for-linux-github",
+      "url": "https://github.com/Rust-for-Linux",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 260039,
+      "shape": "Rust for Linux · GitHub"
+    },
+    {
+      "id": "nixos/nixpkgs",
+      "url": "https://github.com/NixOS/nixpkgs",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 282425,
+      "shape": "GitHub - NixOS/nixpkgs: Nix Packages collection &amp; NixOS · GitHub"
+    },
+    {
+      "id": "nixos/search",
+      "url": "https://search.nixos.org/packages",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 1748,
+      "shape": "NixOS Search"
+    },
+    {
+      "id": "redox/book",
+      "url": "https://doc.redox-os.org/book/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 26267,
+      "shape": "Introduction - The Redox Operating System"
+    },
+    {
+      "id": "redox/redox-os",
+      "url": "https://gitlab.redox-os.org/redox-os",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 27192,
+      "shape": "redox-os · GitLab"
+    },
+    {
+      "id": "redox/rfcs",
+      "url": "https://gitlab.redox-os.org/redox-os/rfcs",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 44491,
+      "shape": "redox-os / rfcs · GitLab"
+    },
+    {
+      "id": "redox/site",
+      "url": "https://www.redox-os.org/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 38622,
+      "shape": "Redox - Your Next(Gen) OS - Redox - Your Next(Gen) OS"
+    },
+    {
+      "id": "rhel/centos-stream-10",
+      "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-10",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 55596,
+      "shape": "Red Hat / centos-stream / src / kernel / centos-stream-10 · GitLab"
+    },
+    {
+      "id": "ubuntu/launchpad",
+      "url": "https://launchpad.net/ubuntu/+source/linux",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 60970,
+      "shape": "linux package : Ubuntu"
+    },
+    {
+      "id": "ubuntu/mainline-builds",
+      "url": "https://kernel.ubuntu.com/mainline/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 305513,
+      "shape": "Index of /mainline"
+    },
+    {
+      "id": "ubuntu/wiki",
+      "url": "https://wiki.ubuntu.com/Kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 39324,
+      "shape": "Kernel - Ubuntu Wiki"
+    }
+  ]
+}

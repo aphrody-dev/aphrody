@@ -1,0 +1,895 @@
+# Kernel watch manifest: every source, host, organisation and satellite site the watch follows.
+# Each URL was requested live on 2026-11-17 and answered 200; fixtures/verified.json records status and shape per source
+# (regenerate with `bun cli.ts verify`). Nothing else in the tool names a host.
+
+[watch]
+user_agent = "kernel-watch"
+min_interval = "10m"
+timeout = "30s"
+max_pages = 3                 # pages followed per poll, and only while a whole page was new
+concurrency_per_host = 2
+retention_days = 45           # high-volume items (commits, mail, pages, packages) older than this are dropped
+max_backoff = "6h"
+
+# Tokens are read from the environment when present; without one the public rate limits apply.
+[watch.auth."api.github.com"]
+scheme = "Bearer"
+env = ["GITHUB_TOKEN", "GH_TOKEN"]
+
+# ------------------------------------------------------------------------------------------------ kernels
+
+[[kernel]]
+id = "linux"
+name = "Linux"
+role = "upstream"
+lineage = "linux"
+description = "Mainline, stable and linux-next trees published by kernel.org."
+  [[kernel.site]]
+  id = "kernel-org"
+  kind = "site"
+  url = "https://www.kernel.org/"
+  [[kernel.site]]
+  id = "docs"
+  kind = "docs"
+  url = "https://docs.kernel.org/"
+  [[kernel.site]]
+  id = "doc-html"
+  kind = "docs"
+  url = "https://www.kernel.org/doc/html/latest/"
+  [[kernel.site]]
+  id = "lore"
+  kind = "list"
+  url = "https://lore.kernel.org/"
+  note = "public-inbox archive of the kernel mailing lists; two list feeds are polled, full ingestion is out of scope"
+  [[kernel.site]]
+  id = "rust-for-linux"
+  kind = "site"
+  url = "https://rust-for-linux.com/"
+  [[kernel.org]]
+  id = "rust-for-linux-github"
+  provider = "github"
+  url = "https://github.com/Rust-for-Linux"
+
+[[kernel]]
+id = "asterinas"
+name = "Asterinas"
+role = "research"
+lineage = "own"
+description = "Rust framekernel with Linux ABI compatibility (OSTD)."
+  [[kernel.site]]
+  id = "site"
+  kind = "site"
+  url = "https://asterinas.github.io/"
+  [[kernel.site]]
+  id = "book"
+  kind = "book"
+  url = "https://asterinas.github.io/book/"
+  [[kernel.site]]
+  id = "linux-compatibility"
+  kind = "docs"
+  url = "https://asterinas.github.io/book/kernel/linux-compatibility/"
+  note = "syscall and feature coverage tables, read in phase B"
+  [[kernel.org]]
+  id = "asterinas"
+  provider = "github"
+  url = "https://github.com/asterinas"
+  source = "asterinas-org-repos"
+
+[[kernel]]
+id = "redox"
+name = "Redox"
+role = "research"
+lineage = "own"
+description = "Rust microkernel and userland, forge on GitLab."
+  [[kernel.site]]
+  id = "site"
+  kind = "site"
+  url = "https://www.redox-os.org/"
+  [[kernel.site]]
+  id = "book"
+  kind = "book"
+  url = "https://doc.redox-os.org/book/"
+  [[kernel.site]]
+  id = "rfcs"
+  kind = "rfc"
+  url = "https://gitlab.redox-os.org/redox-os/rfcs"
+  [[kernel.org]]
+  id = "redox-os"
+  provider = "gitlab"
+  url = "https://gitlab.redox-os.org/redox-os"
+  source = "redox-group-projects"
+
+[[kernel]]
+id = "libernt"
+name = "LiberNT"
+role = "research"
+lineage = "own"
+description = "Free Windows-compatible NT kernel and userland (branch main-nt10)."
+  [[kernel.site]]
+  id = "site"
+  kind = "site"
+  url = "https://libernt.com/"
+  [[kernel.org]]
+  id = "libernt"
+  provider = "github"
+  url = "https://github.com/LiberNT"
+  source = "libernt-org-repos"
+
+[[kernel]]
+id = "android"
+name = "Android Common Kernel"
+role = "downstream"
+lineage = "linux"
+description = "android-mainline and GKI branches of the Android Common Kernel."
+  [[kernel.site]]
+  id = "source-android"
+  kind = "docs"
+  url = "https://source.android.com/docs/core/architecture/kernel/android-common"
+  [[kernel.site]]
+  id = "googlesource"
+  kind = "forge"
+  url = "https://android.googlesource.com/kernel/common"
+
+[[kernel]]
+id = "cachyos"
+name = "CachyOS"
+role = "downstream"
+lineage = "linux"
+description = "Arch-based distro shipping linux-cachyos and linux-cachyos-rc."
+  [[kernel.site]]
+  id = "site"
+  kind = "site"
+  url = "https://cachyos.org/"
+  [[kernel.org]]
+  id = "cachyos"
+  provider = "github"
+  url = "https://github.com/CachyOS"
+  source = "cachyos-org-repos"
+
+[[kernel]]
+id = "chromiumos"
+name = "ChromiumOS kernel"
+role = "downstream"
+lineage = "linux"
+description = "chromeos-X.Y kernel branches of ChromiumOS."
+  [[kernel.site]]
+  id = "docs"
+  kind = "docs"
+  url = "https://www.chromium.org/chromium-os/"
+  [[kernel.site]]
+  id = "googlesource"
+  kind = "forge"
+  url = "https://chromium.googlesource.com/chromiumos/third_party/kernel"
+
+[[kernel]]
+id = "alpine"
+name = "Alpine Linux"
+role = "downstream"
+lineage = "linux"
+description = "linux-lts and linux-rpi in aports edge."
+  [[kernel.site]]
+  id = "packages"
+  kind = "site"
+  url = "https://pkgs.alpinelinux.org/packages"
+  
+[[kernel]]
+id = "nixos"
+name = "NixOS"
+role = "downstream"
+lineage = "linux"
+description = "nixpkgs kernel pins (kernels-org.json): testing (rc) plus every maintained series."
+  [[kernel.site]]
+  id = "search"
+  kind = "site"
+  url = "https://search.nixos.org/packages"
+  [[kernel.org]]
+  id = "nixpkgs"
+  provider = "github"
+  url = "https://github.com/NixOS/nixpkgs"
+
+[[kernel]]
+id = "fedora"
+name = "Fedora"
+role = "downstream"
+lineage = "linux"
+description = "Rawhide and stable Fedora kernels (Bodhi) plus the upstream-tracking kernel-ark tree."
+  [[kernel.site]]
+  id = "dist-git"
+  kind = "forge"
+  url = "https://src.fedoraproject.org/rpms/kernel"
+  [[kernel.org]]
+  id = "kernel-ark"
+  provider = "gitlab"
+  url = "https://gitlab.com/cki-project/kernel-ark"
+
+[[kernel]]
+id = "ubuntu"
+name = "Ubuntu"
+role = "downstream"
+lineage = "linux"
+description = "Archive kernels per series (Launchpad) and the mainline build PPA."
+  [[kernel.site]]
+  id = "wiki"
+  kind = "docs"
+  url = "https://wiki.ubuntu.com/Kernel"
+  [[kernel.site]]
+  id = "launchpad"
+  kind = "forge"
+  url = "https://launchpad.net/ubuntu/+source/linux"
+  [[kernel.site]]
+  id = "mainline-builds"
+  kind = "site"
+  url = "https://kernel.ubuntu.com/mainline/"
+
+[[kernel]]
+id = "arch"
+name = "Arch Linux"
+role = "downstream"
+lineage = "linux"
+description = "Official linux, linux-lts, linux-zen and the AUR linux-mainline rc package."
+  [[kernel.site]]
+  id = "wiki"
+  kind = "docs"
+  url = "https://wiki.archlinux.org/title/Kernel"
+  [[kernel.org]]
+  id = "packaging"
+  provider = "gitlab"
+  url = "https://gitlab.archlinux.org/archlinux/packaging/packages/linux"
+
+[[kernel]]
+id = "rhel"
+name = "RHEL / CentOS Stream"
+role = "downstream"
+lineage = "linux"
+description = "CentOS Stream kernel source-git, the public upstream of RHEL kernels (RHEL itself publishes no kernel API)."
+  [[kernel.org]]
+  id = "centos-stream-10"
+  provider = "gitlab"
+  url = "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-10"
+
+# ------------------------------------------------------------------------------------------------ Linux (kernel.org)
+
+[[source]]
+id = "linux-releases"
+kernel = "linux"
+adapter = "kernel-org-releases"
+kind = "releases-json"
+url = "https://www.kernel.org/releases.json"
+yields = ["release", "version"]
+min_interval = "5m"
+note = "latest mainline rc, stable and longterm series; the reference of every distance in the versions table"
+
+[[source]]
+id = "linux-mainline-commits"
+kernel = "linux"
+adapter = "cgit-atom"
+kind = "cgit-atom"
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/atom/?h=master"
+yields = ["commit"]
+min_interval = "5m"
+note = "cgit redirects ?h=master to the default-branch feed; no ETag, Last-Modified is honoured; one page of about 20 commits"
+
+[[source]]
+id = "linux-stable-commits"
+kernel = "linux"
+adapter = "cgit-atom"
+kind = "cgit-atom"
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/atom/?h=linux-rolling-stable"
+yields = ["commit"]
+min_interval = "10m"
+
+[[source]]
+id = "linux-next-commits"
+kernel = "linux"
+adapter = "cgit-atom"
+kind = "cgit-atom"
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/atom/?h=master"
+yields = ["commit"]
+min_interval = "10m"
+
+[[source]]
+id = "linux-tags"
+kernel = "linux"
+adapter = "cgit-tags"
+kind = "cgit-atom"
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/refs/tags"
+yields = ["tag"]
+min_interval = "6h"
+note = "cgit HTML tag list; gives the ordered mainline cycles used to count cycles between kernels"
+
+[[source]]
+id = "linux-lkml"
+kernel = "linux"
+adapter = "atom"
+kind = "feed"
+url = "https://lore.kernel.org/lkml/new.atom"
+yields = ["mail"]
+min_interval = "10m"
+
+[[source]]
+id = "linux-rust-for-linux-list"
+kernel = "linux"
+adapter = "atom"
+kind = "feed"
+url = "https://lore.kernel.org/rust-for-linux/new.atom"
+yields = ["mail"]
+min_interval = "30m"
+
+# ------------------------------------------------------------------------------------------------ Asterinas (GitHub)
+
+[[source]]
+id = "asterinas-releases"
+kernel = "asterinas"
+adapter = "github-releases"
+kind = "forge-api"
+url = "https://api.github.com/repos/asterinas/asterinas/releases?per_page=30"
+yields = ["release"]
+min_interval = "15m"
+
+[[source]]
+id = "asterinas-commits"
+kernel = "asterinas"
+adapter = "github-commits"
+kind = "forge-api"
+url = "https://api.github.com/repos/asterinas/asterinas/commits?per_page=100"
+yields = ["commit"]
+min_interval = "10m"
+
+[[source]]
+id = "asterinas-issues"
+kernel = "asterinas"
+adapter = "github-issues"
+kind = "forge-api"
+url = "https://api.github.com/repos/asterinas/asterinas/issues?state=all&sort=updated&direction=desc&per_page=100"
+yields = ["issue"]
+min_interval = "10m"
+
+[[source]]
+id = "asterinas-pulls"
+kernel = "asterinas"
+adapter = "github-pulls"
+kind = "forge-api"
+url = "https://api.github.com/repos/asterinas/asterinas/pulls?state=all&sort=updated&direction=desc&per_page=100"
+yields = ["pr"]
+min_interval = "10m"
+
+[[source]]
+id = "asterinas-discussions"
+kernel = "asterinas"
+adapter = "atom"
+kind = "feed"
+url = "https://github.com/asterinas/asterinas/discussions.atom"
+yields = ["discussion"]
+min_interval = "30m"
+note = "the REST API has no discussions endpoint and GraphQL needs a token; the public Atom feed carries the latest ones"
+
+[[source]]
+id = "asterinas-counts"
+kernel = "asterinas"
+adapter = "github-open-counts"
+kind = "forge-api"
+url = "https://api.github.com/search/issues?q=repo:asterinas/asterinas+is:open+is:pr&per_page=1"
+issues_url = "https://api.github.com/search/issues?q=repo:asterinas/asterinas+is:open+is:issue&per_page=1"
+yields = ["metric"]
+min_interval = "30m"
+
+[[source]]
+id = "asterinas-repo"
+kernel = "asterinas"
+adapter = "github-repo"
+kind = "forge-api"
+url = "https://api.github.com/repos/asterinas/asterinas"
+yields = ["metric"]
+min_interval = "1h"
+
+[[source]]
+id = "asterinas-org-repos"
+kernel = "asterinas"
+adapter = "github-org-repos"
+kind = "forge-api"
+url = "https://api.github.com/orgs/asterinas/repos?per_page=100&sort=pushed"
+yields = ["repo"]
+min_interval = "6h"
+
+# ------------------------------------------------------------------------------------------------ Redox (GitLab)
+
+[[source]]
+id = "redox-commits"
+kernel = "redox"
+adapter = "gitlab-commits"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/repository/commits?per_page=100"
+yields = ["commit"]
+min_interval = "10m"
+
+[[source]]
+id = "redox-merge-requests"
+kernel = "redox"
+adapter = "gitlab-merge-requests"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=all&order_by=updated_at&per_page=100"
+yields = ["pr"]
+min_interval = "10m"
+
+[[source]]
+id = "redox-issues"
+kernel = "redox"
+adapter = "gitlab-issues"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/issues?state=all&order_by=updated_at&per_page=100"
+yields = ["issue"]
+min_interval = "10m"
+
+[[source]]
+id = "redox-tags"
+kernel = "redox"
+adapter = "gitlab-tags"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/repository/tags?per_page=50"
+web = "https://gitlab.redox-os.org/redox-os/kernel/-/tags"
+yields = ["tag"]
+min_interval = "1h"
+
+[[source]]
+id = "redox-releases"
+kernel = "redox"
+adapter = "gitlab-releases"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/releases?per_page=30"
+yields = ["release"]
+min_interval = "1h"
+note = "answers 200 with an empty list today; releases are tags"
+
+[[source]]
+id = "redox-counts"
+kernel = "redox"
+adapter = "gitlab-open-counts"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=opened&per_page=1"
+issues_url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/issues?state=opened&per_page=1"
+yields = ["metric"]
+min_interval = "30m"
+
+[[source]]
+id = "redox-project"
+kernel = "redox"
+adapter = "gitlab-project"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel"
+yields = ["metric"]
+min_interval = "1h"
+
+[[source]]
+id = "redox-group-projects"
+kernel = "redox"
+adapter = "gitlab-group-projects"
+kind = "forge-api"
+url = "https://gitlab.redox-os.org/api/v4/groups/redox-os/projects?per_page=100&order_by=last_activity_at"
+yields = ["repo"]
+min_interval = "12h"
+
+[[source]]
+id = "redox-news"
+kernel = "redox"
+adapter = "rss"
+kind = "feed"
+url = "https://www.redox-os.org/news/index.xml"
+yields = ["news"]
+min_interval = "6h"
+
+[[source]]
+id = "redox-sitemap"
+kernel = "redox"
+adapter = "sitemap"
+kind = "sitemap"
+url = "https://www.redox-os.org/sitemap.xml"
+yields = ["page"]
+min_interval = "12h"
+
+# ------------------------------------------------------------------------------------------------ LiberNT (GitHub, branch main-nt10)
+
+[[source]]
+id = "libernt-commits"
+kernel = "libernt"
+adapter = "github-commits"
+kind = "forge-api"
+url = "https://api.github.com/repos/LiberNT/LiberNT/commits?sha=main-nt10&per_page=100"
+yields = ["commit"]
+min_interval = "10m"
+
+[[source]]
+id = "libernt-releases"
+kernel = "libernt"
+adapter = "github-releases"
+kind = "forge-api"
+url = "https://api.github.com/repos/LiberNT/LiberNT/releases?per_page=30"
+yields = ["release"]
+min_interval = "15m"
+
+[[source]]
+id = "libernt-issues"
+kernel = "libernt"
+adapter = "github-issues"
+kind = "forge-api"
+url = "https://api.github.com/repos/LiberNT/LiberNT/issues?state=all&sort=updated&direction=desc&per_page=100"
+yields = ["issue"]
+min_interval = "10m"
+
+[[source]]
+id = "libernt-pulls"
+kernel = "libernt"
+adapter = "github-pulls"
+kind = "forge-api"
+url = "https://api.github.com/repos/LiberNT/LiberNT/pulls?state=all&sort=updated&direction=desc&per_page=100"
+yields = ["pr"]
+min_interval = "10m"
+
+[[source]]
+id = "libernt-discussions"
+kernel = "libernt"
+adapter = "atom"
+kind = "feed"
+url = "https://github.com/LiberNT/LiberNT/discussions.atom"
+yields = ["discussion"]
+min_interval = "30m"
+
+[[source]]
+id = "libernt-counts"
+kernel = "libernt"
+adapter = "github-open-counts"
+kind = "forge-api"
+url = "https://api.github.com/search/issues?q=repo:LiberNT/LiberNT+is:open+is:pr&per_page=1"
+issues_url = "https://api.github.com/search/issues?q=repo:LiberNT/LiberNT+is:open+is:issue&per_page=1"
+yields = ["metric"]
+min_interval = "30m"
+
+[[source]]
+id = "libernt-repo"
+kernel = "libernt"
+adapter = "github-repo"
+kind = "forge-api"
+url = "https://api.github.com/repos/LiberNT/LiberNT"
+yields = ["metric"]
+min_interval = "1h"
+
+[[source]]
+id = "libernt-org-repos"
+kernel = "libernt"
+adapter = "github-org-repos"
+kind = "forge-api"
+url = "https://api.github.com/orgs/LiberNT/repos?per_page=100&sort=pushed"
+yields = ["repo"]
+min_interval = "6h"
+
+[[source]]
+id = "libernt-sitemap"
+kernel = "libernt"
+adapter = "sitemap"
+kind = "sitemap"
+url = "https://libernt.com/sitemap.xml"
+limit = 100
+yields = ["page"]
+min_interval = "12h"
+
+# ------------------------------------------------------------------------------------------------ Android common kernel (Gitiles)
+
+[[source]]
+id = "android-mainline-version"
+kernel = "android"
+adapter = "text-version"
+kind = "gitiles"
+url = "https://android.googlesource.com/kernel/common/+/refs/heads/android-mainline/Makefile?format=TEXT"
+decode = "base64"
+patterns = ['^VERSION[ \t]*=[ \t]*(\d+)', '^PATCHLEVEL[ \t]*=[ \t]*(\d+)', '^SUBLEVEL[ \t]*=[ \t]*(\d+)', '^EXTRAVERSION[ \t]*=[ \t]*(\S*)']
+template = "{1}.{2}.{3}{4}"
+channel = "android-mainline"
+yields = ["version"]
+min_interval = "30m"
+note = "Gitiles serves files base64 encoded with format=TEXT; the version comes from the Makefile header"
+
+[[source]]
+id = "android-gki-version"
+kernel = "android"
+adapter = "gitiles-newest-branch"
+kind = "gitiles"
+url = "https://android.googlesource.com/kernel/common/+refs/heads?format=JSON"
+branch_pattern = '^android\d+-(\d+\.\d+)$'
+file_url = "https://android.googlesource.com/kernel/common/+/refs/heads/{branch}/Makefile?format=TEXT"
+channel = "gki"
+yields = ["version"]
+min_interval = "6h"
+note = "discovers the newest androidNN-X.Y branch from the 68 KB branch list; +refs without /heads is 72 MB and is never used"
+
+[[source]]
+id = "android-mainline-log"
+kernel = "android"
+adapter = "gitiles-log"
+kind = "gitiles"
+url = "https://android.googlesource.com/kernel/common/+log/refs/heads/android-mainline?format=JSON&n=50"
+web = "https://android.googlesource.com/kernel/common"
+yields = ["commit"]
+min_interval = "30m"
+
+# ------------------------------------------------------------------------------------------------ ChromiumOS (Gitiles)
+
+[[source]]
+id = "chromiumos-newest-branch"
+kernel = "chromiumos"
+adapter = "gitiles-newest-branch"
+kind = "gitiles"
+url = "https://chromium.googlesource.com/chromiumos/third_party/kernel/+refs/heads?format=JSON"
+branch_pattern = '^chromeos-(\d+\.\d+)$'
+file_url = "https://chromium.googlesource.com/chromiumos/third_party/kernel/+/refs/heads/{branch}/Makefile?format=TEXT"
+channel = "newest-branch"
+yields = ["version"]
+min_interval = "12h"
+note = "branch list is 1.5 MB, hence the interval; there is no main branch (404), versions live on chromeos-X.Y branches"
+
+[[source]]
+id = "chromiumos-log"
+kernel = "chromiumos"
+adapter = "gitiles-log"
+kind = "gitiles"
+url = "https://chromium.googlesource.com/chromiumos/third_party/kernel/+log/refs/heads/chromeos-6.12?format=JSON&n=50"
+web = "https://chromium.googlesource.com/chromiumos/third_party/kernel"
+yields = ["commit"]
+min_interval = "1h"
+note = "follows the newest branch at the time the manifest was written; the version probe above follows the live newest"
+
+# ------------------------------------------------------------------------------------------------ Alpine (aports on GitLab)
+
+[[source]]
+id = "alpine-lts-version"
+kernel = "alpine"
+adapter = "text-version"
+kind = "package-index"
+url = "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/files/main%2Flinux-lts%2FAPKBUILD/raw?ref=master"
+patterns = ['^pkgver=(\S+)']
+channel = "edge/linux-lts"
+yields = ["version"]
+min_interval = "30m"
+note = "linux-edge is absent from aports master (APKBUILD answers 404 under main, community and testing), so Alpine has no rc kernel"
+
+[[source]]
+id = "alpine-rpi-version"
+kernel = "alpine"
+adapter = "text-version"
+kind = "package-index"
+url = "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/files/main%2Flinux-rpi%2FAPKBUILD/raw?ref=master"
+patterns = ['^pkgver=(\S+)']
+channel = "edge/linux-rpi"
+yields = ["version"]
+min_interval = "30m"
+
+[[source]]
+id = "alpine-lts-commits"
+kernel = "alpine"
+adapter = "gitlab-commits"
+kind = "forge-api"
+url = "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/commits?path=main/linux-lts&per_page=30"
+yields = ["commit"]
+min_interval = "30m"
+
+# ------------------------------------------------------------------------------------------------ NixOS (nixpkgs)
+
+[[source]]
+id = "nixos-kernels"
+kernel = "nixos"
+adapter = "nix-kernels"
+kind = "package-index"
+url = "https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/os-specific/linux/kernel/kernels-org.json"
+yields = ["version"]
+min_interval = "15m"
+note = "nixpkgs master; reaches channels later (channels.nixos.org/<channel>/git-revision names the commit a channel built)"
+
+[[source]]
+id = "nixos-kernel-commits"
+kernel = "nixos"
+adapter = "github-commits"
+kind = "forge-api"
+url = "https://api.github.com/repos/NixOS/nixpkgs/commits?path=pkgs/os-specific/linux/kernel&per_page=50"
+yields = ["commit"]
+min_interval = "30m"
+
+# ------------------------------------------------------------------------------------------------ Fedora
+
+[[source]]
+id = "fedora-bodhi"
+kernel = "fedora"
+adapter = "bodhi-updates"
+kind = "package-index"
+url = "https://bodhi.fedoraproject.org/updates/?packages=kernel&status=stable&rows_per_page=40"
+package = "kernel"
+exclude_releases = ["ELN"]
+yields = ["package", "version"]
+min_interval = "30m"
+note = "stable updates per release; the highest release (rawhide) tracks the mainline rc"
+
+[[source]]
+id = "fedora-ark-tags"
+kernel = "fedora"
+adapter = "gitlab-tags"
+kind = "forge-api"
+url = "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/repository/tags?per_page=30&order_by=updated"
+web = "https://gitlab.com/cki-project/kernel-ark/-/tags"
+version_from = '^kernel-(\d.*)$'
+channel = "kernel-ark"
+yields = ["tag", "version"]
+min_interval = "30m"
+
+[[source]]
+id = "fedora-ark-commits"
+kernel = "fedora"
+adapter = "gitlab-commits"
+kind = "forge-api"
+url = "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/repository/commits?per_page=50"
+yields = ["commit"]
+min_interval = "30m"
+
+[[source]]
+id = "fedora-ark-merge-requests"
+kernel = "fedora"
+adapter = "gitlab-merge-requests"
+kind = "forge-api"
+url = "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/merge_requests?state=all&order_by=updated_at&per_page=50"
+yields = ["pr"]
+min_interval = "30m"
+
+# ------------------------------------------------------------------------------------------------ Ubuntu
+
+[[source]]
+id = "ubuntu-launchpad"
+kernel = "ubuntu"
+adapter = "launchpad-sources"
+kind = "package-index"
+url = "https://api.launchpad.net/devel/ubuntu/+archive/primary?ws.op=getPublishedSources&source_name=linux&exact_match=true&order_by_date=true&ws.size=30"
+yields = ["package", "version"]
+min_interval = "30m"
+
+[[source]]
+id = "ubuntu-mainline-builds"
+kernel = "ubuntu"
+adapter = "html-index-versions"
+kind = "html-index"
+url = "https://kernel.ubuntu.com/mainline/"
+limit = 8
+channel = "mainline-ppa"
+yields = ["build", "version"]
+min_interval = "1h"
+
+# ------------------------------------------------------------------------------------------------ Arch Linux
+
+[[source]]
+id = "arch-linux"
+kernel = "arch"
+adapter = "json-version"
+kind = "package-index"
+url = "https://archlinux.org/packages/core/x86_64/linux/json/"
+path = "pkgver"
+time_path = "last_update"
+channel = "core/linux"
+yields = ["version"]
+min_interval = "30m"
+note = "Core-Testing holds no linux package at the moment (search answers 200 with zero results), so Arch's rc is the AUR package below"
+
+[[source]]
+id = "arch-linux-lts"
+kernel = "arch"
+adapter = "json-version"
+kind = "package-index"
+url = "https://archlinux.org/packages/core/x86_64/linux-lts/json/"
+path = "pkgver"
+time_path = "last_update"
+channel = "core/linux-lts"
+yields = ["version"]
+min_interval = "30m"
+
+[[source]]
+id = "arch-linux-zen"
+kernel = "arch"
+adapter = "json-version"
+kind = "package-index"
+url = "https://archlinux.org/packages/extra/x86_64/linux-zen/json/"
+path = "pkgver"
+time_path = "last_update"
+channel = "extra/linux-zen"
+yields = ["version"]
+min_interval = "30m"
+
+[[source]]
+id = "arch-aur-mainline"
+kernel = "arch"
+adapter = "json-version"
+kind = "package-index"
+url = "https://aur.archlinux.org/rpc/v5/info?arg[]=linux-mainline"
+path = "results.0.Version"
+time_path = "results.0.LastModified"
+channel = "aur/linux-mainline"
+yields = ["version"]
+min_interval = "30m"
+
+[[source]]
+id = "arch-packaging-tags"
+kernel = "arch"
+adapter = "gitlab-tags"
+kind = "forge-api"
+url = "https://gitlab.archlinux.org/api/v4/projects/archlinux%2Fpackaging%2Fpackages%2Flinux/repository/tags?per_page=30"
+web = "https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/tags"
+yields = ["tag"]
+min_interval = "1h"
+
+# ------------------------------------------------------------------------------------------------ CachyOS
+
+[[source]]
+id = "cachyos-stable-version"
+kernel = "cachyos"
+adapter = "text-version"
+kind = "package-index"
+url = "https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos/.SRCINFO"
+patterns = ['^\s*pkgver = (\S+)']
+channel = "linux-cachyos"
+yields = ["version"]
+min_interval = "15m"
+
+[[source]]
+id = "cachyos-rc-version"
+kernel = "cachyos"
+adapter = "text-version"
+kind = "package-index"
+url = "https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos-rc/.SRCINFO"
+patterns = ['^\s*pkgver = (\S+)']
+channel = "linux-cachyos-rc"
+yields = ["version"]
+min_interval = "15m"
+
+[[source]]
+id = "cachyos-commits"
+kernel = "cachyos"
+adapter = "github-commits"
+kind = "forge-api"
+url = "https://api.github.com/repos/CachyOS/linux-cachyos/commits?per_page=50"
+yields = ["commit"]
+min_interval = "15m"
+
+[[source]]
+id = "cachyos-kernel-releases"
+kernel = "cachyos"
+adapter = "github-releases"
+kind = "forge-api"
+url = "https://api.github.com/repos/CachyOS/linux/releases?per_page=30"
+yields = ["release"]
+min_interval = "30m"
+
+[[source]]
+id = "cachyos-org-repos"
+kernel = "cachyos"
+adapter = "github-org-repos"
+kind = "forge-api"
+url = "https://api.github.com/orgs/CachyOS/repos?per_page=100&sort=pushed"
+yields = ["repo"]
+min_interval = "6h"
+
+# ------------------------------------------------------------------------------------------------ RHEL / CentOS Stream
+
+[[source]]
+id = "rhel-c10s-commits"
+kernel = "rhel"
+adapter = "gitlab-commits"
+kind = "forge-api"
+url = "https://gitlab.com/api/v4/projects/redhat%2Fcentos-stream%2Fsrc%2Fkernel%2Fcentos-stream-10/repository/commits?per_page=30"
+version_from = '^\[redhat\] kernel-(\d+\.\d+\.\d+)-\d+'
+channel = "centos-stream-10"
+yields = ["commit", "version"]
+min_interval = "1h"
+note = "RHEL builds are published as source-git commits titled '[redhat] kernel-<base>-<build>'; the base kernel is the version"
+
+[[source]]
+id = "rhel-c9s-commits"
+kernel = "rhel"
+adapter = "gitlab-commits"
+kind = "forge-api"
+url = "https://gitlab.com/api/v4/projects/redhat%2Fcentos-stream%2Fsrc%2Fkernel%2Fcentos-stream-9/repository/commits?per_page=30"
+version_from = '^\[redhat\] kernel-(\d+\.\d+\.\d+)-\d+'
+channel = "centos-stream-9"
+yields = ["commit", "version"]
+min_interval = "1h"
