@@ -1,0 +1,32 @@
+# Test lanes of the kernel watch: what is probed or built where. Hosts are ssh aliases resolved by the local ssh config at run time;
+# nothing here names a machine address or account. Roles come from the fleet rules: production is read-only, builds run on the build host.
+
+[probe]
+# Kernel package names looked at in the Arch repositories (the archlinux.org package API also answers for core-testing and extra-testing).
+packages = ["linux", "linux-lts", "linux-zen", "linux-hardened", "linux-rt", "linux-rt-lts"]
+# AUR package names looked at through the AUR RPC.
+aur = ["linux-mainline", "linux-rc", "linux-git", "linux-cachyos-rc", "linux-xanmod", "linux-tkg"]
+# CachyOS repository directories searched for these package names.
+cachyos_packages = ["linux-cachyos", "linux-cachyos-rc"]
+arch_api = "https://archlinux.org/packages/search/json/"
+aur_rpc = "https://aur.archlinux.org/rpc/v5/info"
+timeout = "60s"
+
+  [[probe.cachyos]]
+  id = "cachyos"
+  url = "https://mirror.cachyos.org/repo/x86_64/cachyos/"
+  [[probe.cachyos]]
+  id = "cachyos-v3"
+  url = "https://mirror.cachyos.org/repo/x86_64_v3/cachyos-v3/"
+  [[probe.cachyos]]
+  id = "cachyos-v4"
+  url = "https://mirror.cachyos.org/repo/x86_64_v4/cachyos-v4/"
+  [[probe.cachyos]]
+  id = "cachyos-znver4"
+  url = "https://mirror.cachyos.org/repo/x86_64_v4/cachyos-znver4/"
+
+  # Read-only probe targets. The probe only runs the fixed command list in probe.ts (uname, pacman -Q/-Sl/-Qu, pacman-conf, stat, cat).
+  [[probe.host]]
+  id = "production"
+  ssh = "prd"
+  label = "production Arch host (read-only)"

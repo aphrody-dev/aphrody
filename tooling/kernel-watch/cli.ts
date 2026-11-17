@@ -6,6 +6,8 @@ import { gate } from "./publish.ts";
 import { poll } from "./poll.ts";
 import { Store } from "./store.ts";
 import { generate } from "./views.ts";
+import { loadLanes } from "./lanes.ts";
+import { buildReport, collect, liveDeps, readProbeReports, recordingDeps, referenceFromStore, renderProbePage } from "./probe.ts";
 import { verify } from "./verify.ts";
 
 const HERE = import.meta.dir;
@@ -18,7 +20,8 @@ const USAGE = `usage: bun cli.ts <command> [options]
   build [--now EPOCH]               regenerate docs/watch from the store
   gate [--slow-minutes N]           print commit or skip for the regenerated files in --out (versions now, activity every N minutes, default 360)
   verify [--write]                  probe every manifest URL live and record status and shape
-options: --manifest PATH  --store PATH  --out DIR (defaults: sources.toml next to this file, $WATCH_STORE or .store/watch.sqlite, ../../docs/watch)`;
+  probe <host-id> [--record FIXTURE_DIR]   read-only probe of a lanes.toml host over ssh (never from CI): writes data/probe/<id>.json and probe.md
+options: --lanes PATH  --manifest PATH  --store PATH  --out DIR (defaults: sources.toml next to this file, $WATCH_STORE or .store/watch.sqlite, ../../docs/watch)`;
 
 const flags = new Map<string, string>();
 const positional: string[] = [];
@@ -36,6 +39,22 @@ const manifestPath = resolve(flags.get("manifest") ?? join(HERE, "sources.toml")
 const storePath = resolve(flags.get("store") ?? Bun.env.WATCH_STORE ?? join(HERE, ".store", "watch.sqlite"));
 const outDir = resolve(flags.get("out") ?? join(HERE, "..", "..", "docs", "watch"));
 const when = (epoch: number | null): string => (epoch ? new Date(epoch * 1000).toISOString().replace(/\.\d+Z$/, "Z") : "-");
+
+async function probeCommand(store: Store): Promise<number> {
+  const lanes = await loadLanes(resolve(flags.get("lanes") ?? join(HERE, "lanes.toml")));
+  const host = lanes.probe.hosts.find((h) => h.id === rest[0]);
+  if (!host) throw new Error(`probe needs a host id from lanes.toml: ${lanes.probe.hosts.map((h) => h.id).join(", ")}`);
+  const live = liveDeps();
+  const deps = flags.get("record") ? recordingDeps(live, resolve(flags.get("record")!)) : live;
+  const collected = await collect(host, lanes.probe, deps);
+  for (const e of collected.errors) console.error(`warning: ${e}`);
+  const report = buildReport(host, collected, referenceFromStore(store));
+  const file = join(outDir, "data", "probe", `${host.id}.json`);
+  await Bun.write(file, `${JSON.stringify(report, null, 2)}\n`);
+  await Bun.write(join(outDir, "probe.md"), renderProbePage(await readProbeReports(outDir)));
+  console.log(JSON.stringify(report, null, 2));
+  return 0;
+}
 
 async function main(): Promise<number> {
   if (!command || command === "help" || flags.has("help")) {
@@ -55,6 +74,7 @@ async function main(): Promise<number> {
 
   const store = new Store(storePath);
   try {
+    if (command === "probe") return await probeCommand(store);
     switch (command) {
       case "poll": {
         const summary = await poll(store, manifest, {
