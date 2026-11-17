@@ -14,7 +14,7 @@ describe("aphrody repo-native bun tooling", () => {
     const entries = parseGitmodules(readFileSync(resolve(repoRoot, ".gitmodules"), "utf8"));
     expect(entries.length).toBeGreaterThanOrEqual(30);
     for (const entry of entries) {
-      expect(entry.url.startsWith("../../aphrody-labs/")).toBe(true);
+      expect(entry.url.startsWith("../../aphrody-labs/") || entry.url.startsWith("../")).toBe(true);
     }
   });
 

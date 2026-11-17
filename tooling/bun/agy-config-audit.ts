@@ -130,11 +130,21 @@ function expandHome(raw: string, home: string): string {
   return raw;
 }
 
+function resolveAgyBin(home: string): string {
+  if (process.platform === "win32") {
+    const localAppData = process.env.LOCALAPPDATA || join(home, "AppData", "Local");
+    const direct = join(localAppData, "agy", "bin", "agy.exe");
+    if (existsSync(direct)) return direct;
+  }
+  return Bun.which("agy") ?? "agy";
+}
+
 export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAuditReport {
   const geminiRoot = join(home, ".gemini");
   const checks: AgyCheckResult[] = [];
+  const agyBin = resolveAgyBin(home);
 
-  const verRes = Bun.spawnSync(["agy", "--version"], { stdout: "pipe", stderr: "pipe", stdin: "ignore" });
+  const verRes = Bun.spawnSync([agyBin, "--version"], { stdout: "pipe", stderr: "pipe", stdin: "ignore" });
   const cliVersion = verRes.exitCode === 0 ? verRes.stdout.toString().trim() : "missing";
   checks.push({
     name: "cli:agy-version",
@@ -253,7 +263,7 @@ export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAud
   ].filter((p) => existsSync(p));
 
   for (const dir of pluginDirs) {
-    const r = Bun.spawnSync(["agy", "plugin", "validate", dir, "--strict"], {
+    const r = Bun.spawnSync([agyBin, "plugin", "validate", dir, "--strict"], {
       stdout: "pipe",
       stderr: "pipe",
       stdin: "ignore",

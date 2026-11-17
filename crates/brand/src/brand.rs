@@ -148,5 +148,21 @@ mod tests {
         assert!(!PLUGIN_SCOPE.is_empty());
         assert!(!GIT_DEFAULT_BRANCH.is_empty());
         assert!(!UPSTREAM_ZED_BRANCH.is_empty());
+        assert!(!UPSTREAM_AWESOME_GPUI_REPO.is_empty());
+        assert!(!UPSTREAM_EXTENSIONS_REPO.is_empty());
+        assert!(!UPSTREAM_WINGET_PKGS_REPO.is_empty());
+        assert!(!UPSTREAM_MODERN_WEB_GUIDANCE_REPO.is_empty());
+        assert!(!UPSTREAM_DESIGN_MD_REPO.is_empty());
+        assert!(!UPSTREAM_STITCH_SDK_REPO.is_empty());
+        assert!(!UPSTREAM_STITCH_SKILLS_REPO.is_empty());
+        assert_eq!(DESIGN_SOURCE_OF_TRUTH, "https://design.google/");
+        assert_eq!(DESIGN_STITCH_URL, "https://stitch.withgoogle.com/");
+        assert_eq!(DESIGN_SANS_FLEX_FAMILY, "Google Sans Flex");
+        assert_eq!(DESIGN_MD_PATH, "DESIGN.md");
+        assert!(!DESIGN_SYSTEM.is_empty());
+        assert!(!DESIGN_TOKENS_MANIFEST.is_empty());
+        assert!(!DESIGN_THEMES_MANIFEST.is_empty());
+        assert!(!DESIGN_SEED_HEX.is_empty());
+        assert!(!DESIGN_VARIANT.is_empty());
     }
 }

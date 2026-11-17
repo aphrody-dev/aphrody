@@ -5,6 +5,7 @@ import { join } from "node:path";
 import {
   ALL_TARGETS,
   buildCatalogEntries,
+  buildZedExtensionsCatalog,
   DEFAULT_CATALOG_PATH,
   loadStoreCatalog,
   packageEntry,
@@ -120,6 +121,12 @@ describe("awesome-gpui-store catalog, parser, and 22-target packager", () => {
         readFileSync(join(dir, "aphrody/winget/AphrodyLabs.Aphrody.yaml"), "utf8"),
       ) as Record<string, unknown>;
       expect(wingetVer.PackageIdentifier).toBe("AphrodyLabs.Aphrody");
+      expect(wingetVer.ManifestVersion).toBe("1.28.0");
+      const wingetInst = Bun.YAML.parse(
+        readFileSync(join(dir, "aphrody/winget/AphrodyLabs.Aphrody.installer.yaml"), "utf8"),
+      ) as Record<string, unknown>;
+      expect(wingetInst.Scope).toBe("user");
+      expect(wingetInst.UpgradeBehavior).toBe("install");
 
       const appx = readFileSync(join(dir, "aphrody/msstore/AppxManifest.xml"), "utf8");
       expect(validateXmlWellFormed(appx, "AppxManifest.xml")).toEqual([]);
@@ -189,5 +196,23 @@ describe("awesome-gpui-store catalog, parser, and 22-target packager", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  test("buildZedExtensionsCatalog classifies zed-industries/extensions entries and includes gpui-wgpu", () => {
+    const catalog = loadStoreCatalog(DEFAULT_CATALOG_PATH);
+    expect(catalog.entries.some((e) => e.id === "gpui-wgpu")).toBe(true);
+
+    const ext = buildZedExtensionsCatalog(
+      `[wgsl]\nsubmodule = "extensions/wgsl"\nversion = "0.2.0"\n[tokyo-night]\nsubmodule = "extensions/tokyo-night"\nversion = "0.1.0"\n[mcp-github]\nsubmodule = "extensions/mcp-github"\nversion = "0.3.0"\n`,
+      `[submodule "extensions/wgsl"]\n\tpath = extensions/wgsl\n\turl = https://github.com/szebniok/zed-wgsl.git\n`,
+      "2026-11-17T00:00:00Z",
+    );
+    expect(ext.total_extensions).toBe(3);
+    expect(ext.category_counts.language).toBe(1);
+    expect(ext.category_counts.theme).toBe(1);
+    expect(ext.category_counts["context-server"]).toBe(1);
+    expect(ext.entries.find((e) => e.id === "wgsl")?.repo_url).toBe(
+      "https://github.com/szebniok/zed-wgsl",
+    );
   });
 });

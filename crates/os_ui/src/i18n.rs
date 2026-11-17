@@ -169,7 +169,7 @@ impl OsI18nCatalog {
     #[must_use]
     pub fn translate_localized(&self, requested: &str, key: &str) -> LocalizedString {
         let tag_str = self.resolve_tag(requested);
-        let tag = Bcp47Tag::parse(&tag_str).unwrap_or_else(|| Bcp47Tag::parse("en").unwrap());
+        let tag = Bcp47Tag::parse(&tag_str).unwrap_or_default();
         let text = self.translate(&tag_str, key);
         let dir = self.direction(&tag_str);
         LocalizedString::new(text, &tag, Some(dir))

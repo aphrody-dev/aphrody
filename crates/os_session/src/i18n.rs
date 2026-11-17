@@ -207,6 +207,12 @@ impl fmt::Display for Bcp47Tag {
     }
 }
 
+impl Default for Bcp47Tag {
+    fn default() -> Self {
+        Self("en".to_owned())
+    }
+}
+
 fn title_case_subtag(subtag: &str) -> String {
     let mut out = String::with_capacity(subtag.len());
     for (idx, b) in subtag.bytes().enumerate() {

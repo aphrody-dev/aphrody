@@ -19,9 +19,16 @@ import { basename, join, relative, resolve } from "node:path";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 export const DEFAULT_CATALOG_PATH = join(repoRoot, "assets/os/awesome_gpui_store.toml");
+export const DEFAULT_EXTENSIONS_CATALOG_PATH = join(repoRoot, "assets/os/zed_extensions_catalog.toml");
+export const DEFAULT_WINGET_BASELINE_PATH = join(repoRoot, "assets/os/winget_upstream_baseline.toml");
 export const UPSTREAM_REPO = "zed-industries/awesome-gpui";
 export const UPSTREAM_README_URL = `https://raw.githubusercontent.com/${UPSTREAM_REPO}/main/README.md`;
 export const UPSTREAM_PROJECTS_URL = `https://raw.githubusercontent.com/${UPSTREAM_REPO}/main/projects.json`;
+export const UPSTREAM_EXTENSIONS_REPO = "zed-industries/extensions";
+export const UPSTREAM_EXTENSIONS_TOML_URL = `https://raw.githubusercontent.com/${UPSTREAM_EXTENSIONS_REPO}/main/extensions.toml`;
+export const UPSTREAM_EXTENSIONS_GITMODULES_URL = `https://raw.githubusercontent.com/${UPSTREAM_EXTENSIONS_REPO}/main/.gitmodules`;
+export const UPSTREAM_WINGET_REPO = "zed-industries/winget-pkgs";
+export const WINGET_MANIFEST_VERSION = "1.28.0";
 
 export const ALL_TARGETS = [
   "winget",
@@ -617,6 +624,32 @@ function buildFirstPartyEntries(): StoreEntry[] {
       tags: ["gpui", "store", "winget", "msix", "flatpak", "rpm", "deb", "apk", "brew", "nsh"],
       first_party: true,
     },
+    {
+      id: "gpui-wgpu",
+      name: "GPUI WebGPU & Wasm CLI",
+      tagline: "Native Wasm LTO/AOT, WGSL/Naga shader compiler, and 15-tool MCP server",
+      description:
+        "Unified Wasm + WebGPU CLI and MCP toolchain for WGSL/SPIR-V/HLSL/MSL transpilation, wasmparser inspection, binaryen LTO optimization, Wasmtime AOT .cwasm compilation, and project scaffolding.",
+      category: "tool",
+      subcategory: "Graphics & Wasm",
+      repo: repoUrl,
+      homepage: `${homepageUrl}/docs/webgpu-wasm-first`,
+      icon_url: `${homepageUrl}/assets/images/aphrody_logo.svg`,
+      publisher: company,
+      publisher_id: publisherId,
+      app_id: `${identifierPrefix}.WgpuCli`,
+      crate_name: "wgpu_cli",
+      npm_package: `@${appSlug}/gpui-wgpu`,
+      bin_name: "gpui-wgpu",
+      version,
+      license: "Apache-2.0",
+      stars: 0,
+      status: "active",
+      platforms: ["windows", "macos", "linux", "freebsd", "web"],
+      targets: [...ALL_TARGETS],
+      tags: ["wgpu", "webgpu", "wasm", "wgsl", "mcp", "cli", "aot", "lto", "first-party"],
+      first_party: true,
+    },
   ];
 }
 
@@ -802,6 +835,240 @@ export function loadStoreCatalog(tomlPath = DEFAULT_CATALOG_PATH): StoreCatalog 
   return Bun.TOML.parse(raw) as unknown as StoreCatalog;
 }
 
+export interface ZedExtensionEntry {
+  id: string;
+  submodule: string;
+  repo_url: string;
+  version: string;
+  category: string;
+}
+
+export interface ZedExtensionsCatalog {
+  schema_version: number;
+  source_repo: string;
+  source_url: string;
+  synced_at: string;
+  total_extensions: number;
+  total_submodules: number;
+  category_counts: Record<string, number>;
+  entries: ZedExtensionEntry[];
+}
+
+export interface WingetUpstreamBaseline {
+  schema_version: number;
+  source_repo: string;
+  source_url: string;
+  synced_at: string;
+  package_identifier: string;
+  latest_version: string;
+  manifest_version: string;
+  scope: string;
+  install_modes: string[];
+  upgrade_behavior: string;
+  moniker: string;
+}
+
+function classifyZedExtension(id: string): string {
+  const lower = id.toLowerCase();
+  if (lower.includes("icon")) return "icon-theme";
+  if (
+    /theme|color|night|catppuccin|dracula|gruvbox|monokai|nord|solarized|one-dark|one-light|ayu/.test(
+      lower,
+    )
+  ) {
+    return "theme";
+  }
+  if (lower.includes("mcp") || lower.includes("context-server")) return "context-server";
+  if (lower.includes("snippet")) return "snippet";
+  if (lower.includes("debug") || lower.includes("dap")) return "debugger";
+  return "language";
+}
+
+function parseGitmodulesUrlMap(raw: string): Map<string, string> {
+  const map = new Map<string, string>();
+  let path = "";
+  let url = "";
+  for (const rawLine of raw.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (line.startsWith("[submodule ")) {
+      if (path && url) map.set(path, url);
+      path = "";
+      url = "";
+      continue;
+    }
+    if (line.startsWith("path = ")) path = line.slice(7).trim();
+    else if (line.startsWith("url = ")) url = line.slice(6).trim();
+  }
+  if (path && url) map.set(path, url);
+  return map;
+}
+
+export function buildZedExtensionsCatalog(
+  extensionsTomlRaw: string,
+  gitmodulesRaw: string,
+  syncedAt = new Date().toISOString(),
+): ZedExtensionsCatalog {
+  const parsed = Bun.TOML.parse(extensionsTomlRaw) as Record<
+    string,
+    { submodule?: string; version?: string }
+  >;
+  const submoduleUrls = parseGitmodulesUrlMap(gitmodulesRaw);
+  const categoryCounts: Record<string, number> = {
+    language: 0,
+    theme: 0,
+    "icon-theme": 0,
+    "context-server": 0,
+    snippet: 0,
+    debugger: 0,
+  };
+  const entries: ZedExtensionEntry[] = [];
+  for (const id of Object.keys(parsed).sort()) {
+    const item = parsed[id];
+    if (!item || typeof item !== "object") continue;
+    const submodule = String(item.submodule ?? `extensions/${id}`);
+    const version = String(item.version ?? "0.0.0");
+    const repoUrl = (submoduleUrls.get(submodule) ?? `https://github.com/${UPSTREAM_EXTENSIONS_REPO}`).replace(
+      /\.git$/,
+      "",
+    );
+    const category = classifyZedExtension(id);
+    categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
+    entries.push({ id, submodule, repo_url: repoUrl, version, category });
+  }
+  return {
+    schema_version: 1,
+    source_repo: UPSTREAM_EXTENSIONS_REPO,
+    source_url: `https://github.com/${UPSTREAM_EXTENSIONS_REPO}`,
+    synced_at: syncedAt,
+    total_extensions: entries.length,
+    total_submodules: submoduleUrls.size,
+    category_counts: categoryCounts,
+    entries,
+  };
+}
+
+export function serializeExtensionsCatalogToml(catalog: ZedExtensionsCatalog): string {
+  const lines: string[] = [
+    "# Auto-generated by tooling/bun/awesome-gpui-store.ts sync-extensions — do not hand-edit.",
+    `schema_version = ${catalog.schema_version}`,
+    `source_repo = ${tomlStr(catalog.source_repo)}`,
+    `source_url = ${tomlStr(catalog.source_url)}`,
+    `synced_at = ${tomlStr(catalog.synced_at)}`,
+    `total_extensions = ${catalog.total_extensions}`,
+    `total_submodules = ${catalog.total_submodules}`,
+    "",
+    "[category_counts]",
+    ...Object.entries(catalog.category_counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${JSON.stringify(k)} = ${v}`),
+    "",
+  ];
+  for (const e of catalog.entries) {
+    lines.push("[[entries]]");
+    lines.push(`id = ${tomlStr(e.id)}`);
+    lines.push(`submodule = ${tomlStr(e.submodule)}`);
+    lines.push(`repo_url = ${tomlStr(e.repo_url)}`);
+    lines.push(`version = ${tomlStr(e.version)}`);
+    lines.push(`category = ${tomlStr(e.category)}`);
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+export async function syncExtensionsCatalog(
+  outPath = DEFAULT_EXTENSIONS_CATALOG_PATH,
+): Promise<ZedExtensionsCatalog> {
+  const [extResp, modResp] = await Promise.all([
+    fetch(UPSTREAM_EXTENSIONS_TOML_URL),
+    fetch(UPSTREAM_EXTENSIONS_GITMODULES_URL),
+  ]);
+  if (!extResp.ok) {
+    throw new Error(`Failed to fetch ${UPSTREAM_EXTENSIONS_TOML_URL}: ${extResp.status}`);
+  }
+  const extRaw = await extResp.text();
+  const modRaw = modResp.ok ? await modResp.text() : "";
+  const catalog = buildZedExtensionsCatalog(extRaw, modRaw);
+  mkdirSync(resolve(outPath, ".."), { recursive: true });
+  writeFileSync(outPath, serializeExtensionsCatalogToml(catalog), "utf8");
+  return catalog;
+}
+
+function serializeWingetBaselineToml(b: WingetUpstreamBaseline): string {
+  return [
+    "# Auto-generated by tooling/bun/awesome-gpui-store.ts sync-winget — do not hand-edit.",
+    `schema_version = ${b.schema_version}`,
+    `source_repo = ${tomlStr(b.source_repo)}`,
+    `source_url = ${tomlStr(b.source_url)}`,
+    `synced_at = ${tomlStr(b.synced_at)}`,
+    `package_identifier = ${tomlStr(b.package_identifier)}`,
+    `latest_version = ${tomlStr(b.latest_version)}`,
+    `manifest_version = ${tomlStr(b.manifest_version)}`,
+    `scope = ${tomlStr(b.scope)}`,
+    `install_modes = ${tomlArr(b.install_modes)}`,
+    `upgrade_behavior = ${tomlStr(b.upgrade_behavior)}`,
+    `moniker = ${tomlStr(b.moniker)}`,
+    "",
+  ].join("\n");
+}
+
+export async function syncWingetBaseline(
+  outPath = DEFAULT_WINGET_BASELINE_PATH,
+): Promise<WingetUpstreamBaseline> {
+  let latestVersion = "1.27.0";
+  let manifestVersion = WINGET_MANIFEST_VERSION;
+  let scope = "user";
+  let installModes = ["interactive", "silent", "silentWithProgress"];
+  let upgradeBehavior = "install";
+  let moniker = "zed";
+
+  const listProc = Bun.spawnSync(
+    ["gh", "api", `repos/${UPSTREAM_WINGET_REPO}/contents/manifests/z/ZedIndustries/Zed`, "--jq", ".[].name"],
+    { stdout: "pipe", stderr: "pipe" },
+  );
+  if (listProc.exitCode === 0) {
+    const versions = new TextDecoder()
+      .decode(listProc.stdout)
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter((s) => /^\d+\.\d+\.\d+$/.test(s))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    if (versions.length > 0) {
+      latestVersion = versions[versions.length - 1];
+      const instUrl = `https://raw.githubusercontent.com/${UPSTREAM_WINGET_REPO}/main/manifests/z/ZedIndustries/Zed/${latestVersion}/ZedIndustries.Zed.installer.yaml`;
+      const locUrl = `https://raw.githubusercontent.com/${UPSTREAM_WINGET_REPO}/main/manifests/z/ZedIndustries/Zed/${latestVersion}/ZedIndustries.Zed.locale.en-US.yaml`;
+      const [instRes, locRes] = await Promise.all([fetch(instUrl), fetch(locUrl)]);
+      if (instRes.ok) {
+        const inst = Bun.YAML.parse(await instRes.text()) as Record<string, unknown>;
+        if (typeof inst.ManifestVersion === "string") manifestVersion = inst.ManifestVersion;
+        if (typeof inst.Scope === "string") scope = inst.Scope;
+        if (Array.isArray(inst.InstallModes)) installModes = inst.InstallModes.map(String);
+        if (typeof inst.UpgradeBehavior === "string") upgradeBehavior = inst.UpgradeBehavior;
+      }
+      if (locRes.ok) {
+        const loc = Bun.YAML.parse(await locRes.text()) as Record<string, unknown>;
+        if (typeof loc.Moniker === "string") moniker = loc.Moniker;
+      }
+    }
+  }
+
+  const baseline: WingetUpstreamBaseline = {
+    schema_version: 1,
+    source_repo: UPSTREAM_WINGET_REPO,
+    source_url: `https://github.com/${UPSTREAM_WINGET_REPO}`,
+    synced_at: new Date().toISOString(),
+    package_identifier: "ZedIndustries.Zed",
+    latest_version: latestVersion,
+    manifest_version: manifestVersion,
+    scope,
+    install_modes: installModes,
+    upgrade_behavior: upgradeBehavior,
+    moniker,
+  };
+  mkdirSync(resolve(outPath, ".."), { recursive: true });
+  writeFileSync(outPath, serializeWingetBaselineToml(baseline), "utf8");
+  return baseline;
+}
+
 function xmlEscape(val: string): string {
   return val
     .replace(/&/g, "&amp;")
@@ -860,16 +1127,22 @@ export function generateTargetManifests(
           `PackageVersion: ${yamlStr(ver)}`,
           "DefaultLocale: en-US",
           "ManifestType: version",
-          "ManifestVersion: 1.9.0",
+          `ManifestVersion: ${WINGET_MANIFEST_VERSION}`,
           "",
         ].join("\n"),
         [`${wgId}.installer.yaml`]: [
           `PackageIdentifier: ${wgId}`,
           `PackageVersion: ${yamlStr(ver)}`,
-          "InstallerType: zip",
           "Platform:",
           "  - Windows.Desktop",
           "MinimumOSVersion: 10.0.19041.0",
+          "InstallerType: zip",
+          "Scope: user",
+          "InstallModes:",
+          "  - interactive",
+          "  - silent",
+          "  - silentWithProgress",
+          "UpgradeBehavior: install",
           "Installers:",
           "  - Architecture: x64",
           `    InstallerUrl: ${yamlStr(`${releaseBase}/${bin}-windows-x64.zip`)}`,
@@ -886,7 +1159,7 @@ export function generateTargetManifests(
           `      - RelativeFilePath: ${yamlStr(`${bin}.exe`)}`,
           `        PortableCommandAlias: ${yamlStr(bin)}`,
           "ManifestType: installer",
-          "ManifestVersion: 1.9.0",
+          `ManifestVersion: ${WINGET_MANIFEST_VERSION}`,
           "",
         ].join("\n"),
         [`${wgId}.locale.en-US.yaml`]: [
@@ -900,10 +1173,14 @@ export function generateTargetManifests(
           `License: ${yamlStr(entry.license)}`,
           `ShortDescription: ${yamlStr(entry.tagline)}`,
           `Description: ${yamlStr(entry.description)}`,
+          `Moniker: ${yamlStr(bin)}`,
           "Tags:",
           ...entry.tags.slice(0, 8).map((t) => `  - ${yamlStr(t)}`),
+          "Documentations:",
+          "  - DocumentLabel: Documentation",
+          `    DocumentUrl: ${yamlStr(entry.homepage)}`,
           "ManifestType: defaultLocale",
-          "ManifestVersion: 1.9.0",
+          `ManifestVersion: ${WINGET_MANIFEST_VERSION}`,
           "",
         ].join("\n"),
       };
@@ -2216,6 +2493,47 @@ if (import.meta.main) {
         2,
       ),
     );
+  } else if (cmd === "sync-extensions") {
+    const out = resolve(repoRoot, getOpt(args, "--out") ?? "assets/os/zed_extensions_catalog.toml");
+    const extCat = await syncExtensionsCatalog(out);
+    console.log(
+      JSON.stringify(
+        {
+          synced: true,
+          path: out,
+          source_repo: extCat.source_repo,
+          total_extensions: extCat.total_extensions,
+          total_submodules: extCat.total_submodules,
+          category_counts: extCat.category_counts,
+        },
+        null,
+        2,
+      ),
+    );
+  } else if (cmd === "sync-winget") {
+    const out = resolve(repoRoot, getOpt(args, "--out") ?? "assets/os/winget_upstream_baseline.toml");
+    const baseline = await syncWingetBaseline(out);
+    console.log(JSON.stringify({ synced: true, path: out, baseline }, null, 2));
+  } else if (cmd === "sync-all") {
+    const useGh = !args.includes("--no-gh");
+    const [storeCat, extCat, wingetBaseline] = await Promise.all([
+      syncCatalog(DEFAULT_CATALOG_PATH, useGh),
+      syncExtensionsCatalog(DEFAULT_EXTENSIONS_CATALOG_PATH),
+      syncWingetBaseline(DEFAULT_WINGET_BASELINE_PATH),
+    ]);
+    console.log(
+      JSON.stringify(
+        {
+          synced: true,
+          store_entries: storeCat.total_entries,
+          extensions_total: extCat.total_extensions,
+          winget_latest: wingetBaseline.latest_version,
+          winget_manifest_version: wingetBaseline.manifest_version,
+        },
+        null,
+        2,
+      ),
+    );
   } else if (cmd === "verify") {
     const dir = resolve(repoRoot, getOpt(args, "--dir") ?? "target/gpui-store-dist");
     const report = verifyPackagedDir(dir);
@@ -2223,7 +2541,7 @@ if (import.meta.main) {
     if (!report.ok) process.exit(1);
   } else {
     console.error(
-      "Usage: bun run tooling/bun/awesome-gpui-store.ts <sync|list|package|verify> [options]",
+      "Usage: bun run tooling/bun/awesome-gpui-store.ts <sync|sync-extensions|sync-winget|sync-all|list|package|verify> [options]",
     );
     process.exit(1);
   }

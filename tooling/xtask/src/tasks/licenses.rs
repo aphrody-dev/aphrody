@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result};
@@ -21,7 +22,16 @@ pub fn run_licenses(_args: LicensesArgs) -> Result<()> {
 
         if let Some(license_file) = first_license_file(crate_dir, LICENSE_FILES) {
             if !license_file.is_symlink() {
-                println!("{} is not a symlink", license_file.display());
+                let valid_windows_git_symlink = cfg!(windows)
+                    && fs::read_to_string(&license_file)
+                        .map(|raw| {
+                            let target = raw.trim();
+                            target.starts_with("../") && crate_dir.join(target).is_file()
+                        })
+                        .unwrap_or(false);
+                if !valid_windows_git_symlink {
+                    println!("{} is not a symlink", license_file.display());
+                }
             }
 
             continue;

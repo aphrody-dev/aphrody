@@ -1,0 +1,46 @@
+{
+  "$schema": "./schema.ts",
+  "name": "aphrody-google-design",
+  "version": "1.0.0",
+  "source": "https://design.google/?home",
+  "tokensStylesheet": "./tokens.css",
+  "designDoc": "./design.md",
+  "svgs": [
+    { "id": "design-google-1", "path": "./svg/design-google-1.svg", "optimized": true },
+    { "id": "design-google-2", "path": "./svg/design-google-2.svg", "optimized": true },
+    { "id": "design-google-3", "path": "./svg/design-google-3.svg", "optimized": true },
+    { "id": "design-google-4", "path": "./svg/design-google-4.svg", "optimized": true },
+    { "id": "design-google-5", "path": "./svg/design-google-5.svg", "optimized": true },
+    { "id": "design-google-6", "path": "./svg/design-google-6.svg", "optimized": true }
+  ],
+  "guidelines": [
+    { "id": "code-is-a-design-material", "path": "./guidelines/code-is-a-design-material.mdx", "format": "mdx" }
+  ],
+  "kits": {
+    "figma": "./kits/figma-design-kit.json",
+    "stitch": "./kits/stitch-design-kit.json"
+  },
+  "gpuiComponents": [
+    {
+      "id": "surface-card",
+      "crate": "gpui_kit",
+      "symbol": "gpui_kit::component::Card",
+      "tokensUsed": ["--gd-surface-elevated", "--gd-border-subtle", "--gd-radius-md"],
+      "states": ["default", "hover", "focused"]
+    },
+    {
+      "id": "expressive-button",
+      "crate": "gpui_kit",
+      "symbol": "gpui_kit::component::Button",
+      "tokensUsed": ["--gd-accent-primary", "--gd-accent-container", "--gd-radius-full", "--gd-ease-expressive"],
+      "states": ["default", "hover", "pressed", "focused", "disabled"]
+    },
+    {
+      "id": "session-inspector-drawer",
+      "crate": "nsh_base",
+      "symbol": "nsh_base::Sheet",
+      "tokensUsed": ["--gd-surface-elevated", "--gd-ink-primary", "--gd-ease-expressive"],
+      "states": ["default", "selected"]
+    }
+  ]
+}

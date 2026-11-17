@@ -6,6 +6,7 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+pub mod extensions_catalog;
 pub mod nsh_store;
 pub mod packagers;
 

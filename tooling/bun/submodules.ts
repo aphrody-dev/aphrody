@@ -62,6 +62,46 @@ export function listReferencedPaths(): string[] {
     .filter((p) => raw.includes(`"${p}"`) || raw.includes(`"${p}/`));
 }
 
+export interface NestedSubmoduleSpec {
+  parentPath: string;
+  nestedPath: string;
+  url: string;
+  manifestPresent: boolean;
+}
+
+export function listNestedReferencedPaths(root = repoRoot): NestedSubmoduleSpec[] {
+  const results: NestedSubmoduleSpec[] = [];
+  const referenced = listReferencedPaths();
+  for (const parentPath of referenced) {
+    const parentDir = join(root, parentPath);
+    const nestedGitmodules = join(parentDir, ".gitmodules");
+    if (!existsSync(nestedGitmodules)) continue;
+    const nestedEntries = parseGitmodules(readFileSync(nestedGitmodules, "utf8"));
+    const cargoScan = Bun.spawnSync(
+      ["rg", "-l", "--glob", "Cargo.toml", "path\\s*=", parentDir],
+      { stdout: "pipe", stderr: "pipe" },
+    );
+    const cargoFiles =
+      cargoScan.exitCode === 0
+        ? new TextDecoder().decode(cargoScan.stdout).split(/\r?\n/).filter(Boolean)
+        : [];
+    const combinedManifests = cargoFiles.map((f) => readFileSync(f, "utf8")).join("\n");
+    for (const nested of nestedEntries) {
+      const escaped = nested.path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const pathDepRe = new RegExp(`path\\s*=\\s*"(?:\\.\\.?\\/)*${escaped}[/"]`);
+      if (pathDepRe.test(combinedManifests)) {
+        results.push({
+          parentPath,
+          nestedPath: nested.path,
+          url: nested.url,
+          manifestPresent: existsSync(join(parentDir, nested.path, "Cargo.toml")),
+        });
+      }
+    }
+  }
+  return results;
+}
+
 if (import.meta.main) {
   const args = Bun.argv.slice(2);
   const cmd = args[0] ?? "status";
@@ -100,12 +140,19 @@ if (import.meta.main) {
       }
     }
     const referenced = listReferencedPaths();
+    const nestedReferenced = listNestedReferencedPaths();
+    for (const nested of nestedReferenced) {
+      if (!nested.manifestPresent) {
+        uninitialized.push(`${nested.parentPath}/${nested.nestedPath}`);
+      }
+    }
     console.log(
       JSON.stringify(
         {
           totalDeclared: entries.length,
           cargoReferencedCount: referenced.length,
           cargoReferenced: referenced,
+          nestedCargoReferenced: nestedReferenced,
           uninitialized,
           dirty,
           ok: (cmd === "status" || dirty.length === 0) && uninitialized.length === 0,
@@ -122,6 +169,13 @@ if (import.meta.main) {
     const targets = syncAll ? entries.map((e) => e.path) : listReferencedPaths();
     const res = runGit(["submodule", "update", "--init", "--depth", "1", "--jobs", jobs, "--", ...targets], true);
     if (res.exitCode !== 0) process.exit(res.exitCode);
+    for (const nested of listNestedReferencedPaths()) {
+      const nestedRes = runGit(
+        ["-C", nested.parentPath, "submodule", "update", "--init", "--depth", "1", "--", nested.nestedPath],
+        true,
+      );
+      if (nestedRes.exitCode !== 0) process.exit(nestedRes.exitCode);
+    }
   } else {
     console.error("Usage: bun tooling/bun/submodules.ts [status|check|sync] [--jobs 8] [--all]");
     process.exit(1);

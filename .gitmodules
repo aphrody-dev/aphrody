@@ -1,6 +1,7 @@
 [submodule "vendor/bun"]
 	path = vendor/bun
 	url = ../../aphrody-labs/bun.git
+	branch = main
 [submodule "vendor/craft-libs"]
 	path = vendor/craft-libs
 	url = ../../aphrody-labs/craft-libs.git
@@ -148,3 +149,4 @@
 [submodule "vendor/ayvpn"]
 	path = vendor/ayvpn
 	url = ../ayvpn.git
+	branch = main

@@ -94,6 +94,7 @@ members = [
     "crates/github_releases",
     "crates/go_to_line",
     "crates/google_ai",
+    "crates/google_design_stitch",
     "crates/gpui",
     "crates/gpui_apple",
     "crates/gpui_ios",
@@ -338,8 +339,9 @@ exclude = [
     "vendor/vello",
     "vendor/wgpu",
     "vendor/winit",
+    "templates/wasm-wgpu/*",
 ]
-default-members = ["crates/gpui_wgpu", "crates/gpui_web", "crates/gpui_ui", "crates/gpui_code", "crates/gpui_store", "crates/os_session", "crates/os_craft", "crates/os_pilot", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
+default-members = ["crates/gpui_wgpu", "crates/gpui_web", "crates/gpui_ui", "crates/gpui_code", "crates/gpui_store", "crates/google_design_stitch", "crates/os_session", "crates/os_craft", "crates/os_pilot", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
 
 [workspace.package]
 version = "0.5.0"
@@ -442,6 +444,7 @@ git_ui_core = { path = "crates/git_ui_core" }
 github_releases = { path = "crates/github_releases" }
 go_to_line = { path = "crates/go_to_line" }
 google_ai = { path = "crates/google_ai" }
+google_design_stitch = { path = "crates/google_design_stitch" }
 gpui = { path = "crates/gpui", default-features = false }
 gpui_apple = { path = "crates/gpui_apple" }
 gpui_ios = { path = "crates/gpui_ios" }
@@ -1213,6 +1216,7 @@ resvg = { version = "0.46.0", default-features = false, features = [
     "memmap-fonts",
     "raster-images",
 ] }
+roxmltree = "0.21"
 rsa = { version = "0.9", default-features = false, features = ["std", "u64_digit"] }
 jupyter-zmq-client = { version = "3.0.0", default-features = false, features = [
     "async-dispatcher-runtime", "aws-lc-rs"
@@ -1426,6 +1430,30 @@ wuff = "0.2.9"
 x11rb = { version = "0.13", default-features = false, features = ["composite", "dri3", "present"] }
 zbus = { version = "5.13", default-features = false, features = ["async-io", "blocking-api"] }
 zip = { version = "9", default-features = false, features = ["deflate"] }
+
+# Shared conformant workspace external dependencies (enforced by xtask package-conformity)
+annotate-snippets = "0.12.1"
+arrayvec = "0.7.6"
+ctrlc = "3.5"
+embed-resource = "3.0"
+gaoya = "0.2.0"
+guppy = "0.18"
+ipc-channel = "0.19"
+lyon_extra = "1.1.0"
+lyon_path = "1.0.19"
+mimalloc = "0.1"
+num_cpus = "1.13"
+nvim-rs = { git = "https://github.com/KillTheMule/nvim-rs", rev = "764dd270c642f77f10f3e19d05cc178a6cbe69f3" }
+parking = "2.0.0"
+pin-project = "1.1.10"
+rpassword = "7.4"
+seahash = "4.1"
+smol_str = { version = "0.3.6", default-features = false }
+thread_local = "1.1.4"
+tiny-skia-path = "0.11"
+trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d884a89351f3b8856d12894cccee261d" }
+vscode_theme = "0.2.0"
+waker-fn = "1.2.0"
 
 [workspace.dependencies.windows]
 version = "0.62"
@@ -1676,6 +1704,23 @@ codegen-units = 1
 debug = false
 strip = true
 panic = "abort"
+
+[profile.web-lto]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+debug = false
+strip = "symbols"
+panic = "abort"
+
+[profile.aot]
+inherits = "release"
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+debug = false
+strip = "debuginfo"
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "allow" }

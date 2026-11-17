@@ -109,3 +109,14 @@ jobs:
             git commit -m "style: apply cargo fmt and xtask brand sync"
             git push
           fi
+
+  audit-wasm-wgpu-issues:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: oven-sh/setup-bun@v2
+      - name: Verify Wasm/WebGPU issue ledger and purged legacy scripts
+        run: bun tooling/bun/zed-wasm-wgpu-issues.ts audit

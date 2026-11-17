@@ -23,7 +23,9 @@ process.chdir(repoRoot);
 const args = Bun.argv.slice(2);
 const command = args[0] ?? "check";
 const targetPkg = opt("--package") ?? "os_desktop";
-const release = args.includes("--release");
+const useLto = args.includes("--lto");
+const useAot = args.includes("--aot");
+const release = args.includes("--release") || useLto;
 const runOpt = release || args.includes("--opt");
 const keepDebug = args.includes("--keep-debug");
 const serveCoi = args.includes("--coi");
@@ -199,7 +201,9 @@ function runCargoWasm(
   if (features.length > 0) {
     cmd.push("--features", features.join(","));
   }
-  if (release) {
+  if (useLto) {
+    cmd.push("--profile", "web-lto");
+  } else if (release) {
     cmd.push("--profile", "web");
   }
   console.log(`$ ${cmd.join(" ")}`);
@@ -407,7 +411,7 @@ function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditR
   const entryName = targetPkg === "os_desktop" ? "web_os" : targetPkg;
   const cargoArgs = targetPkg === "os_desktop" ? ["--example", "web_os"] : [];
   const features = targetPkg === "gpui_web" ? [] : ["web"];
-  const profileDir = release ? "web" : "debug";
+  const profileDir = useLto ? "web-lto" : release ? "web" : "debug";
   const wasmSrc = targetPkg === "os_desktop"
     ? join("target", "wasm32-unknown-unknown", profileDir, "examples", `${entryName}.wasm`)
     : join("target", "wasm32-unknown-unknown", profileDir, `${entryName}.wasm`);
@@ -451,6 +455,16 @@ function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditR
     }
     const bgWasm = join(cohortDir, `${entryName}_bg.wasm`);
     maybeOptimizeWasm(bgWasm, plan.name);
+    if (useAot) {
+      const aotPath = join(cohortDir, `${entryName}.cwasm`);
+      const aotRes = Bun.spawnSync(["wasmtime", "compile", bgWasm, "-o", aotPath], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      if (aotRes.exitCode !== 0) {
+        console.warn(`[warn] wasmtime compile skipped/non-zero on browser module ${bgWasm}`);
+      }
+    }
     const report = inspectWasmBinary(bgWasm);
     if (plan.name === "baseline" && report.importsSharedMemory) {
       throw new Error(`baseline cohort unexpectedly imports shared memory/TLS`);

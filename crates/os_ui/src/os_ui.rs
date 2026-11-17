@@ -6,9 +6,11 @@
 
 pub mod cosmic_shell;
 pub mod cosmic_theme;
+pub mod google_design;
 pub mod i18n;
 pub mod immediate;
 pub mod reactive;
+pub mod starter_pack;
 pub mod unified_runtime;
 
 pub use cosmic_shell::{
@@ -32,4 +34,17 @@ pub use reactive::{
     SubscriptionSpec, TaskCommand, ToggleControl, focusable_action_chip, progress_meter,
     slider_control, toggle_control,
 };
-pub use unified_runtime::{AdaptiveViewport, FormFactor, FrameworkLayer, UnifiedPlatformProfile};
+pub use google_design::{
+    BUNDLED_GOOGLE_DESIGN_TOKENS_TOML, GoogleDesignTokens, GoogleSansFlexAxes, ShapeScale,
+    SpringSpec, StateLayerOpacities, WindowSizeClass,
+};
+pub use starter_pack::{
+    AgentSlotMeta, BUNDLED_SUBMODULE_PARITY_TOML, CoreWebVitalsBudgetSpec, MonorepoAuditSummary,
+    ShadcnGpuiTheme, StarterAlert, StarterBadge, StarterButton, StarterCard, StarterKpiCard,
+    StarterPackCatalog, StarterPrimitiveSpec, StarterSize, StarterSkeleton, StarterVariant,
+    SubmoduleParityEntry, SubmoduleParityMatrix,
+};
+pub use unified_runtime::{
+    AdaptiveViewport, FormFactor, FrameworkCapabilityDescriptor, FrameworkLayer,
+    UnifiedPlatformProfile, UnifiedRuntime,
+};

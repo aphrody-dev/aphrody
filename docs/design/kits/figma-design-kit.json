@@ -1,0 +1,8 @@
+{
+  "name": "Google Design · Material 3 Expressive Figma Kit",
+  "platform": "figma",
+  "version": "1.0.0",
+  "sourceUrl": "https://design.google/?home",
+  "tokensRef": "../tokens.css",
+  "components": ["Card", "Button", "Tabs", "Sheet", "Sidebar", "Badge", "Input"]
+}

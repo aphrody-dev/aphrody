@@ -22,9 +22,11 @@ anyhow.workspace = true
 brand.workspace = true
 editor.workspace = true
 file_icons.workspace = true
+google_design_stitch.workspace = true
 gpui_ui = { workspace = true, features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }
 language.workspace = true
 log.workspace = true
+os_ui.workspace = true
 serde_json.workspace = true
 util.workspace = true
 workspace.workspace = true

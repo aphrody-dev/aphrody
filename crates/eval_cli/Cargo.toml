@@ -20,7 +20,7 @@ agent_ui.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 client.workspace = true
-ctrlc = { version = "3.5", features = ["termination"] }
+ctrlc = { workspace = true, features = ["termination"] }
 db.workspace = true
 debug_adapter_extension.workspace = true
 env_logger.workspace = true

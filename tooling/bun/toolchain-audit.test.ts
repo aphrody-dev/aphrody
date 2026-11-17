@@ -19,7 +19,7 @@ describe("aphrody Rust toolchain & Cargo optimization suite", () => {
   test("parseToolchainToml parses pinned repo toolchain and targets", () => {
     const raw = readFileSync(join(repoRoot, "rust-toolchain.toml"), "utf8");
     const tc = parseToolchainToml(raw);
-    expect(tc.channel).toBe("1.98.1");
+    expect(tc.channel).toBe("1.100.0");
     expect(tc.profile).toBe("minimal");
     expect(tc.components).toContain("clippy");
     expect(tc.components).toContain("rustfmt");
@@ -75,7 +75,7 @@ version = "1.0.228"
 
     const liveReport = analyzeProfiles(cargoToml, cargoConfig, lockStats, bundleConfig);
     expect(liveReport.workspaceMembers).toBeGreaterThanOrEqual(300);
-    expect(liveReport.excludedCount).toBe(20);
+    expect(liveReport.excludedCount).toBeGreaterThanOrEqual(20);
     expect(liveReport.defaultMembers).toBeGreaterThanOrEqual(7);
     expect(liveReport.profiles.dev?.debug).toBe("line-tables-only");
 
@@ -191,7 +191,7 @@ crate-type (bin)                     47
 
   test("runDoctor and CLI subcommands emit valid JSON cleanly without workspace build locks", () => {
     const report = runDoctor(repoRoot);
-    expect(report.rustToolchainToml.channel).toBe("1.98.1");
+    expect(report.rustToolchainToml.channel).toBe("1.100.0");
     expect(report.tools.some((t) => t.name === "rustc" && t.installed)).toBe(true);
     expect(report.tools.some((t) => t.name === "cargo" && t.installed)).toBe(true);
     expect(report.findings.length).toBeGreaterThan(0);

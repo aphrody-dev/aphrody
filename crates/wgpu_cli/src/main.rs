@@ -1,8 +1,13 @@
 mod adapters;
 mod bench;
 mod compute;
+mod design_cli;
+mod doctor;
+mod mcp;
 mod render;
 mod shader;
+mod templates;
+mod wasm_toolchain;
 
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -13,7 +18,7 @@ use clap::{Parser, Subcommand, ValueEnum};
 #[derive(Debug, Parser)]
 #[command(
     name = "gpui-wgpu",
-    about = "WGPU & Naga GPU adapter, shader validation/transpilation, headless render/compute, and benchmark CLI for aphrody",
+    about = "Unified WGPU/Naga v30, WebAssembly Core 2.0/WASI P2/LTO/AOT, Google Design & Lighthouse/Starter Pack CLI + MCP server for aphrody",
     version
 )]
 struct Cli {
@@ -35,6 +40,25 @@ enum Command {
     Compute(compute::ComputeArgs),
     /// Benchmark GPU initialization, buffer upload bandwidth, compute latency, and render throughput
     Bench(bench::BenchArgs),
+    /// Inspect, validate, Binaryen-optimize (-Oz), AOT-compile (.cwasm), bindgen, compose, and strip Wasm binaries
+    Wasm {
+        #[command(subcommand)]
+        cmd: wasm_toolchain::WasmSubcommand,
+    },
+    /// Verify Rust wasm targets, Binaryen/Wasmtime/SH/GPU CLIs, and active wgpu adapters
+    Doctor(doctor::DoctorArgs),
+    /// Scaffold, build (--lto/--aot), and export Google Design / Tailwind tokens for Wasm + WebGPU apps
+    App {
+        #[command(subcommand)]
+        cmd: templates::AppSubcommand,
+    },
+    /// Mirror https://design.google/, manage DESIGN.md & Stitch screens, and audit Core Web Vitals / Lighthouse
+    Design {
+        #[command(subcommand)]
+        cmd: design_cli::DesignSubcommand,
+    },
+    /// Run a 24-tool stdio JSON-RPC 2.0 MCP server for Wasm, WebGPU, Google Design, Lighthouse & Starter Pack
+    Mcp(mcp::McpArgs),
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, ValueEnum)]
@@ -185,5 +209,10 @@ fn main() -> Result<()> {
         Command::Render(args) => render::run(args),
         Command::Compute(args) => compute::run(args),
         Command::Bench(args) => bench::run(args),
+        Command::Wasm { cmd } => wasm_toolchain::run(cmd),
+        Command::Doctor(args) => doctor::run(args),
+        Command::App { cmd } => templates::run(cmd),
+        Command::Design { cmd } => design_cli::run(cmd),
+        Command::Mcp(args) => mcp::run_stdio_server(args),
     }
 }

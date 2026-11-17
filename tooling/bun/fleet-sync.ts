@@ -162,6 +162,12 @@ function syncToHost(host: string, remoteRepo: string, repoBaseUrl: string) {
       `printf '%s\\n' ${specs.map((s) => `"${s.path}|${s.sha}|${s.httpsUrl}|${s.branch ?? ""}"`).join(" ")} | xargs -P 8 -I {} bash -c 'IFS="|" read -r p s u b <<< "{}"; sync_one "$p" "$s" "$u" "$b"'`,
       ...specs.map((s) => `git update-index --add --cacheinfo 160000,${s.sha},${s.path}`),
       "git submodule sync --recursive >/dev/null",
+      'if [ -f vendor/ayvpn/.gitmodules ] && [ ! -e vendor/ayvpn/mullvad/mullvadvpn-app/Cargo.toml ]; then',
+      '  git -C vendor/ayvpn submodule update --init --depth 1 mullvad/mullvadvpn-app >/dev/null 2>&1 || true',
+      'fi',
+      'if [ -f vendor/libcosmic/.gitmodules ] && [ ! -e vendor/libcosmic/iced/Cargo.toml ]; then',
+      '  git -C vendor/libcosmic submodule update --init --depth 1 iced >/dev/null 2>&1 || true',
+      'fi',
     ].join("\n") + "\n";
 
   const syncRes = Bun.spawnSync(["ssh", host, "bash -s"], {

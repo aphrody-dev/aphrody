@@ -20,7 +20,7 @@ anyhow.workspace = true
 anthropic.workspace = true
 http_client.workspace = true
 chrono.workspace = true
-clap = "4"
+clap.workspace = true
 client.workspace = true
 cloud_llm_client = { workspace = true, features = ["predict-edits"] }
 collections.workspace = true
@@ -68,9 +68,9 @@ wasmtime.workspace = true
 zeta_prompt.workspace = true
 rand.workspace = true
 similar.workspace = true
-flate2 = "1.1.8"
+flate2.workspace = true
 toml.workspace = true
-gaoya = "0.2.0"
+gaoya.workspace = true
 
 # Wasmtime is included as a dependency in order to enable the same
 # features that are enabled in Zed.

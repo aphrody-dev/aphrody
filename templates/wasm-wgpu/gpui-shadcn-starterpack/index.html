@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GPUI + shadcn + Base UI + Tailwind v4 starter pack with Core Web Vitals and WCAG AA compliance">
+  <title>GPUI shadcn Starter Pack — Aphrody</title>
+  <style>
+    :root {
+      --md-sys-color-surface: #0E141B;
+      --md-sys-color-on-surface: #E0E6F0;
+      --md-sys-color-primary: #8FD0FF;
+      --background: var(--md-sys-color-surface);
+      --foreground: var(--md-sys-color-on-surface);
+      --card: #161D25;
+      --border: #404956;
+      --ring: var(--md-sys-color-primary);
+    }
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--foreground);
+      font-family: "Google Sans Flex", system-ui, sans-serif;
+    }
+    :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+    .kpi-grid { display: grid; gap: 16px; padding: 24px; font-variant-numeric: tabular-nums; }
+    canvas { display: block; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main data-slot="starterpack-shell" data-stitch-id="gpui-shadcn-starterpack" class="kpi-grid">
+    <section data-slot="card" aria-label="Starter Pack Metrics">
+      <canvas width="1280" height="720" aria-label="GPUI shadcn Starter Pack Viewport"></canvas>
+      <button type="button" data-slot="button">Inspect Components</button>
+    </section>
+  </main>
+</body>
+</html>

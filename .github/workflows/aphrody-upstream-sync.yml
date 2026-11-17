@@ -10,7 +10,7 @@ on:
         required: false
         default: all
         type: choice
-        options: [all, gpui-kit, nsh, bun, zed, wgpu]
+        options: [all, gpui-kit, nsh, bun, zed, wgpu, store]
 
 permissions:
   contents: write
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   sync-bun-gpui-kit-nsh:
-    if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || contains('gpui-kit nsh bun', github.event.inputs.target)
+    if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || contains('gpui-kit nsh bun store', github.event.inputs.target)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -68,6 +68,11 @@ jobs:
           cp -r /tmp/nsh/docs/. docs/nsh/
           cp -r /tmp/nsh/docs/. "$PLUGIN/docs/nsh/"
           rm -rf /tmp/nsh
+      - name: Sync awesome-gpui, extensions, and winget-pkgs catalogs
+        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'store'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun tooling/bun/awesome-gpui-store.ts sync-all
       - name: Create or update upstream-sync PR if changed
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

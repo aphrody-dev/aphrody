@@ -95,9 +95,28 @@ fn main() {
     let upstream_nsh = get_str(&parsed, "git", "upstream_nsh");
     let upstream_gpui_kit = get_str(&parsed, "git", "upstream_gpui_kit");
     let upstream_wgpu = get_str(&parsed, "git", "upstream_wgpu");
+    let upstream_awesome_gpui = get_str(&parsed, "git", "upstream_awesome_gpui");
+    let upstream_extensions = get_str(&parsed, "git", "upstream_extensions");
+    let upstream_winget_pkgs = get_str(&parsed, "git", "upstream_winget_pkgs");
+    let upstream_modern_web_guidance = get_str(&parsed, "git", "upstream_modern_web_guidance");
+    let upstream_design_md = get_str(&parsed, "git", "upstream_design_md");
+    let upstream_stitch_sdk = get_str(&parsed, "git", "upstream_stitch_sdk");
+    let upstream_stitch_skills = get_str(&parsed, "git", "upstream_stitch_skills");
     let submodule_bun = get_str(&parsed, "git", "submodule_bun");
 
     let wgpu_cli_bin = get_str(&parsed, "features", "wgpu_cli_bin");
+
+    let design_source_of_truth = get_str(&parsed, "design", "source_of_truth");
+    let design_system = get_str(&parsed, "design", "system");
+    let design_spec_url = get_str(&parsed, "design", "spec_url");
+    let design_fonts_url = get_str(&parsed, "design", "fonts_url");
+    let design_stitch_url = get_str(&parsed, "design", "stitch_url");
+    let design_sans_flex_family = get_str(&parsed, "design", "sans_flex_family");
+    let design_md = get_str(&parsed, "design", "design_md");
+    let design_tokens_manifest = get_str(&parsed, "design", "tokens_manifest");
+    let design_themes_manifest = get_str(&parsed, "design", "themes_manifest");
+    let design_seed_hex = get_str(&parsed, "design", "seed_hex");
+    let design_variant = get_str(&parsed, "design", "variant");
 
     let legacy_schemes_slice = legacy_url_schemes
         .iter()
@@ -191,9 +210,28 @@ pub const UPSTREAM_ZED_BRANCH: &str = {upstream_zed_branch};
 pub const UPSTREAM_NSH_REPO: &str = {upstream_nsh};
 pub const UPSTREAM_GPUI_KIT_REPO: &str = {upstream_gpui_kit};
 pub const UPSTREAM_WGPU_REPO: &str = {upstream_wgpu};
+pub const UPSTREAM_AWESOME_GPUI_REPO: &str = {upstream_awesome_gpui};
+pub const UPSTREAM_EXTENSIONS_REPO: &str = {upstream_extensions};
+pub const UPSTREAM_WINGET_PKGS_REPO: &str = {upstream_winget_pkgs};
+pub const UPSTREAM_MODERN_WEB_GUIDANCE_REPO: &str = {upstream_modern_web_guidance};
+pub const UPSTREAM_DESIGN_MD_REPO: &str = {upstream_design_md};
+pub const UPSTREAM_STITCH_SDK_REPO: &str = {upstream_stitch_sdk};
+pub const UPSTREAM_STITCH_SKILLS_REPO: &str = {upstream_stitch_skills};
 pub const SUBMODULE_BUN_REPO: &str = {submodule_bun};
 
 pub const WGPU_CLI_BIN: &str = {wgpu_cli_bin};
+
+pub const DESIGN_SOURCE_OF_TRUTH: &str = {design_source_of_truth};
+pub const DESIGN_SYSTEM: &str = {design_system};
+pub const DESIGN_SPEC_URL: &str = {design_spec_url};
+pub const DESIGN_FONTS_URL: &str = {design_fonts_url};
+pub const DESIGN_STITCH_URL: &str = {design_stitch_url};
+pub const DESIGN_SANS_FLEX_FAMILY: &str = {design_sans_flex_family};
+pub const DESIGN_MD_PATH: &str = {design_md};
+pub const DESIGN_TOKENS_MANIFEST: &str = {design_tokens_manifest};
+pub const DESIGN_THEMES_MANIFEST: &str = {design_themes_manifest};
+pub const DESIGN_SEED_HEX: &str = {design_seed_hex};
+pub const DESIGN_VARIANT: &str = {design_variant};
 "#,
         name = rust_str_literal(name),
         slug = rust_str_literal(slug),
@@ -241,8 +279,26 @@ pub const WGPU_CLI_BIN: &str = {wgpu_cli_bin};
         upstream_nsh = rust_str_literal(upstream_nsh),
         upstream_gpui_kit = rust_str_literal(upstream_gpui_kit),
         upstream_wgpu = rust_str_literal(upstream_wgpu),
+        upstream_awesome_gpui = rust_str_literal(upstream_awesome_gpui),
+        upstream_extensions = rust_str_literal(upstream_extensions),
+        upstream_winget_pkgs = rust_str_literal(upstream_winget_pkgs),
+        upstream_modern_web_guidance = rust_str_literal(upstream_modern_web_guidance),
+        upstream_design_md = rust_str_literal(upstream_design_md),
+        upstream_stitch_sdk = rust_str_literal(upstream_stitch_sdk),
+        upstream_stitch_skills = rust_str_literal(upstream_stitch_skills),
         submodule_bun = rust_str_literal(submodule_bun),
         wgpu_cli_bin = rust_str_literal(wgpu_cli_bin),
+        design_source_of_truth = rust_str_literal(design_source_of_truth),
+        design_system = rust_str_literal(design_system),
+        design_spec_url = rust_str_literal(design_spec_url),
+        design_fonts_url = rust_str_literal(design_fonts_url),
+        design_stitch_url = rust_str_literal(design_stitch_url),
+        design_sans_flex_family = rust_str_literal(design_sans_flex_family),
+        design_md = rust_str_literal(design_md),
+        design_tokens_manifest = rust_str_literal(design_tokens_manifest),
+        design_themes_manifest = rust_str_literal(design_themes_manifest),
+        design_seed_hex = rust_str_literal(design_seed_hex),
+        design_variant = rust_str_literal(design_variant),
     );
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR"));

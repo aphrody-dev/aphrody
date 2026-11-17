@@ -11,7 +11,7 @@ Thank you for helping make **Aphrody** (`aphrody-dev/aphrody`) better! Aphrody u
   - Before proposing a moderate-to-large feature, read [Aphrody's Feature Process](./docs/src/development/feature-process.md) for the motivation, integration points, and design checklist to cover.
 - **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, `gfx-rs/wgpu`, and `aphrody-labs/bun` is managed through [`.github/workflows/aphrody-upstream-sync.yml`](./.github/workflows/aphrody-upstream-sync.yml).
 - **Code of Conduct**: All participation across issues, discussions, and pull requests is governed by [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
-- **Plugin, coding rules & architecture guides**: Read [`.rules`](./.rules), [`.agents/plugins/aphrody/rules/AGENTS.md`](./.agents/plugins/aphrody/rules/AGENTS.md), [`.agents/plugins/aphrody/docs/INDEX.md`](./.agents/plugins/aphrody/docs/INDEX.md), and [`docs/architecture/README.md`](./docs/architecture/README.md).
+- **Plugin, coding rules & architecture guides**: Read [`AGENTS.md`](./AGENTS.md), [`.agents/plugins/aphrody/rules/AGENTS.md`](./.agents/plugins/aphrody/rules/AGENTS.md), [`.agents/plugins/aphrody/docs/INDEX.md`](./.agents/plugins/aphrody/docs/INDEX.md), and [`docs/architecture/README.md`](./docs/architecture/README.md).
 
 ### Things We Will (Probably) Not Merge
 
@@ -90,7 +90,7 @@ bun run submodules:sync
 ## Engineering & Coding Standards
 
 - **Formatting**: Configured in [`rustfmt.toml`](./rustfmt.toml) (`edition = "2024"`, `style_edition = "2024"`). Format Rust with `cargo fmt --all` and verify with `cargo fmt --all -- --check`. Markdown/JSONC formatting uses [`.prettierrc`](./.prettierrc) (`./script/prettier`).
-- **Rust & GPUI Rules ([`.rules`](./.rules))**:
+- **Rust & GPUI Rules ([`AGENTS.md`](./AGENTS.md))**:
   1. **No `mod.rs`**: Keep crate roots in `src/<crate_name>.rs` (`[lib] path = ...`) and submodules in `src/<module>.rs`.
   2. **Explicit Error Handling**: Avoid `.unwrap()`, `.expect()` (outside documented invariant tests), and silent `let _ = <fallible>` in core crates; propagate with `?`, `.log_err()`, or explicit `match`/`if let`.
   3. **Clippy & Disallowed APIs ([`clippy.toml`](./clippy.toml), [`Cargo.toml`](./Cargo.toml))**: Workspace lints deny `dbg_macro`, `todo`, `declare_interior_mutable_const`, `redundant_clone`, and `disallowed_methods` (e.g., use `smol::process::Command` instead of blocking `std::process::Command`, `gpui::BackgroundExecutor::timer` instead of `smol::Timer::after`, and `serde_json::from_slice` instead of `serde_json::from_reader`).
@@ -153,7 +153,7 @@ Additional repository checks: `cargo xtask licenses` / `./script/check-licenses`
 - **Build, run locally, and manually test your changes** before opening a PR; document tested platforms and concise reviewer verification steps.
 - **Keep each PR about one thing**, leaving unrelated features and cleanups for separate PRs.
 - **Visual & non-visual artifacts**: For UI changes, follow [`docs/src/development/ui-checklist.md`](./docs/src/development/ui-checklist.md) and attach before/after screenshots or video. For performance, GPU, or CLI changes, attach benchmarks, `gpui-wgpu` reports, or test output.
-- **PR Titles & Release Notes** ([`.rules`](./.rules), [`docs/src/development/release-notes.md`](./docs/src/development/release-notes.md)):
+- **PR Titles & Release Notes** ([`AGENTS.md`](./AGENTS.md), [`docs/src/development/release-notes.md`](./docs/src/development/release-notes.md)):
   - Use a clear, capitalized, imperative PR title without conventional-commit prefixes (`fix:`, `feat:`, `docs:`, etc.) or trailing punctuation (optional crate scope prefix, e.g. `git_ui: Add history view`).
   - Include a final `Release Notes:` section with a blank line followed by `- Added ...`, `- Fixed ...`, `- Improved ...`, or `- N/A`. Any PR touching `crates/gpui*` must include a `- [GPUI] ...` entry (or `- [GPUI] N/A`).
 - **README Self-Review Guard**: Leave lines 1–2 of [`README.md`](./README.md) intact during edits; human authors remove line 2 manually only to confirm final diff self-review.

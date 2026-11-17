@@ -1,0 +1,4 @@
+source_of_truth = "https://design.google/"
+system = "Material 3 Expressive"
+sans_flex_family = "Google Sans Flex"
+template = "nsh-webgpu-shader"

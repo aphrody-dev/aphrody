@@ -164,6 +164,21 @@ impl WgpuAtlasTextures {
         size: Size<DevicePixels>,
         texture_kind: AtlasTextureKind,
     ) -> Option<AtlasTile> {
+        let max_dim = self.max_texture_size as i32;
+        if size.width.0 <= 0
+            || size.height.0 <= 0
+            || size.width.0 > max_dim
+            || size.height.0 > max_dim
+        {
+            log::warn!(
+                "Skipping atlas tile allocation with invalid dimensions {}x{} (max_texture_size={})",
+                size.width.0,
+                size.height.0,
+                max_dim
+            );
+            return None;
+        }
+
         {
             let textures = &mut self.storage[texture_kind];
 
@@ -176,7 +191,7 @@ impl WgpuAtlasTextures {
             }
         }
 
-        let texture = self.push_texture(size, texture_kind);
+        let texture = self.push_texture(size, texture_kind)?;
         texture.allocate(size)
     }
 
@@ -184,7 +199,7 @@ impl WgpuAtlasTextures {
         &mut self,
         min_size: Size<DevicePixels>,
         kind: AtlasTextureKind,
-    ) -> &mut WgpuAtlasTexture {
+    ) -> Option<&mut WgpuAtlasTexture> {
         const DEFAULT_ATLAS_SIZE: Size<DevicePixels> = Size {
             width: DevicePixels(1024),
             height: DevicePixels(1024),
@@ -237,19 +252,15 @@ impl WgpuAtlasTextures {
         };
 
         if let Some(ix) = index {
-            texture_list.textures[ix] = Some(atlas_texture);
-            texture_list
-                .textures
-                .get_mut(ix)
-                .and_then(|t| t.as_mut())
-                .expect("texture must exist")
+            if let Some(slot) = texture_list.textures.get_mut(ix) {
+                *slot = Some(atlas_texture);
+                slot.as_mut()
+            } else {
+                None
+            }
         } else {
             texture_list.textures.push(Some(atlas_texture));
-            texture_list
-                .textures
-                .last_mut()
-                .and_then(|t| t.as_mut())
-                .expect("texture must exist")
+            texture_list.textures.last_mut().and_then(|t| t.as_mut())
         }
     }
 
@@ -269,7 +280,20 @@ impl WgpuAtlasTextures {
             let Some(texture) = self.storage.get(upload.id) else {
                 continue;
             };
-            let bytes_per_pixel = texture.bytes_per_pixel();
+            let bytes_per_pixel = u32::from(texture.bytes_per_pixel());
+            let width = upload.bounds.size.width.0.max(0) as u32;
+            let height = upload.bounds.size.height.0.max(0) as u32;
+            let Some((aligned_data, bytes_per_row)) =
+                align_upload_buffer(&upload.data, width, height, bytes_per_pixel)
+            else {
+                log::warn!(
+                    "Skipping undersized or empty atlas upload {}x{} ({} bytes)",
+                    width,
+                    height,
+                    upload.data.len()
+                );
+                continue;
+            };
 
             self.queue.write_texture(
                 wgpu::TexelCopyTextureInfo {
@@ -282,15 +306,15 @@ impl WgpuAtlasTextures {
                     },
                     aspect: wgpu::TextureAspect::All,
                 },
-                &upload.data,
+                aligned_data.as_ref(),
                 wgpu::TexelCopyBufferLayout {
                     offset: 0,
-                    bytes_per_row: Some(upload.bounds.size.width.0 as u32 * bytes_per_pixel as u32),
+                    bytes_per_row: Some(bytes_per_row),
                     rows_per_image: None,
                 },
                 wgpu::Extent3d {
-                    width: upload.bounds.size.width.0 as u32,
-                    height: upload.bounds.size.height.0 as u32,
+                    width,
+                    height,
                     depth_or_array_layers: 1,
                 },
             );
@@ -389,6 +413,39 @@ fn swizzle_upload_data(bytes: &[u8], format: wgpu::TextureFormat) -> Vec<u8> {
         }
         _ => bytes.to_vec(),
     }
+}
+
+/// Pads tight row pixel data to `wgpu::COPY_BYTES_PER_ROW_ALIGNMENT` (256 bytes) and
+/// validates expected slice length so WebGPU/DX12/Vulkan uploads never fail alignment checks.
+fn align_upload_buffer<'a>(
+    bytes: &'a [u8],
+    width: u32,
+    height: u32,
+    bytes_per_pixel: u32,
+) -> Option<(Cow<'a, [u8]>, u32)> {
+    let unpadded_row = width.checked_mul(bytes_per_pixel)?;
+    let expected_len = unpadded_row.checked_mul(height)? as usize;
+    if unpadded_row == 0 || height == 0 || bytes.len() < expected_len {
+        return None;
+    }
+
+    let align = wgpu::COPY_BYTES_PER_ROW_ALIGNMENT;
+    let padded_row = unpadded_row.div_ceil(align) * align;
+    if padded_row == unpadded_row {
+        return Some((Cow::Borrowed(&bytes[..expected_len]), padded_row));
+    }
+
+    let total_padded = (padded_row as usize).checked_mul(height as usize)?;
+    let mut padded = vec![0u8; total_padded];
+    let row_bytes = unpadded_row as usize;
+    let dst_stride = padded_row as usize;
+    for row in 0..height as usize {
+        let src_start = row * row_bytes;
+        let dst_start = row * dst_stride;
+        padded[dst_start..dst_start + row_bytes]
+            .copy_from_slice(&bytes[src_start..src_start + row_bytes]);
+    }
+    Some((Cow::Owned(padded), padded_row))
 }
 
 #[cfg(all(test, not(target_family = "wasm")))]
@@ -564,5 +621,54 @@ mod tests {
             swizzle_upload_data(&input, wgpu::TextureFormat::Rgba8Unorm),
             vec![0x30, 0x20, 0x10, 0x40, 0xCC, 0xBB, 0xAA, 0xDD]
         );
+    }
+
+    #[test]
+    fn align_upload_buffer_pads_odd_widths_to_256_bytes() {
+        // 10px * 4 bpp = 40 bytes/row -> aligned up to 256 bytes/row across 2 rows.
+        let src = vec![0x7Au8; 40 * 2];
+        let (aligned, stride) =
+            align_upload_buffer(&src, 10, 2, 4).expect("non-empty buffer should align");
+        assert_eq!(stride, wgpu::COPY_BYTES_PER_ROW_ALIGNMENT);
+        assert_eq!(aligned.len(), (wgpu::COPY_BYTES_PER_ROW_ALIGNMENT * 2) as usize);
+        assert_eq!(&aligned[0..40], &src[0..40]);
+        assert_eq!(aligned[40], 0);
+        assert_eq!(&aligned[256..296], &src[40..80]);
+
+        // Undersized upload returns None cleanly without panicking.
+        assert!(align_upload_buffer(&[1, 2, 3], 10, 2, 4).is_none());
+    }
+
+    #[test]
+    fn oversized_or_empty_tile_returns_error_without_allocating_texture() -> anyhow::Result<()> {
+        let (device, queue) = test_device_and_queue()?;
+        let max_dim = device.limits().max_texture_dimension_2d as i32;
+        let atlas = WgpuAtlas::new(device, queue, wgpu::TextureFormat::Bgra8Unorm);
+
+        let oversized_key = AtlasKey::Image(RenderImageParams {
+            image_id: ImageId(9001),
+            frame_index: 0,
+        });
+        let oversized = Size {
+            width: DevicePixels(max_dim + 1),
+            height: DevicePixels(64),
+        };
+        let res = atlas.get_or_insert_with(oversized_key, &mut || {
+            Ok(Some((oversized, Cow::Borrowed(&[]))))
+        });
+        assert!(res.is_err());
+
+        let zero_key = AtlasKey::Image(RenderImageParams {
+            image_id: ImageId(9002),
+            frame_index: 0,
+        });
+        let zero = Size {
+            width: DevicePixels(0),
+            height: DevicePixels(8),
+        };
+        let zero_res =
+            atlas.get_or_insert_with(zero_key, &mut || Ok(Some((zero, Cow::Borrowed(&[])))));
+        assert!(zero_res.is_err());
+        Ok(())
     }
 }

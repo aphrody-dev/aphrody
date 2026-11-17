@@ -53,7 +53,7 @@ clap_complete_nushell = { workspace = true, optional = true }
 collections.workspace = true
 console = { workspace = true, optional = true }
 dialoguer = { workspace = true, optional = true }
-ipc-channel = "0.19"
+ipc-channel.workspace = true
 parking_lot = { workspace = true, optional = true }
 paths = { workspace = true, optional = true }
 release_channel = { workspace = true, optional = true }

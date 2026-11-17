@@ -1,0 +1,15 @@
+[package]
+name = "gpui_shadcn_starterpack"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Core Web Vitals >= 95, Lighthouse, W3C, Vercel & shadcn/Base UI/Tailwind v4 GPUI starter pack."
+
+[workspace]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = "z"
+strip = true
+panic = "abort"

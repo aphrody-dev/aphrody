@@ -65,6 +65,168 @@ impl FrameworkLayer {
             Self::TauriBun => "tauri-bun",
         }
     }
+
+    #[must_use]
+    pub const fn capability(self) -> FrameworkCapabilityDescriptor {
+        match self {
+            Self::Gpui => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/gpui",
+                vendor_submodule: None,
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "gpui_wgpu + gpui_web",
+            },
+            Self::Nsh => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/nsh-engine",
+                vendor_submodule: None,
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: true,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "nsh-platform-gpui + nsh-platform-web",
+            },
+            Self::GpuiKit => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/gpui_ui",
+                vendor_submodule: None,
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "os_ui::google_design + gpui",
+            },
+            Self::Craft => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/os_craft",
+                vendor_submodule: Some("vendor/craft-libs"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: true,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "aot",
+                render_bridge: "craft-anything + wgpu",
+            },
+            Self::Cosmic => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/os_ui",
+                vendor_submodule: Some("vendor/libcosmic"),
+                supports_wasm32_unknown: false,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "release",
+                render_bridge: "cosmic_theme + cosmic_shell + iced",
+            },
+            Self::Iced => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/os_ui",
+                vendor_submodule: Some("vendor/iced"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "os_ui::reactive + iced_wgpu",
+            },
+            Self::Egui => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/os_ui",
+                vendor_submodule: Some("vendor/egui"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "os_ui::immediate + eframe_wgpu",
+            },
+            Self::Wgpu => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/gpui_wgpu",
+                vendor_submodule: Some("vendor/wgpu"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: true,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "aot",
+                render_bridge: "wgpu v30 + naga v30 + gpui-wgpu",
+            },
+            Self::Taffy => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/gpui",
+                vendor_submodule: Some("vendor/taffy"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: true,
+                supports_webgpu: false,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "gpui flexbox/grid taffy_tree",
+            },
+            Self::Blitz => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/os_ui",
+                vendor_submodule: Some("vendor/blitz"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "web-lto",
+                render_bridge: "anyrender_vello + dioxus",
+            },
+            Self::Winit => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/gpui_platform",
+                vendor_submodule: Some("vendor/winit"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: false,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "release",
+                render_bridge: "raw-window-handle + surface host",
+            },
+            Self::TauriBun => FrameworkCapabilityDescriptor {
+                layer: self,
+                crate_anchor: "crates/nsh_workspace",
+                vendor_submodule: Some("vendor/tauri"),
+                supports_wasm32_unknown: true,
+                supports_wasip2_aot: true,
+                supports_webgpu: true,
+                google_design_tokens: true,
+                lto_profile: "aot",
+                render_bridge: "wry + bun + stitch-sdk",
+            },
+        }
+    }
+}
+
+/// Capability descriptor linking a [`FrameworkLayer`] to its workspace crate, submodule, Wasm/LTO/AOT support, and Google Design tokens.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FrameworkCapabilityDescriptor {
+    pub layer: FrameworkLayer,
+    pub crate_anchor: &'static str,
+    pub vendor_submodule: Option<&'static str>,
+    pub supports_wasm32_unknown: bool,
+    pub supports_wasip2_aot: bool,
+    pub supports_webgpu: bool,
+    pub google_design_tokens: bool,
+    pub lto_profile: &'static str,
+    pub render_bridge: &'static str,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct UnifiedRuntime;
+
+impl UnifiedRuntime {
+    #[must_use]
+    pub fn capability_matrix() -> [FrameworkCapabilityDescriptor; 12] {
+        FrameworkLayer::ALL.map(FrameworkLayer::capability)
+    }
 }
 
 /// Single-source responsive metrics derived from live logical viewport dimensions (`vw`, `vh`).
@@ -174,5 +336,14 @@ mod tests {
         assert_eq!(profile.active_layers.len(), 12);
         assert!(profile.wasm_webgpu_ready);
         assert!(profile.hardware.target_fps >= 24);
+
+        let matrix = UnifiedRuntime::capability_matrix();
+        assert_eq!(matrix.len(), 12);
+        for desc in matrix {
+            assert!(desc.google_design_tokens);
+            assert!(!desc.crate_anchor.is_empty());
+            assert!(!desc.lto_profile.is_empty());
+            assert!(!desc.render_bridge.is_empty());
+        }
     }
 }

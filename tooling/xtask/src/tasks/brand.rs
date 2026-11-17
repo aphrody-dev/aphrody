@@ -45,7 +45,24 @@ pub struct ProductManifest {
     pub plugin: PluginSection,
     pub git: GitSection,
     pub features: FeaturesSection,
+    pub design: DesignSection,
     pub colors: ColorsSection,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[allow(dead_code)]
+pub struct DesignSection {
+    pub source_of_truth: String,
+    pub system: String,
+    pub spec_url: String,
+    pub fonts_url: String,
+    pub stitch_url: String,
+    pub sans_flex_family: String,
+    pub design_md: String,
+    pub tokens_manifest: String,
+    pub themes_manifest: String,
+    pub seed_hex: String,
+    pub variant: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -134,6 +151,20 @@ pub struct GitSection {
     pub upstream_nsh: String,
     pub upstream_gpui_kit: String,
     pub upstream_wgpu: String,
+    #[serde(default)]
+    pub upstream_awesome_gpui: String,
+    #[serde(default)]
+    pub upstream_extensions: String,
+    #[serde(default)]
+    pub upstream_winget_pkgs: String,
+    #[serde(default)]
+    pub upstream_modern_web_guidance: String,
+    #[serde(default)]
+    pub upstream_design_md: String,
+    #[serde(default)]
+    pub upstream_stitch_sdk: String,
+    #[serde(default)]
+    pub upstream_stitch_skills: String,
     pub submodule_bun: String,
 }
 
@@ -342,6 +373,34 @@ fn validate_manifest(manifest: &ProductManifest) -> Result<()> {
             manifest.git.upstream_gpui_kit.as_str(),
         ),
         ("git.upstream_wgpu", manifest.git.upstream_wgpu.as_str()),
+        (
+            "git.upstream_awesome_gpui",
+            manifest.git.upstream_awesome_gpui.as_str(),
+        ),
+        (
+            "git.upstream_extensions",
+            manifest.git.upstream_extensions.as_str(),
+        ),
+        (
+            "git.upstream_winget_pkgs",
+            manifest.git.upstream_winget_pkgs.as_str(),
+        ),
+        (
+            "git.upstream_modern_web_guidance",
+            manifest.git.upstream_modern_web_guidance.as_str(),
+        ),
+        (
+            "git.upstream_design_md",
+            manifest.git.upstream_design_md.as_str(),
+        ),
+        (
+            "git.upstream_stitch_sdk",
+            manifest.git.upstream_stitch_sdk.as_str(),
+        ),
+        (
+            "git.upstream_stitch_skills",
+            manifest.git.upstream_stitch_skills.as_str(),
+        ),
         ("git.submodule_bun", manifest.git.submodule_bun.as_str()),
         (
             "features.modular_ui_crate",
@@ -382,11 +441,30 @@ fn validate_manifest(manifest: &ProductManifest) -> Result<()> {
         !manifest.features.default_app_features.is_empty(),
         "product.toml field 'features.default_app_features' cannot be empty"
     );
+    anyhow::ensure!(
+        manifest.design.source_of_truth == "https://design.google/",
+        "product.toml field 'design.source_of_truth' must be 'https://design.google/'"
+    );
     Ok(())
 }
 
 fn apply_brand(root: &Path, manifest: &ProductManifest, generate_icons: bool) -> Result<()> {
     validate_manifest(manifest)?;
+    anyhow::ensure!(
+        root.join(&manifest.design.tokens_manifest).is_file(),
+        "missing design tokens manifest: {}",
+        manifest.design.tokens_manifest
+    );
+    anyhow::ensure!(
+        root.join(&manifest.design.themes_manifest).is_file(),
+        "missing design themes manifest: {}",
+        manifest.design.themes_manifest
+    );
+    anyhow::ensure!(
+        root.join(&manifest.design.design_md).is_file(),
+        "missing root DESIGN.md manifest: {}",
+        manifest.design.design_md
+    );
     let mut updated_files = Vec::new();
     sync_manifest_files(root, manifest, true, &mut updated_files)?;
 
@@ -408,6 +486,19 @@ fn check_brand(root: &Path, manifest: &ProductManifest) -> Result<()> {
     validate_manifest(manifest)?;
     let mut drifted = Vec::new();
     sync_manifest_files(root, manifest, false, &mut drifted)?;
+
+    let tokens_path = root.join(&manifest.design.tokens_manifest);
+    if !tokens_path.is_file() {
+        drifted.push(tokens_path);
+    }
+    let themes_path = root.join(&manifest.design.themes_manifest);
+    if !themes_path.is_file() {
+        drifted.push(themes_path);
+    }
+    let design_md_path = root.join(&manifest.design.design_md);
+    if !design_md_path.is_file() {
+        drifted.push(design_md_path);
+    }
 
     let svg_path = root.join(&manifest.assets.logo_svg);
     if !svg_path.is_file() {
@@ -936,6 +1027,9 @@ mod tests {
                 upstream_nsh: "https://github.com/longbridge/nsh.git".into(),
                 upstream_gpui_kit: "https://github.com/longbridge/gpui-kit.git".into(),
                 upstream_wgpu: "https://github.com/gfx-rs/wgpu.git".into(),
+                upstream_awesome_gpui: "https://github.com/zed-industries/awesome-gpui.git".into(),
+                upstream_extensions: "https://github.com/zed-industries/extensions.git".into(),
+                upstream_winget_pkgs: "https://github.com/zed-industries/winget-pkgs.git".into(),
                 submodule_bun: "https://github.com/aphrody-labs/bun".into(),
             },
             features: FeaturesSection {

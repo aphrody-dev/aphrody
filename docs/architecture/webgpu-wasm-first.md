@@ -14,8 +14,9 @@ Aphrody treats **WebAssembly (`wasm32-unknown-unknown`, `wasm32-wasip2`)** and *
    - `baseline`: universal browser support (`wasm32-unknown-unknown`), strictly verified not to import shared memory or `__wasm_init_tls`.
    - `simd-baseline`: `-C target-feature=+simd128` for 128-bit vector throughput without Cross-Origin Isolation headers.
    - `multithreaded` (`--coi`): opt-in `-C target-feature=+atomics,+bulk-memory,+mutable-globals` with COOP/COEP headers for threaded Wasm workers.
-4. **WASI Preview 2 (`wasm32-wasip2`) & Host Runtime (`wasmtime 48`)**:
-   - Pure logic crates (`os_session`, `os_craft`, `release_channel`, `brand`) cross-check cleanly on `wasm32-wasip2`, matching the host workspace's pinned `wasmtime = "48.0.7"` + `wasmtime-wasi` (`p2`) runtime.
+4. **WASI Preview 2 (`wasm32-wasip2`), LTO/AOT Profiles & Starter Templates**:
+   - Pure logic crates (`os_session`, `os_craft`, `release_channel`, `brand`) cross-check cleanly on `wasm32-wasip2`, matching the host workspace's Wasmtime P2 AOT runtime (`.aot-cache/*.cwasm` in [`crates/extension_host`](../../crates/extension_host/src/wasm_host.rs)).
+   - `[profile.web-lto]` (browser fat-LTO + `-Oz` + `wasm-opt`) and `[profile.aot]` (native `.cwasm` AOT) back `bun tooling/bun/web-build.ts build --lto|--aot`, `gpui-wgpu app|wasm|design|mcp`, and the 5 standalone starter templates documented in [`awesome-wasm-wgpu-gpui.md`](./awesome-wasm-wgpu-gpui.md).
 
 ## Standard Verification Commands
 

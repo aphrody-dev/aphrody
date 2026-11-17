@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "google-expressive",
+  "baseLibrary": "base-ui",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "css": "styles/shadcn-tailwind.css",
+    "baseColor": "slate",
+    "cssVariables": true
+  },
+  "designSource": "https://design.google/",
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "gpui": "os_ui::starter_pack"
+  }
+}

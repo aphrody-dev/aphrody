@@ -1,0 +1,8 @@
+{
+  "name": "Google Design · Stitch Design Kit",
+  "platform": "stitch",
+  "version": "1.0.0",
+  "sourceUrl": "https://stitch.withgoogle.com",
+  "tokensRef": "../tokens.css",
+  "components": ["SessionStudioShell", "TimelineRow", "InspectorDrawer", "KpiGrid"]
+}

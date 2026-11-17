@@ -21,6 +21,7 @@ test-support = ["gpui/test-support", "theme/test-support"]
 anyhow.workspace = true
 brand.workspace = true
 dirs.workspace = true
+google_design_stitch.workspace = true
 gpui.workspace = true
 icons.workspace = true
 log.workspace = true

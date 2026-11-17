@@ -6709,6 +6709,7 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "settings",
+ "sha2 0.10.9",
  "task",
  "telemetry",
  "tempfile",
@@ -8375,6 +8376,29 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "google_design_stitch"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "brand",
+ "flate2",
+ "html5ever 0.39.0",
+ "image",
+ "log",
+ "markup5ever_rcdom",
+ "roxmltree 0.21.2",
+ "serde",
+ "serde_json",
+ "serde_yaml_ng",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.21",
+ "toml 0.9.8",
+ "ureq",
+ "url",
 ]
 
 [[package]]
@@ -14582,9 +14606,11 @@ dependencies = [
  "brand",
  "editor",
  "file_icons",
+ "google_design_stitch",
  "gpui_ui",
  "language",
  "log",
+ "os_ui",
  "serde_json",
  "util",
  "workspace",
@@ -15746,6 +15772,7 @@ dependencies = [
  "anyhow",
  "brand",
  "dirs 6.0.0",
+ "google_design_stitch",
  "gpui",
  "icons",
  "log",
@@ -26673,13 +26700,21 @@ name = "wgpu_cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "brand",
  "bytemuck",
  "clap",
+ "flate2",
+ "google_design_stitch",
  "image",
  "naga",
  "pollster 0.4.0",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "toml 0.9.8",
+ "wasm-encoder 0.254.2",
+ "wasmparser 0.254.2",
  "wgpu",
 ]
 
@@ -28300,7 +28335,7 @@ dependencies = [
  "resvg",
  "serde",
  "serde_json",
- "serde_yaml",
+ "serde_yaml_ng",
  "strum",
  "tempfile",
  "thiserror 2.0.21",

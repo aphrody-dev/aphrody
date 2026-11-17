@@ -1,0 +1,15 @@
+[package]
+name = "wasi_p2_aot_compute"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Deterministic WASI Preview 2 AOT compute kernel anchored to https://design.google/ Material 3 Expressive tokens."
+
+[workspace]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = "z"
+strip = true
+panic = "abort"

@@ -1,0 +1,15 @@
+[package]
+name = "gpui_web_studio"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "GPUI + WebGPU studio starter anchored to https://design.google/ Material 3 Expressive and Google Sans Flex."
+
+[workspace]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = "z"
+strip = true
+panic = "abort"

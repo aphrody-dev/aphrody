@@ -177,6 +177,23 @@ pub fn builtin_tools() -> Vec<McpToolDescriptor> {
                 .to_owned(),
             input_schema: json!({"type": "object", "properties": {}, "additionalProperties": false}),
         },
+        McpToolDescriptor {
+            name: "wasm_wgpu_doctor".to_owned(),
+            description: "Inspect host Wasm/WebGPU toolchain binaries (`gpui-wgpu`, `wasmtime`, `wasm-opt`, `wasm-bindgen`, `wasm-tools`, `bun`)."
+                .to_owned(),
+            input_schema: json!({"type": "object", "properties": {}, "additionalProperties": false}),
+        },
+        McpToolDescriptor {
+            name: "wasm_inspect_binary".to_owned(),
+            description: "Inspect a `.wasm` or component file header, sections, imports, exports, and size."
+                .to_owned(),
+            input_schema: json!({
+                "type": "object",
+                "properties": { "path": { "type": "string" } },
+                "required": ["path"],
+                "additionalProperties": false
+            }),
+        },
     ];
     for pt in builtin_pilot_tools() {
         tools.push(McpToolDescriptor {
@@ -327,6 +344,15 @@ fn call_tool(state: &Arc<Mutex<McpServerState>>, params: &Value) -> Result<Value
             serde_json::to_value(report).map_err(|e| (-32000, e.to_string()))?
         }
         "craft_anything_status" => craft_anything_discovery_json(),
+        "wasm_wgpu_doctor" => collect_wasm_wgpu_doctor_json(),
+        "wasm_inspect_binary" => {
+            let raw_path = args
+                .get("path")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing wasm file path".to_owned()))?;
+            inspect_wasm_binary_json(&PathBuf::from(raw_path))
+                .map_err(|e| (-32001, e.to_string()))?
+        }
         other if other.starts_with("desktop_") => {
             let sync_comp = guard.compositor.clone();
             let theme = guard.active_theme.clone();
@@ -625,6 +651,106 @@ fn handle_http_conn(
     Ok(())
 }
 
+#[cfg(not(target_family = "wasm"))]
+#[allow(
+    clippy::disallowed_methods,
+    reason = "synchronous CLI tool probe in standalone MCP handler"
+)]
+fn collect_wasm_wgpu_doctor_json() -> Value {
+    let mut tools = Vec::new();
+    for bin in [
+        brand::WGPU_CLI_BIN,
+        "wasmtime",
+        "wasm-opt",
+        "wasm-bindgen",
+        "wasm-tools",
+        "wit-bindgen",
+        "bun",
+    ] {
+        let out = std::process::Command::new(bin).arg("--version").output();
+        let (available, version) = match out {
+            Ok(res) if res.status.success() => (
+                true,
+                String::from_utf8_lossy(&res.stdout)
+                    .lines()
+                    .next()
+                    .unwrap_or("")
+                    .trim()
+                    .to_owned(),
+            ),
+            _ => (false, String::new()),
+        };
+        tools.push(json!({ "tool": bin, "available": available, "version": version }));
+    }
+    json!({
+        "platform": std::env::consts::OS,
+        "arch": std::env::consts::ARCH,
+        "tools": tools,
+    })
+}
+
+#[cfg(target_family = "wasm")]
+fn collect_wasm_wgpu_doctor_json() -> Value {
+    json!({
+        "platform": "wasm",
+        "arch": std::env::consts::ARCH,
+        "tools": [],
+    })
+}
+
+fn inspect_wasm_binary_json(path: &std::path::Path) -> anyhow::Result<Value> {
+    let bytes = std::fs::read(path)?;
+    let is_wasm = bytes.len() >= 8 && bytes[0..4] == [0x00, 0x61, 0x73, 0x6d];
+    anyhow::ensure!(is_wasm, "not a valid Wasm binary: {}", path.display());
+    let is_component = bytes[4..8] == [0x0d, 0x00, 0x01, 0x00];
+
+    #[cfg(feature = "wasm-inspect")]
+    let (imports, exports, sections) = {
+        let mut imports = Vec::new();
+        let mut exports = Vec::new();
+        let mut sections = Vec::new();
+        for payload in wasmparser::Parser::new(0).parse_all(&bytes) {
+            match payload? {
+                wasmparser::Payload::ImportSection(reader) => {
+                    sections.push("import");
+                    for imp in reader.into_imports() {
+                        let imp = imp?;
+                        imports.push(format!("{}::{}", imp.module, imp.name));
+                    }
+                }
+                wasmparser::Payload::ExportSection(reader) => {
+                    sections.push("export");
+                    for exp in reader {
+                        let exp = exp?;
+                        exports.push(exp.name.to_owned());
+                    }
+                }
+                wasmparser::Payload::CustomSection(reader) => {
+                    if !reader.name().is_empty() {
+                        sections.push("custom");
+                    }
+                }
+                wasmparser::Payload::CodeSectionStart { .. } => sections.push("code"),
+                _ => {}
+            }
+        }
+        (imports, exports, sections)
+    };
+
+    #[cfg(not(feature = "wasm-inspect"))]
+    let (imports, exports, sections): (Vec<String>, Vec<String>, Vec<&'static str>) =
+        (Vec::new(), Vec::new(), Vec::new());
+
+    Ok(json!({
+        "path": path.display().to_string(),
+        "raw_bytes": bytes.len(),
+        "is_component": is_component,
+        "imports": imports,
+        "exports": exports,
+        "sections": sections,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -680,6 +806,32 @@ mod tests {
         )
         .expect("os_workspace_list reflects AI click");
         assert!(after_ws.contains("\"active_workspace\":1"));
+
+        assert!(list.contains("wasm_wgpu_doctor"));
+        assert!(list.contains("wasm_inspect_binary"));
+        let doc_res = handle_json_rpc_line(
+            &state,
+            r#"{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"wasm_wgpu_doctor","arguments":{}}}"#,
+        )
+        .expect("wasm_wgpu_doctor responds");
+        assert!(doc_res.contains("tools"));
+
+        let temp_wasm_dir = tempfile::tempdir().expect("tempdir creates");
+        let wasm_file = temp_wasm_dir.path().join("minimal.wasm");
+        std::fs::write(&wasm_file, [0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00])
+            .expect("writes minimal wasm");
+        let insp_req = serde_json::json!({
+            "jsonrpc": "2.0",
+            "id": 8,
+            "method": "tools/call",
+            "params": {
+                "name": "wasm_inspect_binary",
+                "arguments": { "path": wasm_file.display().to_string() }
+            }
+        });
+        let insp_res = handle_json_rpc_line(&state, &insp_req.to_string())
+            .expect("wasm_inspect_binary responds");
+        assert!(insp_res.contains("\"raw_bytes\":8"));
     }
 
     #[cfg(not(target_family = "wasm"))]

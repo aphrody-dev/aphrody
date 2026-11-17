@@ -16,3 +16,17 @@ runs:
         echo "$paths"
         git config --global submodule.fetchJobs 8
         [ -z "$paths" ] || echo "$paths" | xargs git submodule update --init --depth 1 --jobs 8 --
+        for sub in $paths; do
+          if [ -f "$sub/.gitmodules" ]; then
+            nested_manifests=$(find "$sub" -name Cargo.toml -not -path '*/target/*' -not -path '*/.git/*')
+            nested_paths=$(git config -f "$sub/.gitmodules" --get-regexp '\.path$' | awk '{print $2}' | while read -r np; do
+              if [ -n "$nested_manifests" ] && echo "$nested_manifests" | xargs grep -lE "path *= *\"(\.\./|\./)*$np[/\"]" > /dev/null 2>&1; then
+                echo "$np"
+              fi
+            done)
+            if [ -n "$nested_paths" ]; then
+              echo "Nested Cargo submodules in $sub: $nested_paths"
+              echo "$nested_paths" | xargs git -C "$sub" submodule update --init --depth 1 --jobs 8 --
+            fi
+          fi
+        done

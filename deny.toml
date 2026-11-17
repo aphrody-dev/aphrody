@@ -1,0 +1,82 @@
+# Supply-chain, license, and third-party dependency policy for Aphrody (cargo-deny).
+# Matches Zed's split license boundary: GPL-3.0-or-later for IDE/app crates and
+# permissive licenses (Apache-2.0 / MIT / BSD / ISC / Zlib) for SDK / OS / WGPU crates.
+[graph]
+all-features = false
+
+[licenses]
+confidence-threshold = 0.8
+unused-allowed-license = "allow"
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "bzip2-1.0.6",
+    "CC0-1.0",
+    "CDLA-Permissive-2.0",
+    "GPL-3.0-only",
+    "GPL-3.0-or-later",
+    "ISC",
+    "LGPL-3.0-or-later",
+    "MIT",
+    "MIT-0",
+    "MPL-2.0",
+    "NCSA",
+    "OpenSSL",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "WTFPL",
+    "Zlib",
+    "0BSD",
+]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = [
+    "https://github.com/KillTheMule/nvim-rs",
+    "https://github.com/RustAudio/cpal",
+    "https://github.com/RustAudio/rodio",
+    "https://github.com/camdencheek/tree-sitter-go-mod",
+    "https://github.com/mullvad/udp-over-tcp",
+    "https://github.com/rust-minidump/minidump-writer",
+    "https://github.com/smol-rs/async-task",
+    "https://github.com/tree-sitter/tree-sitter",
+    "https://github.com/tree-sitter/tree-sitter-cpp",
+    "https://github.com/zed-industries/alacritty",
+    "https://github.com/zed-industries/async-pipe-rs",
+    "https://github.com/zed-industries/async-process",
+    "https://github.com/zed-industries/async-tar",
+    "https://github.com/zed-industries/calloop",
+    "https://github.com/zed-industries/dap-types",
+    "https://github.com/zed-industries/font-kit",
+    "https://github.com/zed-industries/gh-workflow",
+    "https://github.com/zed-industries/khronos-egl",
+    "https://github.com/zed-industries/livekit-rust-sdks",
+    "https://github.com/zed-industries/lsp-types",
+    "https://github.com/zed-industries/notify",
+    "https://github.com/zed-industries/oo7",
+    "https://github.com/zed-industries/python-environment-tools",
+    "https://github.com/zed-industries/reqwest",
+    "https://github.com/zed-industries/scap",
+    "https://github.com/zed-industries/trash-rs",
+    "https://github.com/zed-industries/tree-sitter-git-commit",
+    "https://github.com/zed-industries/tree-sitter-go",
+    "https://github.com/zed-industries/tree-sitter-go-work",
+    "https://github.com/zed-industries/tree-sitter-heex",
+    "https://github.com/zed-industries/tree-sitter-markdown",
+    "https://github.com/zed-industries/tree-sitter-typescript",
+    "https://github.com/zed-industries/tree-sitter-yaml",
+    "https://github.com/zed-industries/wasm_thread",
+    "https://github.com/zed-industries/windows-capture",
+    "https://github.com/zed-industries/wprcontrol",
+    "https://github.com/zed-industries/xim-rs",
+]

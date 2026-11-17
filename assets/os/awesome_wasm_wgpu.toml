@@ -1,0 +1,61 @@
+# Awesome Wasm + WebGPU + GPUI Ecosystem & Starter Templates Catalog
+schema_version = 1
+design_source_of_truth = "https://design.google/"
+cli_binary = "gpui-wgpu"
+mcp_tool_count = 24
+starter_pack_crate = "crates/os_ui/src/starter_pack.rs"
+design_stitch_crate = "crates/google_design_stitch/src/google_design_stitch.rs"
+
+[[templates]]
+id = "wgpu-compute-particles"
+path = "templates/wasm-wgpu/wgpu-compute-particles"
+target = "wasm32-unknown-unknown + native wgpu"
+shader = "shaders/particles.wgsl"
+description = "Compute step and instanced fullscreen WGSL particles tinted by Material 3 Expressive tokens."
+
+[[templates]]
+id = "gpui-web-studio"
+path = "templates/wasm-wgpu/gpui-web-studio"
+target = "wasm32-unknown-unknown (WebGPU / WebGL2)"
+shader = "shaders/studio_surface.wgsl"
+description = "Browser WebGPU + GPUI studio viewport with Material 3 Expressive surface tokens."
+
+[[templates]]
+id = "nsh-webgpu-shader"
+path = "templates/wasm-wgpu/nsh-webgpu-shader"
+target = "nsh desktop + wasm32"
+shader = "shaders/expressive_wave.wgsl"
+description = "Native Shell reactive view paired with M3 Expressive springs and procedural WGSL shaders."
+
+[[templates]]
+id = "wasi-p2-aot-compute"
+path = "templates/wasm-wgpu/wasi-p2-aot-compute"
+target = "wasm32-wasip2 -> .cwasm"
+shader = ""
+description = "Deterministic WASI Preview 2 vector/WCAG contrast compute kernel compiled for Wasmtime AOT execution."
+
+[[templates]]
+id = "gpui-shadcn-starterpack"
+path = "templates/wasm-wgpu/gpui-shadcn-starterpack"
+target = "wasm32-unknown-unknown + native GPUI"
+shader = "shaders/card_surface.wgsl"
+description = "Core Web Vitals >= 95, Lighthouse, W3C WCAG AA/ARIA, Vercel UI, and shadcn/Base UI/Tailwind v4 starter pack."
+
+[[ecosystems]]
+id = "webassembly-org"
+manifest = "assets/os/webassembly_ecosystem.toml"
+doc = "docs/architecture/webassembly-org-ecosystem.md"
+skill = ".agents/plugins/aphrody/skills/webassembly/SKILL.md"
+
+[[ecosystems]]
+id = "google-design-stitch"
+manifest = "assets/os/google_design_tokens.toml"
+sitemap = "assets/os/design_google_sitemap_snapshot.toml"
+doc = "docs/architecture/google-design-system.md"
+skill = ".agents/plugins/aphrody/skills/google-design/SKILL.md"
+
+[[ecosystems]]
+id = "submodule-parity-starterpack"
+manifest = "assets/os/submodule_parity_matrix.toml"
+doc = "docs/architecture/gpui-starterpack-and-parity-matrix.md"
+llms = "docs/architecture/ai-agent-readiness-llms.txt"

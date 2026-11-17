@@ -2257,13 +2257,18 @@ impl WgpuRenderer {
             surface
         } else {
             let ctx_ref = gpu_context.borrow();
-            let instance = &ctx_ref.as_ref().unwrap().instance;
+            let instance = &ctx_ref
+                .as_ref()
+                .context("GPU context missing during surface recovery")?
+                .instance;
             create_surface(instance, window_handle.as_raw())?
         };
 
         let gpu_context = Rc::clone(gpu_context);
         let ctx_ref = gpu_context.borrow();
-        let context = ctx_ref.as_ref().expect("context should exist");
+        let context = ctx_ref
+            .as_ref()
+            .context("GPU context missing after surface recovery")?;
 
         self.state = RendererState::Released;
         self.atlas.handle_device_lost(context);

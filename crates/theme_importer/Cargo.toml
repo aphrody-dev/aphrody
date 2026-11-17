@@ -27,4 +27,4 @@ simplelog = { workspace = true, features = ["termcolor"] }
 strum.workspace = true
 theme.workspace = true
 theme_settings.workspace = true
-vscode_theme = "0.2.0"
+vscode_theme.workspace = true

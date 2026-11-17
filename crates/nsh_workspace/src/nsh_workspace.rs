@@ -10,6 +10,8 @@
 //!    native GPUI surface on every buffer edit — with zero Node.js and zero `rolldown` overhead.
 //! 4. **Dev Server & Bundle Surfaces** (`OpenShowcaseSurface`, `ConnectDevServer`).
 
+pub mod design_stitch_studio;
+
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -495,6 +497,7 @@ pub fn init(cx: &mut App) {
             return;
         };
         NshSurfaceItem::register(workspace, window, cx);
+        design_stitch_studio::DesignStitchStudioItem::register(workspace, window, cx);
     })
     .detach();
 }

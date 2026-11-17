@@ -20,7 +20,7 @@ async-trait.workspace = true
 derive_more = { workspace = true, features = ["display"] }
 futures.workspace = true
 itertools.workspace = true
-jsonwebtoken = { version = "10.2", features = ["use_pem"], optional = true }
+jsonwebtoken = { workspace = true, features = ["use_pem"], optional = true }
 octocrab = { workspace = true, features = [
     "default-client",
     "jwt-aws-lc-rs",

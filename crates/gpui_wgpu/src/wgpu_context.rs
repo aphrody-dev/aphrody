@@ -526,9 +526,10 @@ impl WgpuContext {
     pub fn instance(display: Option<Box<dyn wgpu::wgt::WgpuHasDisplayHandle>>) -> wgpu::Instance {
         let backends =
             wgpu::Backends::from_env().unwrap_or(wgpu::Backends::PRIMARY | wgpu::Backends::GL);
+        let flags = wgpu::InstanceFlags::from_build_config().with_env();
         wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends,
-            flags: wgpu::InstanceFlags::default(),
+            flags,
             backend_options: wgpu::BackendOptions::default(),
             memory_budget_thresholds: wgpu::MemoryBudgetThresholds::default(),
             display,
@@ -812,16 +813,27 @@ impl WgpuContext {
 
 #[cfg(not(target_family = "wasm"))]
 fn parse_pci_id(id: &str) -> anyhow::Result<u32> {
-    let mut id = id.trim();
+    let id = id.trim();
 
-    if id.starts_with("0x") || id.starts_with("0X") {
-        id = &id[2..];
+    if let Some(dec) = id.strip_prefix("dec:") {
+        return dec
+            .parse::<u32>()
+            .context("parsing PCI ID as decimal after `dec:` prefix");
     }
+
+    if let Some(hex) = id.strip_prefix("0x").or_else(|| id.strip_prefix("0X")) {
+        anyhow::ensure!(
+            (1..=8).contains(&hex.len()) && hex.chars().all(|c| c.is_ascii_hexdigit()),
+            "Expected a 1..=8 digit hexadecimal PCI ID after `0x`"
+        );
+        return u32::from_str_radix(hex, 16).context("parsing PCI ID as hex");
+    }
+
     let is_hex_string = id.chars().all(|c| c.is_ascii_hexdigit());
     let is_4_chars = id.len() == 4;
     anyhow::ensure!(
         is_4_chars && is_hex_string,
-        "Expected a 4 digit PCI ID in hexadecimal format"
+        "Expected a 4 digit PCI ID in hexadecimal format (or `0x...` / `dec:...`)"
     );
 
     u32::from_str_radix(id, 16).context("parsing PCI ID as hex")
@@ -888,5 +900,8 @@ mod tests {
             parse_pci_id(&format!("{:#x}", 0x1234)).unwrap(),
             parse_pci_id(&format!("{:#X}", 0x1234)).unwrap(),
         );
+        assert_eq!(parse_pci_id("0x10DE").unwrap(), 0x10DE);
+        assert_eq!(parse_pci_id("dec:4318").unwrap(), 4318);
+        assert_eq!(parse_pci_id("0x1234ABCD").unwrap(), 0x1234_ABCD);
     }
 }

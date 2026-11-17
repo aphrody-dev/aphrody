@@ -30,8 +30,11 @@ use node_runtime::NodeRuntime;
 use release_channel::ReleaseChannel;
 use semver::Version;
 use settings::Settings;
+use sha2::{Digest, Sha256};
 use std::{
     borrow::Cow,
+    fmt::Write as _,
+    fs as std_fs,
     path::{Path, PathBuf},
     sync::{Arc, LazyLock, OnceLock},
     time::Duration,
@@ -39,7 +42,7 @@ use std::{
 use task::{DebugScenario, SpawnInTerminal, TaskTemplate, ZedDebugConfig};
 use util::paths::SanitizedPath;
 use wasmtime::{
-    CacheStore, Engine, Store,
+    CacheStore, Engine, Store, StoreLimits, StoreLimitsBuilder,
     component::{Component, ResourceTable},
 };
 use wasmtime_wasi::{WasiCtx, WasiCtxBuilder, WasiCtxView, WasiView};
@@ -546,6 +549,94 @@ pub struct WasmState {
     pub host: Arc<WasmHost>,
     pub(crate) capability_granter: CapabilityGranter,
     pub(crate) language_server_status_source: Option<gpui::EntityId>,
+    limits: StoreLimits,
+}
+
+fn extension_store_limits() -> StoreLimits {
+    StoreLimitsBuilder::new()
+        .memory_size(512 * 1024 * 1024)
+        .table_elements(100_000)
+        .instances(64)
+        .tables(64)
+        .memories(16)
+        .build()
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    let digest = Sha256::digest(bytes);
+    let mut out = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        if let Err(err) = write!(out, "{byte:02x}") {
+            log::warn!("Failed formatting sha256 digest byte: {err}");
+        }
+    }
+    out
+}
+
+fn load_or_precompile_component(
+    engine: &Engine,
+    aot_cache_dir: &Path,
+    wasm_bytes: &[u8],
+) -> Result<Component> {
+    let hash = sha256_hex(wasm_bytes);
+    let cache_path = aot_cache_dir.join(format!("v1-{hash}.cwasm"));
+
+    if cache_path.is_file() {
+        // SAFETY: `cache_path` lives under the host-controlled extension work directory,
+        // is content-addressed by the SHA-256 of the verified `.wasm` component payload plus
+        // schema prefix, and Wasmtime validates compiled ELF metadata and Engine configuration
+        // before loading the machine code. On any mismatch we remove and recompile cleanly.
+        match unsafe { Component::deserialize_file(engine, &cache_path) } {
+            Ok(component) => return Ok(component),
+            Err(err) => {
+                log::warn!(
+                    "Discarding stale extension AOT cache {}: {err}",
+                    cache_path.display()
+                );
+                if let Err(rm_err) = std_fs::remove_file(&cache_path) {
+                    log::warn!("Failed removing stale AOT cache: {rm_err}");
+                }
+            }
+        }
+    }
+
+    match engine.precompile_component(wasm_bytes) {
+        Ok(compiled) => {
+            if let Err(err) = std_fs::create_dir_all(aot_cache_dir) {
+                log::warn!(
+                    "Failed creating extension AOT cache dir {}: {err}",
+                    aot_cache_dir.display()
+                );
+            } else {
+                let tmp_path = aot_cache_dir.join(format!("v1-{hash}.cwasm.tmp"));
+                match std_fs::write(&tmp_path, &compiled) {
+                    Ok(()) => {
+                        if let Err(rename_err) = std_fs::rename(&tmp_path, &cache_path) {
+                            log::warn!("Failed finalizing AOT cache rename: {rename_err}");
+                        }
+                    }
+                    Err(write_err) => {
+                        log::warn!("Failed writing extension AOT cache temp file: {write_err}");
+                    }
+                }
+            }
+
+            if cache_path.is_file() {
+                // SAFETY: Same host-controlled content-addressed artifact written above from
+                // `engine.precompile_component(wasm_bytes)` for this exact `Engine`.
+                if let Ok(component) = unsafe { Component::deserialize_file(engine, &cache_path) } {
+                    return Ok(component);
+                }
+            }
+        }
+        Err(err) => {
+            log::warn!("Failed precompiling extension component for AOT cache: {err}");
+        }
+    }
+
+    Component::from_binary(engine, wasm_bytes)
+        .map_err(anyhow::Error::from)
+        .context("failed to compile wasm component")
 }
 
 type MainThreadCall = Box<dyn Send + for<'a> FnOnce(&'a mut AsyncApp) -> LocalBoxFuture<'a, ()>>;
@@ -655,12 +746,12 @@ impl WasmHost {
         let compile_task = {
             let manifest_id = manifest.id.clone();
             let engine = this.engine.clone();
+            let aot_cache_dir = this.work_dir.join(".aot-cache");
 
             executor.spawn(async move {
                 let zed_api_version = parse_wasm_extension_version(&manifest_id, &wasm_bytes)?;
-                let component = Component::from_binary(&engine, &wasm_bytes)
-                    .map_err(anyhow::Error::from)
-                    .context("failed to compile wasm component")?;
+                let component =
+                    load_or_precompile_component(&engine, &aot_cache_dir, &wasm_bytes)?;
 
                 anyhow::Ok((zed_api_version, component))
             })
@@ -680,8 +771,10 @@ impl WasmHost {
                         manifest.clone(),
                     ),
                     language_server_status_source: None,
+                    limits: extension_store_limits(),
                 },
             );
+            store.limiter(|state| &mut state.limits);
             // Store will yield after 1 tick, and get a new deadline of 1 tick after each yield.
             store.set_epoch_deadline(1);
             store.epoch_deadline_async_yield_and_update(1);
@@ -1146,5 +1239,28 @@ mod tests {
             result.is_err(),
             "symlink escape through deep non-existent path should be rejected, but got: {result:?}",
         );
+    }
+
+    #[gpui::test]
+    fn aot_cache_persists_precompiled_component_and_reloads(cx: &mut gpui::TestAppContext) {
+        let mut config = wasmtime::Config::new();
+        config.wasm_component_model(true);
+        let engine = wasmtime::Engine::new(&config).expect("engine builds");
+
+        // Minimal valid component binary (magic + component version 0x0d 0x00 0x01 0x00).
+        let component_bytes = [0x00, 0x61, 0x73, 0x6d, 0x0d, 0x00, 0x01, 0x00];
+        let temp_dir = tempfile::tempdir().expect("tempdir creates");
+        let aot_dir = temp_dir.path().join(".aot-cache");
+
+        let _first = load_or_precompile_component(&engine, &aot_dir, &component_bytes)
+            .expect("first compile succeeds");
+        let hash = sha256_hex(&component_bytes);
+        let expected_cache = aot_dir.join(format!("v1-{hash}.cwasm"));
+        assert!(expected_cache.is_file(), "AOT .cwasm file should persist");
+
+        let _second = load_or_precompile_component(&engine, &aot_dir, &component_bytes)
+            .expect("cached .cwasm reload succeeds");
+        let _limits = extension_store_limits();
+        drop(cx);
     }
 }

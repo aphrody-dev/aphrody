@@ -41,8 +41,8 @@ smol.workspace = true
 tempfile.workspace = true
 text.workspace = true
 util.workspace = true
-notify = "9.0.0-rc.4"
-trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d884a89351f3b8856d12894cccee261d" }
+notify.workspace = true
+trash.workspace = true
 
 [target.'cfg(unix)'.dependencies]
 rustix.workspace = true

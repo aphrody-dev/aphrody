@@ -63,6 +63,13 @@ upstream_zed_branch = "main"
 upstream_nsh = "https://github.com/longbridge/nsh.git"
 upstream_gpui_kit = "https://github.com/longbridge/gpui-kit.git"
 upstream_wgpu = "https://github.com/gfx-rs/wgpu.git"
+upstream_awesome_gpui = "https://github.com/zed-industries/awesome-gpui.git"
+upstream_extensions = "https://github.com/zed-industries/extensions.git"
+upstream_winget_pkgs = "https://github.com/zed-industries/winget-pkgs.git"
+upstream_modern_web_guidance = "https://github.com/GoogleChrome/modern-web-guidance-src.git"
+upstream_design_md = "https://github.com/google-labs-code/design.md.git"
+upstream_stitch_sdk = "https://github.com/google-labs-code/stitch-sdk.git"
+upstream_stitch_skills = "https://github.com/google-labs-code/stitch-skills.git"
 submodule_bun = "https://github.com/aphrody-labs/bun"
 
 [features]
@@ -74,6 +81,19 @@ modular_shell_crate = "gpui_app_shell"
 modular_shell_features = "nsh"
 wgpu_cli_package = "wgpu_cli"
 wgpu_cli_bin = "gpui-wgpu"
+
+[design]
+source_of_truth = "https://design.google/"
+system = "Material 3 Expressive"
+spec_url = "https://m3.material.io/"
+fonts_url = "https://fonts.google.com/"
+stitch_url = "https://stitch.withgoogle.com/"
+sans_flex_family = "Google Sans Flex"
+design_md = "DESIGN.md"
+tokens_manifest = "assets/os/google_design_tokens.toml"
+themes_manifest = "assets/os/themes.json"
+seed_hex = "#135B82"
+variant = "expressive"
 
 [colors.channels.lts]
 top = [14, 30, 48, 255]

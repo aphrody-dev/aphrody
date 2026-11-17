@@ -1,7 +1,6 @@
 //! Pure-Rust deterministic manifest generators for all 22 supported store, distro,
 //! mobile, browser extension, and container targets.
 
-use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -360,12 +359,13 @@ fn generate_winget(
     release_base: &str,
     zero_sha: &str,
 ) -> Vec<GeneratedArtifact> {
+    const WINGET_MANIFEST_VERSION: &str = "1.28.0";
     let version_yaml = format!(
-        "PackageIdentifier: {wg_id}\nPackageVersion: {}\nDefaultLocale: en-US\nManifestType: version\nManifestVersion: 1.9.0\n",
+        "PackageIdentifier: {wg_id}\nPackageVersion: {}\nDefaultLocale: en-US\nManifestType: version\nManifestVersion: {WINGET_MANIFEST_VERSION}\n",
         json_quote(ver)
     );
     let installer_yaml = format!(
-        "PackageIdentifier: {wg_id}\nPackageVersion: {ver_q}\nInstallerType: zip\nPlatform:\n  - Windows.Desktop\nMinimumOSVersion: 10.0.19041.0\nInstallers:\n  - Architecture: x64\n    InstallerUrl: {x64_url}\n    InstallerSha256: {zero_sha}\n    NestedInstallerType: portable\n    NestedInstallerFiles:\n      - RelativeFilePath: {exe_q}\n        PortableCommandAlias: {bin_q}\n  - Architecture: arm64\n    InstallerUrl: {arm_url}\n    InstallerSha256: {zero_sha}\n    NestedInstallerType: portable\n    NestedInstallerFiles:\n      - RelativeFilePath: {exe_q}\n        PortableCommandAlias: {bin_q}\nManifestType: installer\nManifestVersion: 1.9.0\n",
+        "PackageIdentifier: {wg_id}\nPackageVersion: {ver_q}\nPlatform:\n  - Windows.Desktop\nMinimumOSVersion: 10.0.19041.0\nInstallerType: zip\nScope: user\nInstallModes:\n  - interactive\n  - silent\n  - silentWithProgress\nUpgradeBehavior: install\nInstallers:\n  - Architecture: x64\n    InstallerUrl: {x64_url}\n    InstallerSha256: {zero_sha}\n    NestedInstallerType: portable\n    NestedInstallerFiles:\n      - RelativeFilePath: {exe_q}\n        PortableCommandAlias: {bin_q}\n  - Architecture: arm64\n    InstallerUrl: {arm_url}\n    InstallerSha256: {zero_sha}\n    NestedInstallerType: portable\n    NestedInstallerFiles:\n      - RelativeFilePath: {exe_q}\n        PortableCommandAlias: {bin_q}\nManifestType: installer\nManifestVersion: {WINGET_MANIFEST_VERSION}\n",
         ver_q = json_quote(ver),
         x64_url = json_quote(&format!("{release_base}/{bin}-windows-x64.zip")),
         arm_url = json_quote(&format!("{release_base}/{bin}-windows-arm64.zip")),
@@ -374,10 +374,10 @@ fn generate_winget(
     );
     let mut tags_yaml = String::new();
     for tag in entry.tags.iter().take(8) {
-        let _ = writeln!(tags_yaml, "  - {}", json_quote(tag));
+        tags_yaml.push_str(&format!("  - {}\n", json_quote(tag)));
     }
     let locale_yaml = format!(
-        "PackageIdentifier: {wg_id}\nPackageVersion: {ver_q}\nPackageLocale: en-US\nPublisher: {pub_q}\nPublisherUrl: {home_q}\nPackageName: {name_q}\nPackageUrl: {repo_q}\nLicense: {lic_q}\nShortDescription: {short_q}\nDescription: {desc_q}\nTags:\n{tags_yaml}ManifestType: defaultLocale\nManifestVersion: 1.9.0\n",
+        "PackageIdentifier: {wg_id}\nPackageVersion: {ver_q}\nPackageLocale: en-US\nPublisher: {pub_q}\nPublisherUrl: {home_q}\nPackageName: {name_q}\nPackageUrl: {repo_q}\nLicense: {lic_q}\nShortDescription: {short_q}\nDescription: {desc_q}\nMoniker: {bin_q}\nTags:\n{tags_yaml}Documentations:\n  - DocumentLabel: Documentation\n    DocumentUrl: {home_q}\nManifestType: defaultLocale\nManifestVersion: {WINGET_MANIFEST_VERSION}\n",
         ver_q = json_quote(ver),
         pub_q = json_quote(&entry.publisher),
         home_q = json_quote(homepage),
@@ -386,6 +386,7 @@ fn generate_winget(
         lic_q = json_quote(&entry.license),
         short_q = json_quote(&entry.tagline),
         desc_q = json_quote(&entry.description),
+        bin_q = json_quote(bin),
     );
     vec![
         artifact(format!("{wg_id}.yaml"), version_yaml),

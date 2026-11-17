@@ -1,0 +1,37 @@
+# Aphrody AI-Agent Production & GPUI Starter Pack Reference
+
+> Canonical entrypoints for coding agents working in aphrody (TypeScript/Bun + Pure Rust GPUI + WebGPU + Wasm).
+
+## Standards & Design Contracts
+- Design source of truth: https://design.google/ (Material 3 Expressive + Google Sans Flex)
+- Workspace token spec: DESIGN.md + assets/os/google_design_tokens.toml
+- Web standards & Lighthouse auditor: crates/google_design_stitch/src/web_standards.rs
+- Pure-Rust GPUI starter pack (shadcn / Base UI / Tailwind v4): crates/os_ui/src/starter_pack.rs
+- NSH workspace studio actions: OpenGoogleDesignMirror, OpenStitchStudio, OpenGpuiStarterPack
+
+## Verification Commands
+- `bun run standards:audit` — submodule parity matrix + micro-bench + TS/Rust Google Style audit
+- `bun run design:audit` — https://design.google/ token & contrast verification
+- `bun run i18n:check` — W3C CharMod / LTLI / BCP 47 / String-Meta verification
+- `bun run web:check` — wasm32-unknown-unknown + wasm32-wasip2 full workspace verification
+- `gpui-wgpu design lighthouse templates/wasm-wgpu --json` — Core Web Vitals & Lighthouse check
+- `gpui-wgpu mcp` — 24-tool JSON-RPC MCP server for Wasm/WGPU/Google Design/Lighthouse/Starter Pack
+
+## Audited Stacks (17 entries)
+- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,os_ui,gpui_wgpu,google_design_stitch} (395 source modules)
+- bun: Bun (aphrody-labs/bun) -> vendor/bun (254 source modules)
+- wgpu: WGPU v30 + Naga (aphrody-labs/wgpu) -> vendor/wgpu (500 source modules)
+- taffy: Taffy Layout (aphrody-labs/taffy) -> vendor/taffy (115 source modules)
+- accesskit: AccessKit (aphrody-labs/accesskit) -> vendor/accesskit (116 source modules)
+- cosmic-text: Cosmic Text (aphrody-labs/cosmic-text) -> vendor/cosmic-text (51 source modules)
+- vello: Vello 2D (aphrody-labs/vello) -> vendor/vello (355 source modules)
+- dioxus: Dioxus (aphrody-labs/dioxus) -> vendor/dioxus (500 source modules)
+- blitz: Blitz HTML5/CSS (aphrody-labs/blitz) -> vendor/blitz (364 source modules)
+- anyrender: AnyRender (aphrody-labs/anyrender) -> vendor/anyrender (99 source modules)
+- iced: Iced (aphrody-labs/iced) -> vendor/iced (379 source modules)
+- egui: Egui (aphrody-labs/egui) -> vendor/egui (442 source modules)
+- libcosmic: Libcosmic (aphrody-labs/libcosmic) -> vendor/libcosmic (500 source modules)
+- tauri: Tauri v3 (aphrody-labs/tauri) -> vendor/tauri/tauri (431 source modules)
+- craft-libs: Craft Libs (aphrody-labs/craft-libs) -> vendor/craft-libs (500 source modules)
+- craft-anything: Craft Anything (aphrody-labs/craft-anything) -> vendor/craft-anything (500 source modules)
+- winit: Winit (aphrody-labs/winit) -> vendor/winit (205 source modules)

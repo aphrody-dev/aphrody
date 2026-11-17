@@ -25,7 +25,9 @@ pub fn run_package_conformity(_args: PackageConformityArgs) -> Result<()> {
 
         let cargo_toml = read_cargo_toml(&package.manifest_path)?;
 
-        let is_using_workspace_lints = cargo_toml.lints.is_some_and(|lints| lints.workspace);
+        // `tooling/perf` intentionally defines stricter standalone pedantic Clippy lints.
+        let is_using_workspace_lints =
+            package.name == "perf" || cargo_toml.lints.is_some_and(|lints| lints.workspace);
         if !is_using_workspace_lints {
             eprintln!(
                 "{package:?} is not using workspace lints",
