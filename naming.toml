@@ -1,0 +1,8 @@
+# Names of this repository, checked by the Aphrody naming scheme (aphrody-labs/.github, naming/NAMING.md).
+id = "aphrody"
+kind = "os"
+org = "aphrody-dev"
+
+[names]
+# The workspace descends from an upstream editor whose crate and package names are kept (gpui, nsh-*, zed-* ...).
+upstream = true

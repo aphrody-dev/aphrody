@@ -10,15 +10,15 @@ aphrody_root_submodules = 37
 
 [owners]
 aphrody = "C:/src/aphrody (Rust OS, GPUI, Craft, NSH, Wasm/WebGPU, W3C i18n, Tooling)"
-ai_os = "C:/src/ai-os (Relay, ACP/A2A/HTTP/MCP daemon, OS automation)"
-ay = "C:/src/ay (SDK, packages/machine, fleet & shell automation)"
-anu = "C:/src/ANU (ANU monorepo)"
-open = "C:/src/open (Browse, opentui, tunnel, ai-router, MV3 extension)"
-auto = "C:/src/auto (Automation workspace)"
-bun = "C:/src/bun (Bun upstream fork & canary builds)"
-browser = "C:/src/browser (Browser monorepo)"
-shenron = "C:/src/shenron (Shenron apps)"
-nie = "C:/src/nie (NIE / Gaming workspace)"
+ai_os = "aphrody-dev/ai-os (Relay, ACP/A2A/HTTP/MCP daemon, OS automation)"
+ay = "aphrody-dev/ay (SDK, packages/machine, fleet & shell automation)"
+anu = "aphrody-dev/anu (ANU monorepo)"
+open = "aphrody-labs/open (Browse, opentui, tunnel, ai-router, MV3 extension)"
+auto = "aphrody-labs/auto (Automation workspace)"
+bun = "aphrody-labs/bun (Bun upstream fork & canary builds)"
+browser = "aphrody-labs/browser (Browser monorepo)"
+shenron = "aphrody-labs/shenron (Shenron apps)"
+nie = "aphrody-labs/nie (NIE / Gaming workspace)"
 org_github = "https://github.com/aphrody-labs/.github (STANDARD.md, standard.toml, i18n/I18N.md, i18n/check.ts)"
 
 [families]
