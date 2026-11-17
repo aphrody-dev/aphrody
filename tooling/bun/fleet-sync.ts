@@ -384,7 +384,8 @@ export function buildParallelShardPlans(
           "bun tooling/bun/repo-hygiene.ts",
           "bun test --timeout 20000 tooling/bun",
           "cargo check --target wasm32-unknown-unknown -p aphrody_desktop --features web --example web_os",
-          "cargo check --target wasm32-wasip2 -p aphrody",
+          "RUSTC_WRAPPER= cargo check --target wasm32-wasip2 -p aphrody --no-default-features --features minimal",
+          "RUSTC_WRAPPER= cargo check --target wasm32-wasip2 -p aphrody_session -p aphrody_craft -p release_channel -p brand --no-default-features",
         ].join("\n"),
       });
     } else {
