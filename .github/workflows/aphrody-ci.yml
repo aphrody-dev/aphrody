@@ -150,7 +150,17 @@ jobs:
         with:
           tool: wasm-bindgen@${{ steps.cfg.outputs.wasm_bindgen }}
       - name: Install binaryen (wasm-opt)
-        run: sudo apt-get update && sudo apt-get install -y binaryen || true
+        # The distro package is years behind and rejects the `--enable-*` flags that tooling/bun/web-build.ts passes.
+        env:
+          BINARYEN_VERSION: version_133
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          archive="binaryen-${BINARYEN_VERSION}-x86_64-linux.tar.gz"
+          gh release download "$BINARYEN_VERSION" -R WebAssembly/binaryen -p "$archive" -p "$archive.sha256" -D "$RUNNER_TEMP"
+          (cd "$RUNNER_TEMP" && sha256sum -c "$archive.sha256")
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/binaryen-${BINARYEN_VERSION}/bin" >> "$GITHUB_PATH"
       - uses: Swatinem/rust-cache@v2
         with:
           prefix-key: wasm-webgpu-v1
