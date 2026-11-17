@@ -1,0 +1,10 @@
+[Unit]
+Description=Kernel lane smoke suite
+After=multi-user.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/lane-smoke
+StandardOutput=journal+console
+StandardError=journal+console
+TimeoutStartSec=infinity

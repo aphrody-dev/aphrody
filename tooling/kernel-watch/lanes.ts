@@ -17,8 +17,36 @@ export interface ProbeConfig {
   timeout: number;
   hosts: ProbeHost[];
 }
+export interface LaneKernel {
+  id: string;
+  name: string;
+  /** Kernel id and channel of the versions table this lane kernel reports its test status to. */
+  kernel: string;
+  channel: string;
+  source: "repo" | "aur" | "cachyos";
+  package: string;
+  repos: string[];
+}
+export interface LaneConfig {
+  ssh: string;
+  repoUrl: string;
+  image: string;
+  aurGit: string;
+  kernelGit: string;
+  testingRepos: string[];
+  vmCpus: number;
+  vmMemoryMb: number;
+  diskGb: number;
+  bootTimeout: number;
+  buildTimeout: number;
+  refreshRootfsDays: number;
+  timer: string;
+  kselftestTargets: string[];
+  kernels: LaneKernel[];
+}
 export interface Lanes {
   probe: ProbeConfig;
+  lane: LaneConfig;
 }
 
 type Table = Record<string, unknown>;
@@ -36,6 +64,11 @@ const list = (t: Table, key: string, where: string): string[] => {
   if (!Array.isArray(v) || v.some((x) => typeof x !== "string")) throw new Error(`lanes.toml: ${where}.${key} must be a list of strings`);
   return v as string[];
 };
+const num = (t: Table, key: string, where: string): number => {
+  const v = t[key];
+  if (typeof v !== "number" || !Number.isFinite(v)) throw new Error(`lanes.toml: ${where}.${key} must be a number`);
+  return v;
+};
 const rows = (t: Table, key: string, where: string): Table[] => {
   const v = t[key];
   if (!Array.isArray(v) || v.length === 0) throw new Error(`lanes.toml: ${where}.${key} must be a non-empty array of tables`);
@@ -45,7 +78,29 @@ const rows = (t: Table, key: string, where: string): Table[] => {
 export function parseLanes(source: string): Lanes {
   const root = table(Bun.TOML.parse(source), "root");
   const p = table(root.probe, "probe");
+  const l = table(root.lane, "lane");
   return {
+    lane: {
+      ssh: text(l, "ssh", "lane"),
+      repoUrl: text(l, "repo_url", "lane"),
+      image: text(l, "image", "lane"),
+      aurGit: text(l, "aur_git", "lane"),
+      kernelGit: text(l, "kernel_git", "lane"),
+      testingRepos: list(l, "testing_repos", "lane"),
+      vmCpus: num(l, "vm_cpus", "lane"),
+      vmMemoryMb: num(l, "vm_memory_mb", "lane"),
+      diskGb: num(l, "disk_gb", "lane"),
+      bootTimeout: parseDuration(text(l, "boot_timeout", "lane")),
+      buildTimeout: parseDuration(text(l, "build_timeout", "lane")),
+      refreshRootfsDays: num(l, "refresh_rootfs_days", "lane"),
+      timer: text(l, "timer", "lane"),
+      kselftestTargets: list(l, "kselftest_targets", "lane"),
+      kernels: rows(l, "kernel", "lane").map((r, i): LaneKernel => {
+        const source = text(r, "source", `lane.kernel[${i}]`);
+        if (source !== "repo" && source !== "aur" && source !== "cachyos") throw new Error(`lanes.toml: lane.kernel[${i}].source must be repo, aur or cachyos`);
+        return { id: text(r, "id", `lane.kernel[${i}]`), name: text(r, "name", `lane.kernel[${i}]`), kernel: text(r, "kernel", `lane.kernel[${i}]`), channel: text(r, "channel", `lane.kernel[${i}]`), source, package: text(r, "package", `lane.kernel[${i}]`), repos: r.repos === undefined ? [] : list(r, "repos", `lane.kernel[${i}]`) };
+      }),
+    },
     probe: {
       packages: list(p, "packages", "probe"),
       aur: list(p, "aur", "probe"),

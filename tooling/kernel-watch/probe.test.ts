@@ -44,14 +44,14 @@ describe("probe", () => {
 
   test("parses the recorded host output", () => {
     const facts = parseRemote(read("remote.txt"));
-    expect(facts.release).toBe("7.2.14-arch1-1");
-    expect(facts.installed).toEqual([{ name: "linux", version: "7.2.14.arch1-1" }]);
-    expect(facts.sync.find((s) => s.name === "linux-zen")).toEqual({ repo: "extra", name: "linux-zen", version: "7.3.4.zen2-1" });
-    expect(facts.repos).toEqual(["core", "extra", "multilib", "omarchy"]);
-    expect(facts.syncedAt).toBe(1794640733);
+    expect(facts.release).toBe("7.0.3-arch1-1");
+    expect(facts.installed).toEqual([{ name: "linux", version: "7.0.3.arch1-1" }]);
+    expect(facts.sync.find((s) => s.name === "linux-zen")).toEqual({ repo: "extra", name: "linux-zen", version: "7.1.0.zen1-1" });
+    expect(facts.repos).toEqual(["core", "extra"]);
+    expect(facts.syncedAt).toBe(1790003600);
     expect(facts.pendingError).toBeNull();
-    expect(facts.pending!.length).toBeGreaterThan(50);
-    expect(facts.pending!.find((p) => p.name === "linux")).toEqual({ name: "linux", from: "7.2.14.arch1-1", to: "7.3.4.arch1-2" });
+    expect(facts.pending!.length).toBe(3);
+    expect(facts.pending!.find((p) => p.name === "linux")).toEqual({ name: "linux", from: "7.0.3.arch1-1", to: "7.3.4.arch1-2" });
   });
 
   test("reports a failed temporary sync as unknown, not as zero", () => {
@@ -74,16 +74,16 @@ describe("probe", () => {
     const collected = await collect(host, lanes.probe, deps);
     expect(collected.errors).toEqual([]);
     const report = buildReport(host, collected, ref);
-    expect(report.running).toMatchObject({ release: "7.2.14-arch1-1", cyclesBehindRc: 2, cyclesBehindStable: 1, relation: "older" });
+    expect(report.running).toMatchObject({ release: "7.0.3-arch1-1", cyclesBehindRc: 4, cyclesBehindStable: 3, relation: "older" });
     expect(report.summary.newestRepo).toBe("linux 7.3.4.arch1-2 (core)");
     expect(report.summary.newestAur).toContain("linux-mainline 7.4rc3-1");
     expect(report.summary.newestCachyos).toContain("linux-cachyos-rc 7.4.rc2-1");
-    expect(report.summary.runningCyclesBehindNewestRepo).toBe(1);
-    expect(report.pendingTotal).toBeGreaterThan(50);
+    expect(report.summary.runningCyclesBehindNewestRepo).toBe(3);
+    expect(report.pendingTotal).toBe(3);
     expect(report.candidates[0]).toMatchObject({ name: "linux-mainline", cyclesBehindRc: 0, rcSteps: 0 });
     const keys = report.candidates.map((c) => [Math.abs(c.cyclesBehindRc), c.rcSteps]);
     expect(keys).toEqual([...keys].sort((a, b) => a[0]! - b[0]! || a[1]! - b[1]!));
-    expect(report.candidates.at(-1)!.cyclesBehindRc).toBeGreaterThan(2);
+    expect(report.candidates.at(-1)!.cyclesBehindRc).toBeGreaterThan(3);
   });
 
   test("a failing source is reported and does not abort the probe", async () => {
@@ -97,7 +97,7 @@ describe("probe", () => {
     const report = buildReport(host, await collect(host, lanes.probe, deps), ref);
     const page = renderProbePage([report]);
     expect(renderProbePage([JSON.parse(JSON.stringify(report))])).toBe(page);
-    expect(page).toContain("| Running kernel | 7.2.14-arch1-1 (7.2.14) |");
+    expect(page).toContain("| Running kernel | 7.0.3-arch1-1 (7.0.3) |");
     expect(page).toContain("| 1 | aur | [linux-mainline]");
     expect(renderProbePage([])).toContain("No probe has been recorded yet");
   });

@@ -5,8 +5,11 @@ import { loadManifest } from "./manifest.ts";
 import { gate } from "./publish.ts";
 import { poll } from "./poll.ts";
 import { Store } from "./store.ts";
+import { defaultOutDir } from "./private.ts";
 import { generate } from "./views.ts";
+import { fetchLaneRecords, readLaneRecords, renderLanePage } from "./lane.ts";
 import { loadLanes } from "./lanes.ts";
+import { fetchWslRecords } from "./wsl.ts";
 import { buildReport, collect, liveDeps, readProbeReports, recordingDeps, referenceFromStore, renderProbePage } from "./probe.ts";
 import { verify } from "./verify.ts";
 
@@ -21,7 +24,9 @@ const USAGE = `usage: bun cli.ts <command> [options]
   gate [--slow-minutes N]           print commit or skip for the regenerated files in --out (versions now, activity every N minutes, default 360)
   verify [--write]                  probe every manifest URL live and record status and shape
   probe <host-id> [--record FIXTURE_DIR]   read-only probe of a lanes.toml host over ssh (never from CI): writes data/probe/<id>.json and probe.md
-options: --lanes PATH  --manifest PATH  --store PATH  --out DIR (defaults: sources.toml next to this file, $WATCH_STORE or .store/watch.sqlite, ../../docs/watch)`;
+  wsl-sync --root DIR               copy the newest WSL2 build, boot test and merge experiment records from the build host into data/wsl
+  lane-sync --root DIR              copy the latest rc lane records from the build host (read over ssh) into data/lane and regenerate lane.md
+options: --lanes PATH  --manifest PATH  --store PATH  --out DIR (defaults: sources.toml next to this file, $WATCH_STORE or .store/watch.sqlite, the git-ignored .private/kernel-watch/watch, or $KERNEL_WATCH_PRIVATE_DIR/watch)`;
 
 const flags = new Map<string, string>();
 const positional: string[] = [];
@@ -37,7 +42,7 @@ for (let i = 0; i < args.length; i++) {
 const [command, ...rest] = positional;
 const manifestPath = resolve(flags.get("manifest") ?? join(HERE, "sources.toml"));
 const storePath = resolve(flags.get("store") ?? Bun.env.WATCH_STORE ?? join(HERE, ".store", "watch.sqlite"));
-const outDir = resolve(flags.get("out") ?? join(HERE, "..", "..", "docs", "watch"));
+const outDir = resolve(flags.get("out") ?? defaultOutDir());
 const when = (epoch: number | null): string => (epoch ? new Date(epoch * 1000).toISOString().replace(/\.\d+Z$/, "Z") : "-");
 
 async function probeCommand(store: Store): Promise<number> {
@@ -68,6 +73,27 @@ async function main(): Promise<number> {
   }
   if (command === "gate") {
     console.log(gate(outDir, Number(flags.get("slow-minutes") ?? 360) * 60));
+    return 0;
+  }
+  if (command === "wsl-sync") {
+    const lanes = await loadLanes(resolve(flags.get("lanes") ?? join(HERE, "lanes.toml")));
+    const root = flags.get("root");
+    if (!root) throw new Error("wsl-sync needs --root DIR, the WSL root on the build host");
+    const records = await fetchWslRecords(lanes.lane.ssh, root);
+    if (records.build) await Bun.write(join(outDir, "data", "wsl", "build.json"), `${JSON.stringify(records.build, null, 2)}\n`);
+    if (records.merge) await Bun.write(join(outDir, "data", "wsl", "merge.json"), `${JSON.stringify(records.merge, null, 2)}\n`);
+    console.log(`build: ${records.build?.release ?? "none"}; merge: ${records.merge ? `${records.merge.conflictedFiles} conflicted files` : "none"}`);
+    return 0;
+  }
+  if (command === "lane-sync") {
+    const lanes = await loadLanes(resolve(flags.get("lanes") ?? join(HERE, "lanes.toml")));
+    const root = flags.get("root");
+    if (!root) throw new Error("lane-sync needs --root DIR, the lane root on the build host");
+    const records = await fetchLaneRecords(lanes.lane.ssh, root);
+    if (records.length === 0) throw new Error("the build host has no lane records yet");
+    for (const r of records) await Bun.write(join(outDir, "data", "lane", `${r.id}.json`), `${JSON.stringify(r, null, 2)}\n`);
+    await Bun.write(join(outDir, "lane.md"), renderLanePage(await readLaneRecords(outDir)));
+    for (const r of records) console.log(`${r.id}: ${r.status} ${r.package} ${r.version} ${r.release}`);
     return 0;
   }
   if (command === "verify") return verify(manifest, join(HERE, "fixtures", "verified.json"), flags.has("write"));

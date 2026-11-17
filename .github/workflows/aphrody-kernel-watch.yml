@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write
+      contents: read
       actions: write
     env:
       GITHUB_TOKEN: ${{ github.token }}
@@ -69,23 +69,8 @@ jobs:
         with:
           path: tooling/kernel-watch/.store
           key: kernel-watch-store-${{ github.run_id }}
-      - name: Regenerate docs/watch
-        run: bun tooling/kernel-watch/cli.ts build
-      - name: Commit when the output changed
-        run: |
-          if [ "$(bun tooling/kernel-watch/cli.ts gate --slow-minutes 360)" != "commit" ]; then
-            echo "nothing worth a commit"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/watch
-          git commit -m "chore(watch): refresh kernel watch data" -- docs/watch
-          for attempt in 1 2 3; do
-            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
-            sleep $((attempt * 5))
-          done
-          exit 1
+      - name: Check that the views build
+        run: bun tooling/kernel-watch/cli.ts build --out "$RUNNER_TEMP/watch"
       - name: Keep the three newest store caches
         run: |
           gh cache list --key kernel-watch-store- --sort created_at --order desc --limit 100 --json id --jq '.[3:][].id' \

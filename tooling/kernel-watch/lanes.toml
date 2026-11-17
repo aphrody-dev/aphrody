@@ -30,3 +30,50 @@ timeout = "60s"
   id = "production"
   ssh = "prd"
   label = "production Arch host (read-only)"
+
+# ------------------------------------------------------------------------------------------------ rc lane (build host)
+# Builds or fetches each rc kernel, boots it in QEMU/KVM against an Arch root filesystem, runs the smoke suite and writes one record per
+# kernel. Everything lives under a root directory given on the command line (--root), on the build host; nothing is cached on the PC.
+
+[lane]
+ssh = "fr1"
+repo_url = "https://github.com/aphrody-dev/aphrody.git"
+image = "archlinux:latest"
+aur_git = "https://aur.archlinux.org/linux-mainline.git"
+kernel_git = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
+testing_repos = ["core-testing", "extra-testing"]
+vm_cpus = 4
+vm_memory_mb = 3072
+disk_gb = 6
+boot_timeout = "20m"
+build_timeout = "4h"
+refresh_rootfs_days = 7
+# systemd OnCalendar of the user timer that runs "run --if-new" (a version that already has a passing record is skipped).
+timer = "*-*-* 00/6:20:00"
+kselftest_targets = ["exec", "membarrier", "clone3", "kcmp", "mincore", "sigaltstack", "mqueue"]
+
+  # source = "repo": pacman -S <package> from the Arch repositories in the guest (the stable baseline the rc is compared with).
+  # source = "aur": makepkg of the AUR PKGBUILD in an archlinux container with the testing repositories enabled.
+  # source = "cachyos": the newest package among the listed CachyOS repositories that the build host CPU can run (probe.cachyos ids).
+  [[lane.kernel]]
+  id = "arch-baseline"
+  name = "Arch linux (stable baseline)"
+  kernel = "arch"
+  channel = "core/linux"
+  source = "repo"
+  package = "linux"
+  [[lane.kernel]]
+  id = "arch-mainline"
+  name = "Arch linux-mainline (AUR, rc)"
+  kernel = "arch"
+  channel = "aur/linux-mainline"
+  source = "aur"
+  package = "linux-mainline"
+  [[lane.kernel]]
+  id = "cachyos-rc"
+  name = "CachyOS linux-cachyos-rc"
+  kernel = "cachyos"
+  channel = "linux-cachyos-rc"
+  source = "cachyos"
+  package = "linux-cachyos-rc"
+  repos = ["cachyos-v3", "cachyos"]

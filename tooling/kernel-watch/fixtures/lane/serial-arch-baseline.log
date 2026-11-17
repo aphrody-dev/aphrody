@@ -1,0 +1,23 @@
+LANE-BEGIN 7.3.4-arch1-2
+LANE-RESULT boot pass systemd running
+LANE-RESULT login pass serial-getty@ttyS0 active
+LANE-METRIC dmesg-err 1
+LANE-METRIC dmesg-warn 6
+LANE-METRIC dmesg-crit 0
+LANE-METRIC dmesg-bug 0
+LANE-DMESG [    0.380000] example: a synthetic error line
+LANE-RESULT dmesg pass err=1 warn=6 crit=0 bug=0
+LANE-RESULT analyze pass Startup finished in 1.6s (kernel) + 4.5s (initrd) + 6.1s (userspace) = 12.2s
+LANE-BLAME 6.0s dev-example.device
+LANE-RESULT network pass dns through the user-mode network
+LANE-METRIC pacman-syu-seconds 4
+LANE-RESULT pacman-syu pass exit 0 with core-testing extra-testing enabled, 2 packages upgraded, kernel package linux held
+LANE-RESULT pacman-qkk pass 168 packages checked, 0 diagnostics, 1 runtime-state ownership notes ignored
+LANE-METRIC kselftest-ok 29
+LANE-METRIC kselftest-notok 1
+LANE-KSELFTEST selftests: membarrier: membarrier_rseq_stress # exit=1
+LANE-RESULT kselftest pass 29 ok, 1 not ok (exit 1)
+LANE-END
+---
+[    0.000000] Linux version 7.3.4-arch1-2 (builder@example) (gcc (GCC) 16.2.1, GNU ld (GNU Binutils) 2.47) #1 SMP PREEMPT_DYNAMIC
+example-guest login: 

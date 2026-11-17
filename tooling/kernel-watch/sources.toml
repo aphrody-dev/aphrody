@@ -247,6 +247,26 @@ description = "CentOS Stream kernel source-git, the public upstream of RHEL kern
   provider = "gitlab"
   url = "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-10"
 
+[[kernel]]
+id = "wsl"
+name = "WSL2 kernel"
+role = "downstream"
+lineage = "linux"
+description = "Microsoft's WSL2 kernel (microsoft/WSL2-Linux-Kernel, the only tree carrying dxgkrnl) and the aphrody build of it."
+  [[kernel.site]]
+  id = "microsoft-tree"
+  kind = "forge"
+  url = "https://github.com/microsoft/WSL2-Linux-Kernel"
+  [[kernel.site]]
+  id = "aphrody-fork"
+  kind = "forge"
+  url = "https://github.com/aphrody-labs/WSL2-Linux-Kernel"
+  note = "fork tracking the newest linux-msft-wsl-*.y branch; the build lives in tooling/kernel-watch/wsl"
+  [[kernel.org]]
+  id = "microsoft-wsl"
+  provider = "github"
+  url = "https://github.com/microsoft/WSL2-Linux-Kernel"
+
 # ------------------------------------------------------------------------------------------------ Linux (kernel.org)
 
 [[source]]
@@ -841,6 +861,27 @@ patterns = ['^\s*pkgver = (\S+)']
 channel = "linux-cachyos-rc"
 yields = ["version"]
 min_interval = "15m"
+
+[[source]]
+id = "wsl-release"
+kernel = "wsl"
+adapter = "text-version"
+kind = "releases-json"
+url = "https://api.github.com/repos/microsoft/WSL2-Linux-Kernel/releases/latest"
+patterns = ['"tag_name":\s*"linux-msft-wsl-(\d+\.\d+\.\d+(?:\.\d+)?)"']
+channel = "microsoft release"
+yields = ["version"]
+min_interval = "1h"
+note = "latest release tag of the Microsoft WSL2 kernel, linux-msft-wsl-<version>"
+
+[[source]]
+id = "wsl-commits"
+kernel = "wsl"
+adapter = "github-commits"
+kind = "forge-api"
+url = "https://api.github.com/repos/microsoft/WSL2-Linux-Kernel/commits?per_page=30"
+yields = ["commit"]
+min_interval = "1h"
 
 [[source]]
 id = "cachyos-commits"

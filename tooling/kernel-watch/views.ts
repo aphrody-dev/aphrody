@@ -2,8 +2,12 @@
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { Kernel, Manifest } from "./manifest.ts";
-import type { Store, StoredItem } from "./store.ts";
+import type { Store, StoredItem, VersionRow } from "./store.ts";
+import { readWslRecords, renderWslPage, wslVersionRows, type WslRecords } from "./wsl.ts";
+import type { ProbeReport } from "./probe.ts";
+import type { LaneRecord } from "./lane.ts";
 import { buildCycles, closenessKey, compareVersions, distance, formatVersion, parseVersion, type Distance, type KernelVersion } from "./version.ts";
+import { laneIndex, readLaneRecords, renderLanePage } from "./lane.ts";
 import { readProbeReports, renderProbePage } from "./probe.ts";
 import type { VerifiedFile } from "./verify.ts";
 
@@ -72,9 +76,10 @@ const link = (text: string, url: string): string => (url ? `[${cell(text)}](${ur
 const json = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
 const signed = (n: number | null): string => (n === null ? "n/a" : n > 0 ? `+${n}` : String(n));
 
-export function computeVersions(store: Store, manifest: Manifest, asOf: number): VersionsView {
+/** extra rows are versions that do not come from a poll (the aphrody WSL build) and are ranked like polled ones. */
+export function computeVersions(store: Store, manifest: Manifest, asOf: number, extra: VersionRow[] = []): VersionsView {
   const kernels = new Map(manifest.kernels.map((k) => [k.id, k]));
-  const rows = store.versionRows().filter((r) => kernels.get(r.kernel)?.lineage === "linux");
+  const rows = [...store.versionRows(), ...extra].filter((r) => kernels.get(r.kernel)?.lineage === "linux");
   const parsed = new Map<string, KernelVersion>();
   for (const r of rows) {
     const v = parseVersion(r.version);
@@ -126,9 +131,16 @@ function stableText(e: VersionEntry): string {
   return e.cyclesBehindStable < 0 ? `${-e.cyclesBehindStable} cycle${e.cyclesBehindStable === -1 ? "" : "s"} ahead` : `${e.cyclesBehindStable} cycles`;
 }
 
-export function versionsTable(view: VersionsView, rows: VersionEntry[] = view.distros, firstSeen = true): string {
-  const head = `| Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable |${firstSeen ? " First seen |" : ""}\n| --: | :-- | :-- | :-- | :-- | :--${firstSeen ? " | :-- |" : " |"}`;
-  const body = rows.map((e, i) => `| ${i + 1} | ${cell(e.kernelName)} | ${cell(e.channel)} | ${cell(e.version, 40)} | ${distanceText(e)} | ${stableText(e)} |${firstSeen ? ` ${iso(e.since)} |` : ""}`);
+export type LaneStatus = ReturnType<typeof laneIndex>;
+
+/** With a lane index the table gains a "Test lane" column: the rc lane's result for the channel, linked to lane.md. */
+export function versionsTable(view: VersionsView, rows: VersionEntry[] = view.distros, firstSeen = true, lane?: LaneStatus): string {
+  const head = `| Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable |${firstSeen ? " First seen |" : ""}${lane ? " Test lane |" : ""}\n| --: | :-- | :-- | :-- | :-- | :--${firstSeen ? " | :--" : ""}${lane ? " | :-- |" : " |"}`;
+  const laneCell = (e: VersionEntry): string => {
+    const r = lane?.get(`${e.kernel}\u0000${e.channel}`);
+    return r ? ` [${r.summary} on ${cell(r.version, 30)}](lane.md) |` : " none |";
+  };
+  const body = rows.map((e, i) => `| ${i + 1} | ${cell(e.kernelName)} | ${cell(e.channel)} | ${cell(e.version, 40)} | ${distanceText(e)} | ${stableText(e)} |${firstSeen ? ` ${iso(e.since)} |` : ""}${lane ? laneCell(e) : ""}`);
   return [head, ...body].join("\n");
 }
 
@@ -235,7 +247,28 @@ function kernelPage(kernel: Kernel, manifest: Manifest, digest: Digest, view: Ve
   return `${lines.join("\n")}\n`;
 }
 
-function stateOfKernels(manifest: Manifest, view: VersionsView, digests: Digest[], store: Store, asOf: number): string {
+interface Lanes {
+  probes: ProbeReport[];
+  lane: LaneRecord[];
+  wsl: WslRecords;
+}
+
+/** Facts from the recorded lanes; what each lane proves and does not prove is hand-written in PLAN.md. */
+function lanesSection(l: Lanes): string[] {
+  const rows: string[] = [];
+  for (const p of l.probes) rows.push(`| Host probe ${p.host} | build host or workstation over ssh, read-only | \`bun tooling/kernel-watch/cli.ts probe ${p.host}\` | ${iso(p.at)}: running ${p.running.release} (${p.running.cyclesBehindRc} cycles behind the rc), newest Arch repo ${p.summary.newestRepo ?? "n/a"}, newest AUR ${p.summary.newestAur ?? "n/a"} |`);
+  for (const r of [...l.lane].sort((a, b) => (a.id < b.id ? -1 : 1))) {
+    const failed = r.checks.filter((c) => c.status === "fail").map((c) => c.name);
+    rows.push(`| rc lane ${r.id} | build host, docker and QEMU/KVM | \`bun tooling/kernel-watch/lane-host.ts run --root DIR --ids ${r.id}\`, then \`cli.ts lane-sync --root DIR\` | ${iso(r.at)}: ${r.status} on ${r.package} ${r.version} (guest ${r.release})${failed.length ? `, failed: ${failed.join(", ")}` : ""} |`);
+  }
+  const b = l.wsl.build;
+  if (b) rows.push(`| WSL2 kernel | build host | \`tooling/kernel-watch/wsl/build.sh ROOT ${b.ref} ${b.march}\` | ${iso(b.builtAt)}: ${b.release}, bzImage sha256 ${b.bzImageSha256.slice(0, 16)}…, boot test ${b.boot ? (b.boot.panic ? "panic" : "no panic") : "not run"} |`);
+  if (l.wsl.merge) rows.push(`| WSL2 merge experiment | build host, throwaway clone | \`tooling/kernel-watch/wsl/merge-test.sh ROOT ${l.wsl.merge.msftTag} ${l.wsl.merge.upstreamTag}\` | ${iso(l.wsl.merge.at)}: ${l.wsl.merge.conflictedFiles} conflicted files, ${l.wsl.merge.dxgkrnlConflicts} in dxgkrnl |`);
+  if (rows.length === 0) return [];
+  return ["## Test lanes", "", "| Lane | Runs on | Rerun | Latest |", "| :-- | :-- | :-- | :-- |", ...rows, "", "Details: docs/watch/probe.md, lane.md, wsl.md. What each lane proves and what it does not: docs/watch/PLAN.md.", ""];
+}
+
+function stateOfKernels(manifest: Manifest, view: VersionsView, digests: Digest[], store: Store, asOf: number, lanes: Lanes): string {
   const lines = [
     "# State of the kernels", "",
     `As of ${iso(asOf)}. Generated by tooling/kernel-watch; condensed from docs/watch. Query the store for detail: \`bun tooling/kernel-watch/cli.ts search "<text>"\`.`, "",
@@ -247,6 +280,7 @@ function stateOfKernels(manifest: Manifest, view: VersionsView, digests: Digest[
   if (view.distros.length) {
     lines.push("## Distributions closest to the mainline rc", "", versionsTable(view, view.distros, false), "", "Behind mainline rc counts mainline cycles (0 cycles and 0 rc: tracking the rc itself). Channel is the newest kernel the distribution ships.", "");
   }
+  lines.push(...lanesSection(lanes));
   lines.push("## Kernels", "", "| Kernel | Latest release | Commits 24h | PRs merged 7d | Open PRs | Open issues |", "| :-- | :-- | --: | --: | --: | --: |");
   for (const kernel of manifest.kernels) {
     const digest = digests.find((d) => d.kernel === kernel.id)!;
@@ -265,7 +299,8 @@ export async function generate(store: Store, manifest: Manifest, options: Genera
   const asOf = options.now ?? Math.ceil(polled / HOUR) * HOUR;
   const verifiedFile = options.verifiedPath ? Bun.file(options.verifiedPath) : null;
   const verified: VerifiedFile | null = verifiedFile && (await verifiedFile.exists()) ? JSON.parse(await verifiedFile.text()) : null;
-  const view = computeVersions(store, manifest, asOf);
+  const wsl = await readWslRecords(options.outDir);
+  const view = computeVersions(store, manifest, asOf, wslVersionRows(wsl));
   const digests = computeDigests(store, manifest, asOf);
   const contents = new Map<string, string>();
 
@@ -283,18 +318,22 @@ export async function generate(store: Store, manifest: Manifest, options: Genera
   }));
   contents.set("data/sources.json", json({ verifiedAt: verified?.verifiedAt ?? null, sources: [...manifest.sources].sort(byId).map((s) => ({ id: s.id, kernel: s.kernel, kind: s.kind, adapter: s.adapter, url: s.url, yields: s.yields, minIntervalSeconds: s.minInterval, verifiedStatus: verified?.sources.find((v) => v.id === s.id)?.status ?? null })) }));
 
-  const table = versionsTable(view);
+  const laneRecords = await readLaneRecords(options.outDir).catch(() => []);
+  const probes = await readProbeReports(options.outDir).catch(() => []);
+  const lane = laneRecords.length ? laneIndex(laneRecords) : undefined;
+  const table = versionsTable(view, view.distros, true, lane);
   contents.set("versions.md", [
     "# Kernel versions", "",
     `Generated as of ${iso(asOf)} from the watch store. Reference: mainline ${view.mainline ?? "n/a"}, stable ${view.stable ?? "n/a"}${view.longterm.length ? `, longterm ${view.longterm.join(", ")}` : ""}.`, "",
     "## Newest kernel per distribution, closest to mainline first", "", table, "",
-    "## Every observed channel", "", versionsTable(view, view.entries), "",
+    "## Every observed channel", "", versionsTable(view, view.entries, true, lane), "",
     "Distance counts mainline cycles between the kernel and the current release candidate, using the tag list of the mainline tree for the cycle order; rc steps are release candidates behind inside the rc's own cycle. Versions are ordered with Bun.semver (`7.4-rc3` < `7.4` < `7.4.1`).", "",
   ].join("\n"));
-  const probes = await readProbeReports(options.outDir).catch(() => []);
+  if (laneRecords.length) contents.set("lane.md", renderLanePage(laneRecords));
+  if (wsl.build || wsl.merge) contents.set("wsl.md", renderWslPage(wsl, view.entries.find((e) => e.kernel === "wsl" && e.channel === "microsoft release")?.version ?? null, view.mainline));
   if (probes.length) contents.set("probe.md", renderProbePage(probes));
   for (const kernel of manifest.kernels) contents.set(`kernels/${kernel.id}.md`, kernelPage(kernel, manifest, digests.find((d) => d.kernel === kernel.id)!, view, store, verified));
-  contents.set("state-of-kernels.md", stateOfKernels(manifest, view, digests, store, asOf));
+  contents.set("state-of-kernels.md", stateOfKernels(manifest, view, digests, store, asOf, { probes, lane: laneRecords, wsl }));
   contents.set("sources.md", [
     "# Sources", "", `${manifest.sources.length} sources over ${new Set(manifest.sources.map((s) => s.host)).size} hosts, defined in tooling/kernel-watch/sources.toml. Status and shape come from fixtures/verified.json${verified ? ` (verified ${verified.verifiedAt})` : ""}.`, "",
     "| Source | Kernel | Kind | Yields | Status | Shape |", "| :-- | :-- | :-- | :-- | --: | :-- |",
@@ -307,6 +346,8 @@ export async function generate(store: Store, manifest: Manifest, options: Genera
     "- [Kernel versions](versions.md): newest kernel per distribution, distance to the mainline rc and stable",
     "- [State of the kernels](state-of-kernels.md): condensed context for agents",
     "- [Host kernel probe](probe.md): read-only probe of the production Arch host against the Arch, AUR and CachyOS kernels (written by `cli.ts probe`, absent until one was recorded)",
+    "- [rc lane](lane.md): the rc kernels built or fetched on the build host, booted in QEMU/KVM and smoke-tested (absent until a run was recorded)",
+    "- [WSL2 kernel](wsl.md): Microsoft's WSL2 kernel and the aphrody build of it, boot test, install, and the merge experiment against mainline (absent until recorded)",
     "- [Sources](sources.md): every endpoint, with the status and shape seen when it was verified",
     "- Per kernel: " + manifest.kernels.map((k) => `[${k.name}](kernels/${k.id}.md)`).join(", "),
     ...(manifest.clones.length

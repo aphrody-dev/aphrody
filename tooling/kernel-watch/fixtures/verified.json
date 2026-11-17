@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-11-17T04:52:22Z",
+  "verifiedAt": "2026-11-17T06:43:14Z",
   "sources": [
     {
       "id": "alpine-lts-commits",
@@ -94,16 +94,16 @@
       "url": "https://api.github.com/repos/asterinas/asterinas/commits?per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 352036,
-      "shape": "100 items; first commit: Fix cache aligment check"
+      "bytes": 351601,
+      "shape": "100 items; first commit: Use `DropGuard` for ext2 rollback"
     },
     {
       "id": "asterinas-counts",
       "url": "https://api.github.com/search/issues?q=repo:asterinas/asterinas+is:open+is:pr&per_page=1",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 4687,
-      "shape": "0 items; metrics open_prs=160, open_issues=267"
+      "bytes": 3025,
+      "shape": "0 items; metrics open_prs=160, open_issues=268"
     },
     {
       "id": "asterinas-discussions",
@@ -118,8 +118,8 @@
       "url": "https://api.github.com/repos/asterinas/asterinas/issues?state=all&sort=updated&direction=desc&per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 668494,
-      "shape": "34 items; first issue: Introduce DRM subsystem and migrate graphics stack from fbdev"
+      "bytes": 680209,
+      "shape": "34 items; first issue: Runtime Memory Hot-Add via virtio-mem (Grow-Only): A Design Proposal f"
     },
     {
       "id": "asterinas-org-repos",
@@ -127,15 +127,15 @@
       "status": 200,
       "contentType": "application/json",
       "bytes": 329994,
-      "shape": "61 items; first repo: asterinas/asterinas"
+      "shape": "61 items; first repo: asterinas/vostd"
     },
     {
       "id": "asterinas-pulls",
       "url": "https://api.github.com/repos/asterinas/asterinas/pulls?state=all&sort=updated&direction=desc&per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 1902626,
-      "shape": "100 items; first pr: Ext4 support: Add basic writable EXT4 extent support"
+      "bytes": 1899858,
+      "shape": "100 items; first pr: Fix fragmented frame cache refills and redundant pool balancing"
     },
     {
       "id": "asterinas-releases",
@@ -151,7 +151,7 @@
       "status": 200,
       "contentType": "application/json",
       "bytes": 6463,
-      "shape": "0 items; metrics stars=5110, forks=420, size_kb=19567"
+      "shape": "0 items; metrics stars=5110, forks=420, size_kb=19576"
     },
     {
       "id": "cachyos-commits",
@@ -175,7 +175,7 @@
       "status": 200,
       "contentType": "application/json",
       "bytes": 544934,
-      "shape": "100 items; first repo: CachyOS/cachyos-aur-derived"
+      "shape": "100 items; first repo: CachyOS/wiki"
     },
     {
       "id": "cachyos-rc-version",
@@ -222,7 +222,7 @@
       "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/merge_requests?state=all&order_by=updated_at&per_page=50",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 203846,
+      "bytes": 203840,
       "shape": "50 items; first pr: redhat/configs: Update powerpc CONFIG_HZ_1000 config"
     },
     {
@@ -246,8 +246,8 @@
       "url": "https://api.github.com/repos/LiberNT/LiberNT/commits?sha=main-nt10&per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 415334,
-      "shape": "100 items; first commit: [DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CP"
+      "bytes": 412733,
+      "shape": "100 items; first commit: [EXPLORER] Load the start menu's strings from the resources"
     },
     {
       "id": "libernt-counts",
@@ -255,7 +255,7 @@
       "status": 200,
       "contentType": "application/json",
       "bytes": 5576,
-      "shape": "0 items; metrics open_prs=31, open_issues=74"
+      "shape": "0 items; metrics open_prs=29, open_issues=74"
     },
     {
       "id": "libernt-discussions",
@@ -270,7 +270,7 @@
       "url": "https://api.github.com/repos/LiberNT/LiberNT/issues?state=all&sort=updated&direction=desc&per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 598031,
+      "bytes": 600013,
       "shape": "20 items; first issue: You are repeating the same mistakes as Microsoft when it comes to the "
     },
     {
@@ -286,8 +286,8 @@
       "url": "https://api.github.com/repos/LiberNT/LiberNT/pulls?state=all&sort=updated&direction=desc&per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 2049436,
-      "shape": "100 items; first pr: [MSCTFIME][IMM32_APITEST] Draw the composition window with the text se"
+      "bytes": 2049512,
+      "shape": "100 items; first pr: [LIBERNT][EXPLORER] Japanese for the drivers entry of Setup and for th"
     },
     {
       "id": "libernt-releases",
@@ -303,7 +303,7 @@
       "status": 200,
       "contentType": "application/json",
       "bytes": 6223,
-      "shape": "0 items; metrics stars=1173, forks=0, size_kb=953350"
+      "shape": "0 items; metrics stars=1173, forks=0, size_kb=953354"
     },
     {
       "id": "libernt-sitemap",
@@ -318,8 +318,8 @@
       "url": "https://lore.kernel.org/lkml/new.atom",
       "status": 200,
       "contentType": "application/atom+xml",
-      "bytes": 213915,
-      "shape": "25 items; first mail: Re: [PATCH v4 2/3] selftests/mm: test userspace MFR for HugeTLB hugepa"
+      "bytes": 96026,
+      "shape": "25 items; first mail: [PATCH v2] dmaengine: tegra: only advertise supported pause operations"
     },
     {
       "id": "linux-mainline-commits",
@@ -350,8 +350,8 @@
       "url": "https://lore.kernel.org/rust-for-linux/new.atom",
       "status": 200,
       "contentType": "application/atom+xml",
-      "bytes": 133655,
-      "shape": "25 items; first mail: Re: [RFC PATCH v2] rust: i2c: Remove use of bindings::i2c_match_id"
+      "bytes": 105920,
+      "shape": "25 items; first mail: Re: [PATCH v2] rust: kernel: fix lifetime of copy_from_iter_raw"
     },
     {
       "id": "linux-stable-commits",
@@ -398,8 +398,8 @@
       "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=opened&per_page=1",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 1805,
-      "shape": "0 items; metrics open_prs=16, open_issues=66"
+      "bytes": 2840,
+      "shape": "0 items; metrics open_prs=17, open_issues=66"
     },
     {
       "id": "redox-group-projects",
@@ -407,7 +407,7 @@
       "status": 200,
       "contentType": "application/json",
       "bytes": 381407,
-      "shape": "100 items; first repo: redox-os/relibc"
+      "shape": "100 items; first repo: redox-os/kernel"
     },
     {
       "id": "redox-issues",
@@ -422,8 +422,8 @@
       "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=all&order_by=updated_at&per_page=100",
       "status": 200,
       "contentType": "application/json",
-      "bytes": 298957,
-      "shape": "100 items; first pr: Draft: IPC priority queue for SIGKILL and SIGSTOP"
+      "bytes": 299498,
+      "shape": "100 items; first pr: Add memstat to inspect memory"
     },
     {
       "id": "redox-news",
@@ -496,6 +496,22 @@
       "contentType": "text/html",
       "bytes": 305513,
       "shape": "8 items; versions mainline-ppa=7.4-rc3; first build: mainline build v7.4-rc3"
+    },
+    {
+      "id": "wsl-commits",
+      "url": "https://api.github.com/repos/microsoft/WSL2-Linux-Kernel/commits?per_page=30",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 129219,
+      "shape": "30 items; first commit: Merge tag 'rolling-lts/wsl/6.18.58.1' into linux-msft-wsl-6.18.y"
+    },
+    {
+      "id": "wsl-release",
+      "url": "https://api.github.com/repos/microsoft/WSL2-Linux-Kernel/releases/latest",
+      "status": 200,
+      "contentType": "application/json",
+      "bytes": 2342,
+      "shape": "1 items; versions microsoft release=6.18.58.1; first version: wsl microsoft release: 6.18.58.1"
     }
   ],
   "sites": [
@@ -520,7 +536,7 @@
       "url": "https://source.android.com/docs/core/architecture/kernel/android-common",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 207933,
+      "bytes": 207929,
       "shape": "Android common kernels &nbsp;|&nbsp; Android OS core topics &nbsp;|&nbsp; Androi"
     },
     {
@@ -544,7 +560,7 @@
       "url": "https://github.com/asterinas",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 243640,
+      "bytes": 243636,
       "shape": "Asterinas · GitHub"
     },
     {
@@ -576,7 +592,7 @@
       "url": "https://github.com/CachyOS",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 273469,
+      "bytes": 273211,
       "shape": "CachyOS · GitHub"
     },
     {
@@ -616,7 +632,7 @@
       "url": "https://gitlab.com/cki-project/kernel-ark",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 62508,
+      "bytes": 62233,
       "shape": "cki-project / kernel-ark · GitLab"
     },
     {
@@ -624,7 +640,7 @@
       "url": "https://github.com/LiberNT",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 218244,
+      "bytes": 218257,
       "shape": "LiberNT · GitHub"
     },
     {
@@ -664,7 +680,7 @@
       "url": "https://lore.kernel.org/",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 19170,
+      "bytes": 19219,
       "shape": "public-inbox listing"
     },
     {
@@ -736,7 +752,7 @@
       "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-10",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 55596,
+      "bytes": 55406,
       "shape": "Red Hat / centos-stream / src / kernel / centos-stream-10 · GitLab"
     },
     {
@@ -760,8 +776,32 @@
       "url": "https://wiki.ubuntu.com/Kernel",
       "status": 200,
       "contentType": "text/html",
-      "bytes": 39324,
+      "bytes": 35496,
       "shape": "Kernel - Ubuntu Wiki"
+    },
+    {
+      "id": "wsl/aphrody-fork",
+      "url": "https://github.com/aphrody-labs/WSL2-Linux-Kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 327884,
+      "shape": "GitHub - aphrody-labs/WSL2-Linux-Kernel: The source for the Linux kernel used in"
+    },
+    {
+      "id": "wsl/microsoft-tree",
+      "url": "https://github.com/microsoft/WSL2-Linux-Kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 321522,
+      "shape": "GitHub - microsoft/WSL2-Linux-Kernel: The source for the Linux kernel used in Wi"
+    },
+    {
+      "id": "wsl/microsoft-wsl",
+      "url": "https://github.com/microsoft/WSL2-Linux-Kernel",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 321522,
+      "shape": "GitHub - microsoft/WSL2-Linux-Kernel: The source for the Linux kernel used in Wi"
     }
   ]
 }
