@@ -8,12 +8,12 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | NixOS | testing | 7.4-rc3 | at rc | 1 cycle ahead | 2026-11-17T04:48Z |
-| 2 | NixOS | 7.3 | 7.3.4 | 1 cycle | current | 2026-11-17T04:48Z |
-| 3 | NixOS | 6.18 lts | 6.18.63 | 6 cycles | 5 cycles | 2026-11-17T04:48Z |
-| 4 | NixOS | 6.12 lts | 6.12.117 | 12 cycles | 11 cycles | 2026-11-17T04:48Z |
-| 5 | NixOS | 6.6 lts | 6.6.162 | 18 cycles | 17 cycles | 2026-11-17T04:48Z |
-| 6 | NixOS | 6.1 lts | 6.1.192 | 23 cycles | 22 cycles | 2026-11-17T04:48Z |
+| 1 | NixOS | testing | 7.4-rc3 | at rc | 1 cycle ahead | 2026-11-17T04:59Z |
+| 2 | NixOS | 7.3 | 7.3.4 | 1 cycle | current | 2026-11-17T04:59Z |
+| 3 | NixOS | 6.18 lts | 6.18.63 | 6 cycles | 5 cycles | 2026-11-17T04:59Z |
+| 4 | NixOS | 6.12 lts | 6.12.117 | 12 cycles | 11 cycles | 2026-11-17T04:59Z |
+| 5 | NixOS | 6.6 lts | 6.6.162 | 18 cycles | 17 cycles | 2026-11-17T04:59Z |
+| 6 | NixOS | 6.1 lts | 6.1.192 | 23 cycles | 22 cycles | 2026-11-17T04:59Z |
 
 ## Activity
 

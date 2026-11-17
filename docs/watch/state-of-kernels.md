@@ -28,10 +28,10 @@ Behind mainline rc counts mainline cycles (0 cycles and 0 rc: tracking the rc it
 
 | Kernel | Latest release | Commits 24h | PRs merged 7d | Open PRs | Open issues |
 | :-- | :-- | --: | --: | --: | --: |
-| Linux | next-20261116 | ≥15 | 0 | - | - |
+| Linux | 7.4-rc3 | ≥15 | 0 | - | - |
 | Asterinas | v0.19.0 | 12 | 15 | 160 | 267 |
 | Redox | syscall-v0.9.5 | 0 | 2 | 16 | 66 |
-| LiberNT | icu-72.1-1 | 148 | 178 | 31 | 74 |
+| LiberNT | icu-72.1-1 | 151 | 180 | 29 | 74 |
 | Android Common Kernel | - | 4 | 0 | - | - |
 | CachyOS | cachyos-7.4-rc3-1 | 2 | 0 | - | - |
 | ChromiumOS kernel | - | 1 | 0 | - | - |

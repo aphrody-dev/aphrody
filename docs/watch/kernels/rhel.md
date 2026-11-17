@@ -8,8 +8,8 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | RHEL / CentOS Stream | centos-stream-10 | 6.12.0 | 12 cycles | 11 cycles | 2026-11-17T04:48Z |
-| 2 | RHEL / CentOS Stream | centos-stream-9 | 5.14.0 | 30 cycles | 29 cycles | 2026-11-17T04:48Z |
+| 1 | RHEL / CentOS Stream | centos-stream-10 | 6.12.0 | 12 cycles | 11 cycles | 2026-11-17T04:59Z |
+| 2 | RHEL / CentOS Stream | centos-stream-9 | 5.14.0 | 30 cycles | 29 cycles | 2026-11-17T04:59Z |
 
 ## Activity
 

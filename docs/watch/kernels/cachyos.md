@@ -8,8 +8,8 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | CachyOS | linux-cachyos-rc | 7.4.rc3 | at rc | 1 cycle ahead | 2026-11-17T04:48Z |
-| 2 | CachyOS | linux-cachyos | 7.3.4 | 1 cycle | current | 2026-11-17T04:48Z |
+| 1 | CachyOS | linux-cachyos-rc | 7.4.rc3 | at rc | 1 cycle ahead | 2026-11-17T04:59Z |
+| 2 | CachyOS | linux-cachyos | 7.3.4 | 1 cycle | current | 2026-11-17T04:59Z |
 
 ## Activity
 
@@ -42,6 +42,7 @@ A leading ≥ marks a lower bound: the polled feed page does not reach back to t
 
 | Repository | Stars | Pushed | Description |
 | :-- | --: | :-- | :-- |
+| [CachyOS/statuspage](https://github.com/CachyOS/statuspage) | 26 | 2026-11-17 | 📈 Uptime monitor and status page for CachyOS, powered by @upptime |
 | [CachyOS/cachyos-aur-derived](https://github.com/CachyOS/cachyos-aur-derived) | 23 | 2026-11-16 |  |
 | [CachyOS/cachyos-calamares](https://github.com/CachyOS/cachyos-calamares) | 78 | 2026-11-16 | CachyOS Calamares |
 | [CachyOS/packageinstaller](https://github.com/CachyOS/packageinstaller) | 40 | 2026-11-16 | Simple Software Application Package Installer for CachyOS which helps setting u… |
@@ -49,7 +50,6 @@ A leading ≥ marks a lower bound: the polled feed page does not reach back to t
 | [CachyOS/website](https://github.com/CachyOS/website) | 25 | 2026-11-16 | Website for CachyOS |
 | [CachyOS/linux-cachyos](https://github.com/CachyOS/linux-cachyos) | 4863 | 2026-11-16 | Archlinux Kernel based on different schedulers and some other performance impro… |
 | [CachyOS/linux](https://github.com/CachyOS/linux) | 110 | 2026-11-16 | Linux kernel source tree |
-| [CachyOS/statuspage](https://github.com/CachyOS/statuspage) | 26 | 2026-11-16 | 📈 Uptime monitor and status page for CachyOS, powered by @upptime |
 | [CachyOS/proton-cachyos](https://github.com/CachyOS/proton-cachyos) | 1587 | 2026-11-16 | Compatibility tool for Steam Play based on Wine and additional components |
 | [CachyOS/wine-cachyos](https://github.com/CachyOS/wine-cachyos) | 58 | 2026-11-16 | Wine with a bit of extra spice (CachyOS Version) |
 | [CachyOS/CachyOS-Live-ISO](https://github.com/CachyOS/CachyOS-Live-ISO) | 106 | 2026-11-15 |  |

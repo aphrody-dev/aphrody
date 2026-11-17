@@ -8,11 +8,11 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | Fedora | F46 | 7.4.0-0.rc3.26.fc46 | at rc | 1 cycle ahead | 2026-11-17T04:48Z |
-| 2 | Fedora | F43 | 7.3.4-100.fc43 | 1 cycle | current | 2026-11-17T04:48Z |
-| 3 | Fedora | F44 | 7.3.4-200.fc44 | 1 cycle | current | 2026-11-17T04:48Z |
-| 4 | Fedora | F45 | 7.3.4-300.fc45 | 1 cycle | current | 2026-11-17T04:48Z |
-| 5 | Fedora | kernel-ark | 7.3.0-0.rc7.2f2f7eeef8b0.62 | 1 cycle | rc of next | 2026-11-17T04:48Z |
+| 1 | Fedora | F46 | 7.4.0-0.rc3.26.fc46 | at rc | 1 cycle ahead | 2026-11-17T04:59Z |
+| 2 | Fedora | F43 | 7.3.4-100.fc43 | 1 cycle | current | 2026-11-17T04:59Z |
+| 3 | Fedora | F44 | 7.3.4-200.fc44 | 1 cycle | current | 2026-11-17T04:59Z |
+| 4 | Fedora | F45 | 7.3.4-300.fc45 | 1 cycle | current | 2026-11-17T04:59Z |
+| 5 | Fedora | kernel-ark | 7.3.0-0.rc7.2f2f7eeef8b0.62 | 1 cycle | rc of next | 2026-11-17T04:59Z |
 
 ## Activity
 
@@ -25,8 +25,8 @@ A leading ≥ marks a lower bound: the polled feed page does not reach back to t
 
 ## Version changes (7d)
 
-- 2026-11-17T04:48Z kernel-ark: 7.3.0-0.rc7.2f2f7eeef8b0.62
-- 2026-11-17T04:48Z kernel-ark: 7.4.0-0.rc3.26
+- 2026-11-17T04:59Z kernel-ark: 7.3.0-0.rc7.2f2f7eeef8b0.62
+- 2026-11-17T04:59Z kernel-ark: 7.4.0-0.rc3.26
 
 ## Notable (7d)
 

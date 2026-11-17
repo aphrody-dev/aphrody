@@ -8,8 +8,8 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | Alpine Linux | edge/linux-lts | 7.3.4 | 1 cycle | current | 2026-11-17T04:48Z |
-| 2 | Alpine Linux | edge/linux-rpi | 6.18.63 | 6 cycles | 5 cycles | 2026-11-17T04:48Z |
+| 1 | Alpine Linux | edge/linux-lts | 7.3.4 | 1 cycle | current | 2026-11-17T04:59Z |
+| 2 | Alpine Linux | edge/linux-rpi | 6.18.63 | 6 cycles | 5 cycles | 2026-11-17T04:59Z |
 
 ## Activity
 

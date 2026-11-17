@@ -8,7 +8,7 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | ChromiumOS kernel | newest-branch (chromeos-6.12) | 6.12.100 | 12 cycles | 11 cycles | 2026-11-17T04:48Z |
+| 1 | ChromiumOS kernel | newest-branch (chromeos-6.12) | 6.12.100 | 12 cycles | 11 cycles | 2026-11-17T04:59Z |
 
 ## Activity
 

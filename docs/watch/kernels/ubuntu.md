@@ -8,12 +8,12 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | Ubuntu | mainline-ppa | 7.4-rc3 | at rc | 1 cycle ahead | 2026-11-17T04:48Z |
-| 2 | Ubuntu | stonking/proposed | 7.3.0-11.12 | 1 cycle | 4 patches | 2026-11-17T04:48Z |
-| 3 | Ubuntu | tenacious/release | 7.3.0-9.9 | 1 cycle | 4 patches | 2026-11-17T04:48Z |
-| 4 | Ubuntu | resolute/security | 7.0.0-43.43 | 4 cycles | 3 cycles | 2026-11-17T04:48Z |
-| 5 | Ubuntu | noble/proposed | 6.8.0-151.151 | 16 cycles | 15 cycles | 2026-11-17T04:48Z |
-| 6 | Ubuntu | jammy/security | 5.15.0-203.213 | 29 cycles | 28 cycles | 2026-11-17T04:48Z |
+| 1 | Ubuntu | mainline-ppa | 7.4-rc3 | at rc | 1 cycle ahead | 2026-11-17T04:59Z |
+| 2 | Ubuntu | stonking/proposed | 7.3.0-11.12 | 1 cycle | 4 patches | 2026-11-17T04:59Z |
+| 3 | Ubuntu | tenacious/release | 7.3.0-9.9 | 1 cycle | 4 patches | 2026-11-17T04:59Z |
+| 4 | Ubuntu | resolute/security | 7.0.0-43.43 | 4 cycles | 3 cycles | 2026-11-17T04:59Z |
+| 5 | Ubuntu | noble/proposed | 6.8.0-151.151 | 16 cycles | 15 cycles | 2026-11-17T04:59Z |
+| 6 | Ubuntu | jammy/security | 5.15.0-203.213 | 29 cycles | 28 cycles | 2026-11-17T04:59Z |
 
 ## Activity
 

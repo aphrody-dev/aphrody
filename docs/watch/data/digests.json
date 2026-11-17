@@ -10,7 +10,7 @@
           "until": "2026-11-17T05:00Z",
           "counts": {
             "commit": 15,
-            "release": 1,
+            "release": 0,
             "issue": 0,
             "pr": 0,
             "discussion": 0,
@@ -29,12 +29,6 @@
           "versionChanges": [],
           "metrics": {},
           "notable": [
-            {
-              "kind": "release",
-              "title": "Linux next-20261116 (linux-next)",
-              "url": "https://git.kernel.org/next/linux-next/h/next-20261116",
-              "time": "2026-11-16T20:59Z"
-            },
             {
               "kind": "commit",
               "title": "Add linux-next specific files for 20261116",
@@ -73,7 +67,7 @@
           "until": "2026-11-17T05:00Z",
           "counts": {
             "commit": 22,
-            "release": 5,
+            "release": 4,
             "issue": 0,
             "pr": 0,
             "discussion": 0,
@@ -92,12 +86,6 @@
           "versionChanges": [],
           "metrics": {},
           "notable": [
-            {
-              "kind": "release",
-              "title": "Linux next-20261116 (linux-next)",
-              "url": "https://git.kernel.org/next/linux-next/h/next-20261116",
-              "time": "2026-11-16T20:59Z"
-            },
             {
               "kind": "commit",
               "title": "Add linux-next specific files for 20261116",
@@ -531,7 +519,7 @@
           "since": "2026-11-16T05:00Z",
           "until": "2026-11-17T05:00Z",
           "counts": {
-            "commit": 148,
+            "commit": 151,
             "release": 0,
             "issue": 4,
             "pr": 32,
@@ -546,7 +534,7 @@
             "issue": 1,
             "pr": 5
           },
-          "mergedPrs": 26,
+          "mergedPrs": 28,
           "commitsLowerBound": false,
           "versionChanges": [],
           "metrics": {
@@ -555,7 +543,7 @@
               "delta": null
             },
             "open_prs": {
-              "current": 31,
+              "current": 29,
               "delta": null
             },
             "forks": {
@@ -574,6 +562,30 @@
           "notable": [
             {
               "kind": "commit",
+              "title": "[LIBERNT] Translate the drivers entry of the components page into Japanese",
+              "url": "https://github.com/LiberNT/LiberNT/commit/80361528ca5ece76d5b05cb5ad1e6411f88ef3a3",
+              "time": "2026-11-17T04:55Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[EXPLORER] Load the start menu's strings from the resources",
+              "url": "https://github.com/LiberNT/LiberNT/commit/9680fba1001d71e7da6e23c766baef2b9e7a0f69",
+              "time": "2026-11-17T04:55Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[MSCTFP][MSCTF_APITEST] Add the proxies of the language bar interfaces",
+              "url": "https://github.com/LiberNT/LiberNT/commit/53467c57e316c03a85c07f0c27f1c36af1fff5b0",
+              "time": "2026-11-17T04:53Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[MSCTFP][MSCTF_APITEST] Add the proxies of the language bar interfaces",
+              "url": "https://github.com/LiberNT/LiberNT/pull/485",
+              "time": "2026-11-17T03:14Z"
+            },
+            {
+              "kind": "commit",
               "title": "[WINED3D] Read a WDDM adapter's identity once per adapter",
               "url": "https://github.com/LiberNT/LiberNT/commit/1ba5e910c1e8abcf4b8266bd39a0d859060ccd41",
               "time": "2026-11-17T01:13Z"
@@ -582,24 +594,6 @@
               "kind": "commit",
               "title": "[DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CPU host aperture takes",
               "url": "https://github.com/LiberNT/LiberNT/commit/397727289abc43b13239f8bac9a985e7f55dba1e",
-              "time": "2026-11-17T01:13Z"
-            },
-            {
-              "kind": "commit",
-              "title": "[APISETS][SHCORE_APITEST] Host the WinRT stream API set on shcore",
-              "url": "https://github.com/LiberNT/LiberNT/commit/49bbd5d3c6c05e6a0b07f0b816afe2281a86f9f1",
-              "time": "2026-11-17T01:13Z"
-            },
-            {
-              "kind": "commit",
-              "title": "[NTOS:KE][KERNEL32_APITEST] Let Sleep(0) hand the processor to a lower-priority thread",
-              "url": "https://github.com/LiberNT/LiberNT/commit/5a88f83e00e0ddbb668839f152c8868affcaac78",
-              "time": "2026-11-17T01:13Z"
-            },
-            {
-              "kind": "commit",
-              "title": "[DXGKRNL][D3DKMT_APITEST] Report WDDM 2.0 for an adapter that runs it",
-              "url": "https://github.com/LiberNT/LiberNT/commit/6d0ce51a412145b8f6adf3677fa977219710c112",
               "time": "2026-11-17T01:13Z"
             },
             {
@@ -637,12 +631,6 @@
               "title": "[HDGFX] Demand-start the hdgfx service",
               "url": "https://github.com/LiberNT/LiberNT/pull/473",
               "time": "2026-11-16T16:43Z"
-            },
-            {
-              "kind": "pr",
-              "title": "[NTOS] Implement SystemPhysicalMemoryInformation query",
-              "url": "https://github.com/LiberNT/LiberNT/pull/472",
-              "time": "2026-11-16T16:25Z"
             },
             {
               "kind": "issue",
@@ -678,7 +666,7 @@
             "issue": 7,
             "pr": 15
           },
-          "mergedPrs": 178,
+          "mergedPrs": 180,
           "commitsLowerBound": true,
           "versionChanges": [],
           "metrics": {
@@ -687,7 +675,7 @@
               "delta": null
             },
             "open_prs": {
-              "current": 31,
+              "current": 29,
               "delta": null
             },
             "forks": {
@@ -706,6 +694,30 @@
           "notable": [
             {
               "kind": "commit",
+              "title": "[LIBERNT] Translate the drivers entry of the components page into Japanese",
+              "url": "https://github.com/LiberNT/LiberNT/commit/80361528ca5ece76d5b05cb5ad1e6411f88ef3a3",
+              "time": "2026-11-17T04:55Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[EXPLORER] Load the start menu's strings from the resources",
+              "url": "https://github.com/LiberNT/LiberNT/commit/9680fba1001d71e7da6e23c766baef2b9e7a0f69",
+              "time": "2026-11-17T04:55Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[MSCTFP][MSCTF_APITEST] Add the proxies of the language bar interfaces",
+              "url": "https://github.com/LiberNT/LiberNT/commit/53467c57e316c03a85c07f0c27f1c36af1fff5b0",
+              "time": "2026-11-17T04:53Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[MSCTFP][MSCTF_APITEST] Add the proxies of the language bar interfaces",
+              "url": "https://github.com/LiberNT/LiberNT/pull/485",
+              "time": "2026-11-17T03:14Z"
+            },
+            {
+              "kind": "commit",
               "title": "[WINED3D] Read a WDDM adapter's identity once per adapter",
               "url": "https://github.com/LiberNT/LiberNT/commit/1ba5e910c1e8abcf4b8266bd39a0d859060ccd41",
               "time": "2026-11-17T01:13Z"
@@ -714,24 +726,6 @@
               "kind": "commit",
               "title": "[DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CPU host aperture takes",
               "url": "https://github.com/LiberNT/LiberNT/commit/397727289abc43b13239f8bac9a985e7f55dba1e",
-              "time": "2026-11-17T01:13Z"
-            },
-            {
-              "kind": "commit",
-              "title": "[APISETS][SHCORE_APITEST] Host the WinRT stream API set on shcore",
-              "url": "https://github.com/LiberNT/LiberNT/commit/49bbd5d3c6c05e6a0b07f0b816afe2281a86f9f1",
-              "time": "2026-11-17T01:13Z"
-            },
-            {
-              "kind": "commit",
-              "title": "[NTOS:KE][KERNEL32_APITEST] Let Sleep(0) hand the processor to a lower-priority thread",
-              "url": "https://github.com/LiberNT/LiberNT/commit/5a88f83e00e0ddbb668839f152c8868affcaac78",
-              "time": "2026-11-17T01:13Z"
-            },
-            {
-              "kind": "commit",
-              "title": "[DXGKRNL][D3DKMT_APITEST] Report WDDM 2.0 for an adapter that runs it",
-              "url": "https://github.com/LiberNT/LiberNT/commit/6d0ce51a412145b8f6adf3677fa977219710c112",
               "time": "2026-11-17T01:13Z"
             },
             {
@@ -769,12 +763,6 @@
               "title": "[HDGFX] Demand-start the hdgfx service",
               "url": "https://github.com/LiberNT/LiberNT/pull/473",
               "time": "2026-11-16T16:43Z"
-            },
-            {
-              "kind": "pr",
-              "title": "[NTOS] Implement SystemPhysicalMemoryInformation query",
-              "url": "https://github.com/LiberNT/LiberNT/pull/472",
-              "time": "2026-11-16T16:25Z"
             },
             {
               "kind": "issue",
@@ -1295,12 +1283,12 @@
             {
               "channel": "kernel-ark",
               "version": "7.3.0-0.rc7.2f2f7eeef8b0.62",
-              "at": "2026-11-17T04:48Z"
+              "at": "2026-11-17T04:59Z"
             },
             {
               "channel": "kernel-ark",
               "version": "7.4.0-0.rc3.26",
-              "at": "2026-11-17T04:48Z"
+              "at": "2026-11-17T04:59Z"
             }
           ],
           "metrics": {},
@@ -1399,12 +1387,12 @@
             {
               "channel": "kernel-ark",
               "version": "7.3.0-0.rc7.2f2f7eeef8b0.62",
-              "at": "2026-11-17T04:48Z"
+              "at": "2026-11-17T04:59Z"
             },
             {
               "channel": "kernel-ark",
               "version": "7.4.0-0.rc3.26",
-              "at": "2026-11-17T04:48Z"
+              "at": "2026-11-17T04:59Z"
             }
           ],
           "metrics": {},

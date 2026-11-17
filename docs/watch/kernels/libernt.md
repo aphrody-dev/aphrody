@@ -8,8 +8,8 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Window | Commits | Releases | Issues opened | PRs opened | PRs merged | Discussions | Mail | Tags |
 | :-- | --: | --: | --: | --: | --: | --: | --: | --: |
-| 24h | 148 | 0 | 4 | 32 | 26 | 1 | 0 | 0 |
-| 7d | ≥300 | 0 | 38 | 213 | 178 | 3 | 0 | 0 |
+| 24h | 151 | 0 | 4 | 32 | 28 | 1 | 0 | 0 |
+| 7d | ≥300 | 0 | 38 | 213 | 180 | 3 | 0 | 0 |
 
 A leading ≥ marks a lower bound: the polled feed page does not reach back to the start of the window.
 
@@ -17,24 +17,24 @@ A leading ≥ marks a lower bound: the polled feed page does not reach back to t
 | :-- | --: | --: | --: |
 | forks | 0 | n/a | n/a |
 | open_issues | 74 | n/a | n/a |
-| open_prs | 31 | n/a | n/a |
+| open_prs | 29 | n/a | n/a |
 | size_kb | 953350 | n/a | n/a |
 | stars | 1173 | n/a | n/a |
 
 ## Notable (7d)
 
+- 2026-11-17T04:55Z commit: [[LIBERNT] Translate the drivers entry of the components page into Japanese](https://github.com/LiberNT/LiberNT/commit/80361528ca5ece76d5b05cb5ad1e6411f88ef3a3)
+- 2026-11-17T04:55Z commit: [[EXPLORER] Load the start menu's strings from the resources](https://github.com/LiberNT/LiberNT/commit/9680fba1001d71e7da6e23c766baef2b9e7a0f69)
+- 2026-11-17T04:53Z commit: [[MSCTFP][MSCTF_APITEST] Add the proxies of the language bar interfaces](https://github.com/LiberNT/LiberNT/commit/53467c57e316c03a85c07f0c27f1c36af1fff5b0)
+- 2026-11-17T03:14Z pr: [[MSCTFP][MSCTF_APITEST] Add the proxies of the language bar interfaces](https://github.com/LiberNT/LiberNT/pull/485)
 - 2026-11-17T01:13Z commit: [[WINED3D] Read a WDDM adapter's identity once per adapter](https://github.com/LiberNT/LiberNT/commit/1ba5e910c1e8abcf4b8266bd39a0d859060ccd41)
 - 2026-11-17T01:13Z commit: [[DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CPU host aperture tak…](https://github.com/LiberNT/LiberNT/commit/397727289abc43b13239f8bac9a985e7f55dba1e)
-- 2026-11-17T01:13Z commit: [[APISETS][SHCORE_APITEST] Host the WinRT stream API set on shcore](https://github.com/LiberNT/LiberNT/commit/49bbd5d3c6c05e6a0b07f0b816afe2281a86f9f1)
-- 2026-11-17T01:13Z commit: [[NTOS:KE][KERNEL32_APITEST] Let Sleep(0) hand the processor to a lower-priority thread](https://github.com/LiberNT/LiberNT/commit/5a88f83e00e0ddbb668839f152c8868affcaac78)
-- 2026-11-17T01:13Z commit: [[DXGKRNL][D3DKMT_APITEST] Report WDDM 2.0 for an adapter that runs it](https://github.com/LiberNT/LiberNT/commit/6d0ce51a412145b8f6adf3677fa977219710c112)
 - 2026-11-16T23:30Z pr: [[MSCTF][MSCTF_APITEST] Notify the application when a text service writes into a compositi…](https://github.com/LiberNT/LiberNT/pull/480)
 - 2026-11-16T21:09Z pr: [Touch screen fixes: double tap tolerance, Enter activation test](https://github.com/LiberNT/LiberNT/pull/477)
 - 2026-11-16T19:56Z discussion: [Boot Liber NT on the Raspbarry pi zero 2 w](https://github.com/LiberNT/LiberNT/discussions/476)
 - 2026-11-16T18:36Z issue: [You are repeating the same mistakes as Microsoft when it comes to the user interface](https://github.com/LiberNT/LiberNT/issues/475)
 - 2026-11-16T18:27Z pr: [[TASKMGR11][UXTHEME] Show Task Manager in under 50 ms and parse each theme once](https://github.com/LiberNT/LiberNT/pull/474)
 - 2026-11-16T16:43Z pr: [[HDGFX] Demand-start the hdgfx service](https://github.com/LiberNT/LiberNT/pull/473)
-- 2026-11-16T16:25Z pr: [[NTOS] Implement SystemPhysicalMemoryInformation query](https://github.com/LiberNT/LiberNT/pull/472)
 - 2026-11-16T12:58Z issue: [[WOW64WIN] CREATESTRUCT rebasing corrupts NULL titles and class atoms in CWP/CWPRET hooks](https://github.com/LiberNT/LiberNT/issues/464)
 - 2026-11-16T08:45Z issue: [Linux subsystem I/O errors after a large number of file operations](https://github.com/LiberNT/LiberNT/issues/452)
 - 2026-11-12T18:55Z discussion: [thank you for your work](https://github.com/LiberNT/LiberNT/discussions/321)

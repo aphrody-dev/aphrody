@@ -8,10 +8,10 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Rank | Kernel | Channel | Version | Behind mainline rc | Behind stable | First seen |
 | --: | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | Arch Linux | aur/linux-mainline | 7.4rc3-1 | at rc | 1 cycle ahead | 2026-11-17T04:48Z |
-| 2 | Arch Linux | core/linux | 7.3.4.arch1 | 1 cycle | current | 2026-11-17T04:48Z |
-| 3 | Arch Linux | extra/linux-zen | 7.3.4.zen2 | 1 cycle | current | 2026-11-17T04:48Z |
-| 4 | Arch Linux | core/linux-lts | 6.18.63 | 6 cycles | 5 cycles | 2026-11-17T04:48Z |
+| 1 | Arch Linux | aur/linux-mainline | 7.4rc3-1 | at rc | 1 cycle ahead | 2026-11-17T04:59Z |
+| 2 | Arch Linux | core/linux | 7.3.4.arch1 | 1 cycle | current | 2026-11-17T04:59Z |
+| 3 | Arch Linux | extra/linux-zen | 7.3.4.zen2 | 1 cycle | current | 2026-11-17T04:59Z |
+| 4 | Arch Linux | core/linux-lts | 6.18.63 | 6 cycles | 5 cycles | 2026-11-17T04:59Z |
 
 ## Activity
 

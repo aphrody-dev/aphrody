@@ -103,12 +103,6 @@
       ],
       "latestReleases": [
         {
-          "title": "Linux next-20261116 (linux-next)",
-          "version": "next-20261116",
-          "url": "https://git.kernel.org/next/linux-next/h/next-20261116",
-          "time": "2026-11-16T20:59Z"
-        },
-        {
           "title": "Linux 7.4-rc3 (mainline)",
           "version": "7.4-rc3",
           "url": "https://git.kernel.org/torvalds/h/v7.4-rc3",
@@ -119,6 +113,12 @@
           "version": "7.3.4",
           "url": "https://git.kernel.org/stable/h/v7.3.4",
           "time": "2026-11-10T18:11Z"
+        },
+        {
+          "title": "Linux 6.18.63 (longterm)",
+          "version": "6.18.63",
+          "url": "https://git.kernel.org/stable/h/v6.18.63",
+          "time": "2026-11-10T18:07Z"
         }
       ],
       "repositories": []
@@ -901,7 +901,7 @@
           "name": "LiberNT/LiberNT",
           "url": "https://github.com/LiberNT/LiberNT",
           "stars": 1173,
-          "pushed": "2026-11-17T03:49Z",
+          "pushed": "2026-11-17T04:55Z",
           "description": "A free Windows-compatible Operating System"
         },
         {
@@ -1081,6 +1081,13 @@
       ],
       "repositories": [
         {
+          "name": "CachyOS/statuspage",
+          "url": "https://github.com/CachyOS/statuspage",
+          "stars": 26,
+          "pushed": "2026-11-17T04:57Z",
+          "description": "📈 Uptime monitor and status page for CachyOS, powered by @upptime"
+        },
+        {
           "name": "CachyOS/cachyos-aur-derived",
           "url": "https://github.com/CachyOS/cachyos-aur-derived",
           "stars": 23,
@@ -1128,13 +1135,6 @@
           "stars": 110,
           "pushed": "2026-11-16T06:56Z",
           "description": "Linux kernel source tree"
-        },
-        {
-          "name": "CachyOS/statuspage",
-          "url": "https://github.com/CachyOS/statuspage",
-          "stars": 26,
-          "pushed": "2026-11-16T06:01Z",
-          "description": "📈 Uptime monitor and status page for CachyOS, powered by @upptime"
         },
         {
           "name": "CachyOS/proton-cachyos",
