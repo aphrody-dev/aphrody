@@ -6,7 +6,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::Result;
 use gpui_ui::gpui::ClickEvent;
 use gpui_ui::prelude::*;
-use gpui_ui::ui::{Callout, Divider, Indicator, Switch, TintColor};
+use gpui_ui::ui::{Callout, Divider, Indicator, Switch, SwitchLabelPosition, TintColor};
 use gpui_ui::{InputField, menu};
 use util::ResultExt as _;
 use workspace::Workspace;
@@ -470,6 +470,13 @@ impl VpnView {
                             this.select_location(LocationSelection::Any, cx);
                         })),
                 );
+                if self.countries.is_empty() {
+                    list = list.child(
+                        Label::new("The daemon has no relay list yet")
+                            .size(LabelSize::Small)
+                            .color(Color::Muted),
+                    );
+                }
                 for country in &self.countries {
                     list = list.child(self.render_country(country, &snapshot.selection, cx));
                 }
@@ -629,7 +636,7 @@ impl VpnView {
                     },
                 )
                 .label(toggle.label())
-                .full_width(true)
+                .label_position(SwitchLabelPosition::End)
                 .disabled(self.busy)
                 .on_click(cx.listener(
                     move |this, state: &ToggleState, _window, cx| {

@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context as _, Result, bail};
 use gpui::{AppContext as _, Bounds, HeadlessAppContext, WindowBounds, WindowOptions, px, size};
-use vpn_ui::{DaemonBackend, VpnView};
+use vpn_ui::{DaemonBackend, Toggle, VpnView};
 
 const SETTLE_TIMEOUT: Duration = Duration::from_secs(30);
 
@@ -75,6 +75,48 @@ fn main() -> Result<()> {
     let locations = output_dir.join("vpn_locations.png");
     cx.capture_screenshot(handle.into())?.save(&locations)?;
 
-    println!("{}\n{}", main_view.display(), locations.display());
+    // A write through the real daemon: flip IPv6, read it back, screenshot, then restore it.
+    let flipped = set_ipv6(&mut cx, handle, true)?;
+    let toggled = output_dir.join("vpn_ipv6_on.png");
+    cx.capture_screenshot(handle.into())?.save(&toggled)?;
+    let restored = set_ipv6(&mut cx, handle, false)?;
+    println!("ipv6 after enable: {flipped}, after restore: {restored}");
+
+    println!(
+        "{}\n{}\n{}",
+        main_view.display(),
+        locations.display(),
+        toggled.display()
+    );
     Ok(())
+}
+
+/// Sends the IPv6 switch to the daemon and waits until the polled snapshot shows it.
+fn set_ipv6(
+    cx: &mut HeadlessAppContext,
+    handle: gpui::WindowHandle<VpnView>,
+    enabled: bool,
+) -> Result<bool> {
+    cx.update(|app| {
+        handle.update(app, |view, _window, cx| {
+            view.set_toggle(Toggle::Ipv6, enabled, cx)
+        })
+    })?;
+    let started = Instant::now();
+    loop {
+        cx.run_until_parked();
+        let current = cx.update(|app| {
+            handle.read(app).map(|view| {
+                view.snapshot()
+                    .is_some_and(|snapshot| snapshot.is_enabled(Toggle::Ipv6))
+            })
+        })?;
+        if current == enabled {
+            return Ok(current);
+        }
+        if started.elapsed() > SETTLE_TIMEOUT {
+            bail!("the daemon did not apply the IPv6 switch within {SETTLE_TIMEOUT:?}");
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    }
 }
