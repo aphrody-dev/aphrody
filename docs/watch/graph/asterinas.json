@@ -1,0 +1,2111 @@
+{
+ "kernel": "asterinas",
+ "repos": [
+  {
+   "id": "asterinas",
+   "url": "https://github.com/asterinas/asterinas.git",
+   "branch": "main",
+   "commit": "f691f8ecccce1973120cabd66a13d5e8f92f33e6",
+   "commitDate": "2026-11-16T21:00:01-08:00",
+   "tree": {
+    "files": 2972,
+    "bytes": 12414440,
+    "lines": 333287,
+    "top": [
+     {
+      "name": "kernel/",
+      "files": 1255,
+      "bytes": 6855158,
+      "lines": 207703,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "ostd/",
+      "files": 362,
+      "bytes": 1959894,
+      "lines": 57569,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "test/",
+      "files": 844,
+      "bytes": 1604851,
+      "lines": 49230,
+      "topLanguage": "C"
+     },
+     {
+      "name": "book/",
+      "files": 210,
+      "bytes": 584523,
+      "lines": 408,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": ".agents/",
+      "files": 46,
+      "bytes": 434158,
+      "lines": 2422,
+      "topLanguage": "YAML"
+     },
+     {
+      "name": "osdk/",
+      "files": 103,
+      "bytes": 422836,
+      "lines": 10620,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "tools/",
+      "files": 47,
+      "bytes": 205565,
+      "lines": 4739,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "(root files)",
+      "files": 27,
+      "bytes": 168824,
+      "lines": 551,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": ".github/",
+      "files": 39,
+      "bytes": 112982,
+      "lines": 0,
+      "topLanguage": "YAML"
+     },
+     {
+      "name": "distro/",
+      "files": 35,
+      "bytes": 63755,
+      "lines": 45,
+      "topLanguage": "Shell"
+     },
+     {
+      "name": ".vscode/",
+      "files": 1,
+      "bytes": 1124,
+      "lines": 0,
+      "topLanguage": "JSON"
+     },
+     {
+      "name": ".devcontainer/",
+      "files": 1,
+      "bytes": 548,
+      "lines": 0,
+      "topLanguage": "JSON"
+     },
+     {
+      "name": ".claude/",
+      "files": 2,
+      "bytes": 222,
+      "lines": 0,
+      "topLanguage": "JSON"
+     }
+    ],
+    "languages": [
+     {
+      "language": "Rust",
+      "files": 1570,
+      "bytes": 9229184,
+      "lines": 279026
+     },
+     {
+      "language": "C",
+      "files": 253,
+      "bytes": 1026631,
+      "lines": 39422
+     },
+     {
+      "language": "Documentation",
+      "files": 175,
+      "bytes": 688879,
+      "lines": 0
+     },
+     {
+      "language": "Other",
+      "files": 331,
+      "bytes": 516390,
+      "lines": 0
+     },
+     {
+      "language": "YAML",
+      "files": 160,
+      "bytes": 358255,
+      "lines": 0
+     },
+     {
+      "language": "Shell",
+      "files": 197,
+      "bytes": 296083,
+      "lines": 9006
+     },
+     {
+      "language": "Assembly",
+      "files": 40,
+      "bytes": 96786,
+      "lines": 3610
+     },
+     {
+      "language": "TOML",
+      "files": 135,
+      "bytes": 68822,
+      "lines": 0
+     },
+     {
+      "language": "Text",
+      "files": 9,
+      "bytes": 61565,
+      "lines": 0
+     },
+     {
+      "language": "Make",
+      "files": 90,
+      "bytes": 54991,
+      "lines": 1871
+     },
+     {
+      "language": "Python",
+      "files": 3,
+      "bytes": 13772,
+      "lines": 352
+     },
+     {
+      "language": "JSON",
+      "files": 9,
+      "bytes": 3082,
+      "lines": 0
+     }
+    ]
+   },
+   "style": {
+    "present": [
+     ".editorconfig",
+     "rustfmt.toml",
+     "clippy.toml",
+     "rust-toolchain.toml",
+     "CODEOWNERS"
+    ],
+    "rustfmt.toml": {
+     "imports_granularity": "Crate",
+     "group_imports": "StdExternalCrate",
+     "reorder_imports": true,
+     "skip_macro_invocations": [
+      "chmod",
+      "mkmod",
+      "ioc"
+     ]
+    },
+    "clippy.toml": {
+     "check-inconsistent-struct-field-initializers": true
+    },
+    "rust-toolchain.toml": {
+     "toolchain": {
+      "channel": "nightly-2026-07-21",
+      "components": [
+       "rust-src",
+       "rustc-dev",
+       "llvm-tools-preview"
+      ],
+      "targets": [
+       "x86_64-unknown-none",
+       "riscv64imac-unknown-none-elf",
+       "loongarch64-unknown-none-softfloat",
+       "aarch64-unknown-none-softfloat"
+      ]
+     }
+    },
+    "editorconfig": {
+     "*": {
+      "root": "true",
+      "end_of_line": "lf",
+      "insert_final_newline": "true"
+     }
+    },
+    "workspaceLints": {
+     "rust": {
+      "redundant_imports": "warn",
+      "unexpected_cfgs": {
+       "level": "allow",
+       "check-cfg": [
+        "cfg(ktest)"
+       ]
+      },
+      "unreachable_pub": "warn",
+      "unused_qualifications": "warn"
+     },
+     "clippy": {
+      "allow_attributes": "warn",
+      "inconsistent_struct_constructor": "warn",
+      "redundant_test_prefix": "warn"
+     }
+    },
+    "workflows": [
+     "benchmark_x86.yml",
+     "benchmark_x86_tdx.yml",
+     "check_licenses.yml",
+     "close_stale_issues_and_prs.yml",
+     "invoke_aster_code_review.yml",
+     "publish_api_docs.yml",
+     "publish_aster_nixos.yml",
+     "publish_docker_images.yml",
+     "publish_osdk_and_ostd.yml",
+     "publish_sctrace.yml",
+     "publish_website.yml",
+     "push_cachix_dev.yml",
+     "push_cachix_prebuilt.yml",
+     "test_aarch64.yml",
+     "test_asterinas_vsock.yml",
+     "test_cargo_component.yml",
+     "test_devcontainer.yml",
+     "test_iso_image.yml",
+     "test_loongarch.yml",
+     "test_nix_flake.yml",
+     "test_nixos_full.yml",
+     "test_nixos_minimal.yml",
+     "test_riscv.yml",
+     "test_vmx.yml",
+     "test_x86.yml",
+     "test_x86_firecracker.yml",
+     "test_x86_tdx.yml",
+     "test_xfstests_full.yml",
+     "validate_scmls.yml"
+    ]
+   },
+   "cargo": {
+    "workspaceMembers": [
+     {
+      "name": "asterinas",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel",
+      "group": "kernel",
+      "workspaceDeps": [
+       "aster-core",
+       "aster-drm",
+       "aster-i8042",
+       "aster-simpledrm",
+       "aster-uart",
+       "ostd"
+      ],
+      "externalDeps": 0,
+      "features": 5
+     },
+     {
+      "name": "aster-drm",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/comps/drm",
+      "group": "kernel/comps",
+      "workspaceDeps": [
+       "aster-core",
+       "aster-util",
+       "atomic-integer-wrapper",
+       "device-id",
+       "int-to-c-enum",
+       "ostd",
+       "ostd-pod",
+       "sparse-id-alloc"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "aster-i8042",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/comps/i8042",
+      "group": "kernel/comps",
+      "workspaceDeps": [
+       "aster-cmdline",
+       "aster-core",
+       "aster-input",
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "aster-simpledrm",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/comps/simpledrm",
+      "group": "kernel/comps",
+      "workspaceDeps": [
+       "aster-core",
+       "aster-drm",
+       "aster-framebuffer",
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "aster-uart",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/comps/uart",
+      "group": "kernel/comps",
+      "workspaceDeps": [
+       "aster-console",
+       "aster-util",
+       "component",
+       "fdt-util",
+       "ostd"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "aster-core",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "align_ext",
+       "aster-bigtcp",
+       "aster-block",
+       "aster-cmdline",
+       "aster-console",
+       "aster-device",
+       "aster-framebuffer",
+       "aster-fuse",
+       "aster-input",
+       "aster-logger",
+       "aster-network",
+       "aster-nvme",
+       "aster-rights",
+       "aster-rights-proc",
+       "aster-softirq",
+       "aster-systree",
+       "aster-time",
+       "aster-util",
+       "aster-virtio",
+       "atomic-integer-wrapper",
+       "component",
+       "cpio-decoder",
+       "device-id",
+       "id-alloc",
+       "int-to-c-enum",
+       "io-util",
+       "jhash",
+       "keyable-arc",
+       "logo-ascii-art",
+       "osdk-frame-allocator",
+       "osdk-heap-allocator",
+       "ostd",
+       "ostd-pod",
+       "ring-buffer",
+       "short-vis-path",
+       "sparse-id-alloc",
+       "typeflags",
+       "typeflags-util",
+       "xarray"
+      ],
+      "externalDeps": 23,
+      "features": 5
+     },
+     {
+      "name": "aster-block",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/block",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "align_ext",
+       "aster-util",
+       "component",
+       "device-id",
+       "dma-pool",
+       "id-alloc",
+       "int-to-c-enum",
+       "io-util",
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "aster-cmdline",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/cmdline",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "aster-console",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/console",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "aster-device",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/device",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-systree",
+       "aster-util",
+       "component",
+       "device-id",
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "aster-framebuffer",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/framebuffer",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "align_ext",
+       "component",
+       "int-to-c-enum",
+       "ostd"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "aster-input",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/input",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "component",
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "aster-logger",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/logger",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-console",
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 2
+     },
+     {
+      "name": "aster-mlsdisk",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/mlsdisk",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-block",
+       "component",
+       "device-id",
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 10,
+      "features": 0
+     },
+     {
+      "name": "aster-network",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/network",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-bigtcp",
+       "aster-softirq",
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "aster-nvme",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/nvme",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-block",
+       "aster-pci",
+       "aster-util",
+       "component",
+       "device-id",
+       "io-util",
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "aster-pci",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/pci",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "align_ext",
+       "component",
+       "fdt-util",
+       "int-to-c-enum",
+       "ostd"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "aster-softirq",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/softirq",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-util",
+       "component",
+       "ostd"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "aster-systree",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/systree",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-util",
+       "component",
+       "id-alloc",
+       "ostd"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "aster-time",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/time",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-util",
+       "component",
+       "fdt-util",
+       "ostd"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "aster-virtio",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/core/comps/virtio",
+      "group": "kernel/core",
+      "workspaceDeps": [
+       "aster-bigtcp",
+       "aster-block",
+       "aster-cmdline",
+       "aster-console",
+       "aster-fuse",
+       "aster-input",
+       "aster-network",
+       "aster-pci",
+       "aster-rights",
+       "aster-softirq",
+       "aster-util",
+       "component",
+       "device-id",
+       "dma-pool",
+       "fdt-util",
+       "id-alloc",
+       "int-to-c-enum",
+       "io-util",
+       "ostd",
+       "ostd-pod",
+       "short-vis-path",
+       "typeflags-util"
+      ],
+      "externalDeps": 5,
+      "features": 2
+     },
+     {
+      "name": "aster-bigtcp",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/aster-bigtcp",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "aster-softirq",
+       "aster-util",
+       "dma-pool",
+       "int-to-c-enum",
+       "jhash",
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "aster-fuse",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/aster-fuse",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "int-to-c-enum",
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "aster-rights",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/aster-rights",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "typeflags",
+       "typeflags-util"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "aster-rights-proc",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/aster-rights-proc",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "aster-util",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/aster-util",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "aster-rights",
+       "aster-rights-proc",
+       "osdk-heap-allocator",
+       "ostd",
+       "ostd-pod",
+       "typeflags-util"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "atomic-integer-wrapper",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/atomic-integer-wrapper",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "component",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/comp-sys/component",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "component-macro"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "component-macro",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/comp-sys/component-macro",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "cpio-decoder",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/cpio-decoder",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "int-to-c-enum"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "device-id",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/device-id",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "aster-util"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "dma-pool",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/dma-pool",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "aster-softirq",
+       "aster-util",
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "fdt-util",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/fdt-util",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "ostd"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "io-util",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/io-util",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "jhash",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/jhash",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "keyable-arc",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/keyable-arc",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "logo-ascii-art",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/logo-ascii-art",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 1,
+      "features": 3
+     },
+     {
+      "name": "ring-buffer",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/ring-buffer",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "ostd",
+       "ostd-pod"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "short-vis-path",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/short-vis-path",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "sparse-id-alloc",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/sparse-id-alloc",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "typeflags",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/typeflags",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "typeflags-util",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/typeflags-util",
+      "group": "kernel/libs",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "xarray",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "kernel/libs/xarray",
+      "group": "kernel/libs",
+      "workspaceDeps": [
+       "ostd"
+      ],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "osdk-frame-allocator",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "osdk/deps/frame-allocator",
+      "group": "osdk",
+      "workspaceDeps": [
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "osdk-heap-allocator",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "osdk/deps/heap-allocator",
+      "group": "osdk",
+      "workspaceDeps": [
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "osdk-test-kernel",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "osdk/deps/test-kernel",
+      "group": "osdk",
+      "workspaceDeps": [
+       "ostd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "ostd",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "ostd",
+      "group": "ostd",
+      "workspaceDeps": [
+       "align_ext",
+       "id-alloc",
+       "int-to-c-enum",
+       "linux-boot-params",
+       "ostd-macros",
+       "ostd-pod",
+       "ostd-test"
+      ],
+      "externalDeps": 28,
+      "features": 6
+     },
+     {
+      "name": "align_ext",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "ostd/libs/align_ext",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "id-alloc",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "ostd/libs/id-alloc",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "int-to-c-enum",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "ostd/libs/int-to-c-enum",
+      "group": "ostd",
+      "workspaceDeps": [
+       "int-to-c-enum-derive"
+      ],
+      "externalDeps": 0,
+      "features": 3
+     },
+     {
+      "name": "int-to-c-enum-derive",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "ostd/libs/int-to-c-enum/derive",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "linux-boot-params",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "ostd/libs/linux-bzimage/boot-params",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "linux-bzimage-builder",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "ostd/libs/linux-bzimage/builder",
+      "group": "ostd",
+      "workspaceDeps": [
+       "align_ext",
+       "ostd-pod"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "linux-bzimage-setup",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "ostd/libs/linux-bzimage/setup",
+      "group": "ostd",
+      "workspaceDeps": [
+       "linux-boot-params"
+      ],
+      "externalDeps": 8,
+      "features": 3
+     },
+     {
+      "name": "ostd-macros",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "ostd/libs/ostd-macros",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "ostd-pod",
+      "version": "0.4.0",
+      "edition": "2024",
+      "path": "ostd/libs/ostd-pod",
+      "group": "ostd",
+      "workspaceDeps": [
+       "ostd-pod-macros",
+       "padding-struct"
+      ],
+      "externalDeps": 1,
+      "features": 4
+     },
+     {
+      "name": "ostd-pod-macros",
+      "version": "0.4.0",
+      "edition": "2024",
+      "path": "ostd/libs/ostd-pod/macros",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "ostd-test",
+      "version": "0.19.0",
+      "edition": "2024",
+      "path": "ostd/libs/ostd-test",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "padding-struct",
+      "version": "0.2.0",
+      "edition": "2024",
+      "path": "ostd/libs/padding-struct",
+      "group": "ostd",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     }
+    ],
+    "internalEdges": [
+     [
+      "aster-bigtcp",
+      "aster-softirq"
+     ],
+     [
+      "aster-bigtcp",
+      "aster-util"
+     ],
+     [
+      "aster-bigtcp",
+      "dma-pool"
+     ],
+     [
+      "aster-bigtcp",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-bigtcp",
+      "jhash"
+     ],
+     [
+      "aster-bigtcp",
+      "ostd"
+     ],
+     [
+      "aster-bigtcp",
+      "ostd-pod"
+     ],
+     [
+      "aster-block",
+      "align_ext"
+     ],
+     [
+      "aster-block",
+      "aster-util"
+     ],
+     [
+      "aster-block",
+      "component"
+     ],
+     [
+      "aster-block",
+      "device-id"
+     ],
+     [
+      "aster-block",
+      "dma-pool"
+     ],
+     [
+      "aster-block",
+      "id-alloc"
+     ],
+     [
+      "aster-block",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-block",
+      "io-util"
+     ],
+     [
+      "aster-block",
+      "ostd"
+     ],
+     [
+      "aster-block",
+      "ostd-pod"
+     ],
+     [
+      "aster-cmdline",
+      "component"
+     ],
+     [
+      "aster-cmdline",
+      "ostd"
+     ],
+     [
+      "aster-console",
+      "component"
+     ],
+     [
+      "aster-console",
+      "ostd"
+     ],
+     [
+      "aster-core",
+      "align_ext"
+     ],
+     [
+      "aster-core",
+      "aster-bigtcp"
+     ],
+     [
+      "aster-core",
+      "aster-block"
+     ],
+     [
+      "aster-core",
+      "aster-cmdline"
+     ],
+     [
+      "aster-core",
+      "aster-console"
+     ],
+     [
+      "aster-core",
+      "aster-device"
+     ],
+     [
+      "aster-core",
+      "aster-framebuffer"
+     ],
+     [
+      "aster-core",
+      "aster-fuse"
+     ],
+     [
+      "aster-core",
+      "aster-input"
+     ],
+     [
+      "aster-core",
+      "aster-logger"
+     ],
+     [
+      "aster-core",
+      "aster-network"
+     ],
+     [
+      "aster-core",
+      "aster-nvme"
+     ],
+     [
+      "aster-core",
+      "aster-rights"
+     ],
+     [
+      "aster-core",
+      "aster-rights-proc"
+     ],
+     [
+      "aster-core",
+      "aster-softirq"
+     ],
+     [
+      "aster-core",
+      "aster-systree"
+     ],
+     [
+      "aster-core",
+      "aster-time"
+     ],
+     [
+      "aster-core",
+      "aster-util"
+     ],
+     [
+      "aster-core",
+      "aster-virtio"
+     ],
+     [
+      "aster-core",
+      "atomic-integer-wrapper"
+     ],
+     [
+      "aster-core",
+      "component"
+     ],
+     [
+      "aster-core",
+      "cpio-decoder"
+     ],
+     [
+      "aster-core",
+      "device-id"
+     ],
+     [
+      "aster-core",
+      "id-alloc"
+     ],
+     [
+      "aster-core",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-core",
+      "io-util"
+     ],
+     [
+      "aster-core",
+      "jhash"
+     ],
+     [
+      "aster-core",
+      "keyable-arc"
+     ],
+     [
+      "aster-core",
+      "logo-ascii-art"
+     ],
+     [
+      "aster-core",
+      "osdk-frame-allocator"
+     ],
+     [
+      "aster-core",
+      "osdk-heap-allocator"
+     ],
+     [
+      "aster-core",
+      "ostd"
+     ],
+     [
+      "aster-core",
+      "ostd-pod"
+     ],
+     [
+      "aster-core",
+      "ring-buffer"
+     ],
+     [
+      "aster-core",
+      "short-vis-path"
+     ],
+     [
+      "aster-core",
+      "sparse-id-alloc"
+     ],
+     [
+      "aster-core",
+      "typeflags"
+     ],
+     [
+      "aster-core",
+      "typeflags-util"
+     ],
+     [
+      "aster-core",
+      "xarray"
+     ],
+     [
+      "aster-device",
+      "aster-systree"
+     ],
+     [
+      "aster-device",
+      "aster-util"
+     ],
+     [
+      "aster-device",
+      "component"
+     ],
+     [
+      "aster-device",
+      "device-id"
+     ],
+     [
+      "aster-device",
+      "ostd"
+     ],
+     [
+      "aster-drm",
+      "aster-core"
+     ],
+     [
+      "aster-drm",
+      "aster-util"
+     ],
+     [
+      "aster-drm",
+      "atomic-integer-wrapper"
+     ],
+     [
+      "aster-drm",
+      "device-id"
+     ],
+     [
+      "aster-drm",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-drm",
+      "ostd"
+     ],
+     [
+      "aster-drm",
+      "ostd-pod"
+     ],
+     [
+      "aster-drm",
+      "sparse-id-alloc"
+     ],
+     [
+      "aster-framebuffer",
+      "align_ext"
+     ],
+     [
+      "aster-framebuffer",
+      "component"
+     ],
+     [
+      "aster-framebuffer",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-framebuffer",
+      "ostd"
+     ],
+     [
+      "aster-fuse",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-fuse",
+      "ostd"
+     ],
+     [
+      "aster-fuse",
+      "ostd-pod"
+     ],
+     [
+      "aster-i8042",
+      "aster-cmdline"
+     ],
+     [
+      "aster-i8042",
+      "aster-core"
+     ],
+     [
+      "aster-i8042",
+      "aster-input"
+     ],
+     [
+      "aster-i8042",
+      "component"
+     ],
+     [
+      "aster-i8042",
+      "ostd"
+     ],
+     [
+      "aster-input",
+      "component"
+     ],
+     [
+      "aster-input",
+      "ostd"
+     ],
+     [
+      "aster-input",
+      "ostd-pod"
+     ],
+     [
+      "aster-logger",
+      "aster-console"
+     ],
+     [
+      "aster-logger",
+      "component"
+     ],
+     [
+      "aster-logger",
+      "ostd"
+     ],
+     [
+      "aster-mlsdisk",
+      "aster-block"
+     ],
+     [
+      "aster-mlsdisk",
+      "component"
+     ],
+     [
+      "aster-mlsdisk",
+      "device-id"
+     ],
+     [
+      "aster-mlsdisk",
+      "ostd"
+     ],
+     [
+      "aster-mlsdisk",
+      "ostd-pod"
+     ],
+     [
+      "aster-network",
+      "aster-bigtcp"
+     ],
+     [
+      "aster-network",
+      "aster-softirq"
+     ],
+     [
+      "aster-network",
+      "component"
+     ],
+     [
+      "aster-network",
+      "ostd"
+     ],
+     [
+      "aster-nvme",
+      "aster-block"
+     ],
+     [
+      "aster-nvme",
+      "aster-pci"
+     ],
+     [
+      "aster-nvme",
+      "aster-util"
+     ],
+     [
+      "aster-nvme",
+      "component"
+     ],
+     [
+      "aster-nvme",
+      "device-id"
+     ],
+     [
+      "aster-nvme",
+      "io-util"
+     ],
+     [
+      "aster-nvme",
+      "ostd"
+     ],
+     [
+      "aster-nvme",
+      "ostd-pod"
+     ],
+     [
+      "aster-pci",
+      "align_ext"
+     ],
+     [
+      "aster-pci",
+      "component"
+     ],
+     [
+      "aster-pci",
+      "fdt-util"
+     ],
+     [
+      "aster-pci",
+      "fdt-util"
+     ],
+     [
+      "aster-pci",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-pci",
+      "ostd"
+     ],
+     [
+      "aster-rights",
+      "typeflags"
+     ],
+     [
+      "aster-rights",
+      "typeflags-util"
+     ],
+     [
+      "aster-simpledrm",
+      "aster-core"
+     ],
+     [
+      "aster-simpledrm",
+      "aster-drm"
+     ],
+     [
+      "aster-simpledrm",
+      "aster-framebuffer"
+     ],
+     [
+      "aster-simpledrm",
+      "component"
+     ],
+     [
+      "aster-simpledrm",
+      "ostd"
+     ],
+     [
+      "aster-softirq",
+      "aster-util"
+     ],
+     [
+      "aster-softirq",
+      "component"
+     ],
+     [
+      "aster-softirq",
+      "ostd"
+     ],
+     [
+      "aster-systree",
+      "aster-util"
+     ],
+     [
+      "aster-systree",
+      "component"
+     ],
+     [
+      "aster-systree",
+      "id-alloc"
+     ],
+     [
+      "aster-systree",
+      "ostd"
+     ],
+     [
+      "aster-time",
+      "aster-util"
+     ],
+     [
+      "aster-time",
+      "component"
+     ],
+     [
+      "aster-time",
+      "fdt-util"
+     ],
+     [
+      "aster-time",
+      "fdt-util"
+     ],
+     [
+      "aster-time",
+      "fdt-util"
+     ],
+     [
+      "aster-time",
+      "ostd"
+     ],
+     [
+      "aster-uart",
+      "aster-console"
+     ],
+     [
+      "aster-uart",
+      "aster-util"
+     ],
+     [
+      "aster-uart",
+      "component"
+     ],
+     [
+      "aster-uart",
+      "fdt-util"
+     ],
+     [
+      "aster-uart",
+      "fdt-util"
+     ],
+     [
+      "aster-uart",
+      "ostd"
+     ],
+     [
+      "aster-util",
+      "aster-rights"
+     ],
+     [
+      "aster-util",
+      "aster-rights-proc"
+     ],
+     [
+      "aster-util",
+      "osdk-heap-allocator"
+     ],
+     [
+      "aster-util",
+      "ostd"
+     ],
+     [
+      "aster-util",
+      "ostd-pod"
+     ],
+     [
+      "aster-util",
+      "typeflags-util"
+     ],
+     [
+      "aster-virtio",
+      "aster-bigtcp"
+     ],
+     [
+      "aster-virtio",
+      "aster-block"
+     ],
+     [
+      "aster-virtio",
+      "aster-cmdline"
+     ],
+     [
+      "aster-virtio",
+      "aster-console"
+     ],
+     [
+      "aster-virtio",
+      "aster-fuse"
+     ],
+     [
+      "aster-virtio",
+      "aster-input"
+     ],
+     [
+      "aster-virtio",
+      "aster-network"
+     ],
+     [
+      "aster-virtio",
+      "aster-pci"
+     ],
+     [
+      "aster-virtio",
+      "aster-rights"
+     ],
+     [
+      "aster-virtio",
+      "aster-softirq"
+     ],
+     [
+      "aster-virtio",
+      "aster-util"
+     ],
+     [
+      "aster-virtio",
+      "component"
+     ],
+     [
+      "aster-virtio",
+      "device-id"
+     ],
+     [
+      "aster-virtio",
+      "dma-pool"
+     ],
+     [
+      "aster-virtio",
+      "fdt-util"
+     ],
+     [
+      "aster-virtio",
+      "fdt-util"
+     ],
+     [
+      "aster-virtio",
+      "id-alloc"
+     ],
+     [
+      "aster-virtio",
+      "int-to-c-enum"
+     ],
+     [
+      "aster-virtio",
+      "io-util"
+     ],
+     [
+      "aster-virtio",
+      "ostd"
+     ],
+     [
+      "aster-virtio",
+      "ostd-pod"
+     ],
+     [
+      "aster-virtio",
+      "short-vis-path"
+     ],
+     [
+      "aster-virtio",
+      "typeflags-util"
+     ],
+     [
+      "asterinas",
+      "aster-core"
+     ],
+     [
+      "asterinas",
+      "aster-drm"
+     ],
+     [
+      "asterinas",
+      "aster-i8042"
+     ],
+     [
+      "asterinas",
+      "aster-simpledrm"
+     ],
+     [
+      "asterinas",
+      "aster-uart"
+     ],
+     [
+      "asterinas",
+      "ostd"
+     ],
+     [
+      "component",
+      "component-macro"
+     ],
+     [
+      "cpio-decoder",
+      "int-to-c-enum"
+     ],
+     [
+      "device-id",
+      "aster-util"
+     ],
+     [
+      "dma-pool",
+      "aster-softirq"
+     ],
+     [
+      "dma-pool",
+      "aster-util"
+     ],
+     [
+      "dma-pool",
+      "ostd"
+     ],
+     [
+      "fdt-util",
+      "ostd"
+     ],
+     [
+      "fdt-util",
+      "ostd"
+     ],
+     [
+      "fdt-util",
+      "ostd"
+     ],
+     [
+      "int-to-c-enum",
+      "int-to-c-enum-derive"
+     ],
+     [
+      "linux-bzimage-builder",
+      "align_ext"
+     ],
+     [
+      "linux-bzimage-builder",
+      "ostd-pod"
+     ],
+     [
+      "linux-bzimage-setup",
+      "linux-boot-params"
+     ],
+     [
+      "osdk-frame-allocator",
+      "ostd"
+     ],
+     [
+      "osdk-heap-allocator",
+      "ostd"
+     ],
+     [
+      "osdk-test-kernel",
+      "ostd"
+     ],
+     [
+      "ostd",
+      "align_ext"
+     ],
+     [
+      "ostd",
+      "id-alloc"
+     ],
+     [
+      "ostd",
+      "int-to-c-enum"
+     ],
+     [
+      "ostd",
+      "linux-boot-params"
+     ],
+     [
+      "ostd",
+      "ostd-macros"
+     ],
+     [
+      "ostd",
+      "ostd-pod"
+     ],
+     [
+      "ostd",
+      "ostd-test"
+     ],
+     [
+      "ostd-pod",
+      "ostd-pod-macros"
+     ],
+     [
+      "ostd-pod",
+      "padding-struct"
+     ],
+     [
+      "ring-buffer",
+      "ostd"
+     ],
+     [
+      "ring-buffer",
+      "ostd-pod"
+     ],
+     [
+      "xarray",
+      "ostd"
+     ]
+    ],
+    "topExternal": [
+     {
+      "name": "spin",
+      "usedBy": 20
+     },
+     {
+      "name": "bitflags",
+      "usedBy": 14
+     },
+     {
+      "name": "zerocopy",
+      "usedBy": 13
+     },
+     {
+      "name": "proc-macro2",
+      "usedBy": 9
+     },
+     {
+      "name": "quote",
+      "usedBy": 9
+     },
+     {
+      "name": "syn",
+      "usedBy": 9
+     },
+     {
+      "name": "bitvec",
+      "usedBy": 7
+     },
+     {
+      "name": "inherit-methods-macro",
+      "usedBy": 7
+     },
+     {
+      "name": "fdt",
+      "usedBy": 4
+     },
+     {
+      "name": "log",
+      "usedBy": 4
+     },
+     {
+      "name": "smallvec",
+      "usedBy": 4
+     },
+     {
+      "name": "tdx-guest",
+      "usedBy": 4
+     },
+     {
+      "name": "hashbrown",
+      "usedBy": 3
+     },
+     {
+      "name": "inventory",
+      "usedBy": 3
+     },
+     {
+      "name": "lending-iterator",
+      "usedBy": 3
+     },
+     {
+      "name": "miniz_oxide",
+      "usedBy": 3
+     },
+     {
+      "name": "owo-colors",
+      "usedBy": 3
+     },
+     {
+      "name": "xmas-elf",
+      "usedBy": 3
+     },
+     {
+      "name": "intrusive-collections",
+      "usedBy": 2
+     },
+     {
+      "name": "itertools",
+      "usedBy": 2
+     },
+     {
+      "name": "json",
+      "usedBy": 2
+     },
+     {
+      "name": "loongArch64",
+      "usedBy": 2
+     },
+     {
+      "name": "lru",
+      "usedBy": 2
+     },
+     {
+      "name": "paste",
+      "usedBy": 2
+     },
+     {
+      "name": "rand",
+      "usedBy": 2
+     },
+     {
+      "name": "riscv",
+      "usedBy": 2
+     },
+     {
+      "name": "serde",
+      "usedBy": 2
+     },
+     {
+      "name": "takeable",
+      "usedBy": 2
+     },
+     {
+      "name": "x86_64",
+      "usedBy": 2
+     },
+     {
+      "name": "acpi",
+      "usedBy": 1
+     }
+    ],
+    "resolvedPackages": 225
+   },
+   "syscalls": {
+    "categories": [
+     {
+      "category": "file-and-directory-operations",
+      "scmlFiles": 10,
+      "fullyCovered": 60,
+      "flagLevel": 11
+     },
+     {
+      "category": "file-descriptor-and-io-control",
+      "scmlFiles": 10,
+      "fullyCovered": 18,
+      "flagLevel": 13
+     },
+     {
+      "category": "file-systems-and-mount-control",
+      "scmlFiles": 9,
+      "fullyCovered": 8,
+      "flagLevel": 10
+     },
+     {
+      "category": "inter-process-communication",
+      "scmlFiles": 5,
+      "fullyCovered": 1,
+      "flagLevel": 4
+     },
+     {
+      "category": "memory-management",
+      "scmlFiles": 6,
+      "fullyCovered": 1,
+      "flagLevel": 6
+     },
+     {
+      "category": "namespaces-cgroups-and-security",
+      "scmlFiles": 5,
+      "fullyCovered": 2,
+      "flagLevel": 5
+     },
+     {
+      "category": "networking-and-sockets",
+      "scmlFiles": 9,
+      "fullyCovered": 4,
+      "flagLevel": 13
+     },
+     {
+      "category": "process-and-thread-management",
+      "scmlFiles": 7,
+      "fullyCovered": 42,
+      "flagLevel": 8
+     },
+     {
+      "category": "signals-and-timers",
+      "scmlFiles": 6,
+      "fullyCovered": 19,
+      "flagLevel": 5
+     },
+     {
+      "category": "system-information-and-misc",
+      "scmlFiles": 8,
+      "fullyCovered": 7,
+      "flagLevel": 7
+     }
+    ],
+    "syscalls": 244,
+    "fullyCovered": 162
+   }
+  }
+ ]
+}

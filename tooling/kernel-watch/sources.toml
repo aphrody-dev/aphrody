@@ -893,3 +893,43 @@ version_from = '^\[redhat\] kernel-(\d+\.\d+\.\d+)-\d+'
 channel = "centos-stream-9"
 yields = ["commit", "version"]
 min_interval = "1h"
+
+# ------------------------------------------------------------------------------------------------ structure reports (phase B)
+# Blob-less shallow clones on the build host, one per repository; the reports go to docs/watch/graph/.
+
+[[clone]]
+id = "linux"
+kernel = "linux"
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
+branch = "master"
+
+[[clone]]
+id = "asterinas"
+kernel = "asterinas"
+url = "https://github.com/asterinas/asterinas.git"
+branch = "main"
+
+[[clone]]
+id = "redox-kernel"
+kernel = "redox"
+url = "https://gitlab.redox-os.org/redox-os/kernel.git"
+branch = "master"
+
+[[clone]]
+id = "redox-drivers"
+kernel = "redox"
+url = "https://gitlab.redox-os.org/redox-os/drivers.git"
+branch = "master"
+
+[[clone]]
+id = "redox-base"
+kernel = "redox"
+url = "https://gitlab.redox-os.org/redox-os/base.git"
+branch = "main"
+note = "the active successor of the drivers repository"
+
+[[clone]]
+id = "libernt"
+kernel = "libernt"
+url = "https://github.com/LiberNT/LiberNT.git"
+branch = "main-nt10"

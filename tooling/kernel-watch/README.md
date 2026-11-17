@@ -11,6 +11,7 @@ bun cli.ts search "io_uring" --kernel linux
 bun cli.ts status              # per-source poll state, failures, next allowed poll
 bun cli.ts build               # regenerate ../../docs/watch from the store
 bun cli.ts verify --write      # request every URL in the manifest live and record status and shape
+bun graph.ts clone|report      # structure reports; heavy, build host only (see below)
 bun test                       # hermetic: local Bun.serve replays fixtures/
 ```
 

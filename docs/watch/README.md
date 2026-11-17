@@ -6,4 +6,5 @@ Real-time-ish tracking of Linux, Asterinas, Redox, LiberNT and the distribution 
 - [State of the kernels](state-of-kernels.md): condensed context for agents
 - [Sources](sources.md): every endpoint, with the status and shape seen when it was verified
 - Per kernel: [Linux](kernels/linux.md), [Asterinas](kernels/asterinas.md), [Redox](kernels/redox.md), [LiberNT](kernels/libernt.md), [Android Common Kernel](kernels/android.md), [CachyOS](kernels/cachyos.md), [ChromiumOS kernel](kernels/chromiumos.md), [Alpine Linux](kernels/alpine.md), [NixOS](kernels/nixos.md), [Fedora](kernels/fedora.md), [Ubuntu](kernels/ubuntu.md), [Arch Linux](kernels/arch.md), [RHEL / CentOS Stream](kernels/rhel.md)
+- Structure reports (tree, languages, subsystems, dependency graph, style; built on the build host, see PLAN.md): [linux](graph/linux.md), [asterinas](graph/asterinas.md), [redox](graph/redox.md), [libernt](graph/libernt.md)
 - Machine-readable (for the site): `data/versions.json`, `data/digests.json`, `data/kernels.json`, `data/sources.json`

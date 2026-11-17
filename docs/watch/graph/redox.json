@@ -1,0 +1,3481 @@
+{
+ "kernel": "redox",
+ "repos": [
+  {
+   "id": "redox-kernel",
+   "url": "https://gitlab.redox-os.org/redox-os/kernel.git",
+   "branch": "master",
+   "commit": "8f0e965e99856fc6215294663fa1a9d1018a7eb2",
+   "commitDate": "2026-11-14T22:36:03+09:00",
+   "tree": {
+    "files": 267,
+    "bytes": 1670531,
+    "lines": 51076,
+    "top": [
+     {
+      "name": "src/",
+      "files": 197,
+      "bytes": 1384997,
+      "lines": 43661,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "syscall/",
+      "files": 21,
+      "bytes": 117297,
+      "lines": 4114,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "rmm/",
+      "files": 24,
+      "bytes": 100210,
+      "lines": 3057,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "(root files)",
+      "files": 14,
+      "bytes": 54529,
+      "lines": 244,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": "linkers/",
+      "files": 4,
+      "bytes": 5863,
+      "lines": 0,
+      "topLanguage": "Other"
+     },
+     {
+      "name": "res/",
+      "files": 1,
+      "bytes": 4096,
+      "lines": 0,
+      "topLanguage": "Other"
+     },
+     {
+      "name": "targets/",
+      "files": 4,
+      "bytes": 3097,
+      "lines": 0,
+      "topLanguage": "JSON"
+     },
+     {
+      "name": ".helix/",
+      "files": 2,
+      "bytes": 442,
+      "lines": 0,
+      "topLanguage": "TOML"
+     }
+    ],
+    "languages": [
+     {
+      "language": "Rust",
+      "files": 231,
+      "bytes": 1592514,
+      "lines": 50514
+     },
+     {
+      "language": "Other",
+      "files": 14,
+      "bytes": 30384,
+      "lines": 0
+     },
+     {
+      "language": "Documentation",
+      "files": 4,
+      "bytes": 22804,
+      "lines": 0
+     },
+     {
+      "language": "Assembly",
+      "files": 2,
+      "bytes": 7630,
+      "lines": 328
+     },
+     {
+      "language": "TOML",
+      "files": 7,
+      "bytes": 6292,
+      "lines": 0
+     },
+     {
+      "language": "Make",
+      "files": 1,
+      "bytes": 3375,
+      "lines": 124
+     },
+     {
+      "language": "JSON",
+      "files": 4,
+      "bytes": 3097,
+      "lines": 0
+     },
+     {
+      "language": "YAML",
+      "files": 1,
+      "bytes": 2692,
+      "lines": 0
+     },
+     {
+      "language": "Device tree",
+      "files": 2,
+      "bytes": 1576,
+      "lines": 103
+     },
+     {
+      "language": "Shell",
+      "files": 1,
+      "bytes": 167,
+      "lines": 7
+     }
+    ]
+   },
+   "style": {
+    "present": [
+     "rustfmt.toml",
+     "rust-toolchain.toml"
+    ],
+    "rustfmt.toml": {
+     "blank_lines_lower_bound": 0,
+     "blank_lines_upper_bound": 1,
+     "brace_style": "SameLineWhere",
+     "disable_all_formatting": false,
+     "edition": "2024",
+     "style_edition": "2015",
+     "empty_item_single_line": true,
+     "fn_single_line": false,
+     "force_explicit_abi": true,
+     "format_strings": false,
+     "hard_tabs": false,
+     "show_parse_errors": true,
+     "imports_granularity": "Crate",
+     "imports_indent": "Block",
+     "imports_layout": "Mixed",
+     "indent_style": "Block",
+     "max_width": 100,
+     "newline_style": "Unix",
+     "skip_children": false,
+     "tab_spaces": 4,
+     "trailing_comma": "Vertical",
+     "where_single_line": false
+    },
+    "rust-toolchain.toml": {
+     "toolchain": {
+      "channel": "nightly-2026-05-24",
+      "components": [
+       "rust-src"
+      ]
+     }
+    },
+    "lints": {
+     "clippy": {
+      "arithmetic_side_effects": "warn",
+      "cast_ptr_alignment": "warn",
+      "identity_op": "allow",
+      "if_same_then_else": "allow",
+      "indexing_slicing": "warn",
+      "many_single_char_names": "allow",
+      "module_inception": "allow",
+      "new_without_default": "allow",
+      "not_unsafe_ptr_arg_deref": "deny",
+      "or_fun_call": "allow",
+      "precedence": "deny",
+      "ptr_cast_constness": "deny",
+      "too_many_arguments": "allow",
+      "significant_drop_in_scrutinee": "deny",
+      "unwrap_used": "warn"
+     },
+     "rust": {
+      "static_mut_refs": "warn",
+      "unreachable_patterns": "deny",
+      "unused_must_use": "deny"
+     }
+    }
+   },
+   "cargo": {
+    "workspaceMembers": [
+     {
+      "name": "kernel",
+      "version": "0.5.12",
+      "edition": "2024",
+      "path": ".",
+      "group": ".",
+      "workspaceDeps": [
+       "redox_syscall",
+       "rmm"
+      ],
+      "externalDeps": 16,
+      "features": 16
+     },
+     {
+      "name": "rmm",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "rmm",
+      "group": "rmm",
+      "workspaceDeps": [],
+      "externalDeps": 1,
+      "features": 1
+     },
+     {
+      "name": "redox_syscall",
+      "version": "0.10.0",
+      "edition": "2021",
+      "path": "syscall",
+      "group": "syscall",
+      "workspaceDeps": [],
+      "externalDeps": 2,
+      "features": 5
+     }
+    ],
+    "internalEdges": [
+     [
+      "kernel",
+      "redox_syscall"
+     ],
+     [
+      "kernel",
+      "rmm"
+     ]
+    ],
+    "topExternal": [
+     {
+      "name": "bitflags",
+      "usedBy": 3
+     },
+     {
+      "name": "arrayvec",
+      "usedBy": 1
+     },
+     {
+      "name": "bitfield",
+      "usedBy": 1
+     },
+     {
+      "name": "cc",
+      "usedBy": 1
+     },
+     {
+      "name": "fdt",
+      "usedBy": 1
+     },
+     {
+      "name": "hashbrown",
+      "usedBy": 1
+     },
+     {
+      "name": "linked_list_allocator",
+      "usedBy": 1
+     },
+     {
+      "name": "object",
+      "usedBy": 1
+     },
+     {
+      "name": "raw-cpuid",
+      "usedBy": 1
+     },
+     {
+      "name": "rustc-demangle",
+      "usedBy": 1
+     },
+     {
+      "name": "rustc-std-workspace-core",
+      "usedBy": 1
+     },
+     {
+      "name": "sbi-rt",
+      "usedBy": 1
+     },
+     {
+      "name": "slab",
+      "usedBy": 1
+     },
+     {
+      "name": "smallvec",
+      "usedBy": 1
+     },
+     {
+      "name": "spin",
+      "usedBy": 1
+     },
+     {
+      "name": "toml",
+      "usedBy": 1
+     },
+     {
+      "name": "x86",
+      "usedBy": 1
+     }
+    ],
+    "resolvedPackages": 72
+   }
+  },
+  {
+   "id": "redox-drivers",
+   "url": "https://gitlab.redox-os.org/redox-os/drivers.git",
+   "branch": "master",
+   "commit": "20ffe4d7f4a85b7cc1f59495d7e6e355fed4cb06",
+   "commitDate": "2025-11-29T09:22:25-07:00",
+   "tree": {
+    "files": 244,
+    "bytes": 2035137,
+    "lines": 44050,
+    "top": [
+     {
+      "name": "storage/",
+      "files": 45,
+      "bytes": 744209,
+      "lines": 7145,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "usb/",
+      "files": 35,
+      "bytes": 321719,
+      "lines": 9257,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "net/",
+      "files": 29,
+      "bytes": 275321,
+      "lines": 7196,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "graphics/",
+      "files": 28,
+      "bytes": 118296,
+      "lines": 3814,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "pcid/",
+      "files": 15,
+      "bytes": 92437,
+      "lines": 2756,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "audio/",
+      "files": 16,
+      "bytes": 91165,
+      "lines": 3249,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "input/",
+      "files": 13,
+      "bytes": 81840,
+      "lines": 2840,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "acpid/",
+      "files": 7,
+      "bytes": 76507,
+      "lines": 2510,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "(root files)",
+      "files": 10,
+      "bytes": 56788,
+      "lines": 10,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": "virtio-core/",
+      "files": 12,
+      "bytes": 53070,
+      "lines": 1545,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "common/",
+      "files": 9,
+      "bytes": 34725,
+      "lines": 1158,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "inputd/",
+      "files": 3,
+      "bytes": 24830,
+      "lines": 801,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "amlserde/",
+      "files": 2,
+      "bytes": 17746,
+      "lines": 475,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "executor/",
+      "files": 2,
+      "bytes": 13204,
+      "lines": 396,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "vboxd/",
+      "files": 4,
+      "bytes": 11534,
+      "lines": 381,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "hwd/",
+      "files": 7,
+      "bytes": 8829,
+      "lines": 242,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "rtcd/",
+      "files": 3,
+      "bytes": 5066,
+      "lines": 173,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": ".gitlab/",
+      "files": 2,
+      "bytes": 4409,
+      "lines": 0,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": "pcid-spawner/",
+      "files": 2,
+      "bytes": 3442,
+      "lines": 102,
+      "topLanguage": "Rust"
+     }
+    ],
+    "languages": [
+     {
+      "language": "Rust",
+      "files": 163,
+      "bytes": 1394773,
+      "lines": 44040
+     },
+     {
+      "language": "Other",
+      "files": 17,
+      "bytes": 605698,
+      "lines": 0
+     },
+     {
+      "language": "TOML",
+      "files": 57,
+      "bytes": 18821,
+      "lines": 0
+     },
+     {
+      "language": "Documentation",
+      "files": 5,
+      "bytes": 15366,
+      "lines": 0
+     },
+     {
+      "language": "YAML",
+      "files": 1,
+      "bytes": 311,
+      "lines": 0
+     },
+     {
+      "language": "Shell",
+      "files": 1,
+      "bytes": 168,
+      "lines": 10
+     }
+    ]
+   },
+   "style": {
+    "present": [
+     "rust-toolchain.toml"
+    ],
+    "rust-toolchain.toml": {
+     "toolchain": {
+      "channel": "nightly-2025-10-03",
+      "components": [
+       "rust-src"
+      ]
+     }
+    }
+   },
+   "cargo": {
+    "workspaceMembers": [
+     {
+      "name": "acpid",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "acpid",
+      "group": "acpid",
+      "workspaceDeps": [
+       "amlserde",
+       "common"
+      ],
+      "externalDeps": 16,
+      "features": 0
+     },
+     {
+      "name": "amlserde",
+      "version": "0.0.1",
+      "edition": "2021",
+      "path": "amlserde",
+      "group": "amlserde",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "ac97d",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "audio/ac97d",
+      "group": "audio",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "ihdad",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "audio/ihdad",
+      "group": "audio",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "sb16d",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "audio/sb16d",
+      "group": "audio",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "common",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "common",
+      "group": "common",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "executor",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "executor",
+      "group": "executor",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "bgad",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/bgad",
+      "group": "graphics",
+      "workspaceDeps": [
+       "common",
+       "inputd",
+       "pcid"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "console-draw",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/console-draw",
+      "group": "graphics",
+      "workspaceDeps": [
+       "graphics-ipc"
+      ],
+      "externalDeps": 2,
+      "features": 1
+     },
+     {
+      "name": "driver-graphics",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/driver-graphics",
+      "group": "graphics",
+      "workspaceDeps": [
+       "common",
+       "graphics-ipc",
+       "inputd"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "fbbootlogd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/fbbootlogd",
+      "group": "graphics",
+      "workspaceDeps": [
+       "console-draw",
+       "graphics-ipc",
+       "inputd"
+      ],
+      "externalDeps": 7,
+      "features": 1
+     },
+     {
+      "name": "fbcond",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/fbcond",
+      "group": "graphics",
+      "workspaceDeps": [
+       "common",
+       "console-draw",
+       "graphics-ipc",
+       "inputd"
+      ],
+      "externalDeps": 8,
+      "features": 1
+     },
+     {
+      "name": "graphics-ipc",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/graphics-ipc",
+      "group": "graphics",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "vesad",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/vesad",
+      "group": "graphics",
+      "workspaceDeps": [
+       "common",
+       "driver-graphics",
+       "graphics-ipc",
+       "inputd"
+      ],
+      "externalDeps": 6,
+      "features": 1
+     },
+     {
+      "name": "virtio-gpud",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "graphics/virtio-gpud",
+      "group": "graphics",
+      "workspaceDeps": [
+       "common",
+       "driver-graphics",
+       "graphics-ipc",
+       "inputd",
+       "pcid",
+       "virtio-core"
+      ],
+      "externalDeps": 10,
+      "features": 0
+     },
+     {
+      "name": "hwd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "hwd",
+      "group": "hwd",
+      "workspaceDeps": [
+       "amlserde",
+       "common"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "ps2d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "input/ps2d",
+      "group": "input",
+      "workspaceDeps": [
+       "common",
+       "inputd"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "usbhidd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "input/usbhidd",
+      "group": "input",
+      "workspaceDeps": [
+       "common",
+       "inputd",
+       "xhcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "inputd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "inputd",
+      "group": "inputd",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "alxd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "net/alxd",
+      "group": "net",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "driver-network",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "net/driver-network",
+      "group": "net",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "e1000d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "net/e1000d",
+      "group": "net",
+      "workspaceDeps": [
+       "common",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "ixgbed",
+      "version": "1.0.0",
+      "edition": "2021",
+      "path": "net/ixgbed",
+      "group": "net",
+      "workspaceDeps": [
+       "common",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "rtl8139d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "net/rtl8139d",
+      "group": "net",
+      "workspaceDeps": [
+       "common",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "rtl8168d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "net/rtl8168d",
+      "group": "net",
+      "workspaceDeps": [
+       "common",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "virtio-netd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "net/virtio-netd",
+      "group": "net",
+      "workspaceDeps": [
+       "common",
+       "driver-network",
+       "pcid",
+       "virtio-core"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "pcid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "pcid",
+      "group": "pcid",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 12,
+      "features": 0
+     },
+     {
+      "name": "pcid-spawner",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "pcid-spawner",
+      "group": "pcid-spawner",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "rtcd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "rtcd",
+      "group": "rtcd",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "ahcid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/ahcid",
+      "group": "storage",
+      "workspaceDeps": [
+       "common",
+       "driver-block",
+       "pcid"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "bcm2835-sdhcid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/bcm2835-sdhcid",
+      "group": "storage",
+      "workspaceDeps": [
+       "common",
+       "driver-block"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "driver-block",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/driver-block",
+      "group": "storage",
+      "workspaceDeps": [
+       "executor",
+       "partitionlib"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "ided",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/ided",
+      "group": "storage",
+      "workspaceDeps": [
+       "common",
+       "driver-block",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "lived",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/lived",
+      "group": "storage",
+      "workspaceDeps": [
+       "driver-block"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "nvmed",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/nvmed",
+      "group": "storage",
+      "workspaceDeps": [
+       "common",
+       "driver-block",
+       "executor",
+       "partitionlib",
+       "pcid"
+      ],
+      "externalDeps": 10,
+      "features": 1
+     },
+     {
+      "name": "partitionlib",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/partitionlib",
+      "group": "storage",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "usbscsid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/usbscsid",
+      "group": "storage",
+      "workspaceDeps": [
+       "driver-block",
+       "xhcid"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "virtio-blkd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "storage/virtio-blkd",
+      "group": "storage",
+      "workspaceDeps": [
+       "common",
+       "driver-block",
+       "pcid",
+       "virtio-core"
+      ],
+      "externalDeps": 10,
+      "features": 0
+     },
+     {
+      "name": "usbctl",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "usb/usbctl",
+      "group": "usb",
+      "workspaceDeps": [
+       "xhcid"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "usbhubd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "usb/usbhubd",
+      "group": "usb",
+      "workspaceDeps": [
+       "common",
+       "xhcid"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "xhcid",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "usb/xhcid",
+      "group": "usb",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 18,
+      "features": 0
+     },
+     {
+      "name": "vboxd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "vboxd",
+      "group": "vboxd",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "virtio-core",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "virtio-core",
+      "group": "virtio-core",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 9,
+      "features": 0
+     }
+    ],
+    "internalEdges": [
+     [
+      "ac97d",
+      "common"
+     ],
+     [
+      "ac97d",
+      "pcid"
+     ],
+     [
+      "acpid",
+      "amlserde"
+     ],
+     [
+      "acpid",
+      "common"
+     ],
+     [
+      "ahcid",
+      "common"
+     ],
+     [
+      "ahcid",
+      "driver-block"
+     ],
+     [
+      "ahcid",
+      "pcid"
+     ],
+     [
+      "alxd",
+      "common"
+     ],
+     [
+      "bcm2835-sdhcid",
+      "common"
+     ],
+     [
+      "bcm2835-sdhcid",
+      "driver-block"
+     ],
+     [
+      "bgad",
+      "common"
+     ],
+     [
+      "bgad",
+      "inputd"
+     ],
+     [
+      "bgad",
+      "pcid"
+     ],
+     [
+      "console-draw",
+      "graphics-ipc"
+     ],
+     [
+      "driver-block",
+      "executor"
+     ],
+     [
+      "driver-block",
+      "partitionlib"
+     ],
+     [
+      "driver-graphics",
+      "common"
+     ],
+     [
+      "driver-graphics",
+      "graphics-ipc"
+     ],
+     [
+      "driver-graphics",
+      "inputd"
+     ],
+     [
+      "e1000d",
+      "common"
+     ],
+     [
+      "e1000d",
+      "driver-network"
+     ],
+     [
+      "e1000d",
+      "pcid"
+     ],
+     [
+      "fbbootlogd",
+      "console-draw"
+     ],
+     [
+      "fbbootlogd",
+      "graphics-ipc"
+     ],
+     [
+      "fbbootlogd",
+      "inputd"
+     ],
+     [
+      "fbcond",
+      "common"
+     ],
+     [
+      "fbcond",
+      "console-draw"
+     ],
+     [
+      "fbcond",
+      "graphics-ipc"
+     ],
+     [
+      "fbcond",
+      "inputd"
+     ],
+     [
+      "graphics-ipc",
+      "common"
+     ],
+     [
+      "hwd",
+      "amlserde"
+     ],
+     [
+      "hwd",
+      "common"
+     ],
+     [
+      "ided",
+      "common"
+     ],
+     [
+      "ided",
+      "driver-block"
+     ],
+     [
+      "ided",
+      "pcid"
+     ],
+     [
+      "ihdad",
+      "common"
+     ],
+     [
+      "ihdad",
+      "pcid"
+     ],
+     [
+      "inputd",
+      "common"
+     ],
+     [
+      "ixgbed",
+      "common"
+     ],
+     [
+      "ixgbed",
+      "driver-network"
+     ],
+     [
+      "ixgbed",
+      "pcid"
+     ],
+     [
+      "lived",
+      "driver-block"
+     ],
+     [
+      "nvmed",
+      "common"
+     ],
+     [
+      "nvmed",
+      "driver-block"
+     ],
+     [
+      "nvmed",
+      "executor"
+     ],
+     [
+      "nvmed",
+      "partitionlib"
+     ],
+     [
+      "nvmed",
+      "pcid"
+     ],
+     [
+      "pcid",
+      "common"
+     ],
+     [
+      "pcid-spawner",
+      "common"
+     ],
+     [
+      "pcid-spawner",
+      "pcid"
+     ],
+     [
+      "ps2d",
+      "common"
+     ],
+     [
+      "ps2d",
+      "inputd"
+     ],
+     [
+      "rtcd",
+      "common"
+     ],
+     [
+      "rtl8139d",
+      "common"
+     ],
+     [
+      "rtl8139d",
+      "driver-network"
+     ],
+     [
+      "rtl8139d",
+      "pcid"
+     ],
+     [
+      "rtl8168d",
+      "common"
+     ],
+     [
+      "rtl8168d",
+      "driver-network"
+     ],
+     [
+      "rtl8168d",
+      "pcid"
+     ],
+     [
+      "sb16d",
+      "common"
+     ],
+     [
+      "usbctl",
+      "xhcid"
+     ],
+     [
+      "usbhidd",
+      "common"
+     ],
+     [
+      "usbhidd",
+      "inputd"
+     ],
+     [
+      "usbhidd",
+      "xhcid"
+     ],
+     [
+      "usbhubd",
+      "common"
+     ],
+     [
+      "usbhubd",
+      "xhcid"
+     ],
+     [
+      "usbscsid",
+      "driver-block"
+     ],
+     [
+      "usbscsid",
+      "xhcid"
+     ],
+     [
+      "vboxd",
+      "common"
+     ],
+     [
+      "vboxd",
+      "pcid"
+     ],
+     [
+      "vesad",
+      "common"
+     ],
+     [
+      "vesad",
+      "driver-graphics"
+     ],
+     [
+      "vesad",
+      "graphics-ipc"
+     ],
+     [
+      "vesad",
+      "inputd"
+     ],
+     [
+      "virtio-blkd",
+      "common"
+     ],
+     [
+      "virtio-blkd",
+      "driver-block"
+     ],
+     [
+      "virtio-blkd",
+      "pcid"
+     ],
+     [
+      "virtio-blkd",
+      "virtio-core"
+     ],
+     [
+      "virtio-core",
+      "common"
+     ],
+     [
+      "virtio-core",
+      "pcid"
+     ],
+     [
+      "virtio-gpud",
+      "common"
+     ],
+     [
+      "virtio-gpud",
+      "driver-graphics"
+     ],
+     [
+      "virtio-gpud",
+      "graphics-ipc"
+     ],
+     [
+      "virtio-gpud",
+      "inputd"
+     ],
+     [
+      "virtio-gpud",
+      "pcid"
+     ],
+     [
+      "virtio-gpud",
+      "virtio-core"
+     ],
+     [
+      "virtio-netd",
+      "common"
+     ],
+     [
+      "virtio-netd",
+      "driver-network"
+     ],
+     [
+      "virtio-netd",
+      "pcid"
+     ],
+     [
+      "virtio-netd",
+      "virtio-core"
+     ],
+     [
+      "xhcid",
+      "common"
+     ],
+     [
+      "xhcid",
+      "pcid"
+     ]
+    ],
+    "topExternal": [
+     {
+      "name": "redox_syscall",
+      "usedBy": 35
+     },
+     {
+      "name": "libredox",
+      "usedBy": 33
+     },
+     {
+      "name": "redox-daemon",
+      "usedBy": 30
+     },
+     {
+      "name": "log",
+      "usedBy": 29
+     },
+     {
+      "name": "redox_event",
+      "usedBy": 25
+     },
+     {
+      "name": "redox-scheme",
+      "usedBy": 15
+     },
+     {
+      "name": "bitflags",
+      "usedBy": 14
+     },
+     {
+      "name": "orbclient",
+      "usedBy": 10
+     },
+     {
+      "name": "futures",
+      "usedBy": 7
+     },
+     {
+      "name": "anyhow",
+      "usedBy": 6
+     },
+     {
+      "name": "serde",
+      "usedBy": 5
+     },
+     {
+      "name": "spin",
+      "usedBy": 5
+     },
+     {
+      "name": "thiserror",
+      "usedBy": 5
+     },
+     {
+      "name": "plain",
+      "usedBy": 4
+     },
+     {
+      "name": "ransid",
+      "usedBy": 4
+     },
+     {
+      "name": "static_assertions",
+      "usedBy": 4
+     },
+     {
+      "name": "fdt",
+      "usedBy": 3
+     },
+     {
+      "name": "toml",
+      "usedBy": 3
+     },
+     {
+      "name": "acpi",
+      "usedBy": 2
+     },
+     {
+      "name": "arrayvec",
+      "usedBy": 2
+     },
+     {
+      "name": "parking_lot",
+      "usedBy": 2
+     },
+     {
+      "name": "pico-args",
+      "usedBy": 2
+     },
+     {
+      "name": "ron",
+      "usedBy": 2
+     },
+     {
+      "name": "smallvec",
+      "usedBy": 2
+     },
+     {
+      "name": "base64",
+      "usedBy": 1
+     },
+     {
+      "name": "bincode",
+      "usedBy": 1
+     },
+     {
+      "name": "byteorder",
+      "usedBy": 1
+     },
+     {
+      "name": "chashmap",
+      "usedBy": 1
+     },
+     {
+      "name": "clap",
+      "usedBy": 1
+     },
+     {
+      "name": "crossbeam-channel",
+      "usedBy": 1
+     }
+    ],
+    "resolvedPackages": 196
+   }
+  },
+  {
+   "id": "redox-base",
+   "url": "https://gitlab.redox-os.org/redox-os/base.git",
+   "branch": "main",
+   "commit": "145309f44eacb9b3db512b980c5deeb1b5045996",
+   "commitDate": "2026-11-13T10:13:39-07:00",
+   "tree": {
+    "files": 487,
+    "bytes": 3547721,
+    "lines": 88225,
+    "top": [
+     {
+      "name": "drivers/",
+      "files": 283,
+      "bytes": 2415659,
+      "lines": 56783,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "selftests/",
+      "files": 34,
+      "bytes": 262941,
+      "lines": 7989,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "bootstrap/",
+      "files": 19,
+      "bytes": 189231,
+      "lines": 4927,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "netstack/",
+      "files": 19,
+      "bytes": 163445,
+      "lines": 4983,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "(root files)",
+      "files": 11,
+      "bytes": 87576,
+      "lines": 310,
+      "topLanguage": "Make"
+     },
+     {
+      "name": "udsd/",
+      "files": 7,
+      "bytes": 86725,
+      "lines": 2621,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "ramfs/",
+      "files": 4,
+      "bytes": 64362,
+      "lines": 2015,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "ptyd/",
+      "files": 17,
+      "bytes": 55532,
+      "lines": 1908,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "ipcd/",
+      "files": 14,
+      "bytes": 45148,
+      "lines": 1433,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "initfs/",
+      "files": 11,
+      "bytes": 40588,
+      "lines": 1270,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "scheme-utils/",
+      "files": 5,
+      "bytes": 34756,
+      "lines": 1017,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "init/",
+      "files": 6,
+      "bytes": 26299,
+      "lines": 874,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "dhcpd/",
+      "files": 3,
+      "bytes": 15930,
+      "lines": 514,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "audiod/",
+      "files": 4,
+      "bytes": 10808,
+      "lines": 337,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "getty/",
+      "files": 2,
+      "bytes": 10750,
+      "lines": 350,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "randd/",
+      "files": 2,
+      "bytes": 10376,
+      "lines": 293,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "logd/",
+      "files": 3,
+      "bytes": 8309,
+      "lines": 297,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "daemon/",
+      "files": 2,
+      "bytes": 4654,
+      "lines": 140,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": ".gitlab/",
+      "files": 2,
+      "bytes": 4409,
+      "lines": 0,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": "init.initfs.d/",
+      "files": 21,
+      "bytes": 3600,
+      "lines": 0,
+      "topLanguage": "Other"
+     },
+     {
+      "name": "zerod/",
+      "files": 3,
+      "bytes": 3413,
+      "lines": 124,
+      "topLanguage": "Rust"
+     },
+     {
+      "name": "init.d/",
+      "files": 13,
+      "bytes": 1793,
+      "lines": 0,
+      "topLanguage": "Other"
+     },
+     {
+      "name": "config/",
+      "files": 2,
+      "bytes": 1417,
+      "lines": 40,
+      "topLanguage": "Rust"
+     }
+    ],
+    "languages": [
+     {
+      "language": "Rust",
+      "files": 325,
+      "bytes": 2820515,
+      "lines": 87663
+     },
+     {
+      "language": "Other",
+      "files": 60,
+      "bytes": 647329,
+      "lines": 0
+     },
+     {
+      "language": "TOML",
+      "files": 83,
+      "bytes": 40491,
+      "lines": 0
+     },
+     {
+      "language": "Documentation",
+      "files": 9,
+      "bytes": 20097,
+      "lines": 0
+     },
+     {
+      "language": "Shell",
+      "files": 5,
+      "bytes": 10346,
+      "lines": 379
+     },
+     {
+      "language": "Make",
+      "files": 1,
+      "bytes": 6928,
+      "lines": 183
+     },
+     {
+      "language": "YAML",
+      "files": 2,
+      "bytes": 1903,
+      "lines": 0
+     },
+     {
+      "language": "Text",
+      "files": 2,
+      "bytes": 112,
+      "lines": 0
+     }
+    ]
+   },
+   "style": {
+    "present": [
+     "rustfmt.toml",
+     "rust-toolchain.toml"
+    ],
+    "rustfmt.toml": {
+     "group_imports": "StdExternalCrate",
+     "imports_granularity": "Module"
+    },
+    "rust-toolchain.toml": {
+     "toolchain": {
+      "channel": "nightly-2026-05-24",
+      "components": [
+       "rust-src"
+      ]
+     }
+    },
+    "workspaceLints": {
+     "rust": {
+      "missing_docs": "allow"
+     },
+     "clippy": {
+      "cast_lossless": "warn",
+      "missing_safety_doc": "warn",
+      "perf": {
+       "level": "deny",
+       "priority": -1
+      },
+      "precedence": "deny",
+      "unused_io_amount": "warn"
+     }
+    }
+   },
+   "cargo": {
+    "workspaceMembers": [
+     {
+      "name": "audiod",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "audiod",
+      "group": "audiod",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "config",
+      "version": "0.0.0",
+      "edition": "2024",
+      "path": "config",
+      "group": "config",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "daemon",
+      "version": "0.0.0",
+      "edition": "2024",
+      "path": "daemon",
+      "group": "daemon",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "dhcpd",
+      "version": "0.0.0",
+      "edition": "2024",
+      "path": "dhcpd",
+      "group": "dhcpd",
+      "workspaceDeps": [],
+      "externalDeps": 0,
+      "features": 0
+     },
+     {
+      "name": "acpid",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "drivers/acpid",
+      "group": "drivers",
+      "workspaceDeps": [
+       "amlserde",
+       "common",
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 15,
+      "features": 0
+     },
+     {
+      "name": "amlserde",
+      "version": "0.0.1",
+      "edition": "2021",
+      "path": "drivers/amlserde",
+      "group": "drivers",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "ac97d",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/audio/ac97d",
+      "group": "drivers",
+      "workspaceDeps": [
+       "audiod",
+       "common",
+       "daemon",
+       "pcid",
+       "scheme-utils"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "ihdad",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/audio/ihdad",
+      "group": "drivers",
+      "workspaceDeps": [
+       "audiod",
+       "common",
+       "daemon",
+       "pcid",
+       "scheme-utils"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "sb16d",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/audio/sb16d",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "common",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/common",
+      "group": "drivers",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "executor",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "drivers/executor",
+      "group": "drivers",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "console-draw",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/console-draw",
+      "group": "drivers",
+      "workspaceDeps": [
+       "graphics-ipc"
+      ],
+      "externalDeps": 5,
+      "features": 1
+     },
+     {
+      "name": "drawbench",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/drawbench",
+      "group": "drivers",
+      "workspaceDeps": [
+       "graphics-ipc",
+       "inputd"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "driver-graphics",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "drivers/graphics/driver-graphics",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "graphics-ipc",
+       "inputd",
+       "scheme-utils"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "fbbootlogd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/fbbootlogd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "console-draw",
+       "daemon",
+       "graphics-ipc",
+       "inputd"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "fbcond",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/fbcond",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "console-draw",
+       "daemon",
+       "graphics-ipc",
+       "inputd",
+       "scheme-utils"
+      ],
+      "externalDeps": 9,
+      "features": 1
+     },
+     {
+      "name": "graphics-ipc",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/graphics-ipc",
+      "group": "drivers",
+      "workspaceDeps": [],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "ihdgd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/ihdgd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-graphics",
+       "ihdgd_macros",
+       "pcid"
+      ],
+      "externalDeps": 13,
+      "features": 0
+     },
+     {
+      "name": "ihdgd_macros",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "drivers/graphics/ihdgd/ihdgd_macros",
+      "group": "drivers",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "vesad",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/vesad",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-graphics"
+      ],
+      "externalDeps": 3,
+      "features": 1
+     },
+     {
+      "name": "virtio-gpud",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/graphics/virtio-gpud",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-graphics",
+       "pcid",
+       "virtio-core"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "hwd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/hwd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "amlserde",
+       "common",
+       "daemon"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "ps2d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/input/ps2d",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "inputd"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "usbhidd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/input/usbhidd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "inputd",
+       "xhcid"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "inputd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/inputd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "driver-network",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/net/driver-network",
+      "group": "drivers",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "e1000d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/net/e1000d",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "ixgbed",
+      "version": "1.0.0",
+      "edition": "2021",
+      "path": "drivers/net/ixgbed",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "rtl8139d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/net/rtl8139d",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "rtl8168d",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/net/rtl8168d",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-network",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "virtio-netd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/net/virtio-netd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-network",
+       "pcid",
+       "virtio-core"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "pcid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/pcid",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 11,
+      "features": 0
+     },
+     {
+      "name": "pcid-spawner",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/pcid-spawner",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "config",
+       "daemon",
+       "pcid"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "redoxerd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/redoxerd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "rtcd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/rtcd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "ahcid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/ahcid",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-block",
+       "pcid"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "bcm2835-sdhcid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/bcm2835-sdhcid",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-block"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "driver-block",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/driver-block",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "executor",
+       "partitionlib",
+       "scheme-utils"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "ided",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/ided",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-block",
+       "pcid"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "lived",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/lived",
+      "group": "drivers",
+      "workspaceDeps": [
+       "daemon",
+       "driver-block"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "nbdd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/nbdd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "daemon",
+       "driver-block"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "nvmed",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/nvmed",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-block",
+       "executor",
+       "partitionlib",
+       "pcid"
+      ],
+      "externalDeps": 9,
+      "features": 1
+     },
+     {
+      "name": "partitionlib",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/partitionlib",
+      "group": "drivers",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "usbscsid",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/usbscsid",
+      "group": "drivers",
+      "workspaceDeps": [
+       "daemon",
+       "driver-block",
+       "xhcid"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "virtio-blkd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/storage/virtio-blkd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "driver-block",
+       "pcid",
+       "virtio-core"
+      ],
+      "externalDeps": 9,
+      "features": 0
+     },
+     {
+      "name": "virtio-fsd",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "drivers/storage/virtio-fsd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "pcid",
+       "scheme-utils",
+       "virtio-core"
+      ],
+      "externalDeps": 13,
+      "features": 0
+     },
+     {
+      "name": "usbctl",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/usb/usbctl",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "xhcid"
+      ],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "usbhubd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/usb/usbhubd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "xhcid"
+      ],
+      "externalDeps": 2,
+      "features": 0
+     },
+     {
+      "name": "xhcid",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/usb/xhcid",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "config",
+       "daemon",
+       "pcid",
+       "scheme-utils"
+      ],
+      "externalDeps": 16,
+      "features": 0
+     },
+     {
+      "name": "vboxd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "drivers/vboxd",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "daemon",
+       "pcid"
+      ],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "virtio-core",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "drivers/virtio-core",
+      "group": "drivers",
+      "workspaceDeps": [
+       "common",
+       "pcid"
+      ],
+      "externalDeps": 9,
+      "features": 0
+     },
+     {
+      "name": "getty",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "getty",
+      "group": "getty",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "init",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "init",
+      "group": "init",
+      "workspaceDeps": [
+       "config"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "redox-initfs",
+      "version": "0.2.0",
+      "edition": "2024",
+      "path": "initfs",
+      "group": "initfs",
+      "workspaceDeps": [],
+      "externalDeps": 1,
+      "features": 0
+     },
+     {
+      "name": "redox-initfs-tools",
+      "version": "0.2.0",
+      "edition": "2021",
+      "path": "initfs/tools",
+      "group": "initfs",
+      "workspaceDeps": [
+       "redox-initfs"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "ipcd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "ipcd",
+      "group": "ipcd",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 5,
+      "features": 0
+     },
+     {
+      "name": "logd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "logd",
+      "group": "logd",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "netstack",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "netstack",
+      "group": "netstack",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 8,
+      "features": 0
+     },
+     {
+      "name": "ptyd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "ptyd",
+      "group": "ptyd",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "ramfs",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "ramfs",
+      "group": "ramfs",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 10,
+      "features": 0
+     },
+     {
+      "name": "randd",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "randd",
+      "group": "randd",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 7,
+      "features": 0
+     },
+     {
+      "name": "scheme-utils",
+      "version": "0.0.0",
+      "edition": "2024",
+      "path": "scheme-utils",
+      "group": "scheme-utils",
+      "workspaceDeps": [],
+      "externalDeps": 3,
+      "features": 0
+     },
+     {
+      "name": "virtio-fsd-selftest",
+      "version": "0.1.0",
+      "edition": "2024",
+      "path": "selftests/virtio-fsd",
+      "group": "selftests",
+      "workspaceDeps": [],
+      "externalDeps": 4,
+      "features": 0
+     },
+     {
+      "name": "udsd",
+      "version": "0.1.0",
+      "edition": "2018",
+      "path": "udsd",
+      "group": "udsd",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 6,
+      "features": 0
+     },
+     {
+      "name": "zerod",
+      "version": "0.1.0",
+      "edition": "2021",
+      "path": "zerod",
+      "group": "zerod",
+      "workspaceDeps": [
+       "daemon",
+       "scheme-utils"
+      ],
+      "externalDeps": 3,
+      "features": 0
+     }
+    ],
+    "internalEdges": [
+     [
+      "ac97d",
+      "audiod"
+     ],
+     [
+      "ac97d",
+      "common"
+     ],
+     [
+      "ac97d",
+      "daemon"
+     ],
+     [
+      "ac97d",
+      "pcid"
+     ],
+     [
+      "ac97d",
+      "scheme-utils"
+     ],
+     [
+      "acpid",
+      "amlserde"
+     ],
+     [
+      "acpid",
+      "common"
+     ],
+     [
+      "acpid",
+      "daemon"
+     ],
+     [
+      "acpid",
+      "scheme-utils"
+     ],
+     [
+      "ahcid",
+      "common"
+     ],
+     [
+      "ahcid",
+      "daemon"
+     ],
+     [
+      "ahcid",
+      "driver-block"
+     ],
+     [
+      "ahcid",
+      "pcid"
+     ],
+     [
+      "audiod",
+      "daemon"
+     ],
+     [
+      "audiod",
+      "scheme-utils"
+     ],
+     [
+      "bcm2835-sdhcid",
+      "common"
+     ],
+     [
+      "bcm2835-sdhcid",
+      "daemon"
+     ],
+     [
+      "bcm2835-sdhcid",
+      "driver-block"
+     ],
+     [
+      "console-draw",
+      "graphics-ipc"
+     ],
+     [
+      "drawbench",
+      "graphics-ipc"
+     ],
+     [
+      "drawbench",
+      "inputd"
+     ],
+     [
+      "driver-block",
+      "common"
+     ],
+     [
+      "driver-block",
+      "daemon"
+     ],
+     [
+      "driver-block",
+      "executor"
+     ],
+     [
+      "driver-block",
+      "partitionlib"
+     ],
+     [
+      "driver-block",
+      "scheme-utils"
+     ],
+     [
+      "driver-graphics",
+      "common"
+     ],
+     [
+      "driver-graphics",
+      "graphics-ipc"
+     ],
+     [
+      "driver-graphics",
+      "inputd"
+     ],
+     [
+      "driver-graphics",
+      "scheme-utils"
+     ],
+     [
+      "driver-network",
+      "daemon"
+     ],
+     [
+      "driver-network",
+      "scheme-utils"
+     ],
+     [
+      "e1000d",
+      "common"
+     ],
+     [
+      "e1000d",
+      "daemon"
+     ],
+     [
+      "e1000d",
+      "driver-network"
+     ],
+     [
+      "e1000d",
+      "pcid"
+     ],
+     [
+      "fbbootlogd",
+      "console-draw"
+     ],
+     [
+      "fbbootlogd",
+      "daemon"
+     ],
+     [
+      "fbbootlogd",
+      "graphics-ipc"
+     ],
+     [
+      "fbbootlogd",
+      "inputd"
+     ],
+     [
+      "fbcond",
+      "common"
+     ],
+     [
+      "fbcond",
+      "console-draw"
+     ],
+     [
+      "fbcond",
+      "daemon"
+     ],
+     [
+      "fbcond",
+      "graphics-ipc"
+     ],
+     [
+      "fbcond",
+      "inputd"
+     ],
+     [
+      "fbcond",
+      "scheme-utils"
+     ],
+     [
+      "hwd",
+      "amlserde"
+     ],
+     [
+      "hwd",
+      "common"
+     ],
+     [
+      "hwd",
+      "daemon"
+     ],
+     [
+      "ided",
+      "common"
+     ],
+     [
+      "ided",
+      "daemon"
+     ],
+     [
+      "ided",
+      "driver-block"
+     ],
+     [
+      "ided",
+      "pcid"
+     ],
+     [
+      "ihdad",
+      "audiod"
+     ],
+     [
+      "ihdad",
+      "common"
+     ],
+     [
+      "ihdad",
+      "daemon"
+     ],
+     [
+      "ihdad",
+      "pcid"
+     ],
+     [
+      "ihdad",
+      "scheme-utils"
+     ],
+     [
+      "ihdgd",
+      "common"
+     ],
+     [
+      "ihdgd",
+      "daemon"
+     ],
+     [
+      "ihdgd",
+      "driver-graphics"
+     ],
+     [
+      "ihdgd",
+      "ihdgd_macros"
+     ],
+     [
+      "ihdgd",
+      "pcid"
+     ],
+     [
+      "init",
+      "config"
+     ],
+     [
+      "inputd",
+      "common"
+     ],
+     [
+      "inputd",
+      "daemon"
+     ],
+     [
+      "inputd",
+      "scheme-utils"
+     ],
+     [
+      "ipcd",
+      "daemon"
+     ],
+     [
+      "ipcd",
+      "scheme-utils"
+     ],
+     [
+      "ixgbed",
+      "common"
+     ],
+     [
+      "ixgbed",
+      "daemon"
+     ],
+     [
+      "ixgbed",
+      "driver-network"
+     ],
+     [
+      "ixgbed",
+      "pcid"
+     ],
+     [
+      "lived",
+      "daemon"
+     ],
+     [
+      "lived",
+      "driver-block"
+     ],
+     [
+      "logd",
+      "daemon"
+     ],
+     [
+      "logd",
+      "scheme-utils"
+     ],
+     [
+      "nbdd",
+      "daemon"
+     ],
+     [
+      "nbdd",
+      "driver-block"
+     ],
+     [
+      "netstack",
+      "daemon"
+     ],
+     [
+      "netstack",
+      "scheme-utils"
+     ],
+     [
+      "nvmed",
+      "common"
+     ],
+     [
+      "nvmed",
+      "daemon"
+     ],
+     [
+      "nvmed",
+      "driver-block"
+     ],
+     [
+      "nvmed",
+      "executor"
+     ],
+     [
+      "nvmed",
+      "partitionlib"
+     ],
+     [
+      "nvmed",
+      "pcid"
+     ],
+     [
+      "pcid",
+      "common"
+     ],
+     [
+      "pcid",
+      "daemon"
+     ],
+     [
+      "pcid",
+      "scheme-utils"
+     ],
+     [
+      "pcid-spawner",
+      "common"
+     ],
+     [
+      "pcid-spawner",
+      "config"
+     ],
+     [
+      "pcid-spawner",
+      "daemon"
+     ],
+     [
+      "pcid-spawner",
+      "pcid"
+     ],
+     [
+      "ps2d",
+      "common"
+     ],
+     [
+      "ps2d",
+      "daemon"
+     ],
+     [
+      "ps2d",
+      "inputd"
+     ],
+     [
+      "ptyd",
+      "daemon"
+     ],
+     [
+      "ptyd",
+      "scheme-utils"
+     ],
+     [
+      "ramfs",
+      "daemon"
+     ],
+     [
+      "ramfs",
+      "scheme-utils"
+     ],
+     [
+      "randd",
+      "daemon"
+     ],
+     [
+      "randd",
+      "scheme-utils"
+     ],
+     [
+      "redox-initfs-tools",
+      "redox-initfs"
+     ],
+     [
+      "redoxerd",
+      "common"
+     ],
+     [
+      "rtcd",
+      "common"
+     ],
+     [
+      "rtl8139d",
+      "common"
+     ],
+     [
+      "rtl8139d",
+      "daemon"
+     ],
+     [
+      "rtl8139d",
+      "driver-network"
+     ],
+     [
+      "rtl8139d",
+      "pcid"
+     ],
+     [
+      "rtl8168d",
+      "common"
+     ],
+     [
+      "rtl8168d",
+      "daemon"
+     ],
+     [
+      "rtl8168d",
+      "driver-network"
+     ],
+     [
+      "rtl8168d",
+      "pcid"
+     ],
+     [
+      "sb16d",
+      "common"
+     ],
+     [
+      "sb16d",
+      "daemon"
+     ],
+     [
+      "sb16d",
+      "scheme-utils"
+     ],
+     [
+      "udsd",
+      "daemon"
+     ],
+     [
+      "udsd",
+      "scheme-utils"
+     ],
+     [
+      "usbctl",
+      "common"
+     ],
+     [
+      "usbctl",
+      "xhcid"
+     ],
+     [
+      "usbhidd",
+      "common"
+     ],
+     [
+      "usbhidd",
+      "inputd"
+     ],
+     [
+      "usbhidd",
+      "xhcid"
+     ],
+     [
+      "usbhubd",
+      "common"
+     ],
+     [
+      "usbhubd",
+      "xhcid"
+     ],
+     [
+      "usbscsid",
+      "daemon"
+     ],
+     [
+      "usbscsid",
+      "driver-block"
+     ],
+     [
+      "usbscsid",
+      "xhcid"
+     ],
+     [
+      "vboxd",
+      "common"
+     ],
+     [
+      "vboxd",
+      "daemon"
+     ],
+     [
+      "vboxd",
+      "pcid"
+     ],
+     [
+      "vesad",
+      "common"
+     ],
+     [
+      "vesad",
+      "daemon"
+     ],
+     [
+      "vesad",
+      "driver-graphics"
+     ],
+     [
+      "virtio-blkd",
+      "common"
+     ],
+     [
+      "virtio-blkd",
+      "daemon"
+     ],
+     [
+      "virtio-blkd",
+      "driver-block"
+     ],
+     [
+      "virtio-blkd",
+      "pcid"
+     ],
+     [
+      "virtio-blkd",
+      "virtio-core"
+     ],
+     [
+      "virtio-core",
+      "common"
+     ],
+     [
+      "virtio-core",
+      "pcid"
+     ],
+     [
+      "virtio-fsd",
+      "common"
+     ],
+     [
+      "virtio-fsd",
+      "daemon"
+     ],
+     [
+      "virtio-fsd",
+      "pcid"
+     ],
+     [
+      "virtio-fsd",
+      "scheme-utils"
+     ],
+     [
+      "virtio-fsd",
+      "virtio-core"
+     ],
+     [
+      "virtio-gpud",
+      "common"
+     ],
+     [
+      "virtio-gpud",
+      "daemon"
+     ],
+     [
+      "virtio-gpud",
+      "driver-graphics"
+     ],
+     [
+      "virtio-gpud",
+      "pcid"
+     ],
+     [
+      "virtio-gpud",
+      "virtio-core"
+     ],
+     [
+      "virtio-netd",
+      "common"
+     ],
+     [
+      "virtio-netd",
+      "daemon"
+     ],
+     [
+      "virtio-netd",
+      "driver-network"
+     ],
+     [
+      "virtio-netd",
+      "pcid"
+     ],
+     [
+      "virtio-netd",
+      "virtio-core"
+     ],
+     [
+      "xhcid",
+      "common"
+     ],
+     [
+      "xhcid",
+      "config"
+     ],
+     [
+      "xhcid",
+      "daemon"
+     ],
+     [
+      "xhcid",
+      "pcid"
+     ],
+     [
+      "xhcid",
+      "scheme-utils"
+     ],
+     [
+      "zerod",
+      "daemon"
+     ],
+     [
+      "zerod",
+      "scheme-utils"
+     ]
+    ],
+    "topExternal": [
+     {
+      "name": "redox_syscall",
+      "usedBy": 51
+     },
+     {
+      "name": "libredox",
+      "usedBy": 49
+     },
+     {
+      "name": "redox_event",
+      "usedBy": 34
+     },
+     {
+      "name": "log",
+      "usedBy": 32
+     },
+     {
+      "name": "redox-scheme",
+      "usedBy": 25
+     },
+     {
+      "name": "anyhow",
+      "usedBy": 14
+     },
+     {
+      "name": "bitflags",
+      "usedBy": 12
+     },
+     {
+      "name": "libc",
+      "usedBy": 11
+     },
+     {
+      "name": "plain",
+      "usedBy": 9
+     },
+     {
+      "name": "futures",
+      "usedBy": 8
+     },
+     {
+      "name": "orbclient",
+      "usedBy": 7
+     },
+     {
+      "name": "serde",
+      "usedBy": 7
+     },
+     {
+      "name": "thiserror",
+      "usedBy": 6
+     },
+     {
+      "name": "toml",
+      "usedBy": 5
+     },
+     {
+      "name": "clap",
+      "usedBy": 4
+     },
+     {
+      "name": "fdt",
+      "usedBy": 4
+     },
+     {
+      "name": "redox-rings",
+      "usedBy": 4
+     },
+     {
+      "name": "spin",
+      "usedBy": 4
+     },
+     {
+      "name": "static_assertions",
+      "usedBy": 4
+     },
+     {
+      "name": "drm",
+      "usedBy": 3
+     },
+     {
+      "name": "drm-sys",
+      "usedBy": 3
+     },
+     {
+      "name": "smallvec",
+      "usedBy": 3
+     },
+     {
+      "name": "zerocopy",
+      "usedBy": 3
+     },
+     {
+      "name": "acpi",
+      "usedBy": 2
+     },
+     {
+      "name": "drm-fourcc",
+      "usedBy": 2
+     },
+     {
+      "name": "env_logger",
+      "usedBy": 2
+     },
+     {
+      "name": "parking_lot",
+      "usedBy": 2
+     },
+     {
+      "name": "piaf",
+      "usedBy": 2
+     },
+     {
+      "name": "pico-args",
+      "usedBy": 2
+     },
+     {
+      "name": "psf-rs",
+      "usedBy": 2
+     }
+    ],
+    "resolvedPackages": 310
+   }
+  }
+ ]
+}

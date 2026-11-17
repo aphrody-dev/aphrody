@@ -305,6 +305,9 @@ export async function generate(store: Store, manifest: Manifest, options: Genera
     "- [State of the kernels](state-of-kernels.md): condensed context for agents",
     "- [Sources](sources.md): every endpoint, with the status and shape seen when it was verified",
     "- Per kernel: " + manifest.kernels.map((k) => `[${k.name}](kernels/${k.id}.md)`).join(", "),
+    ...(manifest.clones.length
+      ? [`- Structure reports (tree, languages, subsystems, dependency graph, style; built on the build host, see PLAN.md): ${[...new Set(manifest.clones.map((c) => c.kernel))].map((id) => `[${id}](graph/${id}.md)`).join(", ")}`]
+      : []),
     "- Machine-readable (for the site): `data/versions.json`, `data/digests.json`, `data/kernels.json`, `data/sources.json`", "",
   ].join("\n"));
 

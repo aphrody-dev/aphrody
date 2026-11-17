@@ -56,10 +56,19 @@ export interface WatchConfig {
   maxBackoff: number;
   auth: Record<string, Auth>;
 }
+/** A repository the structure reports are built from (phase B, build host only). */
+export interface Clone {
+  id: string;
+  kernel: string;
+  url: string;
+  branch: string;
+  note?: string;
+}
 export interface Manifest {
   watch: WatchConfig;
   kernels: Kernel[];
   sources: Source[];
+  clones: Clone[];
 }
 
 const UNITS: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86400 };
@@ -157,9 +166,19 @@ export function parseManifest(text: string): Manifest {
     if (s.yields.length === 0) bad(`source ${s.id}: yields must list what the source produces`);
     if (s.minInterval < 60) bad(`source ${s.id}: min_interval below 1m`);
   }
+  const clones: Clone[] = (raw.clone ?? []).map((c: any): Clone => ({ id: String(c.id ?? ""), kernel: String(c.kernel ?? ""), url: String(c.url ?? ""), branch: String(c.branch ?? ""), ...(c.note ? { note: String(c.note) } : {}) }));
+  const cloneIds = new Set<string>();
+  for (const c of clones) {
+    if (!ID.test(c.id)) bad(`clone id "${c.id}" must match ${ID}`);
+    if (cloneIds.has(c.id)) bad(`duplicate clone id "${c.id}"`);
+    cloneIds.add(c.id);
+    if (!kernelIds.has(c.kernel)) bad(`clone ${c.id}: unknown kernel "${c.kernel}"`);
+    if (!c.branch) bad(`clone ${c.id}: branch is required`);
+    checkUrl(`clone ${c.id}`, c.url, bad);
+  }
   for (const k of kernels) for (const o of k.orgs) if (o.source && !sourceIds.has(o.source)) bad(`kernel ${k.id}: org ${o.id} names unknown source "${o.source}"`);
   if (problems.length) throw new Error(`manifest invalid:\n- ${problems.join("\n- ")}`);
-  return { watch, kernels, sources };
+  return { watch, kernels, sources, clones };
 }
 
 function checkUrl(where: string, url: string, bad: (m: string) => void): void {

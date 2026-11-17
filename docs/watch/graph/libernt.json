@@ -1,0 +1,509 @@
+{
+ "kernel": "libernt",
+ "repos": [
+  {
+   "id": "libernt",
+   "url": "https://github.com/LiberNT/LiberNT.git",
+   "branch": "main-nt10",
+   "commit": "9680fba1001d71e7da6e23c766baef2b9e7a0f69",
+   "commitDate": "2026-11-17T13:55:34+09:00",
+   "tree": {
+    "files": 38462,
+    "bytes": 749972656,
+    "lines": 13781536,
+    "top": [
+     {
+      "name": "dll/",
+      "files": 9909,
+      "bytes": 195598679,
+      "lines": 3448565,
+      "topLanguage": "C"
+     },
+     {
+      "name": "sdk/",
+      "files": 8112,
+      "bytes": 133553906,
+      "lines": 3783164,
+      "topLanguage": "C"
+     },
+     {
+      "name": "modules/",
+      "files": 6139,
+      "bytes": 125841940,
+      "lines": 2589104,
+      "topLanguage": "C"
+     },
+     {
+      "name": "media/",
+      "files": 1912,
+      "bytes": 103294519,
+      "lines": 5164,
+      "topLanguage": "Text"
+     },
+     {
+      "name": "drivers/",
+      "files": 4520,
+      "bytes": 80653183,
+      "lines": 1998787,
+      "topLanguage": "C"
+     },
+     {
+      "name": "base/",
+      "files": 4850,
+      "bytes": 59722680,
+      "lines": 699031,
+      "topLanguage": "C"
+     },
+     {
+      "name": "subsystems/",
+      "files": 1166,
+      "bytes": 21658884,
+      "lines": 615674,
+      "topLanguage": "C"
+     },
+     {
+      "name": "ntos/",
+      "files": 801,
+      "bytes": 12420700,
+      "lines": 387076,
+      "topLanguage": "C"
+     },
+     {
+      "name": "boot/",
+      "files": 441,
+      "bytes": 9946155,
+      "lines": 103623,
+      "topLanguage": "C"
+     },
+     {
+      "name": "hal/",
+      "files": 176,
+      "bytes": 3477146,
+      "lines": 61880,
+      "topLanguage": "C"
+     },
+     {
+      "name": "submodules/",
+      "files": 222,
+      "bytes": 1725975,
+      "lines": 40677,
+      "topLanguage": "C"
+     },
+     {
+      "name": "bootloader/",
+      "files": 128,
+      "bytes": 1346456,
+      "lines": 45980,
+      "topLanguage": "C"
+     },
+     {
+      "name": "(root files)",
+      "files": 36,
+      "bytes": 373268,
+      "lines": 1731,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": "translations/",
+      "files": 36,
+      "bytes": 297350,
+      "lines": 0,
+      "topLanguage": "Documentation"
+     },
+     {
+      "name": "scripts/",
+      "files": 7,
+      "bytes": 47826,
+      "lines": 1080,
+      "topLanguage": "Python"
+     },
+     {
+      "name": ".github/",
+      "files": 4,
+      "bytes": 11333,
+      "lines": 0,
+      "topLanguage": "YAML"
+     },
+     {
+      "name": ".theia/",
+      "files": 3,
+      "bytes": 2656,
+      "lines": 0,
+      "topLanguage": "JSON"
+     }
+    ],
+    "languages": [
+     {
+      "language": "C",
+      "files": 19945,
+      "bytes": 409508273,
+      "lines": 12079913
+     },
+     {
+      "language": "Other",
+      "files": 6349,
+      "bytes": 227885092,
+      "lines": 0
+     },
+     {
+      "language": "Resource",
+      "files": 5375,
+      "bytes": 43527358,
+      "lines": 0
+     },
+     {
+      "language": "C++",
+      "files": 2846,
+      "bytes": 36809045,
+      "lines": 1214353
+     },
+     {
+      "language": "Text",
+      "files": 358,
+      "bytes": 14536500,
+      "lines": 0
+     },
+     {
+      "language": "IDL",
+      "files": 671,
+      "bytes": 8118014,
+      "lines": 240881
+     },
+     {
+      "language": "Assembly",
+      "files": 503,
+      "bytes": 4524631,
+      "lines": 127460
+     },
+     {
+      "language": "CMake",
+      "files": 2075,
+      "bytes": 2140263,
+      "lines": 63137
+     },
+     {
+      "language": "JavaScript",
+      "files": 27,
+      "bytes": 956509,
+      "lines": 21986
+     },
+     {
+      "language": "Python",
+      "files": 112,
+      "bytes": 955544,
+      "lines": 22414
+     },
+     {
+      "language": "Documentation",
+      "files": 103,
+      "bytes": 570733,
+      "lines": 0
+     },
+     {
+      "language": "Shell",
+      "files": 54,
+      "bytes": 241271,
+      "lines": 7128
+     },
+     {
+      "language": "C#",
+      "files": 13,
+      "bytes": 82018,
+      "lines": 2166
+     },
+     {
+      "language": "Perl",
+      "files": 1,
+      "bytes": 43380,
+      "lines": 1310
+     },
+     {
+      "language": "JSON",
+      "files": 9,
+      "bytes": 39086,
+      "lines": 0
+     },
+     {
+      "language": "Make",
+      "files": 13,
+      "bytes": 20153,
+      "lines": 643
+     },
+     {
+      "language": "YAML",
+      "files": 5,
+      "bytes": 11966,
+      "lines": 0
+     },
+     {
+      "language": "Rust",
+      "files": 2,
+      "bytes": 2673,
+      "lines": 132
+     },
+     {
+      "language": "Device tree",
+      "files": 1,
+      "bytes": 147,
+      "lines": 13
+     }
+    ]
+   },
+   "style": {
+    "present": [
+     ".clang-format",
+     ".editorconfig",
+     ".gitattributes",
+     "CONTRIBUTING.md",
+     "CODEOWNERS",
+     "CODE_OF_CONDUCT.md"
+    ],
+    "clangFormat": {
+     "BasedOnStyle": "Microsoft",
+     "IndentWidth": "4",
+     "UseTab": "Never",
+     "BreakBeforeBraces": "Allman",
+     "AlignAfterOpenBracket": "AlwaysBreak"
+    },
+    "editorconfig": {
+     "*": {
+      "root": "true",
+      "insert_final_newline": "true",
+      "charset": "utf-8",
+      "indent_size": "4",
+      "indent_style": "space",
+      "trim_trailing_whitespace": "true"
+     },
+     "*.{json,yml,md}": {
+      "indent_size": "2"
+     }
+    },
+    "workflows": [
+     "build.yml",
+     "pr-cache-cleanup.yml"
+    ]
+   },
+   "cmake": {
+    "modules": 1583,
+    "moduleTypes": [
+     [
+      "win32cui",
+      560
+     ],
+     [
+      "win32dll",
+      548
+     ],
+     [
+      "kernelmodedriver",
+      269
+     ],
+     [
+      "win32gui",
+      114
+     ],
+     [
+      "kmdfdriver",
+      28
+     ],
+     [
+      "kerneldll",
+      25
+     ],
+     [
+      "cpl",
+      21
+     ],
+     [
+      "module",
+      16
+     ],
+     [
+      "nativedll",
+      6
+     ],
+     [
+      "nativecui",
+      4
+     ],
+     [
+      "win32ocx",
+      3
+     ],
+     [
+      "wdmdriver",
+      2
+     ],
+     [
+      "kernel",
+      1
+     ]
+    ],
+    "modulesByTop": [
+     [
+      "modules",
+      549
+     ],
+     [
+      "dll",
+      519
+     ],
+     [
+      "drivers",
+      256
+     ],
+     [
+      "base",
+      217
+     ],
+     [
+      "subsystems",
+      46
+     ],
+     [
+      "sdk",
+      4
+     ],
+     [
+      "boot",
+      2
+     ],
+     [
+      "hal",
+      2
+     ],
+     [
+      "media",
+      1
+     ],
+     [
+      "ntos",
+      1
+     ]
+    ],
+    "mostLinked": [
+     {
+      "module": "kernel32",
+      "linkedBy": 1218
+     },
+     {
+      "module": "msvcrt",
+      "linkedBy": 1165
+     },
+     {
+      "module": "ntdll",
+      "linkedBy": 859
+     },
+     {
+      "module": "user32",
+      "linkedBy": 541
+     },
+     {
+      "module": "advapi32",
+      "linkedBy": 499
+     },
+     {
+      "module": "ole32",
+      "linkedBy": 310
+     },
+     {
+      "module": "ntoskrnl",
+      "linkedBy": 299
+     },
+     {
+      "module": "hal",
+      "linkedBy": 283
+     },
+     {
+      "module": "gdi32",
+      "linkedBy": 234
+     },
+     {
+      "module": "oleaut32",
+      "linkedBy": 168
+     },
+     {
+      "module": "shell32",
+      "linkedBy": 149
+     },
+     {
+      "module": "comctl32",
+      "linkedBy": 122
+     },
+     {
+      "module": "shlwapi",
+      "linkedBy": 120
+     },
+     {
+      "module": "setupapi",
+      "linkedBy": 89
+     },
+     {
+      "module": "combase",
+      "linkedBy": 82
+     },
+     {
+      "module": "ws2_32",
+      "linkedBy": 82
+     },
+     {
+      "module": "rpcrt4",
+      "linkedBy": 76
+     },
+     {
+      "module": "winmm",
+      "linkedBy": 51
+     },
+     {
+      "module": "iphlpapi",
+      "linkedBy": 49
+     },
+     {
+      "module": "version",
+      "linkedBy": 42
+     },
+     {
+      "module": "comdlg32",
+      "linkedBy": 40
+     },
+     {
+      "module": "crypt32",
+      "linkedBy": 34
+     },
+     {
+      "module": "ndis",
+      "linkedBy": 33
+     },
+     {
+      "module": "mfplat",
+      "linkedBy": 26
+     },
+     {
+      "module": "netapi32",
+      "linkedBy": 25
+     },
+     {
+      "module": "bcrypt",
+      "linkedBy": 22
+     },
+     {
+      "module": "uxtheme",
+      "linkedBy": 22
+     },
+     {
+      "module": "usbd",
+      "linkedBy": 21
+     },
+     {
+      "module": "propsys",
+      "linkedBy": 19
+     },
+     {
+      "module": "cfgmgr32",
+      "linkedBy": 18
+     }
+    ]
+   }
+  }
+ ]
+}
