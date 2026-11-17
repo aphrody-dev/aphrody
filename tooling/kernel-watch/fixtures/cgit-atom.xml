@@ -1,0 +1,146 @@
+<feed xmlns='http://www.w3.org/2005/Atom'>
+<title>kernel/git/torvalds/linux.git, branch master</title>
+<subtitle>Linux kernel source tree</subtitle>
+<id>http://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/atom/</id>
+<link rel='self' href='http://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/atom/'/>
+<link rel='alternate' type='text/html' href='http://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/'/>
+<updated>2026-11-16T17:35:38Z</updated>
+<entry>
+<title>Merge tag 'assoc-array-fixes-v2'</title>
+<updated>2026-11-16T17:35:38Z</updated>
+<author>
+<name>Linus Torvalds</name>
+
+</author>
+<published>2026-11-16T17:35:38Z</published>
+<link rel='alternate' type='text/html' href='http://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=666539eecdf4db623f5e3c3e55cf9f2dfad24aa4'/>
+<id>urn:sha1:666539eecdf4db623f5e3c3e55cf9f2dfad24aa4</id>
+<content type='text'>
+Clean up assoc_array library code
+
+I had already gotten rid of this tag locally, because we then decided
+to just remove the assoc_array library entirely since it has only one
+single user - the key handling code - and that user is getting rewritten
+to use rhashtable instead.
+
+But that removal is scheduled for 7.5, and this fixes real bugs and does
+clean up some of the code.  So while it's all slated for removal, some
+of the fixes need back-porting and we might as well remove the
+cleaned-up version.  Maybe somebody decides they want to resurrect it
+for another project - it really is fairly generic library code - they
+shouldn't get the messy end state that we decided to jettison.
+
+Background: Nils Ollrogge reported a bug in the assoc_array library and
+had a patch to fix it too, but that code was too obscure for me to
+follow, so I used some LLM tools to help make sense of it all and found
+more issues in the process.
+
+* tag 'assoc-array-fixes-v2':
+  assoc_array: use assoc_array_parent_link() when splitting a shortcut
+  assoc_array: find and collapse in deletion without gotos
+  assoc_array: move deletion's collapse into a function of its own
+  assoc_array: replace the labels in gc's tree walk with a loop
+  assoc_array: move gc's folding into a function of its own
+  assoc_array: keep gc's cleanup out of the live tree on allocation failure
+  assoc_array: don't chain a new shortcut onto an existing one
+  assoc_array: choose between splitting a node and a shortcut without gotos
+  assoc_array: move shortcut creation into a function of its own
+  assoc_array: move node splitting into a function of its own
+  assoc_array: fill the segment cache in one place
+  assoc_array: move in-place insertion into a function of its own
+  assoc_array: don't lose objects when a root shortcut is split at level 4
+  assoc_array: don't lose objects when a shortcut is split on a word boundary
+  assoc_array: correct the documentation of get_key_chunk()'s level argument
+</content>
+</entry>
+<entry>
+<title>Merge tag 'char-misc-7.4-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc</title>
+<updated>2026-11-16T16:02:58Z</updated>
+<author>
+<name>Linus Torvalds</name>
+
+</author>
+<published>2026-11-16T16:02:58Z</published>
+<link rel='alternate' type='text/html' href='http://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=141b164bbe186423e295b139e40e8e2d11cf1341'/>
+<id>urn:sha1:141b164bbe186423e295b139e40e8e2d11cf1341</id>
+<content type='text'>
+Pull char/misc/iio driver fixes from Greg KH:
+ "Here are a bunch of char, misc, and iio driver fixes for reported
+  problems for 7.4-rc4. Included in here are:
+
+   - usual collection of lots of IIO driver fixes for issues
+
+   - binder driver fix
+
+   - iio, w1, and comedi driver fixes found and fixed by Josef
+
+   - comedi driver fix for a reported problem
+
+   - other misc driver fixes
+
+  All of these have been in linux-next for a while with no reported
+  issues"
+
+* tag 'char-misc-7.4-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc: (68 commits)
+  iio: hid-sensors: fix fractional part for unit exponents -7 and -8
+  iio: trigger: free the trigger ID after device_del()
+  iio: hid-sensors: fix a division by zero
+  iio: humidity: hid-sensor-humidity: Use per-instance callbacks
+  iio: temperature: hid-sensor-temperature: Use per-instance callbacks
+  comedi: comedi_bond: Fix leak of opened device references
+  mei: me: add ice lake point LP iTouch DID
+  mei: lb: read the MTU once
+  rust_binder: push BR_TRANSACTION_COMPLETE before BR_FAILED_REPLY
+  misc: ibmvmc: initialize HMC state before device registration
+  w1: w1_therm: leave the slaves of other families alone
+  w1: w1_therm: lock the list of slaves for the bulk read
+  w1: don't hold list_mutex while a slave is torn down
+  w1: netlink: drop the slave after the bus is unlocked
+  w1: ds2805: use the bus mutex to talk on the bus
+  w1: ds28e04: use the bus mutex to talk on the bus
+  w1: ds2482: set the strong pull-up with its byte
+  w1: remove the master's files before taking its locks
+  w1: use the bus mutex for the "rw" file
+  misc: bcm-vk: fix DMA allocation memory leak
+  ...
+</content>
+</entry>
+<entry>
+<title>Merge tag 'tty-7.4-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/tty</title>
+<updated>2026-11-16T15:59:28Z</updated>
+<author>
+<name>Linus Torvalds</name>
+
+</author>
+<published>2026-11-16T15:59:28Z</published>
+<link rel='alternate' type='text/html' href='http://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b6793a9e2a3c280bb7c6c7d39be271e2f57aa2bb'/>
+<id>urn:sha1:b6793a9e2a3c280bb7c6c7d39be271e2f57aa2bb</id>
+<content type='text'>
+Pull tty/serial driver fixes from Greg KH:
+ "Here are some small tty and serial driver fixes for reported problems
+  for 7.4-rc4. Included in here are:
+
+   - tty driver and vt fixes reported and fixed by Josef Bacik and Chris
+     Mason
+
+   - some serial driver fixes by Jiri for found problems
+
+  All of these have been in linux-next for almost 2 weeks now, with no
+  reported issues"
+
+* tag 'tty-7.4-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/tty:
+  serial: samsung: put the previous baud clock
+  serial: samsung: don't leak the tty on an RX IRQ
+  serial: rda: free the interrupt on shutdown
+  serial: imx: fix the tty reference of the wakeup event
+  serial: fsl_lpuart: fix tty ref of wakeup event
+  serial: 8250_mxpcie: handle hangup during break
+  serial: 8250_lpss: don't divide by 0 above 6.25 Mbaud
+  serial: core: respect runtime PM when sending x_char
+  vt: serialise the producers of the flip buffer
+  tty: fix misapplied compat_ptr() in tty_compat_ioctl()
+  serial: 8250_hp300: reorder HPDCA code
+  serial: 8250_exar: check priv-&gt;gpio properly
+</content>
+</entry>
+</feed>

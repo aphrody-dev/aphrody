@@ -1,0 +1,1722 @@
+{
+  "asOf": "2026-11-17T05:00Z",
+  "digests": [
+    {
+      "kernel": "linux",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 15,
+            "release": 1,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 50,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": true,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "release",
+              "title": "Linux next-20261116 (linux-next)",
+              "url": "https://git.kernel.org/next/linux-next/h/next-20261116",
+              "time": "2026-11-16T20:59Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Add linux-next specific files for 20261116",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=749a4de370409464cf8501ec5b2451df45c84eb4",
+              "time": "2026-11-16T20:59Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'headers' of git://git.infradead.org/users/willy/pagecache.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=8c6de30cb7f8317d35e8ade1fa8653c7c21b9e27",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'spec' of https://git.kernel.org/pub/scm/linux/kernel/git/sashal/kapi.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=b62f3941e56edd6873370d4256f51963e1e8f7d6",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'for-next' of https://github.com/hisilicon/linux-hisi.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=a3dd66e96973f76ac3b70265abf7e11e6eef8000",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'crc-next' of https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=c8c1796bd79c92c42714e7cdf1d0b4cd052468ce",
+              "time": "2026-11-16T20:26Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 22,
+            "release": 5,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 50,
+            "tag": 1,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": true,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "release",
+              "title": "Linux next-20261116 (linux-next)",
+              "url": "https://git.kernel.org/next/linux-next/h/next-20261116",
+              "time": "2026-11-16T20:59Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Add linux-next specific files for 20261116",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=749a4de370409464cf8501ec5b2451df45c84eb4",
+              "time": "2026-11-16T20:59Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'headers' of git://git.infradead.org/users/willy/pagecache.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=8c6de30cb7f8317d35e8ade1fa8653c7c21b9e27",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'spec' of https://git.kernel.org/pub/scm/linux/kernel/git/sashal/kapi.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=b62f3941e56edd6873370d4256f51963e1e8f7d6",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'for-next' of https://github.com/hisilicon/linux-hisi.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=a3dd66e96973f76ac3b70265abf7e11e6eef8000",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'crc-next' of https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git",
+              "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=c8c1796bd79c92c42714e7cdf1d0b4cd052468ce",
+              "time": "2026-11-16T20:26Z"
+            },
+            {
+              "kind": "release",
+              "title": "Linux 7.4-rc3 (mainline)",
+              "url": "https://git.kernel.org/torvalds/h/v7.4-rc3",
+              "time": "2026-11-15T22:30Z"
+            },
+            {
+              "kind": "release",
+              "title": "Linux 7.3.4 (stable)",
+              "url": "https://git.kernel.org/stable/h/v7.3.4",
+              "time": "2026-11-10T18:11Z"
+            },
+            {
+              "kind": "release",
+              "title": "Linux 6.18.63 (longterm)",
+              "url": "https://git.kernel.org/stable/h/v6.18.63",
+              "time": "2026-11-10T18:07Z"
+            },
+            {
+              "kind": "release",
+              "title": "Linux 6.12.117 (longterm)",
+              "url": "https://git.kernel.org/stable/h/v6.12.117",
+              "time": "2026-11-10T18:05Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "asterinas",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 12,
+            "release": 0,
+            "issue": 3,
+            "pr": 6,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 4,
+            "pr": 13
+          },
+          "mergedPrs": 4,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {
+            "open_issues": {
+              "current": 267,
+              "delta": null
+            },
+            "open_prs": {
+              "current": 160,
+              "delta": null
+            },
+            "forks": {
+              "current": 420,
+              "delta": null
+            },
+            "size_kb": {
+              "current": 19567,
+              "delta": null
+            },
+            "stars": {
+              "current": 5110,
+              "delta": null
+            }
+          },
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "Improve allocation contiguity",
+              "url": "https://github.com/asterinas/asterinas/commit/0d38f078f584ba1ea5b96226ac670ae310a90004",
+              "time": "2026-11-17T04:42Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Simplify cache storage",
+              "url": "https://github.com/asterinas/asterinas/commit/53909f9b03c2b0b6ddd53b866aa7af83eb1c457e",
+              "time": "2026-11-17T04:42Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Fix cache aligment check",
+              "url": "https://github.com/asterinas/asterinas/commit/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
+              "time": "2026-11-17T04:42Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Fix `SIGEV_THREAD` panic",
+              "url": "https://github.com/asterinas/asterinas/commit/562d65e7a1ef2e6f1095d3613d420ccd980cb434",
+              "time": "2026-11-17T04:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Remove `Box` from `registered_callback`",
+              "url": "https://github.com/asterinas/asterinas/commit/5ecdf99b9c41d7f41c3938065c5485971b948a4d",
+              "time": "2026-11-17T04:26Z"
+            },
+            {
+              "kind": "issue",
+              "title": "Implement POSIX message queues (`/dev/mqueue` and `mq_*` syscalls)",
+              "url": "https://github.com/asterinas/asterinas/issues/4226",
+              "time": "2026-11-16T11:45Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Fix a race between UDP socket close and packet delivery",
+              "url": "https://github.com/asterinas/asterinas/pull/4225",
+              "time": "2026-11-16T10:20Z"
+            },
+            {
+              "kind": "issue",
+              "title": "x86-64 `sched_getcpu` reports an incorrect CPU through the bundled vDSO",
+              "url": "https://github.com/asterinas/asterinas/issues/4223",
+              "time": "2026-11-16T08:19Z"
+            },
+            {
+              "kind": "issue",
+              "title": "sched_setaffinity` leaves a runnable or running thread on a disallowed CPU",
+              "url": "https://github.com/asterinas/asterinas/issues/4222",
+              "time": "2026-11-16T08:18Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Improve allocation contiguity in `CacheArray` and fix bugs",
+              "url": "https://github.com/asterinas/asterinas/pull/4217",
+              "time": "2026-11-16T02:59Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Refactor `Timer` and fill timer `si_info`",
+              "url": "https://github.com/asterinas/asterinas/pull/4205",
+              "time": "2026-11-13T01:04Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Build gVisor syscall tests with Nix",
+              "url": "https://github.com/asterinas/asterinas/pull/4026",
+              "time": "2026-10-16T02:05Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 31,
+            "release": 0,
+            "issue": 10,
+            "pr": 25,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 24,
+            "pr": 43
+          },
+          "mergedPrs": 15,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {
+            "open_issues": {
+              "current": 267,
+              "delta": null
+            },
+            "open_prs": {
+              "current": 160,
+              "delta": null
+            },
+            "forks": {
+              "current": 420,
+              "delta": null
+            },
+            "size_kb": {
+              "current": 19567,
+              "delta": null
+            },
+            "stars": {
+              "current": 5110,
+              "delta": null
+            }
+          },
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "Improve allocation contiguity",
+              "url": "https://github.com/asterinas/asterinas/commit/0d38f078f584ba1ea5b96226ac670ae310a90004",
+              "time": "2026-11-17T04:42Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Simplify cache storage",
+              "url": "https://github.com/asterinas/asterinas/commit/53909f9b03c2b0b6ddd53b866aa7af83eb1c457e",
+              "time": "2026-11-17T04:42Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Fix cache aligment check",
+              "url": "https://github.com/asterinas/asterinas/commit/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
+              "time": "2026-11-17T04:42Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Fix `SIGEV_THREAD` panic",
+              "url": "https://github.com/asterinas/asterinas/commit/562d65e7a1ef2e6f1095d3613d420ccd980cb434",
+              "time": "2026-11-17T04:26Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Remove `Box` from `registered_callback`",
+              "url": "https://github.com/asterinas/asterinas/commit/5ecdf99b9c41d7f41c3938065c5485971b948a4d",
+              "time": "2026-11-17T04:26Z"
+            },
+            {
+              "kind": "issue",
+              "title": "Implement POSIX message queues (`/dev/mqueue` and `mq_*` syscalls)",
+              "url": "https://github.com/asterinas/asterinas/issues/4226",
+              "time": "2026-11-16T11:45Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Fix a race between UDP socket close and packet delivery",
+              "url": "https://github.com/asterinas/asterinas/pull/4225",
+              "time": "2026-11-16T10:20Z"
+            },
+            {
+              "kind": "issue",
+              "title": "x86-64 `sched_getcpu` reports an incorrect CPU through the bundled vDSO",
+              "url": "https://github.com/asterinas/asterinas/issues/4223",
+              "time": "2026-11-16T08:19Z"
+            },
+            {
+              "kind": "issue",
+              "title": "sched_setaffinity` leaves a runnable or running thread on a disallowed CPU",
+              "url": "https://github.com/asterinas/asterinas/issues/4222",
+              "time": "2026-11-16T08:18Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Improve allocation contiguity in `CacheArray` and fix bugs",
+              "url": "https://github.com/asterinas/asterinas/pull/4217",
+              "time": "2026-11-16T02:59Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Fix some wrong behavior in `set_priority`",
+              "url": "https://github.com/asterinas/asterinas/pull/4211",
+              "time": "2026-11-13T07:24Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Refactor `Timer` and fill timer `si_info`",
+              "url": "https://github.com/asterinas/asterinas/pull/4205",
+              "time": "2026-11-13T01:04Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Use `return_errno{,_with_message}` macros if possible",
+              "url": "https://github.com/asterinas/asterinas/pull/4194",
+              "time": "2026-11-10T09:43Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "redox",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {
+            "open_issues": {
+              "current": 66,
+              "delta": null
+            },
+            "open_prs": {
+              "current": 16,
+              "delta": null
+            },
+            "forks": {
+              "current": 97,
+              "delta": null
+            },
+            "stars": {
+              "current": 37,
+              "delta": null
+            }
+          },
+          "notable": []
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 2,
+            "release": 0,
+            "issue": 0,
+            "pr": 2,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 1
+          },
+          "mergedPrs": 2,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {
+            "open_issues": {
+              "current": 66,
+              "delta": null
+            },
+            "open_prs": {
+              "current": 16,
+              "delta": null
+            },
+            "forks": {
+              "current": 97,
+              "delta": null
+            },
+            "stars": {
+              "current": 37,
+              "delta": null
+            }
+          },
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "refactor: Use args() and defaults for Sqe initialization",
+              "url": "https://gitlab.redox-os.org/redox-os/kernel/-/commit/8f0e965e99856fc6215294663fa1a9d1018a7eb2",
+              "time": "2026-11-14T13:36Z"
+            },
+            {
+              "kind": "pr",
+              "title": "refactor: Use args() and defaults for Sqe initialization",
+              "url": "https://gitlab.redox-os.org/redox-os/kernel/-/merge_requests/776",
+              "time": "2026-11-14T13:34Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Use node-local kernel stacks",
+              "url": "https://gitlab.redox-os.org/redox-os/kernel/-/commit/f31b7512dc381b9fed09b9a641da717092d83e65",
+              "time": "2026-11-10T12:31Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Local Kernel Stacks",
+              "url": "https://gitlab.redox-os.org/redox-os/kernel/-/merge_requests/768",
+              "time": "2026-11-06T12:33Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "libernt",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 148,
+            "release": 0,
+            "issue": 4,
+            "pr": 32,
+            "discussion": 1,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 1,
+            "pr": 5
+          },
+          "mergedPrs": 26,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {
+            "open_issues": {
+              "current": 74,
+              "delta": null
+            },
+            "open_prs": {
+              "current": 31,
+              "delta": null
+            },
+            "forks": {
+              "current": 0,
+              "delta": null
+            },
+            "size_kb": {
+              "current": 953350,
+              "delta": null
+            },
+            "stars": {
+              "current": 1173,
+              "delta": null
+            }
+          },
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "[WINED3D] Read a WDDM adapter's identity once per adapter",
+              "url": "https://github.com/LiberNT/LiberNT/commit/1ba5e910c1e8abcf4b8266bd39a0d859060ccd41",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CPU host aperture takes",
+              "url": "https://github.com/LiberNT/LiberNT/commit/397727289abc43b13239f8bac9a985e7f55dba1e",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[APISETS][SHCORE_APITEST] Host the WinRT stream API set on shcore",
+              "url": "https://github.com/LiberNT/LiberNT/commit/49bbd5d3c6c05e6a0b07f0b816afe2281a86f9f1",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[NTOS:KE][KERNEL32_APITEST] Let Sleep(0) hand the processor to a lower-priority thread",
+              "url": "https://github.com/LiberNT/LiberNT/commit/5a88f83e00e0ddbb668839f152c8868affcaac78",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[DXGKRNL][D3DKMT_APITEST] Report WDDM 2.0 for an adapter that runs it",
+              "url": "https://github.com/LiberNT/LiberNT/commit/6d0ce51a412145b8f6adf3677fa977219710c112",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[MSCTF][MSCTF_APITEST] Notify the application when a text service writes into a composition",
+              "url": "https://github.com/LiberNT/LiberNT/pull/480",
+              "time": "2026-11-16T23:30Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Touch screen fixes: double tap tolerance, Enter activation test",
+              "url": "https://github.com/LiberNT/LiberNT/pull/477",
+              "time": "2026-11-16T21:09Z"
+            },
+            {
+              "kind": "discussion",
+              "title": "Boot Liber NT on the Raspbarry pi zero 2 w",
+              "url": "https://github.com/LiberNT/LiberNT/discussions/476",
+              "time": "2026-11-16T19:56Z"
+            },
+            {
+              "kind": "issue",
+              "title": "You are repeating the same mistakes as Microsoft when it comes to the user interface",
+              "url": "https://github.com/LiberNT/LiberNT/issues/475",
+              "time": "2026-11-16T18:36Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[TASKMGR11][UXTHEME] Show Task Manager in under 50 ms and parse each theme once",
+              "url": "https://github.com/LiberNT/LiberNT/pull/474",
+              "time": "2026-11-16T18:27Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[HDGFX] Demand-start the hdgfx service",
+              "url": "https://github.com/LiberNT/LiberNT/pull/473",
+              "time": "2026-11-16T16:43Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[NTOS] Implement SystemPhysicalMemoryInformation query",
+              "url": "https://github.com/LiberNT/LiberNT/pull/472",
+              "time": "2026-11-16T16:25Z"
+            },
+            {
+              "kind": "issue",
+              "title": "[WOW64WIN] CREATESTRUCT rebasing corrupts NULL titles and class atoms in CWP/CWPRET hooks",
+              "url": "https://github.com/LiberNT/LiberNT/issues/464",
+              "time": "2026-11-16T12:58Z"
+            },
+            {
+              "kind": "issue",
+              "title": "Linux subsystem I/O errors after a large number of file operations",
+              "url": "https://github.com/LiberNT/LiberNT/issues/452",
+              "time": "2026-11-16T08:45Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 300,
+            "release": 0,
+            "issue": 38,
+            "pr": 213,
+            "discussion": 3,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 7,
+            "pr": 15
+          },
+          "mergedPrs": 178,
+          "commitsLowerBound": true,
+          "versionChanges": [],
+          "metrics": {
+            "open_issues": {
+              "current": 74,
+              "delta": null
+            },
+            "open_prs": {
+              "current": 31,
+              "delta": null
+            },
+            "forks": {
+              "current": 0,
+              "delta": null
+            },
+            "size_kb": {
+              "current": 953350,
+              "delta": null
+            },
+            "stars": {
+              "current": 1173,
+              "delta": null
+            }
+          },
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "[WINED3D] Read a WDDM adapter's identity once per adapter",
+              "url": "https://github.com/LiberNT/LiberNT/commit/1ba5e910c1e8abcf4b8266bd39a0d859060ccd41",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[DXGKRNL][NTOS:INBV][KMTESTS] Move the boot screen off a window the CPU host aperture takes",
+              "url": "https://github.com/LiberNT/LiberNT/commit/397727289abc43b13239f8bac9a985e7f55dba1e",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[APISETS][SHCORE_APITEST] Host the WinRT stream API set on shcore",
+              "url": "https://github.com/LiberNT/LiberNT/commit/49bbd5d3c6c05e6a0b07f0b816afe2281a86f9f1",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[NTOS:KE][KERNEL32_APITEST] Let Sleep(0) hand the processor to a lower-priority thread",
+              "url": "https://github.com/LiberNT/LiberNT/commit/5a88f83e00e0ddbb668839f152c8868affcaac78",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "[DXGKRNL][D3DKMT_APITEST] Report WDDM 2.0 for an adapter that runs it",
+              "url": "https://github.com/LiberNT/LiberNT/commit/6d0ce51a412145b8f6adf3677fa977219710c112",
+              "time": "2026-11-17T01:13Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[MSCTF][MSCTF_APITEST] Notify the application when a text service writes into a composition",
+              "url": "https://github.com/LiberNT/LiberNT/pull/480",
+              "time": "2026-11-16T23:30Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Touch screen fixes: double tap tolerance, Enter activation test",
+              "url": "https://github.com/LiberNT/LiberNT/pull/477",
+              "time": "2026-11-16T21:09Z"
+            },
+            {
+              "kind": "discussion",
+              "title": "Boot Liber NT on the Raspbarry pi zero 2 w",
+              "url": "https://github.com/LiberNT/LiberNT/discussions/476",
+              "time": "2026-11-16T19:56Z"
+            },
+            {
+              "kind": "issue",
+              "title": "You are repeating the same mistakes as Microsoft when it comes to the user interface",
+              "url": "https://github.com/LiberNT/LiberNT/issues/475",
+              "time": "2026-11-16T18:36Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[TASKMGR11][UXTHEME] Show Task Manager in under 50 ms and parse each theme once",
+              "url": "https://github.com/LiberNT/LiberNT/pull/474",
+              "time": "2026-11-16T18:27Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[HDGFX] Demand-start the hdgfx service",
+              "url": "https://github.com/LiberNT/LiberNT/pull/473",
+              "time": "2026-11-16T16:43Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[NTOS] Implement SystemPhysicalMemoryInformation query",
+              "url": "https://github.com/LiberNT/LiberNT/pull/472",
+              "time": "2026-11-16T16:25Z"
+            },
+            {
+              "kind": "issue",
+              "title": "[WOW64WIN] CREATESTRUCT rebasing corrupts NULL titles and class atoms in CWP/CWPRET hooks",
+              "url": "https://github.com/LiberNT/LiberNT/issues/464",
+              "time": "2026-11-16T12:58Z"
+            },
+            {
+              "kind": "issue",
+              "title": "Linux subsystem I/O errors after a large number of file operations",
+              "url": "https://github.com/LiberNT/LiberNT/issues/452",
+              "time": "2026-11-16T08:45Z"
+            },
+            {
+              "kind": "discussion",
+              "title": "thank you for your work",
+              "url": "https://github.com/LiberNT/LiberNT/discussions/321",
+              "time": "2026-11-12T18:55Z"
+            },
+            {
+              "kind": "discussion",
+              "title": "Can you try to make 160MB RAM bootability, to prove memory efficiency, a long-term goal?",
+              "url": "https://github.com/LiberNT/LiberNT/discussions/301",
+              "time": "2026-11-11T21:26Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "android",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 4,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "ANDROID: gki_defconfig: Remove CONFIG_DM_SNAPSHOT",
+              "url": "https://android.googlesource.com/kernel/common/+/244c1268ab72dffe5792e78bb09302ec1c5ba286",
+              "time": "2026-11-16T16:12Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: ARM64: gki_defconfig: Enable PKVM guest driver",
+              "url": "https://android.googlesource.com/kernel/common/+/83c15a41357516c11fe500cf3e4c094c645bd9a4",
+              "time": "2026-11-16T11:28Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: Remove ioremap_guard from the GKI and microdroid cmdlines",
+              "url": "https://android.googlesource.com/kernel/common/+/c0d3ec4cfcca46c43e0263c63e12ea02f29bbdd7",
+              "time": "2026-11-16T06:56Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: microdroid: add system dma heap module",
+              "url": "https://android.googlesource.com/kernel/common/+/7d9575e8d1fd2f522f62a8c6f34590d173666395",
+              "time": "2026-11-16T06:52Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 7,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "ANDROID: gki_defconfig: Remove CONFIG_DM_SNAPSHOT",
+              "url": "https://android.googlesource.com/kernel/common/+/244c1268ab72dffe5792e78bb09302ec1c5ba286",
+              "time": "2026-11-16T16:12Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: ARM64: gki_defconfig: Enable PKVM guest driver",
+              "url": "https://android.googlesource.com/kernel/common/+/83c15a41357516c11fe500cf3e4c094c645bd9a4",
+              "time": "2026-11-16T11:28Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: Remove ioremap_guard from the GKI and microdroid cmdlines",
+              "url": "https://android.googlesource.com/kernel/common/+/c0d3ec4cfcca46c43e0263c63e12ea02f29bbdd7",
+              "time": "2026-11-16T06:56Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: microdroid: add system dma heap module",
+              "url": "https://android.googlesource.com/kernel/common/+/7d9575e8d1fd2f522f62a8c6f34590d173666395",
+              "time": "2026-11-16T06:52Z"
+            },
+            {
+              "kind": "commit",
+              "title": "ANDROID: selftests/mm: Move MAP_DROPPABLE fallback to a compat header",
+              "url": "https://android.googlesource.com/kernel/common/+/f3a85265e02b0a54ffd7f18cf317d090203405f8",
+              "time": "2026-11-12T13:21Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "cachyos",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 2,
+            "release": 1,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "config: build applesmc (#1155)",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/780dd8d6a2e611e3bdca15652845bb635c1fbd7f",
+              "time": "2026-11-16T12:18Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux-cachyos-rc: 7.4-rc3-1",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/a742bd85d0c5f6cc385041e3f403780c79235461",
+              "time": "2026-11-16T06:53Z"
+            },
+            {
+              "kind": "release",
+              "title": "CachyOS Linux 7.4-rc3-1",
+              "url": "https://github.com/CachyOS/linux/releases/tag/cachyos-7.4-rc3-1",
+              "time": "2026-11-16T06:01Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 6,
+            "release": 2,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "config: build applesmc (#1155)",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/780dd8d6a2e611e3bdca15652845bb635c1fbd7f",
+              "time": "2026-11-16T12:18Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux-cachyos-rc: 7.4-rc3-1",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/a742bd85d0c5f6cc385041e3f403780c79235461",
+              "time": "2026-11-16T06:53Z"
+            },
+            {
+              "kind": "release",
+              "title": "CachyOS Linux 7.4-rc3-1",
+              "url": "https://github.com/CachyOS/linux/releases/tag/cachyos-7.4-rc3-1",
+              "time": "2026-11-16T06:01Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux-cachyos-eac: Fix sbsign with openssl4",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/13814d5415535c5866784445b670b759ab418b61",
+              "time": "2026-11-14T11:55Z"
+            },
+            {
+              "kind": "commit",
+              "title": "config: Add Rust Binder and sync",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/8c1b37292a40209e9edd6df5bc08aec71236550f",
+              "time": "2026-11-13T07:33Z"
+            },
+            {
+              "kind": "commit",
+              "title": "7.3.4-1",
+              "url": "https://github.com/CachyOS/linux-cachyos/commit/8e308d0a3895dbc741381fb61b9a9a8603be793d",
+              "time": "2026-11-11T13:04Z"
+            },
+            {
+              "kind": "release",
+              "title": "CachyOS Linux 7.3.4-1",
+              "url": "https://github.com/CachyOS/linux/releases/tag/cachyos-7.3.4-1",
+              "time": "2026-11-11T12:10Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "chromiumos",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 1,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "CHROMIUM: intel_gna: clear page tables on request error in gna_score",
+              "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel/+/dbf6d2784c9a99eb4a89bda8627cbd7e16d3a7b9",
+              "time": "2026-11-16T09:56Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 1,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "CHROMIUM: intel_gna: clear page tables on request error in gna_score",
+              "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel/+/dbf6d2784c9a99eb4a89bda8627cbd7e16d3a7b9",
+              "time": "2026-11-16T09:56Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "alpine",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": []
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 1,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "main/linux-lts: upgrade to 7.3.4",
+              "url": "https://gitlab.alpinelinux.org/alpine/aports/-/commit/07a4476de6a7dc5d20203104ddaf63c5595d63a5",
+              "time": "2026-11-11T09:20Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "nixos",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 1,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "linux_testing: 7.4-rc2 -> 7.4-rc3",
+              "url": "https://github.com/NixOS/nixpkgs/commit/00aad0872e52b1690aeabc9eb2466d1eb70bc94c",
+              "time": "2026-11-16T17:39Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 12,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "linux_testing: 7.4-rc2 -> 7.4-rc3",
+              "url": "https://github.com/NixOS/nixpkgs/commit/00aad0872e52b1690aeabc9eb2466d1eb70bc94c",
+              "time": "2026-11-16T17:39Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux_zen: 7.3.4 -> 7.3.4",
+              "url": "https://github.com/NixOS/nixpkgs/commit/7c68e22c2704fd87d2f2d1f442e0141ca6a9e60d",
+              "time": "2026-11-11T17:37Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux_zen: 7.2.15 -> 7.3.4 (#586563)",
+              "url": "https://github.com/NixOS/nixpkgs/commit/f049638e6b90672a12ceb3e8590c874640dbbfcf",
+              "time": "2026-11-11T08:17Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux_xanmod, linux_xanmod_latest: 2026-11-10 (#586560)",
+              "url": "https://github.com/NixOS/nixpkgs/commit/789789e55727b3995f598537c159bab9f774eb7e",
+              "time": "2026-11-11T06:22Z"
+            },
+            {
+              "kind": "commit",
+              "title": "linux_zen: 7.2.15 -> 7.3.4",
+              "url": "https://github.com/NixOS/nixpkgs/commit/c8075e55cf6a6ecc10d178b3abc3a1766fd0d441",
+              "time": "2026-11-11T05:14Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "fedora",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 14,
+            "release": 0,
+            "issue": 0,
+            "pr": 2,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 1,
+            "package": 4,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 18
+          },
+          "mergedPrs": 10,
+          "commitsLowerBound": false,
+          "versionChanges": [
+            {
+              "channel": "kernel-ark",
+              "version": "7.3.0-0.rc7.2f2f7eeef8b0.62",
+              "at": "2026-11-17T04:48Z"
+            },
+            {
+              "channel": "kernel-ark",
+              "version": "7.4.0-0.rc3.26",
+              "at": "2026-11-17T04:48Z"
+            }
+          ],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "Merge branch 'makefile_cleanups_1' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/37c8448bd5ffa198037fcc3cbe4100c12cad5c69",
+              "time": "2026-11-16T16:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-29/drivers/platform' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/4b0c57960c8eb98b86e3aefab7769572c003d074",
+              "time": "2026-11-16T16:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-28/lib/Kconfig.debug' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/0174ba5aa9f7b10ec677a973fd7d3055a0582e5a",
+              "time": "2026-11-16T16:12Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-26/drivers/mtd' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/d1494a985e079cf5b15e6780e4025aaf7739fcb1",
+              "time": "2026-11-16T16:12Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-23/lib/Kconfig.debug' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/cada737df9cc79ebf8719c73c2d86ed0a8ba06fe",
+              "time": "2026-11-16T16:11Z"
+            },
+            {
+              "kind": "tag",
+              "title": "kernel-7.4.0-0.rc3.26",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/tags/kernel-7.4.0-0.rc3.26",
+              "time": "2026-11-16T11:23Z"
+            },
+            {
+              "kind": "pr",
+              "title": "redhat/Makefile: restore variables lost by the EXPORTED_VARS conversion",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4892",
+              "time": "2026-11-16T11:07Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Revert \"phy: qcom: qmp-pcie: Skip PHY reset if already up\"",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4891",
+              "time": "2026-11-15T14:50Z"
+            },
+            {
+              "kind": "pr",
+              "title": "firmware: raspberrypi: Add bcm2712 revD compatible check",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4889",
+              "time": "2026-11-14T09:04Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Backport for ipu-bridge and intel_cvs drivers",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4884",
+              "time": "2026-11-11T06:33Z"
+            },
+            {
+              "kind": "pr",
+              "title": "[redhat] New configs in drivers/platform",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4856",
+              "time": "2026-10-29T10:37Z"
+            }
+          ]
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 150,
+            "release": 0,
+            "issue": 0,
+            "pr": 13,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 12,
+            "package": 6,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 20
+          },
+          "mergedPrs": 19,
+          "commitsLowerBound": true,
+          "versionChanges": [
+            {
+              "channel": "kernel-ark",
+              "version": "7.3.0-0.rc7.2f2f7eeef8b0.62",
+              "at": "2026-11-17T04:48Z"
+            },
+            {
+              "channel": "kernel-ark",
+              "version": "7.4.0-0.rc3.26",
+              "at": "2026-11-17T04:48Z"
+            }
+          ],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "Merge branch 'makefile_cleanups_1' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/37c8448bd5ffa198037fcc3cbe4100c12cad5c69",
+              "time": "2026-11-16T16:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-29/drivers/platform' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/4b0c57960c8eb98b86e3aefab7769572c003d074",
+              "time": "2026-11-16T16:13Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-28/lib/Kconfig.debug' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/0174ba5aa9f7b10ec677a973fd7d3055a0582e5a",
+              "time": "2026-11-16T16:12Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-26/drivers/mtd' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/d1494a985e079cf5b15e6780e4025aaf7739fcb1",
+              "time": "2026-11-16T16:12Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge branch 'configs/os-build/2026-10-23/lib/Kconfig.debug' into 'os-build'",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/commit/cada737df9cc79ebf8719c73c2d86ed0a8ba06fe",
+              "time": "2026-11-16T16:11Z"
+            },
+            {
+              "kind": "tag",
+              "title": "kernel-7.4.0-0.rc3.26",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/tags/kernel-7.4.0-0.rc3.26",
+              "time": "2026-11-16T11:23Z"
+            },
+            {
+              "kind": "pr",
+              "title": "redhat/Makefile: restore variables lost by the EXPORTED_VARS conversion",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4892",
+              "time": "2026-11-16T11:07Z"
+            },
+            {
+              "kind": "tag",
+              "title": "v7.4-rc3",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/tags/v7.4-rc3",
+              "time": "2026-11-15T22:30Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Revert \"phy: qcom: qmp-pcie: Skip PHY reset if already up\"",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4891",
+              "time": "2026-11-15T14:50Z"
+            },
+            {
+              "kind": "tag",
+              "title": "kernel-7.4.0-0.rc2.23c62304dde2.25",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/tags/kernel-7.4.0-0.rc2.23c62304dde2.25",
+              "time": "2026-11-15T11:21Z"
+            },
+            {
+              "kind": "tag",
+              "title": "kernel-7.4.0-0.rc2.97d73c825122.24",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/tags/kernel-7.4.0-0.rc2.97d73c825122.24",
+              "time": "2026-11-14T11:22Z"
+            },
+            {
+              "kind": "pr",
+              "title": "firmware: raspberrypi: Add bcm2712 revD compatible check",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4889",
+              "time": "2026-11-14T09:04Z"
+            },
+            {
+              "kind": "tag",
+              "title": "kernel-7.4.0-0.rc2.7e1392a42ea2.23",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/tags/kernel-7.4.0-0.rc2.7e1392a42ea2.23",
+              "time": "2026-11-13T11:23Z"
+            },
+            {
+              "kind": "pr",
+              "title": "redhat: Tighten the default image policy in the UKI",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4887",
+              "time": "2026-11-12T16:44Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Backport for ipu-bridge and intel_cvs drivers",
+              "url": "https://gitlab.com/cki-project/kernel-ark/-/merge_requests/4884",
+              "time": "2026-11-11T06:33Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "ubuntu",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": []
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 3,
+            "news": 0,
+            "build": 2
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": []
+        }
+      ]
+    },
+    {
+      "kernel": "arch",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": []
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 2,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "tag",
+              "title": "7.3.4.arch1-2",
+              "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/tags/7.3.4.arch1-2",
+              "time": "2026-11-12T21:33Z"
+            },
+            {
+              "kind": "tag",
+              "title": "7.3.4.arch1-1",
+              "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/tags/7.3.4.arch1-1",
+              "time": "2026-11-11T03:56Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kernel": "rhel",
+      "windows": [
+        {
+          "label": "24h",
+          "since": "2026-11-16T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 0,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": []
+        },
+        {
+          "label": "7d",
+          "since": "2026-11-10T05:00Z",
+          "until": "2026-11-17T05:00Z",
+          "counts": {
+            "commit": 30,
+            "release": 0,
+            "issue": 0,
+            "pr": 0,
+            "discussion": 0,
+            "mail": 0,
+            "tag": 0,
+            "package": 0,
+            "news": 0,
+            "build": 0
+          },
+          "updated": {
+            "issue": 0,
+            "pr": 0
+          },
+          "mergedPrs": 0,
+          "commitsLowerBound": false,
+          "versionChanges": [],
+          "metrics": {},
+          "notable": [
+            {
+              "kind": "commit",
+              "title": "[redhat] kernel-5.14.0-765.el9",
+              "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/c6faf147119cf8cb37e71922b3afdacafb6f73ab",
+              "time": "2026-11-11T09:11Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge: CVE-2026-99032: net/smc: protect clcsock lifetime in smc_getname",
+              "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/3ab2f3cfd4b24ad1775915e8e19a86d417692944",
+              "time": "2026-11-11T09:10Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge: CVE-2026-68451: s390/zcrypt: Validate length for CCA ECC private key requests",
+              "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/c938a4b154e1e8e06e2624b8832904140811c3d7",
+              "time": "2026-11-11T09:10Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge: CVE-2026-68452: s390/zcrypt: Validate length for CCA AES cipher key requests",
+              "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/6974d67c51b389d30c70029fcbec66554e930fa9",
+              "time": "2026-11-11T09:10Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Merge: scsi: qla2xxx: Derive physical port from real INTx pin on Hyper-V DDA guests",
+              "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/904417c83c5a397fc418c0a37b90cfe62a5ac7a4",
+              "time": "2026-11-11T09:10Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

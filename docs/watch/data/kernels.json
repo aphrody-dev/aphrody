@@ -1,0 +1,1628 @@
+{
+  "asOf": "2026-11-17T05:00Z",
+  "kernels": [
+    {
+      "id": "linux",
+      "name": "Linux",
+      "role": "upstream",
+      "lineage": "linux",
+      "description": "Mainline, stable and linux-next trees published by kernel.org.",
+      "sites": [
+        {
+          "id": "kernel-org",
+          "kind": "site",
+          "url": "https://www.kernel.org/"
+        },
+        {
+          "id": "docs",
+          "kind": "docs",
+          "url": "https://docs.kernel.org/"
+        },
+        {
+          "id": "doc-html",
+          "kind": "docs",
+          "url": "https://www.kernel.org/doc/html/latest/"
+        },
+        {
+          "id": "lore",
+          "kind": "list",
+          "url": "https://lore.kernel.org/",
+          "note": "public-inbox archive of the kernel mailing lists; two list feeds are polled, full ingestion is out of scope"
+        },
+        {
+          "id": "rust-for-linux",
+          "kind": "site",
+          "url": "https://rust-for-linux.com/"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "rust-for-linux-github",
+          "provider": "github",
+          "url": "https://github.com/Rust-for-Linux"
+        }
+      ],
+      "sources": [
+        {
+          "id": "linux-lkml",
+          "kind": "feed",
+          "url": "https://lore.kernel.org/lkml/new.atom",
+          "yields": [
+            "mail"
+          ]
+        },
+        {
+          "id": "linux-mainline-commits",
+          "kind": "cgit-atom",
+          "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/atom/?h=master",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "linux-next-commits",
+          "kind": "cgit-atom",
+          "url": "https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/atom/?h=master",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "linux-releases",
+          "kind": "releases-json",
+          "url": "https://www.kernel.org/releases.json",
+          "yields": [
+            "release",
+            "version"
+          ]
+        },
+        {
+          "id": "linux-rust-for-linux-list",
+          "kind": "feed",
+          "url": "https://lore.kernel.org/rust-for-linux/new.atom",
+          "yields": [
+            "mail"
+          ]
+        },
+        {
+          "id": "linux-stable-commits",
+          "kind": "cgit-atom",
+          "url": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/atom/?h=linux-rolling-stable",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "linux-tags",
+          "kind": "cgit-atom",
+          "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/refs/tags",
+          "yields": [
+            "tag"
+          ]
+        }
+      ],
+      "latestReleases": [
+        {
+          "title": "Linux next-20261116 (linux-next)",
+          "version": "next-20261116",
+          "url": "https://git.kernel.org/next/linux-next/h/next-20261116",
+          "time": "2026-11-16T20:59Z"
+        },
+        {
+          "title": "Linux 7.4-rc3 (mainline)",
+          "version": "7.4-rc3",
+          "url": "https://git.kernel.org/torvalds/h/v7.4-rc3",
+          "time": "2026-11-15T22:30Z"
+        },
+        {
+          "title": "Linux 7.3.4 (stable)",
+          "version": "7.3.4",
+          "url": "https://git.kernel.org/stable/h/v7.3.4",
+          "time": "2026-11-10T18:11Z"
+        }
+      ],
+      "repositories": []
+    },
+    {
+      "id": "asterinas",
+      "name": "Asterinas",
+      "role": "research",
+      "lineage": "own",
+      "description": "Rust framekernel with Linux ABI compatibility (OSTD).",
+      "sites": [
+        {
+          "id": "site",
+          "kind": "site",
+          "url": "https://asterinas.github.io/"
+        },
+        {
+          "id": "book",
+          "kind": "book",
+          "url": "https://asterinas.github.io/book/"
+        },
+        {
+          "id": "linux-compatibility",
+          "kind": "docs",
+          "url": "https://asterinas.github.io/book/kernel/linux-compatibility/",
+          "note": "syscall and feature coverage tables, read in phase B"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "asterinas",
+          "provider": "github",
+          "url": "https://github.com/asterinas",
+          "source": "asterinas-org-repos"
+        }
+      ],
+      "sources": [
+        {
+          "id": "asterinas-commits",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/asterinas/asterinas/commits?per_page=100",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "asterinas-counts",
+          "kind": "forge-api",
+          "url": "https://api.github.com/search/issues?q=repo:asterinas/asterinas+is:open+is:pr&per_page=1",
+          "yields": [
+            "metric"
+          ]
+        },
+        {
+          "id": "asterinas-discussions",
+          "kind": "feed",
+          "url": "https://github.com/asterinas/asterinas/discussions.atom",
+          "yields": [
+            "discussion"
+          ]
+        },
+        {
+          "id": "asterinas-issues",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/asterinas/asterinas/issues?state=all&sort=updated&direction=desc&per_page=100",
+          "yields": [
+            "issue"
+          ]
+        },
+        {
+          "id": "asterinas-org-repos",
+          "kind": "forge-api",
+          "url": "https://api.github.com/orgs/asterinas/repos?per_page=100&sort=pushed",
+          "yields": [
+            "repo"
+          ]
+        },
+        {
+          "id": "asterinas-pulls",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/asterinas/asterinas/pulls?state=all&sort=updated&direction=desc&per_page=100",
+          "yields": [
+            "pr"
+          ]
+        },
+        {
+          "id": "asterinas-releases",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/asterinas/asterinas/releases?per_page=30",
+          "yields": [
+            "release"
+          ]
+        },
+        {
+          "id": "asterinas-repo",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/asterinas/asterinas",
+          "yields": [
+            "metric"
+          ]
+        }
+      ],
+      "latestReleases": [
+        {
+          "title": "v0.19.0",
+          "version": "v0.19.0",
+          "url": "https://github.com/asterinas/asterinas/releases/tag/v0.19.0",
+          "time": "2026-10-12T21:37Z"
+        },
+        {
+          "title": "v0.18.1",
+          "version": "v0.18.1",
+          "url": "https://github.com/asterinas/asterinas/releases/tag/v0.18.1",
+          "time": "2026-08-18T15:10Z"
+        },
+        {
+          "title": "v0.18.0",
+          "version": "v0.18.0",
+          "url": "https://github.com/asterinas/asterinas/releases/tag/v0.18.0",
+          "time": "2026-06-03T14:32Z"
+        }
+      ],
+      "repositories": [
+        {
+          "name": "asterinas/asterinas",
+          "url": "https://github.com/asterinas/asterinas",
+          "stars": 5110,
+          "pushed": "2026-11-17T04:42Z",
+          "description": "Asterinas aims to be a production-grade Linux alternative—memory safe, high-performance, and more."
+        },
+        {
+          "name": "asterinas/book",
+          "url": "https://github.com/asterinas/book",
+          "stars": 2,
+          "pushed": "2026-11-17T04:29Z",
+          "description": "The Website for the Asterinas Book. The content is generated by MdBook."
+        },
+        {
+          "name": "asterinas/kata-containers",
+          "url": "https://github.com/asterinas/kata-containers",
+          "stars": 0,
+          "pushed": "2026-11-17T03:43Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/vostd",
+          "url": "https://github.com/asterinas/vostd",
+          "stars": 62,
+          "pushed": "2026-11-17T03:34Z",
+          "description": "Ongoing formal verification for Asterinas OSTD"
+        },
+        {
+          "name": "asterinas/verus",
+          "url": "https://github.com/asterinas/verus",
+          "stars": 2,
+          "pushed": "2026-11-17T03:10Z",
+          "description": "Verified Rust for Asterinas code"
+        },
+        {
+          "name": "asterinas/api-docs-nightly",
+          "url": "https://github.com/asterinas/api-docs-nightly",
+          "stars": 0,
+          "pushed": "2026-11-17T00:29Z",
+          "description": "The nightly version of the Asterinas OSTD API documentation is always kept up-to-date with the latest version of Asterinas OSTD."
+        },
+        {
+          "name": "asterinas/benchmark",
+          "url": "https://github.com/asterinas/benchmark",
+          "stars": 1,
+          "pushed": "2026-11-17T00:07Z",
+          "description": "The Website for the Asterinas Benchmark. The content is generated by Benchmarks Test."
+        },
+        {
+          "name": "asterinas/rust-deductive-verifier",
+          "url": "https://github.com/asterinas/rust-deductive-verifier",
+          "stars": 3,
+          "pushed": "2026-11-13T13:30Z",
+          "description": "Helper framework for `vostd`"
+        },
+        {
+          "name": "asterinas/thank-you-dataset",
+          "url": "https://github.com/asterinas/thank-you-dataset",
+          "stars": 0,
+          "pushed": "2026-11-09T04:12Z",
+          "description": "The project automatically generates and maintains a list of Asterinas contributors, ranked by their scores, for display on the official website"
+        },
+        {
+          "name": "asterinas/KVerus",
+          "url": "https://github.com/asterinas/KVerus",
+          "stars": 29,
+          "pushed": "2026-10-27T02:33Z",
+          "description": "KVerus: Scalable and Resilient Formal Verification for Rust Code"
+        },
+        {
+          "name": "asterinas/tpm-core",
+          "url": "https://github.com/asterinas/tpm-core",
+          "stars": 1,
+          "pushed": "2026-10-15T14:20Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/asterinas.github.io",
+          "url": "https://github.com/asterinas/asterinas.github.io",
+          "stars": 1,
+          "pushed": "2026-10-13T03:36Z",
+          "description": "The source code of the Asterinas website"
+        },
+        {
+          "name": "asterinas/api-docs",
+          "url": "https://github.com/asterinas/api-docs",
+          "stars": 2,
+          "pushed": "2026-10-12T21:25Z",
+          "description": "The hosted API documentation of Asterinas OSTD"
+        },
+        {
+          "name": "asterinas/github-action-benchmark",
+          "url": "https://github.com/asterinas/github-action-benchmark",
+          "stars": 0,
+          "pushed": "2026-10-09T06:04Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/asterinas-artwork",
+          "url": "https://github.com/asterinas/asterinas-artwork",
+          "stars": 1,
+          "pushed": "2026-10-08T08:18Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/confidential-containers",
+          "url": "https://github.com/asterinas/confidential-containers",
+          "stars": 0,
+          "pushed": "2026-09-28T08:56Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/linux_vdso",
+          "url": "https://github.com/asterinas/linux_vdso",
+          "stars": 0,
+          "pushed": "2026-09-18T07:49Z",
+          "description": "Contain a vdso64.so file of Linux v6.2.10."
+        },
+        {
+          "name": "asterinas/smoltcp",
+          "url": "https://github.com/asterinas/smoltcp",
+          "stars": 3,
+          "pushed": "2026-08-11T08:20Z",
+          "description": "a smol tcp/ip stack"
+        },
+        {
+          "name": "asterinas/hyperenclave",
+          "url": "https://github.com/asterinas/hyperenclave",
+          "stars": 88,
+          "pushed": "2026-08-10T02:54Z",
+          "description": "HyperEnclave is an open and cross-platform trusted execution environment."
+        },
+        {
+          "name": "asterinas/unified-attestation",
+          "url": "https://github.com/asterinas/unified-attestation",
+          "stars": 1,
+          "pushed": "2026-07-20T02:02Z",
+          "description": "【网空计划】统一远程证明服务代码"
+        },
+        {
+          "name": "asterinas/linux_binary_cache",
+          "url": "https://github.com/asterinas/linux_binary_cache",
+          "stars": 0,
+          "pushed": "2026-07-14T07:25Z",
+          "description": "Contain a vmlinuz-5.15.0-105-generic file of Linux v5.15.0."
+        },
+        {
+          "name": "asterinas/pr-review-analysis",
+          "url": "https://github.com/asterinas/pr-review-analysis",
+          "stars": 0,
+          "pushed": "2026-07-02T06:29Z",
+          "description": "Tooling to collect, analyze, and summarize the code review history of Asterinas"
+        },
+        {
+          "name": "asterinas/zzjh-wang-haiwang",
+          "url": "https://github.com/asterinas/zzjh-wang-haiwang",
+          "stars": 0,
+          "pushed": "2026-06-24T14:07Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/zzjh-wang-aojie",
+          "url": "https://github.com/asterinas/zzjh-wang-aojie",
+          "stars": 0,
+          "pushed": "2026-06-22T08:57Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/ccf-open-inno-competition",
+          "url": "https://github.com/asterinas/ccf-open-inno-competition",
+          "stars": 1,
+          "pushed": "2026-06-15T10:29Z",
+          "description": "2026 CCF开源创新大赛 星绽赛题"
+        },
+        {
+          "name": "asterinas/verus-analyzer",
+          "url": "https://github.com/asterinas/verus-analyzer",
+          "stars": 0,
+          "pushed": "2026-03-30T03:22Z",
+          "description": "A Verus compiler front-end for IDEs (derived from rust-analyzer)"
+        },
+        {
+          "name": "asterinas/fast26-artifact-evaluation",
+          "url": "https://github.com/asterinas/fast26-artifact-evaluation",
+          "stars": 1,
+          "pushed": "2026-01-20T09:53Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/lmbench",
+          "url": "https://github.com/asterinas/lmbench",
+          "stars": 1,
+          "pushed": "2025-12-17T09:21Z",
+          "description": ""
+        },
+        {
+          "name": "asterinas/summer-ospp-teaching-os",
+          "url": "https://github.com/asterinas/summer-ospp-teaching-os",
+          "stars": 0,
+          "pushed": "2025-10-24T03:31Z",
+          "description": "Asterinas is a secure, fast, and general-purpose OS kernel, written in Rust and providing Linux-compatible ABI."
+        },
+        {
+          "name": "asterinas/int-to-c-enum",
+          "url": "https://github.com/asterinas/int-to-c-enum",
+          "stars": 0,
+          "pushed": "2025-06-27T09:13Z",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "redox",
+      "name": "Redox",
+      "role": "research",
+      "lineage": "own",
+      "description": "Rust microkernel and userland, forge on GitLab.",
+      "sites": [
+        {
+          "id": "site",
+          "kind": "site",
+          "url": "https://www.redox-os.org/"
+        },
+        {
+          "id": "book",
+          "kind": "book",
+          "url": "https://doc.redox-os.org/book/"
+        },
+        {
+          "id": "rfcs",
+          "kind": "rfc",
+          "url": "https://gitlab.redox-os.org/redox-os/rfcs"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "redox-os",
+          "provider": "gitlab",
+          "url": "https://gitlab.redox-os.org/redox-os",
+          "source": "redox-group-projects"
+        }
+      ],
+      "sources": [
+        {
+          "id": "redox-commits",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/repository/commits?per_page=100",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "redox-counts",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=opened&per_page=1",
+          "yields": [
+            "metric"
+          ]
+        },
+        {
+          "id": "redox-group-projects",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/groups/redox-os/projects?per_page=100&order_by=last_activity_at",
+          "yields": [
+            "repo"
+          ]
+        },
+        {
+          "id": "redox-issues",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/issues?state=all&order_by=updated_at&per_page=100",
+          "yields": [
+            "issue"
+          ]
+        },
+        {
+          "id": "redox-merge-requests",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/merge_requests?state=all&order_by=updated_at&per_page=100",
+          "yields": [
+            "pr"
+          ]
+        },
+        {
+          "id": "redox-news",
+          "kind": "feed",
+          "url": "https://www.redox-os.org/news/index.xml",
+          "yields": [
+            "news"
+          ]
+        },
+        {
+          "id": "redox-project",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel",
+          "yields": [
+            "metric"
+          ]
+        },
+        {
+          "id": "redox-releases",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/releases?per_page=30",
+          "yields": [
+            "release"
+          ]
+        },
+        {
+          "id": "redox-sitemap",
+          "kind": "sitemap",
+          "url": "https://www.redox-os.org/sitemap.xml",
+          "yields": [
+            "page"
+          ]
+        },
+        {
+          "id": "redox-tags",
+          "kind": "forge-api",
+          "url": "https://gitlab.redox-os.org/api/v4/projects/redox-os%2Fkernel/repository/tags?per_page=50",
+          "yields": [
+            "tag"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": [
+        {
+          "name": "redox-os/relibc",
+          "url": "https://gitlab.redox-os.org/redox-os/relibc",
+          "stars": 41,
+          "pushed": "2026-11-17T02:35Z",
+          "description": "C Library in Rust for Redox and Linux (WIP)"
+        },
+        {
+          "name": "redox-os/redox",
+          "url": "https://gitlab.redox-os.org/redox-os/redox",
+          "stars": 136,
+          "pushed": "2026-11-17T00:04Z",
+          "description": "Redox: A Rust Operating System"
+        },
+        {
+          "name": "redox-os/liborbital",
+          "url": "https://gitlab.redox-os.org/redox-os/liborbital",
+          "stars": 0,
+          "pushed": "2026-11-16T18:49Z",
+          "description": "C bindings to the Orbital client library"
+        },
+        {
+          "name": "redox-os/base",
+          "url": "https://gitlab.redox-os.org/redox-os/base",
+          "stars": 2,
+          "pushed": "2026-11-16T15:29Z",
+          "description": "Essential system components and drivers."
+        },
+        {
+          "name": "redox-os/test-results",
+          "url": "https://gitlab.redox-os.org/redox-os/test-results",
+          "stars": 1,
+          "pushed": "2026-11-16T14:41Z",
+          "description": ""
+        },
+        {
+          "name": "redox-os/games",
+          "url": "https://gitlab.redox-os.org/redox-os/games",
+          "stars": 4,
+          "pushed": "2026-11-16T14:40Z",
+          "description": "Games for Redox!"
+        },
+        {
+          "name": "redox-os/pkgutils",
+          "url": "https://gitlab.redox-os.org/redox-os/pkgutils",
+          "stars": 12,
+          "pushed": "2026-11-16T14:39Z",
+          "description": "Redox Packaging Utilities"
+        },
+        {
+          "name": "redox-os/pkgar",
+          "url": "https://gitlab.redox-os.org/redox-os/pkgar",
+          "stars": 4,
+          "pushed": "2026-11-15T13:38Z",
+          "description": "Package Archive"
+        },
+        {
+          "name": "redox-os/cargo",
+          "url": "https://gitlab.redox-os.org/redox-os/cargo",
+          "stars": 0,
+          "pushed": "2026-11-15T12:51Z",
+          "description": "The Rust package manager"
+        },
+        {
+          "name": "redox-os/backtrace-rs",
+          "url": "https://gitlab.redox-os.org/redox-os/backtrace-rs",
+          "stars": 0,
+          "pushed": "2026-11-15T11:36Z",
+          "description": ""
+        },
+        {
+          "name": "redox-os/kernel",
+          "url": "https://gitlab.redox-os.org/redox-os/kernel",
+          "stars": 37,
+          "pushed": "2026-11-15T02:33Z",
+          "description": "The Redox microkernel"
+        },
+        {
+          "name": "redox-os/book",
+          "url": "https://gitlab.redox-os.org/redox-os/book",
+          "stars": 15,
+          "pushed": "2026-11-14T21:07Z",
+          "description": "The Redox book - https://doc.redox-os.org/book/"
+        },
+        {
+          "name": "redox-os/website",
+          "url": "https://gitlab.redox-os.org/redox-os/website",
+          "stars": 12,
+          "pushed": "2026-11-14T15:22Z",
+          "description": "The Redox website (blog, news, feed, etc.)"
+        },
+        {
+          "name": "redox-os/orbclient",
+          "url": "https://gitlab.redox-os.org/redox-os/orbclient",
+          "stars": 5,
+          "pushed": "2026-11-14T00:36Z",
+          "description": "The Orbital Client Library. Compatible with Redox and SDL2."
+        },
+        {
+          "name": "redox-os/orbutils",
+          "url": "https://gitlab.redox-os.org/redox-os/orbutils",
+          "stars": 3,
+          "pushed": "2026-11-13T13:45Z",
+          "description": "The Orbital Utilities. Compatible with Redox and SDL2."
+        },
+        {
+          "name": "redox-os/orbital",
+          "url": "https://gitlab.redox-os.org/redox-os/orbital",
+          "stars": 21,
+          "pushed": "2026-11-09T22:01Z",
+          "description": "Redox Windowing and Compositing System"
+        },
+        {
+          "name": "redox-os/gtk",
+          "url": "https://gitlab.redox-os.org/redox-os/gtk",
+          "stars": 0,
+          "pushed": "2026-11-09T18:56Z",
+          "description": ""
+        },
+        {
+          "name": "redox-os/redoxer",
+          "url": "https://gitlab.redox-os.org/redox-os/redoxer",
+          "stars": 7,
+          "pushed": "2026-11-09T13:13Z",
+          "description": "Method for quickly running programs inside of Redox from a KVM capable OS."
+        },
+        {
+          "name": "redox-os/installer",
+          "url": "https://gitlab.redox-os.org/redox-os/installer",
+          "stars": 0,
+          "pushed": "2026-11-08T13:09Z",
+          "description": "A Redox filesystem builder"
+        },
+        {
+          "name": "redox-os/libredox",
+          "url": "https://gitlab.redox-os.org/redox-os/libredox",
+          "stars": 2,
+          "pushed": "2026-11-06T17:31Z",
+          "description": "Redox system library (stable ABI)"
+        },
+        {
+          "name": "redox-os/bootloader",
+          "url": "https://gitlab.redox-os.org/redox-os/bootloader",
+          "stars": 6,
+          "pushed": "2026-11-05T14:10Z",
+          "description": "Redox OS Bootloader"
+        },
+        {
+          "name": "redox-os/rehid",
+          "url": "https://gitlab.redox-os.org/redox-os/rehid",
+          "stars": 1,
+          "pushed": "2026-11-05T13:52Z",
+          "description": "Redox HID parsing library"
+        },
+        {
+          "name": "redox-os/chashmap",
+          "url": "https://gitlab.redox-os.org/redox-os/chashmap",
+          "stars": 4,
+          "pushed": "2026-11-03T14:49Z",
+          "description": "A concurrent HashMap"
+        },
+        {
+          "name": "redox-os/liblibc",
+          "url": "https://gitlab.redox-os.org/redox-os/liblibc",
+          "stars": 1,
+          "pushed": "2026-11-03T00:41Z",
+          "description": "Raw bindings to platform APIs for Rust"
+        },
+        {
+          "name": "redox-os/ca-certificates",
+          "url": "https://gitlab.redox-os.org/redox-os/ca-certificates",
+          "stars": 0,
+          "pushed": "2026-11-02T15:31Z",
+          "description": ""
+        },
+        {
+          "name": "redox-os/acid",
+          "url": "https://gitlab.redox-os.org/redox-os/acid",
+          "stars": 1,
+          "pushed": "2026-11-02T15:21Z",
+          "description": "Redox test suite"
+        },
+        {
+          "name": "redox-os/redoxfs",
+          "url": "https://gitlab.redox-os.org/redox-os/redoxfs",
+          "stars": 11,
+          "pushed": "2026-11-01T17:28Z",
+          "description": "The Redox Filesystem"
+        },
+        {
+          "name": "redox-os/redox-scheme",
+          "url": "https://gitlab.redox-os.org/redox-os/redox-scheme",
+          "stars": 0,
+          "pushed": "2026-11-01T17:27Z",
+          "description": ""
+        },
+        {
+          "name": "redox-os/posix-regex",
+          "url": "https://gitlab.redox-os.org/redox-os/posix-regex",
+          "stars": 1,
+          "pushed": "2026-10-29T18:18Z",
+          "description": "A library for parsing POSIX regular expressions"
+        },
+        {
+          "name": "redox-os/range-tree",
+          "url": "https://gitlab.redox-os.org/redox-os/range-tree",
+          "stars": 0,
+          "pushed": "2026-10-29T15:35Z",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "libernt",
+      "name": "LiberNT",
+      "role": "research",
+      "lineage": "own",
+      "description": "Free Windows-compatible NT kernel and userland (branch main-nt10).",
+      "sites": [
+        {
+          "id": "site",
+          "kind": "site",
+          "url": "https://libernt.com/"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "libernt",
+          "provider": "github",
+          "url": "https://github.com/LiberNT",
+          "source": "libernt-org-repos"
+        }
+      ],
+      "sources": [
+        {
+          "id": "libernt-commits",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/LiberNT/LiberNT/commits?sha=main-nt10&per_page=100",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "libernt-counts",
+          "kind": "forge-api",
+          "url": "https://api.github.com/search/issues?q=repo:LiberNT/LiberNT+is:open+is:pr&per_page=1",
+          "yields": [
+            "metric"
+          ]
+        },
+        {
+          "id": "libernt-discussions",
+          "kind": "feed",
+          "url": "https://github.com/LiberNT/LiberNT/discussions.atom",
+          "yields": [
+            "discussion"
+          ]
+        },
+        {
+          "id": "libernt-issues",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/LiberNT/LiberNT/issues?state=all&sort=updated&direction=desc&per_page=100",
+          "yields": [
+            "issue"
+          ]
+        },
+        {
+          "id": "libernt-org-repos",
+          "kind": "forge-api",
+          "url": "https://api.github.com/orgs/LiberNT/repos?per_page=100&sort=pushed",
+          "yields": [
+            "repo"
+          ]
+        },
+        {
+          "id": "libernt-pulls",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/LiberNT/LiberNT/pulls?state=all&sort=updated&direction=desc&per_page=100",
+          "yields": [
+            "pr"
+          ]
+        },
+        {
+          "id": "libernt-releases",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/LiberNT/LiberNT/releases?per_page=30",
+          "yields": [
+            "release"
+          ]
+        },
+        {
+          "id": "libernt-repo",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/LiberNT/LiberNT",
+          "yields": [
+            "metric"
+          ]
+        },
+        {
+          "id": "libernt-sitemap",
+          "kind": "sitemap",
+          "url": "https://libernt.com/sitemap.xml",
+          "yields": [
+            "page"
+          ]
+        }
+      ],
+      "latestReleases": [
+        {
+          "title": "ICU payload 72.1-1",
+          "version": "icu-72.1-1",
+          "url": "https://github.com/LiberNT/LiberNT/releases/tag/icu-72.1-1",
+          "time": "2026-10-30T15:05Z"
+        },
+        {
+          "title": "FFmpeg codec payload n8.1.3-1",
+          "version": "ffmpeg-n8.1.3-1",
+          "url": "https://github.com/LiberNT/LiberNT/releases/tag/ffmpeg-n8.1.3-1",
+          "time": "2026-10-28T02:32Z"
+        },
+        {
+          "title": "Mesa LLVMpipe/Lavapipe payload 26.2.2-1",
+          "version": "mesa-llvmpipe-26.2.2-1",
+          "url": "https://github.com/LiberNT/LiberNT/releases/tag/mesa-llvmpipe-26.2.2-1",
+          "time": "2026-10-22T13:54Z"
+        }
+      ],
+      "repositories": [
+        {
+          "name": "LiberNT/LiberNT",
+          "url": "https://github.com/LiberNT/LiberNT",
+          "stars": 1173,
+          "pushed": "2026-11-17T03:49Z",
+          "description": "A free Windows-compatible Operating System"
+        },
+        {
+          "name": "LiberNT/libernt-mesa",
+          "url": "https://github.com/LiberNT/libernt-mesa",
+          "stars": 0,
+          "pushed": "2026-11-11T04:14Z",
+          "description": ""
+        },
+        {
+          "name": "LiberNT/.github",
+          "url": "https://github.com/LiberNT/.github",
+          "stars": 0,
+          "pushed": "2026-11-04T11:03Z",
+          "description": "Welcome to LiberNT."
+        },
+        {
+          "name": "LiberNT/FEX",
+          "url": "https://github.com/LiberNT/FEX",
+          "stars": 1,
+          "pushed": "2026-10-22T07:17Z",
+          "description": "A fast usermode x86 and x86-64 emulator for Arm64 Linux"
+        },
+        {
+          "name": "LiberNT/libernt-build-toolchain",
+          "url": "https://github.com/LiberNT/libernt-build-toolchain",
+          "stars": 2,
+          "pushed": "2026-10-20T10:49Z",
+          "description": "Prebuilt Windows build toolchain (RosBE) for LiberNT"
+        },
+        {
+          "name": "LiberNT/mesa",
+          "url": "https://github.com/LiberNT/mesa",
+          "stars": 2,
+          "pushed": "2026-09-01T10:19Z",
+          "description": "https://gitlab.freedesktop.org/mesa/mesa"
+        },
+        {
+          "name": "LiberNT/qemu-rpi3",
+          "url": "https://github.com/LiberNT/qemu-rpi3",
+          "stars": 2,
+          "pushed": "2026-08-11T18:20Z",
+          "description": "QEMU 11.0.0 + 3 BCM283x fixes so Raspberry Pi 3 UEFI boots on -M raspi3b (branch rpi3-uefi-fixes). RPI_EFI.fd is an armstub linked at 0x0, so -kernel fails; needs BOTH: -M raspi3b -m 1G -bios RPI_EFI.fd -device loader,file=RPI_EFI.fd,addr=0x0,force-raw=on -drive file=sd.img,if=sd,format=raw. TF-A logs on UART0, UEFI on UART1."
+        }
+      ]
+    },
+    {
+      "id": "android",
+      "name": "Android Common Kernel",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "android-mainline and GKI branches of the Android Common Kernel.",
+      "sites": [
+        {
+          "id": "source-android",
+          "kind": "docs",
+          "url": "https://source.android.com/docs/core/architecture/kernel/android-common"
+        },
+        {
+          "id": "googlesource",
+          "kind": "forge",
+          "url": "https://android.googlesource.com/kernel/common"
+        }
+      ],
+      "orgs": [],
+      "sources": [
+        {
+          "id": "android-gki-version",
+          "kind": "gitiles",
+          "url": "https://android.googlesource.com/kernel/common/+refs/heads?format=JSON",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "android-mainline-log",
+          "kind": "gitiles",
+          "url": "https://android.googlesource.com/kernel/common/+log/refs/heads/android-mainline?format=JSON&n=50",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "android-mainline-version",
+          "kind": "gitiles",
+          "url": "https://android.googlesource.com/kernel/common/+/refs/heads/android-mainline/Makefile?format=TEXT",
+          "yields": [
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "cachyos",
+      "name": "CachyOS",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "Arch-based distro shipping linux-cachyos and linux-cachyos-rc.",
+      "sites": [
+        {
+          "id": "site",
+          "kind": "site",
+          "url": "https://cachyos.org/"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "cachyos",
+          "provider": "github",
+          "url": "https://github.com/CachyOS",
+          "source": "cachyos-org-repos"
+        }
+      ],
+      "sources": [
+        {
+          "id": "cachyos-commits",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/CachyOS/linux-cachyos/commits?per_page=50",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "cachyos-kernel-releases",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/CachyOS/linux/releases?per_page=30",
+          "yields": [
+            "release"
+          ]
+        },
+        {
+          "id": "cachyos-org-repos",
+          "kind": "forge-api",
+          "url": "https://api.github.com/orgs/CachyOS/repos?per_page=100&sort=pushed",
+          "yields": [
+            "repo"
+          ]
+        },
+        {
+          "id": "cachyos-rc-version",
+          "kind": "package-index",
+          "url": "https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos-rc/.SRCINFO",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "cachyos-stable-version",
+          "kind": "package-index",
+          "url": "https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos/.SRCINFO",
+          "yields": [
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [
+        {
+          "title": "CachyOS Linux 7.4-rc3-1",
+          "version": "cachyos-7.4-rc3-1",
+          "url": "https://github.com/CachyOS/linux/releases/tag/cachyos-7.4-rc3-1",
+          "time": "2026-11-16T06:01Z"
+        },
+        {
+          "title": "CachyOS Linux 7.3.4-1",
+          "version": "cachyos-7.3.4-1",
+          "url": "https://github.com/CachyOS/linux/releases/tag/cachyos-7.3.4-1",
+          "time": "2026-11-11T12:10Z"
+        },
+        {
+          "title": "CachyOS Linux 7.4-rc2-2",
+          "version": "cachyos-7.4-rc2-2",
+          "url": "https://github.com/CachyOS/linux/releases/tag/cachyos-7.4-rc2-2",
+          "time": "2026-11-09T03:40Z"
+        }
+      ],
+      "repositories": [
+        {
+          "name": "CachyOS/cachyos-aur-derived",
+          "url": "https://github.com/CachyOS/cachyos-aur-derived",
+          "stars": 23,
+          "pushed": "2026-11-16T22:07Z",
+          "description": ""
+        },
+        {
+          "name": "CachyOS/cachyos-calamares",
+          "url": "https://github.com/CachyOS/cachyos-calamares",
+          "stars": 78,
+          "pushed": "2026-11-16T18:50Z",
+          "description": "CachyOS Calamares"
+        },
+        {
+          "name": "CachyOS/packageinstaller",
+          "url": "https://github.com/CachyOS/packageinstaller",
+          "stars": 40,
+          "pushed": "2026-11-16T18:50Z",
+          "description": "Simple Software Application Package Installer for CachyOS which helps setting up & installing applications"
+        },
+        {
+          "name": "CachyOS/CachyOS-PKGBUILDS",
+          "url": "https://github.com/CachyOS/CachyOS-PKGBUILDS",
+          "stars": 399,
+          "pushed": "2026-11-16T17:58Z",
+          "description": "PKGBUILDs for CachyOS"
+        },
+        {
+          "name": "CachyOS/website",
+          "url": "https://github.com/CachyOS/website",
+          "stars": 25,
+          "pushed": "2026-11-16T14:59Z",
+          "description": "Website for CachyOS"
+        },
+        {
+          "name": "CachyOS/linux-cachyos",
+          "url": "https://github.com/CachyOS/linux-cachyos",
+          "stars": 4863,
+          "pushed": "2026-11-16T12:18Z",
+          "description": "Archlinux Kernel based on different schedulers and some other performance improvements."
+        },
+        {
+          "name": "CachyOS/linux",
+          "url": "https://github.com/CachyOS/linux",
+          "stars": 110,
+          "pushed": "2026-11-16T06:56Z",
+          "description": "Linux kernel source tree"
+        },
+        {
+          "name": "CachyOS/statuspage",
+          "url": "https://github.com/CachyOS/statuspage",
+          "stars": 26,
+          "pushed": "2026-11-16T06:01Z",
+          "description": "📈 Uptime monitor and status page for CachyOS, powered by @upptime"
+        },
+        {
+          "name": "CachyOS/proton-cachyos",
+          "url": "https://github.com/CachyOS/proton-cachyos",
+          "stars": 1587,
+          "pushed": "2026-11-16T00:32Z",
+          "description": "Compatibility tool for Steam Play based on Wine and additional components"
+        },
+        {
+          "name": "CachyOS/wine-cachyos",
+          "url": "https://github.com/CachyOS/wine-cachyos",
+          "stars": 58,
+          "pushed": "2026-11-16T00:29Z",
+          "description": "Wine with a bit of extra spice (CachyOS Version)"
+        },
+        {
+          "name": "CachyOS/CachyOS-Live-ISO",
+          "url": "https://github.com/CachyOS/CachyOS-Live-ISO",
+          "stars": 106,
+          "pushed": "2026-11-15T18:41Z",
+          "description": ""
+        },
+        {
+          "name": "CachyOS/shim-review",
+          "url": "https://github.com/CachyOS/shim-review",
+          "stars": 0,
+          "pushed": "2026-11-15T17:52Z",
+          "description": "Reviews of shim"
+        },
+        {
+          "name": "CachyOS/New-Cli-Installer",
+          "url": "https://github.com/CachyOS/New-Cli-Installer",
+          "stars": 158,
+          "pushed": "2026-11-15T16:26Z",
+          "description": "CachyOS CLI Installer"
+        },
+        {
+          "name": "CachyOS/cachyos-compositor-settings",
+          "url": "https://github.com/CachyOS/cachyos-compositor-settings",
+          "stars": 2,
+          "pushed": "2026-11-15T09:17Z",
+          "description": "Common packages and settings for Wayland compositors provided by CachyOS"
+        },
+        {
+          "name": "CachyOS/CachyOS-Settings",
+          "url": "https://github.com/CachyOS/CachyOS-Settings",
+          "stars": 469,
+          "pushed": "2026-11-14T17:59Z",
+          "description": "Settings used for CachyOS"
+        },
+        {
+          "name": "CachyOS/wiki",
+          "url": "https://github.com/CachyOS/wiki",
+          "stars": 168,
+          "pushed": "2026-11-14T08:46Z",
+          "description": "Wiki for CachyOS"
+        },
+        {
+          "name": "CachyOS/cachyos-compositor-tinted",
+          "url": "https://github.com/CachyOS/cachyos-compositor-tinted",
+          "stars": 0,
+          "pushed": "2026-11-13T10:08Z",
+          "description": ""
+        },
+        {
+          "name": "CachyOS/copr-linux-cachyos",
+          "url": "https://github.com/CachyOS/copr-linux-cachyos",
+          "stars": 382,
+          "pushed": "2026-11-12T17:16Z",
+          "description": "CachyOS Packages for Fedora"
+        },
+        {
+          "name": "CachyOS/cachyos-noctalia-settings",
+          "url": "https://github.com/CachyOS/cachyos-noctalia-settings",
+          "stars": 2,
+          "pushed": "2026-11-12T15:30Z",
+          "description": "CachyOS common Noctalia settings"
+        },
+        {
+          "name": "CachyOS/cachyos-repo-add-script",
+          "url": "https://github.com/CachyOS/cachyos-repo-add-script",
+          "stars": 20,
+          "pushed": "2026-11-12T06:04Z",
+          "description": "Script to automatically add/remove our repos :)"
+        },
+        {
+          "name": "CachyOS/cachyos-umbriel-settings",
+          "url": "https://github.com/CachyOS/cachyos-umbriel-settings",
+          "stars": 7,
+          "pushed": "2026-11-11T16:53Z",
+          "description": "Umbriel settings"
+        },
+        {
+          "name": "CachyOS/kernel-patches",
+          "url": "https://github.com/CachyOS/kernel-patches",
+          "stars": 393,
+          "pushed": "2026-11-11T12:12Z",
+          "description": "Custom Linux kernel patches"
+        },
+        {
+          "name": "CachyOS/CachyOS-Welcome",
+          "url": "https://github.com/CachyOS/CachyOS-Welcome",
+          "stars": 53,
+          "pushed": "2026-11-10T19:42Z",
+          "description": ""
+        },
+        {
+          "name": "CachyOS/cachy-update",
+          "url": "https://github.com/CachyOS/cachy-update",
+          "stars": 98,
+          "pushed": "2026-11-08T09:24Z",
+          "description": "An update notifier & applier for Arch Linux with a systray applet that assists you with important pre / post update tasks."
+        },
+        {
+          "name": "CachyOS/cachyos-wsl",
+          "url": "https://github.com/CachyOS/cachyos-wsl",
+          "stars": 22,
+          "pushed": "2026-11-05T13:15Z",
+          "description": ""
+        },
+        {
+          "name": "CachyOS/WSL",
+          "url": "https://github.com/CachyOS/WSL",
+          "stars": 2,
+          "pushed": "2026-11-02T14:09Z",
+          "description": "Windows Subsystem for Linux"
+        },
+        {
+          "name": "CachyOS/builder-dashboard",
+          "url": "https://github.com/CachyOS/builder-dashboard",
+          "stars": 4,
+          "pushed": "2026-10-31T23:45Z",
+          "description": ""
+        },
+        {
+          "name": "CachyOS/chwd",
+          "url": "https://github.com/CachyOS/chwd",
+          "stars": 139,
+          "pushed": "2026-10-31T16:10Z",
+          "description": "Hardware Detection and Configuration for CachyOS"
+        },
+        {
+          "name": "CachyOS/CachyOS-Handheld",
+          "url": "https://github.com/CachyOS/CachyOS-Handheld",
+          "stars": 91,
+          "pushed": "2026-10-29T10:42Z",
+          "description": "CachyOS for Handhelds"
+        },
+        {
+          "name": "CachyOS/cachyos-hooks",
+          "url": "https://github.com/CachyOS/cachyos-hooks",
+          "stars": 8,
+          "pushed": "2026-10-26T08:28Z",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "id": "chromiumos",
+      "name": "ChromiumOS kernel",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "chromeos-X.Y kernel branches of ChromiumOS.",
+      "sites": [
+        {
+          "id": "docs",
+          "kind": "docs",
+          "url": "https://www.chromium.org/chromium-os/"
+        },
+        {
+          "id": "googlesource",
+          "kind": "forge",
+          "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel"
+        }
+      ],
+      "orgs": [],
+      "sources": [
+        {
+          "id": "chromiumos-log",
+          "kind": "gitiles",
+          "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel/+log/refs/heads/chromeos-6.12?format=JSON&n=50",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "chromiumos-newest-branch",
+          "kind": "gitiles",
+          "url": "https://chromium.googlesource.com/chromiumos/third_party/kernel/+refs/heads?format=JSON",
+          "yields": [
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "alpine",
+      "name": "Alpine Linux",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "linux-lts and linux-rpi in aports edge.",
+      "sites": [
+        {
+          "id": "packages",
+          "kind": "site",
+          "url": "https://pkgs.alpinelinux.org/packages"
+        }
+      ],
+      "orgs": [],
+      "sources": [
+        {
+          "id": "alpine-lts-commits",
+          "kind": "forge-api",
+          "url": "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/commits?path=main/linux-lts&per_page=30",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "alpine-lts-version",
+          "kind": "package-index",
+          "url": "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/files/main%2Flinux-lts%2FAPKBUILD/raw?ref=master",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "alpine-rpi-version",
+          "kind": "package-index",
+          "url": "https://gitlab.alpinelinux.org/api/v4/projects/alpine%2Faports/repository/files/main%2Flinux-rpi%2FAPKBUILD/raw?ref=master",
+          "yields": [
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "nixos",
+      "name": "NixOS",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "nixpkgs kernel pins (kernels-org.json): testing (rc) plus every maintained series.",
+      "sites": [
+        {
+          "id": "search",
+          "kind": "site",
+          "url": "https://search.nixos.org/packages"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "nixpkgs",
+          "provider": "github",
+          "url": "https://github.com/NixOS/nixpkgs"
+        }
+      ],
+      "sources": [
+        {
+          "id": "nixos-kernel-commits",
+          "kind": "forge-api",
+          "url": "https://api.github.com/repos/NixOS/nixpkgs/commits?path=pkgs/os-specific/linux/kernel&per_page=50",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "nixos-kernels",
+          "kind": "package-index",
+          "url": "https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/os-specific/linux/kernel/kernels-org.json",
+          "yields": [
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "fedora",
+      "name": "Fedora",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "Rawhide and stable Fedora kernels (Bodhi) plus the upstream-tracking kernel-ark tree.",
+      "sites": [
+        {
+          "id": "dist-git",
+          "kind": "forge",
+          "url": "https://src.fedoraproject.org/rpms/kernel"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "kernel-ark",
+          "provider": "gitlab",
+          "url": "https://gitlab.com/cki-project/kernel-ark"
+        }
+      ],
+      "sources": [
+        {
+          "id": "fedora-ark-commits",
+          "kind": "forge-api",
+          "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/repository/commits?per_page=50",
+          "yields": [
+            "commit"
+          ]
+        },
+        {
+          "id": "fedora-ark-merge-requests",
+          "kind": "forge-api",
+          "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/merge_requests?state=all&order_by=updated_at&per_page=50",
+          "yields": [
+            "pr"
+          ]
+        },
+        {
+          "id": "fedora-ark-tags",
+          "kind": "forge-api",
+          "url": "https://gitlab.com/api/v4/projects/cki-project%2Fkernel-ark/repository/tags?per_page=30&order_by=updated",
+          "yields": [
+            "tag",
+            "version"
+          ]
+        },
+        {
+          "id": "fedora-bodhi",
+          "kind": "package-index",
+          "url": "https://bodhi.fedoraproject.org/updates/?packages=kernel&status=stable&rows_per_page=40",
+          "yields": [
+            "package",
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "ubuntu",
+      "name": "Ubuntu",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "Archive kernels per series (Launchpad) and the mainline build PPA.",
+      "sites": [
+        {
+          "id": "wiki",
+          "kind": "docs",
+          "url": "https://wiki.ubuntu.com/Kernel"
+        },
+        {
+          "id": "launchpad",
+          "kind": "forge",
+          "url": "https://launchpad.net/ubuntu/+source/linux"
+        },
+        {
+          "id": "mainline-builds",
+          "kind": "site",
+          "url": "https://kernel.ubuntu.com/mainline/"
+        }
+      ],
+      "orgs": [],
+      "sources": [
+        {
+          "id": "ubuntu-launchpad",
+          "kind": "package-index",
+          "url": "https://api.launchpad.net/devel/ubuntu/+archive/primary?ws.op=getPublishedSources&source_name=linux&exact_match=true&order_by_date=true&ws.size=30",
+          "yields": [
+            "package",
+            "version"
+          ]
+        },
+        {
+          "id": "ubuntu-mainline-builds",
+          "kind": "html-index",
+          "url": "https://kernel.ubuntu.com/mainline/",
+          "yields": [
+            "build",
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "arch",
+      "name": "Arch Linux",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "Official linux, linux-lts, linux-zen and the AUR linux-mainline rc package.",
+      "sites": [
+        {
+          "id": "wiki",
+          "kind": "docs",
+          "url": "https://wiki.archlinux.org/title/Kernel"
+        }
+      ],
+      "orgs": [
+        {
+          "id": "packaging",
+          "provider": "gitlab",
+          "url": "https://gitlab.archlinux.org/archlinux/packaging/packages/linux"
+        }
+      ],
+      "sources": [
+        {
+          "id": "arch-aur-mainline",
+          "kind": "package-index",
+          "url": "https://aur.archlinux.org/rpc/v5/info?arg[]=linux-mainline",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "arch-linux",
+          "kind": "package-index",
+          "url": "https://archlinux.org/packages/core/x86_64/linux/json/",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "arch-linux-lts",
+          "kind": "package-index",
+          "url": "https://archlinux.org/packages/core/x86_64/linux-lts/json/",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "arch-linux-zen",
+          "kind": "package-index",
+          "url": "https://archlinux.org/packages/extra/x86_64/linux-zen/json/",
+          "yields": [
+            "version"
+          ]
+        },
+        {
+          "id": "arch-packaging-tags",
+          "kind": "forge-api",
+          "url": "https://gitlab.archlinux.org/api/v4/projects/archlinux%2Fpackaging%2Fpackages%2Flinux/repository/tags?per_page=30",
+          "yields": [
+            "tag"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    },
+    {
+      "id": "rhel",
+      "name": "RHEL / CentOS Stream",
+      "role": "downstream",
+      "lineage": "linux",
+      "description": "CentOS Stream kernel source-git, the public upstream of RHEL kernels (RHEL itself publishes no kernel API).",
+      "sites": [],
+      "orgs": [
+        {
+          "id": "centos-stream-10",
+          "provider": "gitlab",
+          "url": "https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-10"
+        }
+      ],
+      "sources": [
+        {
+          "id": "rhel-c10s-commits",
+          "kind": "forge-api",
+          "url": "https://gitlab.com/api/v4/projects/redhat%2Fcentos-stream%2Fsrc%2Fkernel%2Fcentos-stream-10/repository/commits?per_page=30",
+          "yields": [
+            "commit",
+            "version"
+          ]
+        },
+        {
+          "id": "rhel-c9s-commits",
+          "kind": "forge-api",
+          "url": "https://gitlab.com/api/v4/projects/redhat%2Fcentos-stream%2Fsrc%2Fkernel%2Fcentos-stream-9/repository/commits?per_page=30",
+          "yields": [
+            "commit",
+            "version"
+          ]
+        }
+      ],
+      "latestReleases": [],
+      "repositories": []
+    }
+  ]
+}

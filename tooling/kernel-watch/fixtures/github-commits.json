@@ -1,0 +1,110 @@
+[
+ {
+  "sha": "f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
+  "commit": {
+   "author": {
+    "name": "Ruihan Li",
+    "date": "2026-11-16T02:42:36Z"
+   },
+   "committer": {
+    "name": "Tate, Hongliang Tian",
+    "date": "2026-11-17T04:42:02Z"
+   },
+   "message": "Fix cache aligment check",
+   "url": "https://api.github.com/repos/asterinas/asterinas/git/commits/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
+   "comment_count": 0
+  },
+  "url": "https://api.github.com/repos/asterinas/asterinas/commits/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
+  "html_url": "https://github.com/asterinas/asterinas/commit/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
+  "author": {
+   "login": "lrh2000",
+   "id": 41988959,
+   "url": "https://api.github.com/users/lrh2000",
+   "html_url": "https://github.com/lrh2000",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "committer": {
+   "login": "tatetian",
+   "id": 568208,
+   "url": "https://api.github.com/users/tatetian",
+   "html_url": "https://github.com/tatetian",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  }
+ },
+ {
+  "sha": "53909f9b03c2b0b6ddd53b866aa7af83eb1c457e",
+  "commit": {
+   "author": {
+    "name": "Ruihan Li",
+    "date": "2026-11-16T02:41:55Z"
+   },
+   "committer": {
+    "name": "Tate, Hongliang Tian",
+    "date": "2026-11-17T04:42:02Z"
+   },
+   "message": "Simplify cache storage",
+   "url": "https://api.github.com/repos/asterinas/asterinas/git/commits/53909f9b03c2b0b6ddd53b866aa7af83eb1c457e",
+   "comment_count": 0
+  },
+  "url": "https://api.github.com/repos/asterinas/asterinas/commits/53909f9b03c2b0b6ddd53b866aa7af83eb1c457e",
+  "html_url": "https://github.com/asterinas/asterinas/commit/53909f9b03c2b0b6ddd53b866aa7af83eb1c457e",
+  "author": {
+   "login": "lrh2000",
+   "id": 41988959,
+   "url": "https://api.github.com/users/lrh2000",
+   "html_url": "https://github.com/lrh2000",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "committer": {
+   "login": "tatetian",
+   "id": 568208,
+   "url": "https://api.github.com/users/tatetian",
+   "html_url": "https://github.com/tatetian",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  }
+ },
+ {
+  "sha": "0d38f078f584ba1ea5b96226ac670ae310a90004",
+  "commit": {
+   "author": {
+    "name": "Ruihan Li",
+    "date": "2026-11-16T01:17:30Z"
+   },
+   "committer": {
+    "name": "Tate, Hongliang Tian",
+    "date": "2026-11-17T04:42:02Z"
+   },
+   "message": "Improve allocation contiguity",
+   "url": "https://api.github.com/repos/asterinas/asterinas/git/commits/0d38f078f584ba1ea5b96226ac670ae310a90004",
+   "comment_count": 0
+  },
+  "url": "https://api.github.com/repos/asterinas/asterinas/commits/0d38f078f584ba1ea5b96226ac670ae310a90004",
+  "html_url": "https://github.com/asterinas/asterinas/commit/0d38f078f584ba1ea5b96226ac670ae310a90004",
+  "author": {
+   "login": "lrh2000",
+   "id": 41988959,
+   "url": "https://api.github.com/users/lrh2000",
+   "html_url": "https://github.com/lrh2000",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "committer": {
+   "login": "tatetian",
+   "id": 568208,
+   "url": "https://api.github.com/users/tatetian",
+   "html_url": "https://github.com/tatetian",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  }
+ }
+]

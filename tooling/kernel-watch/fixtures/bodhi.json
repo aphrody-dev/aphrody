@@ -1,0 +1,61 @@
+{
+ "updates": [
+  {
+   "alias": "FEDORA-2026-d40b6bfcae",
+   "title": "kernel-7.4.0-0.rc3.26.eln159",
+   "status": "stable",
+   "url": "https://bodhi.fedoraproject.org/updates/FEDORA-2026-d40b6bfcae",
+   "date_stable": "2026-11-16 20:29:53",
+   "release": {
+    "name": "ELN"
+   },
+   "builds": [
+    {
+     "nvr": "kernel-7.4.0-0.rc3.26.eln159"
+    }
+   ],
+   "notes": "",
+   "user": {
+    "name": "jforbes"
+   }
+  },
+  {
+   "alias": "FEDORA-2026-d7e895970e",
+   "title": "kernel-7.4.0-0.rc3.26.fc46",
+   "status": "stable",
+   "url": "https://bodhi.fedoraproject.org/updates/FEDORA-2026-d7e895970e",
+   "date_stable": "2026-11-16 20:50:53",
+   "release": {
+    "name": "F46"
+   },
+   "builds": [
+    {
+     "nvr": "kernel-7.4.0-0.rc3.26.fc46"
+    }
+   ],
+   "notes": "",
+   "user": {
+    "name": "jforbes"
+   }
+  },
+  {
+   "alias": "FEDORA-2026-082e57dc45",
+   "title": "kernel-7.4.0-0.rc2.261111g067c5c24cef2.21.eln159",
+   "status": "stable",
+   "url": "https://bodhi.fedoraproject.org/updates/FEDORA-2026-082e57dc45",
+   "date_stable": "2026-11-11 18:37:40",
+   "release": {
+    "name": "ELN"
+   },
+   "builds": [
+    {
+     "nvr": "kernel-7.4.0-0.rc2.261111g067c5c24cef2.21.eln159"
+    }
+   ],
+   "notes": "",
+   "user": {
+    "name": "jforbes"
+   }
+  }
+ ]
+}

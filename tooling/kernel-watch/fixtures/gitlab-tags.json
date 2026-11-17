@@ -1,0 +1,77 @@
+[
+ {
+  "name": "kernel-7.4.0-0.rc3.26",
+  "message": "kernel-7.4.0-0.rc3.26",
+  "target": "1fc9df5f291c000ead8dd4bebf979dbdc4e65144",
+  "commit": {
+   "id": "8b9bb18483c4a76c716af8e5d34d3784a59695a0",
+   "short_id": "8b9bb184",
+   "created_at": "2026-11-16T11:23:12.000+00:00",
+   "parent_ids": [
+    "69d3ab33620a5d23a4952b95056549de32d4f0e4"
+   ],
+   "title": "[redhat] kernel-7.4.0-0.rc3.26",
+   "message": "[redhat] kernel-7.4.0-0.rc3.26\n\nSigned-off-by: Fedora Kernel Team <redacted@example.invalid>\n",
+   "author_name": "Fedora Kernel Team",
+   "authored_date": "2026-11-16T11:23:12.000+00:00",
+   "committer_name": "Fedora Kernel Team",
+   "committed_date": "2026-11-16T11:23:12.000+00:00",
+   "trailers": {},
+   "extended_trailers": {},
+   "web_url": "https://gitlab.com/cki-project/kernel-ark/-/commit/8b9bb18483c4a76c716af8e5d34d3784a59695a0"
+  },
+  "release": null,
+  "protected": true,
+  "created_at": "2026-11-16T11:23:13.000Z"
+ },
+ {
+  "name": "v7.4-rc3",
+  "message": "Linux 7.4-rc3\n-----BEGIN PGP SIGNATURE-----\n\niQFSBAABCgA8FiEEq68RxlopcLEwq+PEeb4+QwBBGIYFAmr6MnMeHHRvcnZhbGRz\nQGxpbnV4LWZvdW5kYXRpb24ub3JnAAoJEHm+PkMAQRiGH8cH/Rp75Z3xUZGd7Lgz\nVZ1Uezf4EnWCYtCUub8EYojZ7AjVPI9aXQzj120a+qiXmu9QfIKh7fF+eBqUOJlo\ncv9pOufSn49vZl2fntRheu+tLSVIz0VOkonaHlZzfjYExtSl29eaLb+lL9GZNjbk\nWyPFic3dtJCUL5BByfM4IHpJvu6JyJ8lKa47X/JX968HEVwJuNPud+JbNkzYChhd\n+acWlWukXdmKY9CCvI51ZV6W/zT+QjcTQIjHU6jhAZm/tKyTq9vU2zC3WSTI6rlm\ndXth/V7pUpki6oxbD+0pjOT3E12jLQnKefYKQTUk8zBwTt3GNPdMXSZ9y/xajwwe\ni9ifYIE=\n=2+sZ\n-----END PGP SIGNATURE-----",
+  "target": "19d1b4de6d37bccecc3ad9144d279f1baa405eb1",
+  "commit": {
+   "id": "aebb7274476403040d582c61478df8f4a7bf9cd3",
+   "short_id": "aebb7274",
+   "created_at": "2026-11-15T14:30:11.000-08:00",
+   "parent_ids": [
+    "a9daf327f3ff90625204876981f88cfe2b6f6fff"
+   ],
+   "title": "Linux 7.4-rc3",
+   "message": "Linux 7.4-rc3\n",
+   "author_name": "Linus Torvalds",
+   "authored_date": "2026-11-15T14:30:11.000-08:00",
+   "committer_name": "Linus Torvalds",
+   "committed_date": "2026-11-15T14:30:11.000-08:00",
+   "trailers": {},
+   "extended_trailers": {},
+   "web_url": "https://gitlab.com/cki-project/kernel-ark/-/commit/aebb7274476403040d582c61478df8f4a7bf9cd3"
+  },
+  "release": null,
+  "protected": true,
+  "created_at": "2026-11-15T22:30:11.000Z"
+ },
+ {
+  "name": "kernel-7.4.0-0.rc2.23c62304dde2.25",
+  "message": "kernel-7.4.0-0.rc2.23c62304dde2.25",
+  "target": "528f9bdfd95408fd5ff9199f8e3ef5f8f4378f08",
+  "commit": {
+   "id": "44f301b15e8e078f78a34613612a96133fcc1e42",
+   "short_id": "44f301b1",
+   "created_at": "2026-11-15T11:21:32.000+00:00",
+   "parent_ids": [
+    "b6e71dfc5cbb7a394544f3d1e031292a7c014784"
+   ],
+   "title": "[redhat] kernel-7.4.0-0.rc2.23c62304dde2.25",
+   "message": "[redhat] kernel-7.4.0-0.rc2.23c62304dde2.25\n\nSigned-off-by: Fedora Kernel Team <redacted@example.invalid>\n",
+   "author_name": "Fedora Kernel Team",
+   "authored_date": "2026-11-15T11:21:32.000+00:00",
+   "committer_name": "Fedora Kernel Team",
+   "committed_date": "2026-11-15T11:21:32.000+00:00",
+   "trailers": {},
+   "extended_trailers": {},
+   "web_url": "https://gitlab.com/cki-project/kernel-ark/-/commit/44f301b15e8e078f78a34613612a96133fcc1e42"
+  },
+  "release": null,
+  "protected": true,
+  "created_at": "2026-11-15T11:21:32.000Z"
+ }
+]

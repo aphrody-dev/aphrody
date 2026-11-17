@@ -1,0 +1,12 @@
+{
+  "name": "aphrody-kernel-watch",
+  "private": true,
+  "description": "Polls kernel sources into SQLite and generates the docs/watch views. Bun built-ins only.",
+  "scripts": {
+    "validate": "bun cli.ts validate",
+    "poll": "bun cli.ts poll",
+    "build": "bun cli.ts build",
+    "versions": "bun cli.ts versions",
+    "test": "bun test"
+  }
+}

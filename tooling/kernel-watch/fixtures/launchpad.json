@@ -1,0 +1,31 @@
+{
+ "entries": [
+  {
+   "source_package_name": "linux",
+   "source_package_version": "6.8.0-151.151",
+   "distro_series_link": "https://api.launchpad.net/devel/ubuntu/noble",
+   "pocket": "Proposed",
+   "status": "Published",
+   "date_published": "2026-11-13T19:26:07.471903+00:00",
+   "self_link": "https://api.launchpad.net/devel/ubuntu/+archive/primary/+sourcepub/18951463"
+  },
+  {
+   "source_package_name": "linux",
+   "source_package_version": "6.8.0-149.149",
+   "distro_series_link": "https://api.launchpad.net/devel/ubuntu/noble",
+   "pocket": "Security",
+   "status": "Published",
+   "date_published": "2026-11-11T21:12:07.813617+00:00",
+   "self_link": "https://api.launchpad.net/devel/ubuntu/+archive/primary/+sourcepub/18947184"
+  },
+  {
+   "source_package_name": "linux",
+   "source_package_version": "7.0.0-43.43",
+   "distro_series_link": "https://api.launchpad.net/devel/ubuntu/resolute",
+   "pocket": "Security",
+   "status": "Published",
+   "date_published": "2026-11-10T09:56:59.772539+00:00",
+   "self_link": "https://api.launchpad.net/devel/ubuntu/+archive/primary/+sourcepub/18943469"
+  }
+ ]
+}

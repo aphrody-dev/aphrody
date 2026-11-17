@@ -1,0 +1,6 @@
+# Maintainer: Natanael Copa <redacted@example.invalid>
+
+_flavor=${FLAVOR:-lts}
+pkgname=linux-$_flavor
+pkgver=7.3.4
+_kernver=${pkgver%.*}
