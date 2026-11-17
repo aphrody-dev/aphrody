@@ -78,6 +78,7 @@ export class Store {
   }
 
   close(): void {
+    this.db.run("PRAGMA wal_checkpoint(TRUNCATE)");
     this.db.close();
   }
 
