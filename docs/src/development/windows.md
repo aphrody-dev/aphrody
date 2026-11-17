@@ -1,15 +1,15 @@
 ---
-title: Building Zed for Windows
-description: "Guide to building zed for windows for Zed development."
+title: Building Aphrody for Windows
+description: "Guide to building Aphrody for Windows from source."
 ---
 
-# Building Zed for Windows
+# Building Aphrody for Windows
 
 > The following commands may be executed in any shell.
 
 ## Repository
 
-Clone the [Zed repository](https://github.com/zed-industries/zed).
+Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with submodules (or run `bun run submodules:sync`).
 
 ## Dependencies
 
@@ -95,18 +95,18 @@ After this, restart the `postgresql` service. Press `Win`+`R` to open the Run di
 
 ## Building from source
 
-Once you have the dependencies installed, you can build Zed using [Cargo](https://doc.rust-lang.org/cargo/).
+Once you have the dependencies installed, you can build Aphrody using [Cargo](https://doc.rust-lang.org/cargo/).
 
 For a debug build:
 
 ```sh
-cargo run
+cargo run -p zed
 ```
 
 For a release build:
 
 ```sh
-cargo run --release
+cargo run -p zed --release
 ```
 
 And to run the tests:
@@ -115,7 +115,7 @@ And to run the tests:
 cargo test --workspace
 ```
 
-> **Note:** Visual regression tests are currently macOS-only and require Screen Recording permission. See [Building Zed for macOS](./macos.md#visual-regression-tests) for details.
+> **Note:** Visual regression tests are currently macOS-only and require Screen Recording permission. See [Building Aphrody for macOS](./macos.md#visual-regression-tests) for details.
 
 ## Installing from msys2
 
@@ -245,20 +245,18 @@ For more information on this, please see [win32 docs](https://learn.microsoft.co
 
 ### Graphics issues
 
-#### Zed fails to launch
+#### Aphrody fails to launch
 
-Zed currently uses Vulkan as its graphics API on Windows. If Zed fails to launch, Vulkan is a common cause.
-
-You can check the Zed log at:
-`C:\Users\YOU\AppData\Local\Zed\logs\Zed.log`
+Aphrody uses WGPU (Vulkan/DX12) and GPUI graphics APIs on Windows. If Aphrody fails to launch, inspect GPU adapters with `cargo run -p wgpu_cli -- adapters --json` and check the log at:
+`C:\Users\YOU\AppData\Local\Aphrody\logs\Aphrody.log`
 
 If you see messages like:
 
-- `Zed failed to open a window: NoSupportedDeviceFound`
+- `NoSupportedDeviceFound`
 - `ERROR_INITIALIZATION_FAILED`
 - `GPU Crashed`
 - `ERROR_SURFACE_LOST_KHR`
 
-Vulkan may not be working correctly on your system. Updating GPU drivers often resolves this.
+Vulkan or your GPU driver may not be working correctly on your system. Updating GPU drivers often resolves this.
 
-If there's nothing Vulkan-related in the logs and you happen to have Bandicam installed, try uninstalling it. Zed is currently not compatible with Bandicam.
+If there's nothing Vulkan-related in the logs and you happen to have Bandicam installed, try uninstalling it (known upstream incompatibility).

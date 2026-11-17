@@ -386,7 +386,7 @@ const EQ_PRESETS = [
 ];
 const PRESETS = { Flat: [0, 0, 0, 0, 0], Bass: [8, 5, 0, -2, -1], Vocal: [-3, 0, 5, 4, 1] };
 
-const count = (n: number) => n.toLocaleString("en-US");
+const count = (n: number) => n.toLocaleString(undefined);
 
 const SORTS = [
   { value: "newest", title: "Newest first" },

@@ -1,12 +1,13 @@
 use std::fs;
 use std::path::PathBuf;
+use std::rc::Rc;
 
-use gpui::{AnyElement, App, ElementId, SharedString, Window, div, prelude::*, px};
+use gpui::{FontWeight, Role};
 use serde::{Deserialize, Serialize};
-use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
+use ui::{ButtonSize, ButtonStyle, IconButton, Tooltip, prelude::*};
 
 use crate::cosmic_theme::OsTheme;
-use crate::reactive::focusable_action_chip;
+use crate::reactive::FocusableActionChip;
 
 /// Horizontal slot inside a COSMIC-style panel/topbar where applets mount dynamically.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -92,6 +93,84 @@ pub struct NavItem {
     pub badge: Option<SharedString>,
 }
 
+/// Accessible `libcosmic`-style navigation rail supporting compact and expanded widths.
+#[derive(IntoElement)]
+pub struct NavRail {
+    id: ElementId,
+    items: Vec<NavItem>,
+    active_id: SharedString,
+    compact: bool,
+    theme: OsTheme,
+    on_select: Rc<dyn Fn(SharedString, &mut Window, &mut App) + 'static>,
+}
+
+impl NavRail {
+    pub fn new(
+        id: impl Into<ElementId>,
+        items: Vec<NavItem>,
+        active_id: impl Into<SharedString>,
+        compact: bool,
+        theme: &OsTheme,
+        on_select: impl Fn(SharedString, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        Self {
+            id: id.into(),
+            items,
+            active_id: active_id.into(),
+            compact,
+            theme: theme.clone(),
+            on_select: Rc::new(on_select),
+        }
+    }
+}
+
+impl RenderOnce for NavRail {
+    fn render(self, _window: &mut Window, _cx: &mut App) -> impl IntoElement {
+        let mut rail = v_flex()
+            .id(self.id)
+            .role(Role::Navigation)
+            .aria_label("Navigation Rail")
+            .flex_shrink_0()
+            .h_full()
+            .when(self.compact, |el| el.w(rems_from_px(64.0_f32)))
+            .when(!self.compact, |el| el.w(rems_from_px(212.0_f32)))
+            .p_2()
+            .pb_5()
+            .gap_2()
+            .overflow_y_scroll()
+            .bg(self.theme.colors.surface_container_low)
+            .border_r_1()
+            .border_color(self.theme.colors.outline_variant);
+
+        for (idx, item) in self.items.into_iter().enumerate() {
+            let selected = item.id == self.active_id;
+            let item_id = item.id.clone();
+            let handler = Rc::clone(&self.on_select);
+            let (label, badge) = if self.compact {
+                (SharedString::default(), None)
+            } else {
+                (item.label.clone(), item.badge)
+            };
+
+            let chip = FocusableActionChip::new(
+                ElementId::Name(format!("nav-{}", item.id).into()),
+                item.icon,
+                label,
+                item.label,
+                &self.theme,
+                move |_, window, cx| handler(item_id.clone(), window, cx),
+            )
+            .badge(badge)
+            .selected(selected)
+            .tab_index(idx as isize + 1);
+
+            rail = rail.child(chip);
+        }
+
+        rail
+    }
+}
+
 /// Renders an accessible `libcosmic`-style navigation rail supporting compact (icon-only <= 900px) and expanded modes.
 pub fn render_nav_rail<F>(
     id: impl Into<ElementId>,
@@ -104,44 +183,102 @@ pub fn render_nav_rail<F>(
 where
     F: Fn(SharedString, &mut Window, &mut App) + Clone + 'static,
 {
-    let mut rail = v_flex()
-        .id(id)
-        .h_full()
-        .when(compact, |el| el.w(px(64.0)))
-        .when(!compact, |el| el.w(px(212.0)))
-        .p_2()
-        .pb_5()
-        .gap_2()
-        .overflow_y_scroll()
-        .bg(theme.colors.surface_container_low)
-        .border_r_1()
-        .border_color(theme.colors.outline_variant);
+    NavRail::new(
+        id,
+        items.to_vec(),
+        SharedString::from(active_id.to_owned()),
+        compact,
+        theme,
+        on_select,
+    )
+    .into_any_element()
+}
 
-    for (idx, item) in items.iter().enumerate() {
-        let selected = item.id.as_ref() == active_id;
-        let item_id = item.id.clone();
-        let handler = on_select.clone();
-        let (label, badge) = if compact {
-            (SharedString::default(), None)
-        } else {
-            (item.label.clone(), item.badge.clone())
-        };
+/// Right-hand contextual drawer (`libcosmic::widget::context_drawer`) with explicit close escape control.
+#[derive(IntoElement)]
+pub struct ContextDrawer {
+    title: SharedString,
+    body: AnyElement,
+    theme: OsTheme,
+    on_close: Box<dyn Fn(&mut Window, &mut App) + 'static>,
+}
 
-        let chip = focusable_action_chip(
-            ElementId::Name(format!("nav-{}", item.id).into()),
-            item.icon,
-            label,
-            badge,
-            item.label.clone(),
-            selected,
-            idx as isize + 1,
-            theme,
-            move |_, window, cx| handler(item_id.clone(), window, cx),
-        );
-        rail = rail.child(chip);
+impl ContextDrawer {
+    pub fn new(
+        title: impl Into<SharedString>,
+        body: AnyElement,
+        theme: &OsTheme,
+        on_close: impl Fn(&mut Window, &mut App) + 'static,
+    ) -> Self {
+        Self {
+            title: title.into(),
+            body,
+            theme: theme.clone(),
+            on_close: Box::new(on_close),
+        }
     }
+}
 
-    rail.into_any_element()
+impl RenderOnce for ContextDrawer {
+    fn render(self, _window: &mut Window, _cx: &mut App) -> impl IntoElement {
+        let close_label = SharedString::from(format!("Close {} drawer", self.title));
+        let on_close = self.on_close;
+
+        v_flex()
+            .id("os-context-drawer")
+            .role(Role::Region)
+            .aria_label(self.title.clone())
+            .flex_shrink_0()
+            .w(rems_from_px(320.0_f32))
+            .max_w(relative(0.45))
+            .h_full()
+            .bg(self.theme.colors.surface_container)
+            .border_l_1()
+            .border_color(self.theme.colors.outline_variant)
+            .child(
+                h_flex()
+                    .w_full()
+                    .min_w_0()
+                    .min_h(rems_from_px(44.0_f32))
+                    .px_3()
+                    .gap_2()
+                    .justify_between()
+                    .items_center()
+                    .border_b_1()
+                    .border_color(self.theme.colors.outline_variant)
+                    .child(
+                        div().flex_1().min_w_0().overflow_hidden().child(
+                            Label::new(self.title)
+                                .size(LabelSize::Default)
+                                .weight(FontWeight::MEDIUM)
+                                .truncate(),
+                        ),
+                    )
+                    .child(
+                        IconButton::new("close-drawer", IconName::Close)
+                            .style(ButtonStyle::Outlined)
+                            .size(ButtonSize::Large)
+                            .width(rems_from_px(32.0_f32))
+                            .icon_size(IconSize::Small)
+                            .icon_color(Color::Custom(self.theme.colors.on_surface))
+                            .tab_index(1_isize)
+                            .aria_label(close_label.clone())
+                            .tooltip(Tooltip::text(close_label))
+                            .on_click(move |_, window, cx| on_close(window, cx)),
+                    ),
+            )
+            .child(
+                div()
+                    .id("os-context-drawer-body")
+                    .flex_1()
+                    .min_w_0()
+                    .size_full()
+                    .p_3()
+                    .pb_6()
+                    .overflow_y_scroll()
+                    .child(self.body),
+            )
+    }
 }
 
 /// Renders a right-hand contextual drawer (`libcosmic::widget::context_drawer`) with explicit close escape control.
@@ -154,46 +291,5 @@ pub fn render_context_drawer<F>(
 where
     F: Fn(&mut Window, &mut App) + 'static,
 {
-    let title = title.into();
-    v_flex()
-        .id("os-context-drawer")
-        .w(px(320.0))
-        .max_w(gpui::relative(0.45))
-        .h_full()
-        .bg(theme.colors.surface_container)
-        .border_l_1()
-        .border_color(theme.colors.outline_variant)
-        .child(
-            h_flex()
-                .w_full()
-                .min_h(px(44.0))
-                .px_3()
-                .justify_between()
-                .items_center()
-                .border_b_1()
-                .border_color(theme.colors.outline_variant)
-                .child(Label::new(title.clone()).size(LabelSize::Default))
-                .child(focusable_action_chip(
-                    "close-drawer",
-                    IconName::Close,
-                    "",
-                    None,
-                    SharedString::from(format!("Close {title} drawer")),
-                    false,
-                    1,
-                    theme,
-                    move |_, window, cx| on_close(window, cx),
-                )),
-        )
-        .child(
-            div()
-                .id("os-context-drawer-body")
-                .flex_1()
-                .size_full()
-                .p_3()
-                .pb_6()
-                .overflow_y_scroll()
-                .child(body),
-        )
-        .into_any_element()
+    ContextDrawer::new(title, body, theme, on_close).into_any_element()
 }

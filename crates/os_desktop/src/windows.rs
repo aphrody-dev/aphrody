@@ -1,20 +1,20 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use gpui::{AnyElement, App, Context, ElementId, SharedString, Window, prelude::*, px};
+use gpui::{AnyElement, App, Context, ElementId, SharedString, Window, div, prelude::*, px};
 use os_craft::{CraftCatalog, InspectionReport, inspect_path};
 use os_session::{
     DistBundleSpec, HardwareCapabilities, SessionEnvironment, SessionSupervisor, TilingMode,
     UnitPhase,
 };
 use os_ui::{
-    AppearanceMode, ImmediateUi, OsConfigStore, OsTheme, OsThemeCatalog, ReactiveHost,
-    ReactiveProgram, StatusTone, SubscriptionSpec, TaskCommand, UnifiedPlatformProfile,
-    focusable_action_chip, progress_meter, slider_control, sparkline_chart, status_badge,
-    toggle_control,
+    AppearanceMode, ImmediateUi, OsConfigStore, OsI18nCatalog, OsTheme, OsThemeCatalog,
+    ReactiveHost, ReactiveProgram, StatusTone, SubscriptionSpec, TaskCommand,
+    UnifiedPlatformProfile, focusable_action_chip, progress_meter, slider_control, sparkline_chart,
+    status_badge, toggle_control,
 };
 use serde::{Deserialize, Serialize};
-use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
+use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, rems_from_px, v_flex};
 
 /// Window payload identity inside [`os_session::CompositorState`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,6 +55,12 @@ pub struct DesktopPrefs {
     pub layout_mode: TilingMode,
     pub window_gap: f32,
     pub reduced_motion: bool,
+    #[serde(default = "default_locale_pref")]
+    pub locale: String,
+}
+
+fn default_locale_pref() -> String {
+    os_session::detect_process_locale().as_str().to_owned()
 }
 
 impl Default for DesktopPrefs {
@@ -65,6 +71,7 @@ impl Default for DesktopPrefs {
             layout_mode: TilingMode::Dwindle,
             window_gap: 8.0,
             reduced_motion: false,
+            locale: default_locale_pref(),
         }
     }
 }
@@ -90,6 +97,7 @@ pub enum SettingsMessage {
     SetLayout(TilingMode),
     SetGap(f32),
     SetReducedMotion(bool),
+    SetLocale(String),
 }
 
 /// `iced`-style reactive COSMIC Settings application hosted on a GPUI `ReactiveHost`.
@@ -123,6 +131,10 @@ impl ReactiveProgram for SettingsProgram {
             SettingsMessage::SetLayout(layout) => state.prefs.layout_mode = layout,
             SettingsMessage::SetGap(gap) => state.prefs.window_gap = gap.clamp(0.0, 24.0),
             SettingsMessage::SetReducedMotion(flag) => state.prefs.reduced_motion = flag,
+            SettingsMessage::SetLocale(locale) => {
+                state.prefs.locale = os_session::Bcp47Tag::parse(&locale)
+                    .map_or_else(|| "en".to_owned(), |t| t.as_str().to_owned());
+            }
         }
         state.version += 1;
 
@@ -155,9 +167,13 @@ impl ReactiveProgram for SettingsProgram {
             },
         };
 
+        let i18n = OsI18nCatalog::load_with_user_override().unwrap_or_default();
+        let active_locale = i18n.resolve_tag(&state.prefs.locale);
+        let active_dir = i18n.direction(&active_locale);
+
         let entity = cx.entity();
         let mut ui = ImmediateUi::new(&theme);
-        ui.heading("COSMIC & Material 3 Settings");
+        ui.heading(i18n.translate(&active_locale, "settings_title"));
         ui.label(state.saved_note.clone());
 
         let mut theme_chips = h_flex().w_full().gap_1p5().flex_wrap();
@@ -238,10 +254,36 @@ impl ReactiveProgram for SettingsProgram {
             },
         );
 
+        let mut locale_chips = h_flex().w_full().gap_1p5().flex_wrap();
+        for (idx, tag) in i18n.available_locales().into_iter().enumerate() {
+            let selected = tag.eq_ignore_ascii_case(&active_locale);
+            let target = entity.clone();
+            let chosen = tag.clone();
+            let label = i18n
+                .entry(&tag)
+                .map_or_else(|| tag.clone(), |e| format!("{} ({tag})", e.native_name));
+            let dir_hint = i18n.direction(&tag);
+            locale_chips = locale_chips.child(focusable_action_chip(
+                ElementId::Name(format!("settings-locale-{tag}").into()),
+                IconName::Font,
+                SharedString::from(label),
+                None,
+                SharedString::from(format!("BCP 47 {tag} ({dir_hint})")),
+                selected,
+                (260 + idx) as isize,
+                &theme,
+                move |_, _window, cx| {
+                    target.update(cx, |host, cx| {
+                        host.dispatch(SettingsMessage::SetLocale(chosen.clone()), cx);
+                    });
+                },
+            ));
+        }
+
         let target_motion = entity;
         let motion_toggle = toggle_control(
             "settings-reduced-motion",
-            "Reduced Motion",
+            i18n.translate(&active_locale, "reduced_motion"),
             state.prefs.reduced_motion,
             &theme,
             move |flag, _window, cx| {
@@ -251,18 +293,29 @@ impl ReactiveProgram for SettingsProgram {
             },
         );
 
-        ui.section("Theme Catalog", |sec| {
+        ui.section(i18n.translate(&active_locale, "theme_catalog"), |sec| {
             sec.push_element(mode_toggle);
             sec.push_element(theme_chips.into_any_element());
             sec.color_swatch("Primary", sec.theme.colors.primary, "M3 Seed");
             sec.color_swatch("Surface", sec.theme.colors.surface_container, "Container");
         });
 
-        ui.section("Compositor Geometry", |sec| {
-            sec.push_element(layout_chips.into_any_element());
-            sec.push_element(gap_slider);
-            sec.push_element(motion_toggle);
+        ui.section(i18n.translate(&active_locale, "language_locale"), |sec| {
+            sec.kv_row(
+                i18n.translate(&active_locale, "text_direction"),
+                format!("{active_locale} | dir={active_dir}"),
+            );
+            sec.push_element(locale_chips.into_any_element());
         });
+
+        ui.section(
+            i18n.translate(&active_locale, "compositor_geometry"),
+            |sec| {
+                sec.push_element(layout_chips.into_any_element());
+                sec.push_element(gap_slider);
+                sec.push_element(motion_toggle);
+            },
+        );
 
         v_flex()
             .id("settings-scroll")
@@ -451,12 +504,17 @@ pub fn render_files_window(
         .child(
             h_flex()
                 .w_full()
+                .min_w_0()
                 .justify_between()
                 .items_center()
+                .gap_2()
                 .child(
-                    Label::new(files.current_dir.display().to_string())
-                        .size(LabelSize::XSmall)
-                        .color(ui::Color::Muted),
+                    div().flex_1().min_w_0().overflow_hidden().child(
+                        Label::new(files.current_dir.display().to_string())
+                            .size(LabelSize::XSmall)
+                            .color(ui::Color::Muted)
+                            .truncate_middle(),
+                    ),
                 )
                 .child(focusable_action_chip(
                     "files-up-dir",
@@ -474,12 +532,14 @@ pub fn render_files_window(
             h_flex()
                 .flex_1()
                 .w_full()
+                .min_w_0()
                 .min_h(px(0.0))
                 .gap_3()
                 .child(
                     v_flex()
                         .id("files-list-scroll")
                         .flex_1()
+                        .min_w_0()
                         .h_full()
                         .overflow_y_scroll()
                         .child(rows_col),
@@ -487,12 +547,13 @@ pub fn render_files_window(
                 .child(
                     v_flex()
                         .id("files-detail-scroll")
-                        .w(px(230.0))
+                        .flex_shrink_0()
+                        .w(rems_from_px(230.0_f32))
                         .h_full()
                         .p_2()
                         .pb_4()
                         .overflow_y_scroll()
-                        .rounded(px(8.0))
+                        .rounded(rems_from_px(8.0_f32))
                         .bg(theme.colors.surface_container)
                         .border_1()
                         .border_color(theme.colors.outline_variant)
@@ -613,9 +674,17 @@ pub fn render_monitor_window(
             sec.push_element(
                 h_flex()
                     .w_full()
+                    .min_w_0()
                     .justify_between()
                     .items_center()
-                    .child(Label::new(unit.config.id.clone()).size(LabelSize::XSmall))
+                    .gap_2()
+                    .child(
+                        div().flex_1().min_w_0().overflow_hidden().child(
+                            Label::new(unit.config.id.clone())
+                                .size(LabelSize::XSmall)
+                                .truncate(),
+                        ),
+                    )
                     .child(status_badge(icon, text, tone, sec.theme))
                     .into_any_element(),
             );

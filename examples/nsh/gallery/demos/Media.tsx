@@ -3,7 +3,7 @@ import { Icon } from "../icons";
 import { Badge, Button, Caption, Card, colors, DemoPage, finish, isDark, Meter, Press, radius, RoundButton, Segmented, terminal, TERMINAL_GAP } from "../ui";
 
 /** An inline page in the gallery's colors (for the appearance shown: the page reloads when it changes). */
-const page = () => `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+const page = () => `<!doctype html><html lang="en" dir="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   html { -webkit-text-size-adjust: 100%; }
   body { margin: 0; padding: 16px; background: ${colors.inset}; color: ${colors.text}; font-family: -apple-system, system-ui, sans-serif; font-size: 15px; line-height: 1.4; }

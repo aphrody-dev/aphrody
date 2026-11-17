@@ -1,5 +1,25 @@
+# Normalize all source/docs/web text files to LF + UTF-8; keep binaries untouched.
+* text=auto eol=lf
+
 # Prevent GitHub from displaying comments within JSON files as errors.
 *.json linguist-language=JSON-with-Comments
+
+# Windows batch scripts require CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.wasm binary
+*.ttf binary
+*.otf binary
+*.woff2 binary
+*.psd binary
+*.exr binary
 
 # Ensure the WSL script always has LF line endings, even on Windows
 crates/zed/resources/windows/zed.sh text eol=lf

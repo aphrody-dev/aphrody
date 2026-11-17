@@ -195,7 +195,10 @@ pub fn run_web_examples(args: WebExamplesArgs) -> Result<()> {
         return Ok(());
     }
 
-    eprintln!("Serving with Bun on http://127.0.0.1:{} (COI={})...", args.port, args.coi);
+    eprintln!(
+        "Serving with Bun on http://127.0.0.1:{} (COI={})...",
+        args.port, args.coi
+    );
 
     let coi_flag = if args.coi { "true" } else { "false" };
     let out_dir_js = out_dir_str.replace('\\', "/");
@@ -245,7 +248,7 @@ Bun.serve({{
 fn make_example_html(name: &str) -> String {
     format!(
         r#"<!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -291,7 +294,7 @@ fn make_gallery_html(examples: &[&str]) -> String {
 
     format!(
         r##"<!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -308,7 +311,7 @@ fn make_gallery_html(examples: &[&str]) -> String {
         #sidebar {{
             width: 240px; min-width: 240px;
             background: #181825;
-            border-right: 1px solid #313244;
+            border-inline-end: 1px solid #313244;
             display: flex; flex-direction: column;
         }}
         #sidebar-header {{

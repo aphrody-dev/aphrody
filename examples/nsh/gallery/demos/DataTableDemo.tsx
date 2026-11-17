@@ -436,7 +436,7 @@ export function DataTableDemo() {
           {/* Muted as the rest of the line; only a selection, a value, in the text color. */}
           <Text class={`shrink-0 text-xs ${(several() ? pick() : selection()) ? "text-foreground" : "text-muted-foreground"}`}>{describe()}</Text>
           <Text class="shrink-0 text-xs tabular-nums text-muted-foreground">
-            {`Rows ${visible().start + 1}–${visible().end} of ${ROWS.toLocaleString("en-US")}`}
+            {`Rows ${visible().start + 1}–${visible().end} of ${ROWS.toLocaleString(undefined)}`}
           </Text>
           <Text style={{ numberOfLines: 1 }} class="shrink text-xs tabular-nums text-muted-foreground">{`${columns.length} columns · ${ticks()} updates`}</Text>
           <If when={!live()}>

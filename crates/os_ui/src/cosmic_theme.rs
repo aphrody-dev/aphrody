@@ -290,6 +290,7 @@ impl OsTheme {
         tc.elevated_surface_background = c.surface_container_high;
         tc.panel_background = c.surface_container;
         tc.panel_overlay_background = c.surface_container_high;
+        tc.panel_overlay_hover = c.surface_container_highest;
         tc.title_bar_background = c.surface_container_lowest;
         tc.title_bar_inactive_background = c.surface_dim;
         tc.status_bar_background = c.surface_container_lowest;
@@ -302,22 +303,36 @@ impl OsTheme {
         tc.element_active = c.primary_container;
         tc.element_selected = c.primary_container;
         tc.element_selection_background = c.primary_container.opacity(0.6);
+        tc.element_disabled = c.surface_container_low;
+        tc.ghost_element_background = gpui::transparent_black();
         tc.ghost_element_hover = c.surface_container_high;
         tc.ghost_element_active = c.surface_container_highest;
         tc.ghost_element_selected = c.primary_container;
+        tc.ghost_element_disabled = gpui::transparent_black();
         tc.text = c.on_surface;
         tc.text_muted = c.on_surface_variant;
         tc.text_placeholder = c.outline;
+        tc.text_disabled = c.outline;
         tc.text_accent = c.primary;
         tc.icon = c.on_surface;
         tc.icon_muted = c.on_surface_variant;
+        tc.icon_disabled = c.outline;
+        tc.icon_placeholder = c.outline;
         tc.icon_accent = c.primary;
         tc.border = c.outline;
         tc.border_variant = c.outline_variant;
         tc.border_focused = c.primary;
         tc.border_selected = c.primary;
+        tc.border_transparent = gpui::transparent_black();
+        tc.border_disabled = c.outline_variant;
         tc.pane_focused_border = c.primary;
         tc.panel_focused_border = c.primary;
+        tc.pane_group_border = c.outline_variant;
+        tc.drop_target_background = c.primary_container.opacity(0.45);
+        tc.drop_target_border = c.primary;
+        tc.scrollbar_thumb_background = c.outline_variant;
+        tc.scrollbar_thumb_hover_background = c.outline;
+        tc.scrollbar_thumb_active_background = c.primary;
 
         let mut status = if is_dark {
             StatusColors::dark()

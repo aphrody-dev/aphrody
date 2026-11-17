@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "os-craft": {
+      "command": "bun",
+      "args": ["${PLUGIN_ROOT}/scripts/os-craft-mcp.ts"]
+    }
+  }
+}

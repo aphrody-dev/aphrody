@@ -5,6 +5,7 @@ use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
+use os_pilot::{CommandContext, PilotEngine, TargetBackend, builtin_pilot_tools};
 use os_session::{
     CompositorState, Rect, SessionManifest, SessionSupervisor, TilingMode, discover_system_apps,
 };
@@ -27,6 +28,7 @@ pub struct McpServerState {
     pub compositor: CompositorState,
     pub supervisor: SessionSupervisor,
     pub catalog: CraftCatalog,
+    pub pilot: PilotEngine,
     pub active_theme: String,
     pub active_dark: bool,
     pub active_studio_app: String,
@@ -61,10 +63,16 @@ impl McpServerState {
             CompositorState::new(Rect::new(0.0, 0.0, 1440.0, 900.0), &ws_names, layout);
         compositor.open_window("ArtCraft Studio", &active_studio_app);
 
+        let pilot = PilotEngine::new();
+        pilot
+            .gpui
+            .sync_compositor(compositor.clone(), &active_theme, active_dark);
+
         Ok(Self {
             compositor,
             supervisor,
             catalog,
+            pilot,
             active_theme,
             active_dark,
             active_studio_app,
@@ -74,7 +82,7 @@ impl McpServerState {
 
 #[must_use]
 pub fn builtin_tools() -> Vec<McpToolDescriptor> {
-    vec![
+    let mut tools = vec![
         McpToolDescriptor {
             name: "os_workspace_list".to_owned(),
             description: "List active COSMIC workspace, layout mode, and placed window rectangles."
@@ -169,7 +177,15 @@ pub fn builtin_tools() -> Vec<McpToolDescriptor> {
                 .to_owned(),
             input_schema: json!({"type": "object", "properties": {}, "additionalProperties": false}),
         },
-    ]
+    ];
+    for pt in builtin_pilot_tools() {
+        tools.push(McpToolDescriptor {
+            name: pt.name.to_owned(),
+            description: pt.description.to_owned(),
+            input_schema: pt.input_schema,
+        });
+    }
+    tools
 }
 
 /// Dispatches one JSON-RPC 2.0 request line against [`McpServerState`].
@@ -311,8 +327,40 @@ fn call_tool(state: &Arc<Mutex<McpServerState>>, params: &Value) -> Result<Value
             serde_json::to_value(report).map_err(|e| (-32000, e.to_string()))?
         }
         "craft_anything_status" => craft_anything_discovery_json(),
+        other if other.starts_with("desktop_") => {
+            let sync_comp = guard.compositor.clone();
+            let theme = guard.active_theme.clone();
+            let dark = guard.active_dark;
+            guard.pilot.gpui.sync_compositor(sync_comp, &theme, dark);
+            let ctx = CommandContext {
+                app: args.get("app").and_then(Value::as_str).map(str::to_owned),
+                window_id: args
+                    .get("window_id")
+                    .and_then(Value::as_str)
+                    .map(str::to_owned),
+                timeout_ms: args.get("timeout_ms").and_then(Value::as_u64),
+                target: TargetBackend::parse(args.get("target").and_then(Value::as_str)),
+                ..Default::default()
+            };
+            let val = guard
+                .pilot
+                .execute_tool(other, &args, &ctx)
+                .map_err(|err| (-32002, err.to_string()))?;
+            guard.compositor = guard.pilot.gpui.export_compositor();
+            val
+        }
         other => return Err((-32601, format!("unknown tool '{other}'"))),
     };
+
+    if matches!(
+        tool_name,
+        "os_workspace_switch" | "os_layout_set" | "os_window_open" | "os_theme_set"
+    ) {
+        let comp = guard.compositor.clone();
+        let theme = guard.active_theme.clone();
+        let dark = guard.active_dark;
+        guard.pilot.gpui.sync_compositor(comp, &theme, dark);
+    }
 
     Ok(json!({
         "content": [{ "type": "text", "text": structured.to_string() }],
@@ -486,7 +534,10 @@ fn validate_local_http_headers(
 
     if let Some(token) = expected_token {
         let provided = auth_header
-            .and_then(|v| v.strip_prefix("Bearer ").or_else(|| v.strip_prefix("bearer ")))
+            .and_then(|v| {
+                v.strip_prefix("Bearer ")
+                    .or_else(|| v.strip_prefix("bearer "))
+            })
             .map(str::trim);
         if provided != Some(token) {
             return Err(("401 Unauthorized", "missing or invalid bearer token"));
@@ -514,9 +565,20 @@ fn handle_http_conn(
     let method = parts.next().unwrap_or("GET");
     let path = parts.next().unwrap_or("/");
     let body = body_raw.trim();
-    let expected_token = brand::env_var("MCP_TOKEN")
-        .ok()
-        .filter(|s| !s.is_empty());
+    let expected_token = brand::env_var("MCP_TOKEN").ok().filter(|s| !s.is_empty());
+    let accept_language = headers_block.lines().skip(1).find_map(|line| {
+        let (name, val) = line.split_once(':')?;
+        name.trim()
+            .eq_ignore_ascii_case("accept-language")
+            .then_some(val.trim())
+    });
+    let negotiated = os_session::negotiate_locale(
+        accept_language,
+        &[
+            "en", "fr", "ar", "he", "es", "de", "ja", "zh-Hans", "pt", "hi", "ko", "uk",
+        ],
+        "en",
+    );
 
     let (status, payload) = if let Err((err_status, reason)) =
         validate_local_http_headers(headers_block, expected_token.as_deref())
@@ -526,11 +588,23 @@ fn handle_http_conn(
         match (method, path) {
             ("GET", "/health") => (
                 "200 OK",
-                json!({ "ok": true, "service": brand::APP_SLUG }).to_string(),
+                json!({
+                    "ok": true,
+                    "service": brand::APP_SLUG,
+                    "lang": negotiated.locale,
+                    "dir": negotiated.dir,
+                })
+                .to_string(),
             ),
-            ("GET", "/.well-known/webmcp.json") => {
-                ("200 OK", json!({ "tools": builtin_tools() }).to_string())
-            }
+            ("GET", "/.well-known/webmcp.json") => (
+                "200 OK",
+                json!({
+                    "lang": negotiated.locale,
+                    "dir": negotiated.dir,
+                    "tools": builtin_tools(),
+                })
+                .to_string(),
+            ),
             ("POST", "/mcp") => {
                 let out = handle_json_rpc_line(state, body)
                     .unwrap_or_else(|| json!({ "ok": true }).to_string());
@@ -541,7 +615,9 @@ fn handle_http_conn(
     };
 
     let response = format!(
-        "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{payload}",
+        "HTTP/1.1 {status}\r\nContent-Type: application/json; charset=utf-8\r\nContent-Language: {}\r\nVary: {}\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{payload}",
+        negotiated.content_language,
+        negotiated.vary,
         payload.len()
     );
     stream.write_all(response.as_bytes())?;
@@ -580,6 +656,30 @@ mod tests {
         )
         .expect("switch workspace responds");
         assert!(switched.contains("\"active_workspace\":2"));
+
+        assert!(list.contains("desktop_snapshot"));
+        assert!(list.contains("desktop_ai_act_verify"));
+
+        let snap = handle_json_rpc_line(
+            &state,
+            r#"{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"desktop_snapshot","arguments":{"interactive":true}}}"#,
+        )
+        .expect("desktop_snapshot responds");
+        assert!(snap.contains("Workspace 2"));
+
+        let ai = handle_json_rpc_line(
+            &state,
+            r#"{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"desktop_ai_act_verify","arguments":{"locator":{"role":"button","name":"Workspace 1 (Studio)"},"action":{"kind":"click"}}}}"#,
+        )
+        .expect("ai_act_verify responds");
+        assert!(ai.contains("\"verified\":true"));
+
+        let after_ws = handle_json_rpc_line(
+            &state,
+            r#"{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"os_workspace_list","arguments":{}}}"#,
+        )
+        .expect("os_workspace_list reflects AI click");
+        assert!(after_ws.contains("\"active_workspace\":1"));
     }
 
     #[cfg(not(target_family = "wasm"))]
@@ -591,7 +691,8 @@ mod tests {
             Err(("403 Forbidden", _))
         ));
 
-        let bad_origin = "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1:4195\r\nOrigin: https://evil.example\r\n";
+        let bad_origin =
+            "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1:4195\r\nOrigin: https://evil.example\r\n";
         assert!(matches!(
             validate_local_http_headers(bad_origin, None),
             Err(("403 Forbidden", _))

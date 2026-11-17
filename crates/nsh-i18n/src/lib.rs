@@ -34,8 +34,8 @@ pub const ENGLISH: &str = include_str!("../data/en.json");
 /// The languages with data here an app ships (English is the runtime's
 /// own: [`ENGLISH`]).
 pub const LANGUAGES: &[&str] = &[
-    "de", "es", "fr", "hi", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "th", "tr", "vi",
-    "zh",
+    "ar", "de", "es", "fa", "fr", "he", "hi", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv",
+    "th", "tr", "vi", "zh",
 ];
 
 /// The data of `language` (`"de"`, a language subtag): JSON, as the
@@ -43,9 +43,12 @@ pub const LANGUAGES: &[&str] = &[
 /// data.
 pub fn language_data(language: &str) -> Option<&'static str> {
     Some(match language {
+        "ar" => include_str!("../data/ar.json"),
         "de" => include_str!("../data/de.json"),
         "es" => include_str!("../data/es.json"),
+        "fa" => include_str!("../data/fa.json"),
         "fr" => include_str!("../data/fr.json"),
+        "he" => include_str!("../data/he.json"),
         "hi" => include_str!("../data/hi.json"),
         "id" => include_str!("../data/id.json"),
         "it" => include_str!("../data/it.json"),
@@ -62,6 +65,42 @@ pub fn language_data(language: &str) -> Option<&'static str> {
         "zh" => include_str!("../data/zh.json"),
         _ => return None,
     })
+}
+
+/// W3C String-Meta base writing direction (`"ltr"` or `"rtl"`) for a BCP 47 locale tag.
+pub fn direction(locale: &str) -> &'static str {
+    let mut subtags = locale.split(['-', '_']);
+    let lang = subtags.next().unwrap_or_default().to_ascii_lowercase();
+    for part in subtags {
+        if part.len() == 4 {
+            let script = format!(
+                "{}{}",
+                part[..1].to_ascii_uppercase(),
+                part[1..].to_ascii_lowercase()
+            );
+            return if matches!(
+                script.as_str(),
+                "Arab" | "Hebr" | "Syrc" | "Thaa" | "Nkoo" | "Adlm" | "Mand" | "Samr"
+            ) {
+                "rtl"
+            } else {
+                "ltr"
+            };
+        }
+    }
+    if matches!(
+        lang.as_str(),
+        "ar" | "ckb" | "dv" | "fa" | "he" | "iw" | "ku" | "ps" | "sd" | "ug" | "ur" | "yi"
+    ) {
+        "rtl"
+    } else {
+        "ltr"
+    }
+}
+
+/// Whether `locale` defaults to right-to-left typography.
+pub fn is_rtl(locale: &str) -> bool {
+    direction(locale) == "rtl"
 }
 
 /// The language of a locale (`zh-Hant-TW`: `zh`), lower case.
@@ -219,5 +258,17 @@ mod tests {
         assert_eq!(translations["en"]["hello"], "Hello");
         assert_eq!(translations["zh-CN"]["messages.hello"], "你好，%{name}");
         assert_eq!(locale_files(&dir).len(), 2);
+    }
+
+    #[test]
+    fn rtl_direction_matches_w3c_bcp47_rules() {
+        assert_eq!(direction("ar"), "rtl");
+        assert_eq!(direction("ar-EG"), "rtl");
+        assert_eq!(direction("fa"), "rtl");
+        assert_eq!(direction("he"), "rtl");
+        assert!(is_rtl("he-IL"));
+        assert_eq!(direction("ug-Arab"), "rtl");
+        assert_eq!(direction("fr-FR"), "ltr");
+        assert!(!is_rtl("ja-JP"));
     }
 }

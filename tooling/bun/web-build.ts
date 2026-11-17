@@ -58,6 +58,16 @@ const FRAMEWORK_SPECS: FrameworkWebSpec[] = [
     coiRequired: false,
   },
   {
+    id: "gpui_store",
+    label: "Awesome GPUI Store (NSH + 22 Packagers)",
+    manifest: "crates/gpui_store/Cargo.toml",
+    packageName: "gpui_store",
+    features: ["web"],
+    legacyTooling: "Unified (web-build.ts + awesome-gpui-store.ts)",
+    wasmBackend: "WebGPU + NSH adaptive Store surface",
+    coiRequired: false,
+  },
+  {
     id: "gpui_web",
     label: "GPUI Web Platform & WGPU",
     manifest: "crates/gpui_web/Cargo.toml",
@@ -270,7 +280,7 @@ function inspectWasmBinary(filePath: string): WasmAuditReport {
   };
 }
 
-function maybeOptimizeWasm(wasmFile: string) {
+function maybeOptimizeWasm(wasmFile: string, cohortName: string) {
   if (!runOpt) return;
   const wasmOptVer = checkProgramVersion("wasm-opt");
   if (!wasmOptVer) {
@@ -286,10 +296,14 @@ function maybeOptimizeWasm(wasmFile: string) {
     "--enable-sign-ext",
     "--enable-reference-types",
     "--enable-multivalue",
-    keepDebug ? "--debuginfo" : "--strip-debug",
-    "-o",
-    wasmFile,
   ];
+  if (cohortName === "simd-baseline" || cohortName === "multithreaded") {
+    argsList.push("--enable-simd");
+  }
+  if (cohortName === "multithreaded") {
+    argsList.push("--enable-threads");
+  }
+  argsList.push(keepDebug ? "--debuginfo" : "--strip-debug", "-o", wasmFile);
   console.log(`$ wasm-opt ${argsList.join(" ")}`);
   const res = Bun.spawnSync(["wasm-opt", ...argsList], { stdout: "inherit", stderr: "inherit" });
   if (res.exitCode !== 0) {
@@ -299,7 +313,7 @@ function maybeOptimizeWasm(wasmFile: string) {
 
 function generateCohortHtml(pkg: string, entryName: string, wgVersion: string, cohorts: string[]): string {
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -309,9 +323,23 @@ function generateCohortHtml(pkg: string, entryName: string, wgVersion: string, c
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: Canvas; color: CanvasText; font-family: system-ui, -apple-system, sans-serif; }
     #app-root { display: contents; }
-    #a11y-status { position: fixed; bottom: 8px; right: 12px; z-index: 10; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: rgba(15, 23, 42, 0.82); color: #e2e8f0; border: 1px solid rgba(148, 163, 184, 0.35); }
+    #a11y-status { position: fixed; inset-block-end: 8px; inset-inline-end: 12px; z-index: 10; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: rgba(15, 23, 42, 0.82); color: #e2e8f0; border: 1px solid rgba(148, 163, 184, 0.35); }
     canvas { position: fixed; inset: 0; display: block; width: 100%; height: 100%; }
   </style>
+  <script>
+    (() => {
+      const req = new URLSearchParams(location.search).get("lang") || navigator.language || "en";
+      try {
+        const [tag] = Intl.getCanonicalLocales(req);
+        if (tag) {
+          document.documentElement.lang = tag;
+          const lang = tag.split("-")[0].toLowerCase();
+          const rtl = /^(ar|ckb|dv|fa|he|iw|ku|ps|sd|ug|ur|yi)$/.test(lang) || /-Arab|-Hebr/i.test(tag);
+          document.documentElement.dir = rtl ? "rtl" : "ltr";
+        }
+      } catch {}
+    })();
+  </script>
 </head>
 <body>
   <main id="app-root" role="main" aria-label="${pkg} GPU workspace">
@@ -422,7 +450,7 @@ function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditR
       throw new Error(`wasm-bindgen failed (${wbRes.exitCode}) for cohort ${plan.name}`);
     }
     const bgWasm = join(cohortDir, `${entryName}_bg.wasm`);
-    maybeOptimizeWasm(bgWasm);
+    maybeOptimizeWasm(bgWasm, plan.name);
     const report = inspectWasmBinary(bgWasm);
     if (plan.name === "baseline" && report.importsSharedMemory) {
       throw new Error(`baseline cohort unexpectedly imports shared memory/TLS`);
@@ -474,6 +502,8 @@ function serveDist() {
       }
       const headers = new Headers({
         "Content-Type": mimeMap[extname(filePath)] ?? "application/octet-stream",
+        "Content-Language": "en",
+        "Vary": "Accept-Language",
       });
       if (serveCoi) {
         headers.set("Cross-Origin-Embedder-Policy", "require-corp");
@@ -521,8 +551,38 @@ if (command === "matrix" || command === "audit") {
 } else if (command === "check") {
   const wgVersion = verifyBindgenVersion();
   console.log(`Verified wasm-bindgen ${wgVersion} == Cargo.lock`);
-  runCargoWasm(["gpui_web", "gpui_wgpu", "os_session", "os_craft", "os_ui"], [], [], "", "check");
-  runCargoWasm(["os_desktop"], ["web"], [], "", "check");
+  runCargoWasm(
+    ["gpui", "gpui_web", "gpui_wgpu", "gpui_platform", "gpui_ui", "gpui_code", "os_session", "os_craft", "os_ui", "nsh-core", "nsh-platform-web"],
+    [],
+    [],
+    "",
+    "check",
+  );
+  runCargoWasm(["os_desktop"], ["web"], ["--example", "web_os"], "", "check");
+  if (existsSync(resolve(repoRoot, "crates/gpui_store/Cargo.toml"))) {
+    runCargoWasm(["gpui_store"], ["web"], [], "", "check");
+  }
+  const wasiEnv = { ...process.env, RUSTC_WRAPPER: "", RUSTC_BOOTSTRAP: "1" };
+  const wasiCmd = [
+    "cargo",
+    "check",
+    "--target",
+    "wasm32-wasip2",
+    "-p",
+    "os_session",
+    "-p",
+    "os_craft",
+    "-p",
+    "release_channel",
+    "-p",
+    "brand",
+    "--no-default-features",
+  ];
+  console.log(`$ ${wasiCmd.join(" ")}`);
+  const wasiRes = Bun.spawnSync(wasiCmd, { stdout: "inherit", stderr: "inherit", env: wasiEnv });
+  if (wasiRes.exitCode !== 0) {
+    throw new Error(`cargo wasm32-wasip2 check failed (${wasiRes.exitCode})`);
+  }
 } else if (command === "build") {
   const built = buildCohorts();
   console.log(JSON.stringify(built, null, 2));

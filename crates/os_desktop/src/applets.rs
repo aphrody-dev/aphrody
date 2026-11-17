@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use gpui::{App, ElementId, SharedString, Window, div, prelude::*, px};
+use gpui::{App, ElementId, SharedString, Window, div, prelude::*};
 use os_session::{TilingMode, WorkspaceId};
 use os_ui::{
     AdaptiveViewport, AppearanceMode, AppletSlot, OsTheme, PanelApplet, StatusTone,
     focusable_action_chip, status_badge,
 };
-use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex};
+use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, rems_from_px};
 
 #[derive(Debug, Clone)]
 pub struct WorkspacePill {
@@ -142,26 +142,31 @@ impl PanelApplet for BrandLauncherApplet {
                 format!("{} OS · {}", self.brand_name, self.active_app)
             };
             div()
+                .min_w_0()
+                .overflow_hidden()
                 .px_2p5()
                 .py_1()
-                .rounded(px(8.0))
+                .rounded(rems_from_px(8.0_f32))
                 .bg(theme.colors.surface_container_high)
                 .border_1()
                 .border_color(theme.colors.outline_variant)
-                .child(Label::new(text).size(LabelSize::Small))
+                .child(Label::new(text).size(LabelSize::Small).truncate())
         });
 
-        let shortcut_badge = (!narrow).then(|| SharedString::from("Ctrl+K"));
+        let compact = f32::from(vp_size.width) < 1520.0;
+        let shortcut_badge = (!narrow && !compact).then(|| SharedString::from("Ctrl+K"));
         let theme_chip = (!narrow).then(|| {
             div()
+                .flex_shrink_0()
                 .px_2()
                 .py_0p5()
-                .rounded(px(6.0))
+                .rounded(rems_from_px(6.0_f32))
                 .bg(theme.colors.surface_container)
                 .child(
                     Label::new(self.theme_name.clone())
                         .size(LabelSize::XSmall)
-                        .color(ui::Color::Muted),
+                        .color(ui::Color::Muted)
+                        .single_line(),
                 )
         });
 
@@ -257,7 +262,11 @@ impl PanelApplet for SystemTelemetryApplet {
                 "panel-toggle-mode",
                 IconName::Sparkle,
                 mode_label,
-                (!narrow).then(|| SharedString::from("Ctrl+Shift+T")),
+                if f32::from(vp_size.width) >= 1520.0 {
+                    Some(SharedString::from("Ctrl+Shift+T"))
+                } else {
+                    None
+                },
                 SharedString::from("Switch between Dark and Light OS theme polarity"),
                 self.mode == AppearanceMode::Light,
                 20,

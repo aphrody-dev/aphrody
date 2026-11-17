@@ -6,22 +6,30 @@
 
 pub mod cosmic_shell;
 pub mod cosmic_theme;
+pub mod i18n;
 pub mod immediate;
 pub mod reactive;
 pub mod unified_runtime;
 
 pub use cosmic_shell::{
-    AppletSlot, NavItem, OsConfigStore, PanelApplet, render_context_drawer, render_nav_rail,
+    AppletSlot, ContextDrawer, NavItem, NavRail, OsConfigStore, PanelApplet, render_context_drawer,
+    render_nav_rail,
 };
 pub use cosmic_theme::{
     AppearanceMode, BUNDLED_THEMES_JSON, OsColorTokens, OsLayoutTokens, OsTheme, OsThemeCatalog,
     OsThemeEntry, contrast_ratio, parse_cosmic_ron_palette, parse_hex_hsla,
 };
+pub use i18n::{
+    BUNDLED_OS_LOCALES_TOML, LocaleEntry, OsI18nCatalog, PluralCategory, format_iso_utc,
+    plural_category,
+};
 pub use immediate::{
-    ImmediateMemory, ImmediateUi, PropertyInspect, StatusTone, sparkline_chart, status_badge,
+    ColorSwatchRow, ImmediateMemory, ImmediateUi, KeyValueRow, PropertyInspect, SparklineChart,
+    StatusBadge, StatusTone, sparkline_chart, status_badge,
 };
 pub use reactive::{
-    ReactiveHost, ReactiveProgram, SubscriptionSpec, TaskCommand, focusable_action_chip,
-    progress_meter, slider_control, toggle_control,
+    FocusableActionChip, ProgressMeter, ReactiveHost, ReactiveProgram, SliderControl,
+    SubscriptionSpec, TaskCommand, ToggleControl, focusable_action_chip, progress_meter,
+    slider_control, toggle_control,
 };
 pub use unified_runtime::{AdaptiveViewport, FormFactor, FrameworkLayer, UnifiedPlatformProfile};

@@ -17,8 +17,12 @@ use os_ui::{
     AdaptiveViewport, AppearanceMode, AppletSlot, OsConfigStore, OsTheme, OsThemeCatalog,
     PanelApplet, ReactiveHost, StatusTone, focusable_action_chip, status_badge,
 };
-use ui::{Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
+use ui::{
+    Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, Tooltip, h_flex, rems_from_px,
+    v_flex,
+};
 
+use crate::DesktopOptions;
 use crate::applets::{BrandLauncherApplet, SystemTelemetryApplet, WorkspaceApplet, WorkspacePill};
 use crate::overlays::{render_context_drawer_pane, render_launcher_modal};
 use crate::studio_view::{StudioCallbacks, StudioState, render_studio_window};
@@ -26,7 +30,6 @@ use crate::windows::{
     DesktopPrefs, FilesState, SettingsFlags, SettingsMessage, SettingsProgram, WindowKind,
     render_files_window, render_monitor_window,
 };
-use crate::DesktopOptions;
 
 const TOP_PANEL_HEIGHT: f32 = 44.0;
 const BOTTOM_DOCK_HEIGHT: f32 = 64.0;
@@ -55,6 +58,7 @@ pub struct OsDesktopShell {
     pub(crate) craft_catalog: CraftCatalog,
     supervisor: SessionSupervisor,
     compositor: CompositorState,
+    pub pilot: os_pilot::PilotEngine,
     pub(crate) discovered_apps: Vec<AppEntry>,
     window_kinds: BTreeMap<ToplevelId, WindowKind>,
     pub(crate) studio: StudioState,
@@ -192,6 +196,13 @@ impl OsDesktopShell {
         let focus_handle = cx.focus_handle();
         window.focus(&focus_handle, cx);
 
+        let pilot = os_pilot::PilotEngine::new();
+        pilot.gpui.sync_compositor(
+            compositor.clone(),
+            &theme.id,
+            theme.mode == AppearanceMode::Dark,
+        );
+
         Self {
             focus_handle,
             theme_catalog,
@@ -200,6 +211,7 @@ impl OsDesktopShell {
             craft_catalog,
             supervisor,
             compositor,
+            pilot,
             discovered_apps,
             window_kinds,
             studio,
@@ -227,7 +239,39 @@ impl OsDesktopShell {
             self.theme = resolved;
             self.theme.apply_to_gpui(cx);
         }
+        self.pilot.gpui.sync_compositor(
+            self.compositor.clone(),
+            &self.theme.id,
+            self.theme.mode == AppearanceMode::Dark,
+        );
         cx.notify();
+    }
+
+    /// Executes an AI OS Pilot tool step against the live GPUI `OsDesktopShell`, syncing the
+    /// COSMIC compositor, AccessKit tree, and AI Pilot HUD activity trail in one transaction.
+    pub fn pilot_execute_step(
+        &mut self,
+        tool: &str,
+        args: serde_json::Value,
+        target: os_pilot::TargetBackend,
+        cx: &mut Context<Self>,
+    ) -> Result<serde_json::Value, os_pilot::PilotError> {
+        let prev_ws = self.compositor.active_workspace;
+        let was_dark = self.theme.mode == AppearanceMode::Dark;
+        self.pilot
+            .gpui
+            .sync_compositor(self.compositor.clone(), &self.theme.id, was_dark);
+        let ctx = os_pilot::CommandContext {
+            target,
+            ..Default::default()
+        };
+        let out = self.pilot.execute_tool(tool, &args, &ctx)?;
+        self.compositor = self.pilot.gpui.export_compositor();
+        if self.compositor.active_workspace != prev_ws {
+            self.sync_chrome_layers(self.compositor.screen.w, self.compositor.screen.h);
+        }
+        cx.notify();
+        Ok(out)
     }
 
     pub fn open_or_focus_window(&mut self, kind: WindowKind, title: &str, cx: &mut Context<Self>) {
@@ -461,22 +505,60 @@ impl OsDesktopShell {
                 AppletSlot::Right => right_pills.push(pill),
             }
         }
+        let compact_pilot = f32::from(window.viewport_size().width) < 1400.0;
+        right_pills.insert(
+            0,
+            crate::pilot_hud::render_pilot_status_pill(
+                self.pilot.active_adapter().backend_name(),
+                self.compositor.arrange_active_workspace().len(),
+                &self.pilot.recent_hud_activity,
+                compact_pilot,
+                &self.theme,
+            ),
+        );
 
         h_flex()
             .id("os-top-panel")
             .role(Role::Toolbar)
             .aria_label("Desktop Top Panel")
             .w_full()
-            .h(px(top_h))
+            .min_w_0()
+            .h(rems_from_px(top_h))
             .px_3()
+            .gap_2()
             .justify_between()
             .items_center()
             .bg(self.theme.colors.surface_container_low)
             .border_b_1()
             .border_color(self.theme.colors.outline_variant)
-            .child(h_flex().gap_1p5().items_center().children(left_pills))
-            .child(h_flex().gap_2().items_center().children(center_pills))
-            .child(h_flex().gap_2().items_center().children(right_pills))
+            .child(
+                h_flex()
+                    .flex_shrink_0()
+                    .min_w_0()
+                    .overflow_hidden()
+                    .gap_1p5()
+                    .items_center()
+                    .children(left_pills),
+            )
+            .child(
+                h_flex()
+                    .flex_1()
+                    .min_w_0()
+                    .overflow_hidden()
+                    .justify_center()
+                    .gap_2()
+                    .items_center()
+                    .children(center_pills),
+            )
+            .child(
+                h_flex()
+                    .flex_shrink_0()
+                    .min_w_0()
+                    .overflow_hidden()
+                    .gap_2()
+                    .items_center()
+                    .children(right_pills),
+            )
             .into_any_element()
     }
 
@@ -553,8 +635,10 @@ impl OsDesktopShell {
             .child(
                 h_flex()
                     .w_full()
-                    .h(px(36.0))
+                    .min_w_0()
+                    .h(rems_from_px(36.0_f32))
                     .px_3()
+                    .gap_2()
                     .justify_between()
                     .items_center()
                     .bg(header_bg)
@@ -562,10 +646,18 @@ impl OsDesktopShell {
                     .border_color(self.theme.colors.outline_variant)
                     .child(
                         h_flex()
+                            .flex_1()
+                            .min_w_0()
                             .gap_2()
                             .items_center()
+                            .overflow_hidden()
                             .child(Icon::new(kind.icon()).size(IconSize::Small))
-                            .child(Label::new(title).size(LabelSize::Small))
+                            .child(
+                                div()
+                                    .min_w_0()
+                                    .overflow_hidden()
+                                    .child(Label::new(title).size(LabelSize::Small).truncate()),
+                            )
                             .when(placed.focused, |el| {
                                 el.child(status_badge(
                                     IconName::Check,
@@ -967,6 +1059,7 @@ impl OsDesktopShell {
                     .tab_stop(true)
                     .role(Role::Button)
                     .aria_label(label.clone())
+                    .tooltip(Tooltip::text(label.clone()))
                     .focus_visible(move |s| s.border_2().border_color(ring))
                     .on_click(move |_, _w, cx| {
                         entity.update(cx, |shell, cx| {

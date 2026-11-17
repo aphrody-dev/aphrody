@@ -195,7 +195,7 @@ export function Mass() {
         <Text style={{ fontSize: 13, color: color.muted }}>
           Thrust to weight{" "}
           <Text style={{ fontFamily: mono, color: tw() < 1.3 ? color.caution : color.text }}>{tw().toFixed(2)}</Text> at full
-          throttle (<Text style={{ fontFamily: mono, color: color.text }}>{THRUST.toLocaleString("en-US")} N</Text>)
+          throttle (<Text style={{ fontFamily: mono, color: color.text }}>{THRUST.toLocaleString(undefined)} N</Text>)
         </Text>
       </Inset>
     </Panel>

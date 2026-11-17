@@ -1,10 +1,11 @@
 name: Report a crash
-description: Aphrody application or GPU pipeline crashed or panicked.
+description: Aphrody application or GPU pipeline crashed, froze, or panicked.
 labels: ["bug"]
 body:
   - type: textarea
     attributes:
       label: Reproduction steps
+      description: Step-by-step actions to reproduce the crash or panic from a clean setup.
       placeholder: |
         1. Launch `aphrody` / GPUI app
         2. Perform action / shader dispatch
@@ -13,17 +14,25 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Backtrace / stderr / Aphrody.log
-      value: |
-        ```log
-
-        ```
+      label: Aphrody version, GPU & OS environment
+      description: |
+        Run `CopySystemSpecsIntoClipboard` if accessible, or provide OS, GPU adapter (`cargo run -p wgpu_cli -- adapters --json`), and driver version.
+      placeholder: |
+        OS, GPU adapter (`gpui-wgpu adapters`), driver version
     validations:
       required: true
   - type: textarea
     attributes:
-      label: GPU & OS environment
-      placeholder: |
-        OS, GPU adapter (`gpui-wgpu adapters`), driver version
+      label: Backtrace / stderr / Aphrody.log
+      description: |
+        ⚠️ **Please review logs and backtraces for secrets or private paths and redact them before posting.**
+      value: |
+        <details><summary>Aphrody.log / Backtrace</summary>
+
+        ```log
+
+        ```
+
+        </details>
     validations:
       required: true

@@ -23,3 +23,6 @@ rustflags = ["-C", "link-arg=-fuse-ld=lld"]
 [env]
 MACOSX_DEPLOYMENT_TARGET = "12.0"
 RUSTC_BOOTSTRAP = "1"
+
+[cache]
+auto-clean-frequency = "1 day"

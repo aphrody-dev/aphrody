@@ -8,6 +8,7 @@ use ui::IconName;
 
 pub mod applets;
 pub mod overlays;
+pub mod pilot_hud;
 pub mod shell;
 pub mod studio_view;
 pub mod windows;

@@ -38,6 +38,7 @@ dirs.workspace = true
 image = { workspace = true, optional = true }
 log.workspace = true
 object = { workspace = true, optional = true }
+os_pilot.workspace = true
 os_session.workspace = true
 resvg = { workspace = true, optional = true }
 schemars.workspace = true

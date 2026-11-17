@@ -172,6 +172,7 @@ impl Installation {
             }
         }
         if cfg!(target_os = "macos") && new.extension().is_some_and(|e| e == "app") {
+            #[allow(clippy::disallowed_methods)] // Synchronous installer runs off the UI thread.
             let status = Command::new("/usr/bin/codesign")
                 .args(["--verify", "--deep", "--strict"])
                 .arg(new)
@@ -457,6 +458,7 @@ mod tests {
 </dict></plist>"#,
         )
         .unwrap();
+        #[allow(clippy::disallowed_methods)] // Synchronous unit test setup.
         let output = Command::new("/usr/bin/codesign")
             .args(["--force", "--sign", "-", "--timestamp=none"])
             .arg(root)

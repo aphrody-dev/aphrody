@@ -168,6 +168,9 @@ function initShellAlias() {
 
 function isZedRepo() {
   try {
+    if (fs.existsSync(path.join(process.cwd(), "product.toml"))) {
+      return true;
+    }
     const result = spawnSync("git", ["remote", "-v"], {
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
@@ -176,7 +179,11 @@ function isZedRepo() {
     if (result.status !== 0 || !result.stdout) {
       return false;
     }
-    return result.stdout.includes("zed-industries/zed");
+    return (
+      result.stdout.includes("zed-industries/zed") ||
+      result.stdout.includes("aphrody-dev/aphrody") ||
+      result.stdout.includes("aphrody-labs/aphrody")
+    );
   } catch {
     return false;
   }

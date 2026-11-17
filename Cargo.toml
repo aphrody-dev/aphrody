@@ -110,6 +110,7 @@ members = [
     "crates/gpui_ui",
     "crates/gpui_code",
     "crates/gpui_app_shell",
+    "crates/gpui_store",
     "crates/grammars",
     "crates/hang_telemetry",
     "crates/html_to_markdown",
@@ -197,6 +198,7 @@ members = [
     "crates/opencode",
     "crates/os_craft",
     "crates/os_desktop",
+    "crates/os_pilot",
     "crates/os_session",
     "crates/os_ui",
     "crates/outline",
@@ -335,7 +337,7 @@ exclude = [
     "vendor/wgpu",
     "vendor/winit",
 ]
-default-members = ["crates/gpui_ui", "crates/gpui_code", "crates/os_session", "crates/os_craft", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
+default-members = ["crates/gpui_wgpu", "crates/gpui_web", "crates/gpui_ui", "crates/gpui_code", "crates/gpui_store", "crates/os_session", "crates/os_craft", "crates/os_pilot", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
 
 [workspace.package]
 version = "0.5.0"
@@ -527,6 +529,7 @@ open_router = { path = "crates/open_router", features = ["schemars"] }
 openai_subscribed = { path = "crates/openai_subscribed" }
 opencode = { path = "crates/opencode" }
 os_craft = { path = "crates/os_craft" }
+os_pilot = { path = "crates/os_pilot" }
 os_session = { path = "crates/os_session" }
 os_ui = { path = "crates/os_ui" }
 outline = { path = "crates/outline" }
@@ -1299,6 +1302,7 @@ unicode-script = "0.5.7"
 unicode-segmentation = "1.10"
 unicode-width = "0.2"
 unindent = "0.2.0"
+upt = "0.9.0"
 url = "2.2"
 urlencoding = "2.1.2"
 usvg = { version = "0.46.0", default-features = false }
@@ -1531,14 +1535,14 @@ msvc_spectre_libs = { path = "tooling/corgi/patches/msvc_spectre_libs" }
 split-debuginfo = "unpacked"
 incremental = true
 codegen-units = 16
-debug = "limited"
+debug = "line-tables-only"
 
 # mirror configuration for crates compiled for the build platform
 # (without this cargo will compile ~400 crates twice)
 [profile.dev.build-override]
 codegen-units = 16
 split-debuginfo = "unpacked"
-debug = "limited"
+debug = false
 
 # "debug" is a reserved profile name.
 [profile.dbg]
@@ -1549,6 +1553,7 @@ debug = "full"
 debug = "full"
 
 [profile.dev.package]
+"*" = { debug = false }
 # proc-macros start
 gpui_macros = { opt-level = 3 }
 derive_refineable = { opt-level = 3 }
@@ -1560,7 +1565,28 @@ util_macros = { opt-level = 3 }
 quote = { opt-level = 3 }
 syn = { opt-level = 3 }
 proc-macro2 = { opt-level = 3 }
+serde_derive = { opt-level = 3 }
+thiserror-impl = { opt-level = 3 }
+tokio-macros = { opt-level = 3 }
+strum_macros = { opt-level = 3 }
+clap_derive = { opt-level = 3 }
+schemars_derive = { opt-level = 3 }
+derive_more-impl = { opt-level = 3 }
+zerocopy-derive = { opt-level = 3 }
+async-trait = { opt-level = 3 }
+pin-project-internal = { opt-level = 3 }
+bytemuck_derive = { opt-level = 3 }
+wasm-bindgen-macro = { opt-level = 3 }
 # proc-macros end
+
+naga = { opt-level = 3 }
+wgpu-core = { opt-level = 3 }
+flate2 = { opt-level = 3 }
+zstd-sys = { opt-level = 3 }
+ring = { opt-level = 3 }
+aws-lc-rs = { opt-level = 3 }
+image = { opt-level = 3 }
+pulldown-cmark = { opt-level = 3 }
 
 tree-sitter = { opt-level = 3 }
 taffy = { opt-level = 3 }

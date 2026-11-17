@@ -157,6 +157,23 @@ where
     let config = nucleo::Config::DEFAULT;
     let mut matchers = matcher::get_matchers(num_cpus, config);
 
+    let run_segment = |segment_idx: usize, results: &mut Vec<StringMatch>, matcher: &mut nucleo::Matcher| {
+        let query = &query;
+        let segment_start = segment_idx * base_size + segment_idx.min(remainder);
+        let segment_end = (segment_idx + 1) * base_size + (segment_idx + 1).min(remainder);
+
+        match_string_helper(
+            &candidates[segment_start..segment_end],
+            query,
+            matcher,
+            length_penalty,
+            results,
+            cancel_flag,
+        )
+        .ok();
+    };
+
+    #[cfg(not(target_family = "wasm"))]
     executor
         .scoped(|scope| {
             for (segment_idx, (results, matcher)) in segment_results
@@ -164,25 +181,22 @@ where
                 .zip(matchers.iter_mut())
                 .enumerate()
             {
-                let query = &query;
-                scope.spawn(async move {
-                    let segment_start = segment_idx * base_size + segment_idx.min(remainder);
-                    let segment_end =
-                        (segment_idx + 1) * base_size + (segment_idx + 1).min(remainder);
-
-                    match_string_helper(
-                        &candidates[segment_start..segment_end],
-                        query,
-                        matcher,
-                        length_penalty,
-                        results,
-                        cancel_flag,
-                    )
-                    .ok();
-                });
+                scope.spawn(async move { run_segment(segment_idx, results, matcher) });
             }
         })
         .await;
+
+    #[cfg(target_family = "wasm")]
+    {
+        let _ = executor;
+        for (segment_idx, (results, matcher)) in segment_results
+            .iter_mut()
+            .zip(matchers.iter_mut())
+            .enumerate()
+        {
+            run_segment(segment_idx, results, matcher);
+        }
+    }
 
     matcher::return_matchers(matchers);
 

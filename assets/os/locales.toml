@@ -1,0 +1,277 @@
+default_locale = "en"
+
+[locales.en]
+name = "English"
+native_name = "English"
+dir = "ltr"
+decimal = "."
+group = ","
+indian_grouping = false
+
+[locales.en.messages]
+apps = "Apps"
+compositor_geometry = "Compositor Geometry"
+dark = "Dark"
+inspector = "Inspector"
+language_locale = "Language & Script (BCP 47)"
+light = "Light"
+light_polarity = "Light Polarity"
+reduced_motion = "Reduced Motion"
+settings_title = "COSMIC & Material 3 Settings"
+studio_title = "ArtCraft Studio"
+text_direction = "Direction"
+theme_catalog = "Theme Catalog"
+window_gap = "Window Gap"
+
+[locales.fr]
+name = "French"
+native_name = "Français"
+dir = "ltr"
+decimal = ","
+group = " "
+indian_grouping = false
+
+[locales.fr.messages]
+apps = "Applications"
+compositor_geometry = "Géométrie du compositeur"
+dark = "Sombre"
+inspector = "Inspecteur"
+language_locale = "Langue et écriture (BCP 47)"
+light = "Clair"
+light_polarity = "Polarité claire"
+reduced_motion = "Mouvement réduit"
+settings_title = "Paramètres COSMIC & Material 3"
+studio_title = "Atelier ArtCraft"
+text_direction = "Sens d'écriture"
+theme_catalog = "Catalogue de thèmes"
+window_gap = "Espacement des fenêtres"
+
+[locales.ar]
+name = "Arabic"
+native_name = "العربية"
+dir = "rtl"
+decimal = "٫"
+group = "٬"
+indian_grouping = false
+
+[locales.ar.messages]
+apps = "التطبيقات"
+compositor_geometry = "هندسة المؤلف"
+dark = "داكن"
+inspector = "المفتش"
+language_locale = "اللغة والخط (BCP 47)"
+light = "فاتح"
+light_polarity = "الوضع الفاتح"
+reduced_motion = "تقليل الحركة"
+settings_title = "إعدادات COSMIC و Material 3"
+studio_title = "استوديو ArtCraft"
+text_direction = "اتجاه النص"
+theme_catalog = "كتالوج السمات"
+window_gap = "تباعد النوافذ"
+
+[locales.he]
+name = "Hebrew"
+native_name = "עברית"
+dir = "rtl"
+decimal = "."
+group = ","
+indian_grouping = false
+
+[locales.he.messages]
+apps = "יישומים"
+compositor_geometry = "גאומטריית מלחין"
+dark = "כהה"
+inspector = "מפקח"
+language_locale = "שפה וכתב (BCP 47)"
+light = "בהיר"
+light_polarity = "מצב בהיר"
+reduced_motion = "הפחתת תנועה"
+settings_title = "הגדרות COSMIC ו-Material 3"
+studio_title = "סטודיו ArtCraft"
+text_direction = "כיוון טקסט"
+theme_catalog = "קטלוג ערכות נושא"
+window_gap = "מרווח חלונות"
+
+[locales.es]
+name = "Spanish"
+native_name = "Español"
+dir = "ltr"
+decimal = ","
+group = "."
+indian_grouping = false
+
+[locales.es.messages]
+apps = "Aplicaciones"
+compositor_geometry = "Geometría del compositor"
+dark = "Oscuro"
+inspector = "Inspector"
+language_locale = "Idioma y escritura (BCP 47)"
+light = "Claro"
+light_polarity = "Polaridad clara"
+reduced_motion = "Movimiento reducido"
+settings_title = "Ajustes COSMIC y Material 3"
+studio_title = "Estudio ArtCraft"
+text_direction = "Dirección"
+theme_catalog = "Catálogo de temas"
+window_gap = "Separación de ventanas"
+
+[locales.de]
+name = "German"
+native_name = "Deutsch"
+dir = "ltr"
+decimal = ","
+group = "."
+indian_grouping = false
+
+[locales.de.messages]
+apps = "Anwendungen"
+compositor_geometry = "Kompositor-Geometrie"
+dark = "Dunkel"
+inspector = "Inspektor"
+language_locale = "Sprache & Schrift (BCP 47)"
+light = "Hell"
+light_polarity = "Helles Design"
+reduced_motion = "Reduzierte Bewegung"
+settings_title = "COSMIC & Material 3 Einstellungen"
+studio_title = "ArtCraft Studio"
+text_direction = "Textrichtung"
+theme_catalog = "Design-Katalog"
+window_gap = "Fensterabstand"
+
+[locales.pt]
+name = "Portuguese"
+native_name = "Português"
+dir = "ltr"
+decimal = ","
+group = "."
+indian_grouping = false
+
+[locales.pt.messages]
+apps = "Aplicativos"
+compositor_geometry = "Geometria do compositor"
+dark = "Escuro"
+inspector = "Inspetor"
+language_locale = "Idioma e escrita (BCP 47)"
+light = "Claro"
+light_polarity = "Tema claro"
+reduced_motion = "Movimento reduzido"
+settings_title = "Configurações COSMIC e Material 3"
+studio_title = "Estúdio ArtCraft"
+text_direction = "Direção"
+theme_catalog = "Catálogo de temas"
+window_gap = "Espaçamento de janelas"
+
+[locales.ja]
+name = "Japanese"
+native_name = "日本語"
+dir = "ltr"
+decimal = "."
+group = ","
+indian_grouping = false
+
+[locales.ja.messages]
+apps = "アプリ"
+compositor_geometry = "コンポジター配置"
+dark = "ダーク"
+inspector = "インスペクター"
+language_locale = "言語と文字 (BCP 47)"
+light = "ライト"
+light_polarity = "ライトテーマ"
+reduced_motion = "視差効果を減らす"
+settings_title = "COSMIC & Material 3 設定"
+studio_title = "ArtCraft スタジオ"
+text_direction = "書字方向"
+theme_catalog = "テーマ一覧"
+window_gap = "ウィンドウ間隔"
+
+[locales.zh-Hans]
+name = "Chinese (Simplified)"
+native_name = "简体中文"
+dir = "ltr"
+decimal = "."
+group = ","
+indian_grouping = false
+
+[locales.zh-Hans.messages]
+apps = "应用"
+compositor_geometry = "合成器布局"
+dark = "深色"
+inspector = "检查器"
+language_locale = "语言与文字 (BCP 47)"
+light = "浅色"
+light_polarity = "浅色主题"
+reduced_motion = "减弱动态效果"
+settings_title = "COSMIC 与 Material 3 设置"
+studio_title = "ArtCraft 工作室"
+text_direction = "排版方向"
+theme_catalog = "主题目录"
+window_gap = "窗口间距"
+
+[locales.ko]
+name = "Korean"
+native_name = "한국어"
+dir = "ltr"
+decimal = "."
+group = ","
+indian_grouping = false
+
+[locales.ko.messages]
+apps = "앱"
+compositor_geometry = "컴포지터 레이아웃"
+dark = "다크"
+inspector = "인스펙터"
+language_locale = "언어 및 문자 (BCP 47)"
+light = "라이트"
+light_polarity = "라이트 모드"
+reduced_motion = "동작 줄이기"
+settings_title = "COSMIC & Material 3 설정"
+studio_title = "ArtCraft 스튜디오"
+text_direction = "텍스트 방향"
+theme_catalog = "테마 카탈로그"
+window_gap = "창 간격"
+
+[locales.hi]
+name = "Hindi"
+native_name = "हिन्दी"
+dir = "ltr"
+decimal = "."
+group = ","
+indian_grouping = true
+
+[locales.hi.messages]
+apps = "ऐप्स"
+compositor_geometry = "कंपोज़िटर ज्यामिति"
+dark = "डार्क"
+inspector = "निरीक्षक"
+language_locale = "भाषा और लिपि (BCP 47)"
+light = "लाइट"
+light_polarity = "लाइट मोड"
+reduced_motion = "कम गति"
+settings_title = "COSMIC और Material 3 सेटिंग्स"
+studio_title = "ArtCraft स्टूडियो"
+text_direction = "लेखन दिशा"
+theme_catalog = "थीम सूची"
+window_gap = "विंडो अंतराल"
+
+[locales.uk]
+name = "Ukrainian"
+native_name = "Українська"
+dir = "ltr"
+decimal = ","
+group = " "
+indian_grouping = false
+
+[locales.uk.messages]
+apps = "Застосунки"
+compositor_geometry = "Геометрія композитора"
+dark = "Темна"
+inspector = "Інспектор"
+language_locale = "Мова та писемність (BCP 47)"
+light = "Світла"
+light_polarity = "Світла тема"
+reduced_motion = "Зменшений рух"
+settings_title = "Налаштування COSMIC і Material 3"
+studio_title = "Студія ArtCraft"
+text_direction = "Напрямок тексту"
+theme_catalog = "Каталог тем"
+window_gap = "Відступ вікон"

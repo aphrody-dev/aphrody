@@ -68,6 +68,17 @@ enum Command {
         #[arg(long)]
         addr: Option<String>,
     },
+    /// Execute an AI OS Pilot computer-use step (`status`, `snapshot`, `click`, `type`, `ai_act_verify`, etc.) returning JSON envelope 2.6.
+    Pilot {
+        /// Pilot operation name (`status`, `permissions`, `snapshot`, `find`, `click`, `type`, `windows`, `displays`, `screenshot`, `wait`, `batch`, `ai_act_verify`).
+        op: String,
+        /// JSON object arguments for the pilot operation.
+        #[arg(long, default_value = "{}")]
+        args: String,
+        /// Target backend (`auto`, `gpui`, `native`).
+        #[arg(long, default_value = "auto")]
+        target: String,
+    },
 }
 
 fn parse_mode(raw: Option<&str>) -> Option<AppearanceMode> {
@@ -139,11 +150,27 @@ fn main() -> anyhow::Result<()> {
             let system_apps = discover_system_apps(16);
             if json {
                 let hardware = HardwareCapabilities::detect();
+                let i18n = os_ui::OsI18nCatalog::load_with_user_override().unwrap_or_default();
+                let process_locale = os_session::detect_process_locale();
+                let active_locale = i18n.resolve_tag(process_locale.as_str());
+                let active_dir = i18n.direction(&active_locale);
                 let payload = serde_json::json!({
                     "brand": brand::APP_NAME,
                     "version": env!("CARGO_PKG_VERSION"),
                     "hardware": hardware,
                     "environment": env_info,
+                    "i18n": {
+                        "locale": active_locale,
+                        "dir": active_dir.as_str(),
+                        "available_locales": i18n.available_locales(),
+                        "w3c_specs": [
+                            "https://www.w3.org/International/",
+                            "https://www.w3.org/TR/international-specs/",
+                            "https://www.w3.org/TR/string-meta/",
+                            "https://www.w3.org/TR/charmod-norm/",
+                            "https://www.w3.org/TR/ltli/"
+                        ]
+                    },
                     "theme_ids": themes.ids(),
                     "craft_app_count": catalog.apps.len(),
                     "system_app_count": system_apps.len(),
@@ -178,6 +205,22 @@ fn main() -> anyhow::Result<()> {
         Some(Command::Serve { addr }) => {
             let state = Arc::new(Mutex::new(McpServerState::bootstrap()?));
             serve_http(state, addr.as_deref())?;
+        }
+        Some(Command::Pilot { op, args, target }) => {
+            let parsed_args: serde_json::Value = serde_json::from_str(&args)?;
+            let mut engine = os_pilot::PilotEngine::new();
+            let ctx = os_pilot::CommandContext {
+                target: os_pilot::TargetBackend::parse(Some(&target)),
+                ..Default::default()
+            };
+            let envelope = match engine.execute_tool(&op, &parsed_args, &ctx) {
+                Ok(data) => os_pilot::CommandEnvelope::ok(op, data),
+                Err(err) => os_pilot::CommandEnvelope::err(op, err),
+            };
+            println!("{}", serde_json::to_string_pretty(&envelope)?);
+            if !envelope.ok {
+                std::process::exit(1);
+            }
         }
     }
     Ok(())

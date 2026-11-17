@@ -1,14 +1,30 @@
 {
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "aphrody",
+  "displayName": "Aphrody OS & GPUI",
   "version": "1.30.0",
-  "description": "Unified Aphrody engineering plugin bundling all skills, hooks, docs, and architecture references for Zed, GPUI, WGPU/Naga, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Branding, and GitHub automation.",
+  "description": "Unified Aphrody OS & GPUI engineering plugin bundling skills, hooks, custom agents, MCP scripts, and architecture references for Zed, GPUI, WGPU/Naga, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, and OS Pilot.",
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "Audit workspace conformance with brand check, repo hygiene, and clippy",
+    "Optimize fr1 XFS/KVM/sccache CI host and verify WebGPU + Linux desktop screenshots",
+    "Drive os_desktop and native windows via ai-os-pilot desktop_ai_act_verify"
+  ],
   "author": {
     "name": "Aphrody Labs",
     "url": "https://aphrody.com"
   },
   "homepage": "https://aphrody.com",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aphrody-dev/aphrody"
-  }
+  "repository": "https://github.com/aphrody-dev/aphrody",
+  "license": "Apache-2.0",
+  "keywords": [
+    "aphrody",
+    "gpui",
+    "zed",
+    "wgpu",
+    "webgpu",
+    "wasm",
+    "desktop-os",
+    "ai-pilot"
+  ]
 }

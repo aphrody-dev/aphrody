@@ -8,8 +8,8 @@
  *   bun tooling/bun/fleet-sync.ts sync --host fr1 [--remote-dir /srv/xbuild/scratch/aphrody]
  *   bun tooling/bun/fleet-sync.ts verify --host fr1 [--pull-shots]
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { parseGitmodules } from "./submodules.ts";
 
 const repoRoot = resolve(import.meta.dir, "../..");
@@ -50,11 +50,7 @@ function syncToHost(host: string, remoteRepo: string, repoBaseUrl: string) {
   const localHead = runChecked(["git", "-C", repoRoot, "rev-parse", "HEAD"]).trim();
   const remoteHead = runChecked(["ssh", host, `git -C ${remoteRepo} rev-parse HEAD`]).trim();
 
-  runChecked([
-    "ssh",
-    host,
-    `git -C ${remoteRepo} reset --hard HEAD && git -C ${remoteRepo} clean -fd -e vendor`,
-  ]);
+  runChecked(["ssh", host, `git -C ${remoteRepo} reset --hard HEAD && git -C ${remoteRepo} clean -fd -e vendor`]);
 
   if (localHead !== remoteHead) {
     const bundleBytes = Bun.spawnSync(["git", "-C", repoRoot, "bundle", "create", "-", "main", `^${remoteHead}`]);
@@ -90,10 +86,10 @@ function syncToHost(host: string, remoteRepo: string, repoBaseUrl: string) {
   }
 
   if (trackedPatch.stdout.length > 0) {
-    const apply = Bun.spawnSync(
-      ["ssh", host, `git -C ${remoteRepo} apply --binary --whitespace=nowarn -`],
-      { stdin: trackedPatch.stdout, stderr: "pipe" },
-    );
+    const apply = Bun.spawnSync(["ssh", host, `git -C ${remoteRepo} apply --binary --whitespace=nowarn -`], {
+      stdin: trackedPatch.stdout,
+      stderr: "pipe",
+    });
     if (apply.exitCode !== 0) {
       throw new Error(`remote git apply failed: ${new TextDecoder().decode(apply.stderr)}`);
     }
@@ -137,35 +133,36 @@ function syncToHost(host: string, remoteRepo: string, repoBaseUrl: string) {
       httpsUrl: new URL(entry.url, `${repoBaseUrl}/`).toString(),
     }));
 
-  const remoteSubSync = [
-    "set -euo pipefail",
-    `cd ${remoteRepo}`,
-    "git rm -rfq --ignore-unmatch vendor/wgpu || true",
-    "if [ -d vendor/wgpu ] && [ ! -e vendor/wgpu/.git ]; then rm -rf vendor/wgpu; fi",
-    "sync_one() {",
-    '  local path="$1" sha="$2" url="$3" branch="$4"',
-    '  mkdir -p "$(dirname "$path")"',
-    '  if [ -e "$path/.git" ]; then',
-    '    local cur; cur=$(git -C "$path" rev-parse HEAD 2>/dev/null || true)',
-    '    if [ "$cur" != "$sha" ]; then',
-    '      git -C "$path" fetch --depth 1 "$url" "$sha" >/dev/null 2>&1 || git -C "$path" fetch "$url" >/dev/null 2>&1',
-    '      git -C "$path" checkout -qf "$sha"',
-    "    fi",
-    "  else",
-    '    rm -rf "$path"',
-    '    if [ -n "$branch" ]; then git clone -q --depth 1 --branch "$branch" "$url" "$path" 2>/dev/null || git clone -q --depth 1 "$url" "$path"; else git clone -q --depth 1 "$url" "$path"; fi',
-    '    local cur; cur=$(git -C "$path" rev-parse HEAD 2>/dev/null || true)',
-    '    if [ "$cur" != "$sha" ]; then',
-    '      git -C "$path" fetch --depth 1 "$url" "$sha" >/dev/null 2>&1 || git -C "$path" fetch "$url" >/dev/null 2>&1',
-    '      git -C "$path" checkout -qf "$sha"',
-    "    fi",
-    "  fi",
-    "}",
-    "export -f sync_one",
-    `printf '%s\\n' ${specs.map((s) => `"${s.path}|${s.sha}|${s.httpsUrl}|${s.branch ?? ""}"`).join(" ")} | xargs -P 8 -I {} bash -c 'IFS="|" read -r p s u b <<< "{}"; sync_one "$p" "$s" "$u" "$b"'`,
-    ...specs.map((s) => `git update-index --add --cacheinfo 160000,${s.sha},${s.path}`),
-    "git submodule sync --recursive >/dev/null",
-  ].join("\n") + "\n";
+  const remoteSubSync =
+    [
+      "set -euo pipefail",
+      `cd ${remoteRepo}`,
+      "git rm -rfq --ignore-unmatch vendor/wgpu || true",
+      "if [ -d vendor/wgpu ] && [ ! -e vendor/wgpu/.git ]; then rm -rf vendor/wgpu; fi",
+      "sync_one() {",
+      '  local path="$1" sha="$2" url="$3" branch="$4"',
+      '  mkdir -p "$(dirname "$path")"',
+      '  if [ -e "$path/.git" ]; then',
+      '    local cur; cur=$(git -C "$path" rev-parse HEAD 2>/dev/null || true)',
+      '    if [ "$cur" != "$sha" ]; then',
+      '      git -C "$path" fetch --depth 1 "$url" "$sha" >/dev/null 2>&1 || git -C "$path" fetch "$url" >/dev/null 2>&1',
+      '      git -C "$path" checkout -qf "$sha"',
+      "    fi",
+      "  else",
+      '    rm -rf "$path"',
+      '    if [ -n "$branch" ]; then git clone -q --depth 1 --branch "$branch" "$url" "$path" 2>/dev/null || git clone -q --depth 1 "$url" "$path"; else git clone -q --depth 1 "$url" "$path"; fi',
+      '    local cur; cur=$(git -C "$path" rev-parse HEAD 2>/dev/null || true)',
+      '    if [ "$cur" != "$sha" ]; then',
+      '      git -C "$path" fetch --depth 1 "$url" "$sha" >/dev/null 2>&1 || git -C "$path" fetch "$url" >/dev/null 2>&1',
+      '      git -C "$path" checkout -qf "$sha"',
+      "    fi",
+      "  fi",
+      "}",
+      "export -f sync_one",
+      `printf '%s\\n' ${specs.map((s) => `"${s.path}|${s.sha}|${s.httpsUrl}|${s.branch ?? ""}"`).join(" ")} | xargs -P 8 -I {} bash -c 'IFS="|" read -r p s u b <<< "{}"; sync_one "$p" "$s" "$u" "$b"'`,
+      ...specs.map((s) => `git update-index --add --cacheinfo 160000,${s.sha},${s.path}`),
+      "git submodule sync --recursive >/dev/null",
+    ].join("\n") + "\n";
 
   const syncRes = Bun.spawnSync(["ssh", host, "bash -s"], {
     stdin: Buffer.from(remoteSubSync, "utf8"),
@@ -188,17 +185,22 @@ function syncToHost(host: string, remoteRepo: string, repoBaseUrl: string) {
 }
 
 function runVerify(host: string, remoteRepo: string, pullShots: boolean) {
-  const script = [
-    "set -euo pipefail",
-    'export PATH="$HOME/.cargo/bin:$HOME/.bun/bin:/usr/local/bin:$PATH"',
-    `cd ${remoteRepo}`,
-    "cargo test --lib -p util -p gpui_ui -p os_session -p os_craft -p os_ui -p os_desktop",
-    "cargo test -p os_desktop --test visual_smoke -- --nocapture",
-    "cargo clippy -p os_session -p os_craft -p os_ui -p os_desktop -p gpui_wgpu -p gpui_web -p gpui_ui -p util -p xtask -- -D warnings",
-    "cargo xtask brand check",
-    "cargo xtask package-conformity",
-    "cargo run -p os_desktop --bin aphrody-os -- doctor --json",
-  ].join("\n") + "\n";
+  const script =
+    [
+      "set -euo pipefail",
+      'export PATH="$HOME/.cargo/bin:$HOME/.bun/bin:/usr/local/bin:$PATH"',
+      'if command -v sccache >/dev/null 2>&1; then export RUSTC_WRAPPER="$(command -v sccache)"; fi',
+      'export SCCACHE_DIR="${SCCACHE_DIR:-/var/cache/aphrody/sccache}"',
+      'export SCCACHE_BASEDIRS="${SCCACHE_BASEDIRS:-/srv/xbuild:/home/ubuntu:/srv}"',
+      'export TMPDIR="/tmp"',
+      `cd ${remoteRepo}`,
+      "cargo test --lib -p util -p brand -p gpui_ui -p gpui_store -p os_session -p os_pilot -p os_craft -p os_ui -p os_desktop",
+      "cargo test -p os_desktop --test visual_smoke -- --nocapture",
+      "cargo clippy --no-deps -p os_session -p os_pilot -p os_craft -p os_ui -p os_desktop -p gpui_store -p gpui_wgpu -p gpui_web -p gpui_ui -p util -p brand -p xtask -- -D warnings",
+      "cargo xtask brand check",
+      "cargo xtask package-conformity",
+      "cargo run -p os_desktop --bin aphrody-os -- doctor --json",
+    ].join("\n") + "\n";
 
   const res = Bun.spawnSync(["ssh", host, "bash -s"], {
     stdin: Buffer.from(script, "utf8"),
@@ -231,7 +233,9 @@ if (import.meta.main) {
     console.log(JSON.stringify(syncToHost(host, remoteRepo, repoSlug), null, 2));
     runVerify(host, remoteRepo, pullShots);
   } else {
-    console.error("Usage: bun tooling/bun/fleet-sync.ts [sync|verify] --host <ssh-host> [--remote-dir <path>] [--pull-shots]");
+    console.error(
+      "Usage: bun tooling/bun/fleet-sync.ts [sync|verify] --host <ssh-host> [--remote-dir <path>] [--pull-shots]",
+    );
     process.exit(1);
   }
 }

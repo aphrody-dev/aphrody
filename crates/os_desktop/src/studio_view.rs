@@ -11,7 +11,9 @@ use os_ui::{
     focusable_action_chip, render_nav_rail, slider_control, sparkline_chart, status_badge,
     toggle_control,
 };
-use ui::{Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
+use ui::{
+    Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, rems_from_px, v_flex,
+};
 
 use crate::parse_icon_name;
 
@@ -291,13 +293,14 @@ fn render_center_workspace(
                         .child(Icon::new(app_icon).size(IconSize::Medium))
                         .child(
                             v_flex()
-                                .min_w(px(120.0))
+                                .min_w(rems_from_px(120.0_f32))
                                 .flex_1()
+                                .overflow_hidden()
                                 .gap_0p5()
                                 .child(
                                     Label::new(app_name.to_owned())
                                         .size(LabelSize::Default)
-                                        .single_line(),
+                                        .truncate(),
                                 )
                                 .when(!compact, |el| {
                                     el.child(
@@ -717,10 +720,20 @@ fn render_inspector_pane(
 
     v_flex()
         .id("studio-inspector-pane")
+        .role(Role::Region)
+        .aria_label("Studio Inspector")
         .when(!stacked, |el| {
-            el.w(px(inspector_width)).h_full().border_l_1()
+            el.flex_shrink_0()
+                .w(rems_from_px(inspector_width))
+                .h_full()
+                .border_l_1()
         })
-        .when(stacked, |el| el.w_full().h(px(210.0)).border_t_1())
+        .when(stacked, |el| {
+            el.w_full()
+                .min_w_0()
+                .h(rems_from_px(210.0_f32))
+                .border_t_1()
+        })
         .p_2p5()
         .pb_6()
         .overflow_y_scroll()

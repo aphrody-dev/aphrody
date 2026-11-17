@@ -123,6 +123,44 @@ jobs:
           cargo test -j 4 -p "${{ steps.cfg.outputs.wgpu_pkg }}" --bins
           cargo check -j 4 -p "${{ steps.cfg.outputs.wgpu_pkg }}" --examples
 
+  wasm-webgpu-first:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+      - uses: ./.github/actions/vendor-submodules
+      - uses: oven-sh/setup-bun@v2
+      - name: Read toolchain and pinned wasm-bindgen version
+        id: cfg
+        run: |
+          bun -e '
+            import { readFileSync } from "node:fs";
+            const rt = Bun.TOML.parse(readFileSync("rust-toolchain.toml", "utf8")) as any;
+            const lock = readFileSync("Cargo.lock", "utf8");
+            const wb = lock.match(/name = "wasm-bindgen"\r?\nversion = "([^"]+)"/)?.[1] ?? "0.2.129";
+            console.log(`toolchain=${rt.toolchain.channel}`);
+            console.log(`wasm_bindgen=${wb}`);
+          ' >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.cfg.outputs.toolchain }}
+          targets: wasm32-unknown-unknown,wasm32-wasip2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@${{ steps.cfg.outputs.wasm_bindgen }}
+      - name: Install binaryen (wasm-opt)
+        run: sudo apt-get update && sudo apt-get install -y binaryen || true
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: wasm-webgpu-v1
+      - name: Check full monorepo WebAssembly & WASI Preview 2 targets
+        run: bun run web:check
+      - name: Build & audit optimized WebGPU cohorts (baseline + simd128)
+        run: bun run web:build:release
+      - name: Validate WGSL shaders & WGPU adapter tooling
+        run: cargo test -j 4 -p wgpu_cli --bins
+
   windows-aphrody-and-gpu:
     runs-on: windows-latest
     steps:

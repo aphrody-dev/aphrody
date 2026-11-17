@@ -102,11 +102,11 @@ impl AdaptiveViewport {
             form_factor,
             compact_dock: width < 640.0,
             compact_panel_chrome,
-            narrow_panel_labels: width < 1100.0,
+            narrow_panel_labels: width < 1400.0,
             icon_only_panel_controls: width < 840.0,
             compact_nav_rail,
             stacked_inspector: width < 680.0,
-            studio_inspector_width: if compact_nav_rail { 228.0 } else { 292.0 },
+            studio_inspector_width: if compact_nav_rail { 228.0 } else { 310.0 },
             top_panel_height: if compact_panel_chrome { 38.0 } else { 44.0 },
             dock_height: if compact_panel_chrome { 54.0 } else { 64.0 },
         }
@@ -135,7 +135,8 @@ impl UnifiedPlatformProfile {
             target_family,
             wasm_webgpu_ready: true,
             mobile_ready: matches!(os, "ios" | "android") || cfg!(feature = "test-support") || true,
-            desktop_ready: matches!(os, "linux" | "windows" | "macos" | "freebsd") || !cfg!(target_family = "wasm"),
+            desktop_ready: matches!(os, "linux" | "windows" | "macos" | "freebsd")
+                || !cfg!(target_family = "wasm"),
             active_layers: FrameworkLayer::ALL.to_vec(),
         }
     }

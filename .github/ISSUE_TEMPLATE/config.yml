@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Feature request
+    url: https://github.com/aphrody-dev/aphrody/discussions/new?category=feature-requests
+    about: Propose a new feature, improvement, or architecture change in Discussions.
   - name: Discussions
     url: https://github.com/aphrody-dev/aphrody/discussions
     about: Feature requests, design architecture discussions, and Q&A for Aphrody.

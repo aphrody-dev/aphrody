@@ -783,7 +783,7 @@ function BlockInput(props: { block: Block; first: boolean }) {
   );
 }
 
-const TODAY = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+const TODAY = new Date().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
 function DocumentWindow() {
   const win = currentWindow();

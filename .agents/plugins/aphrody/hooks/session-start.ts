@@ -33,8 +33,11 @@ const hasPluginDocs = existsSync(join(root, docsIndexRel));
 const summary = [
   `[${pluginName} plugin active for ${productName}]`,
   `Brand manifest: product.toml (branch: ${defaultBranch}, verify with \`cargo xtask brand check\`).`,
-  "Rules: never create mod.rs files, never use .unwrap() on fallible calls, preserve README.md lines 1-2, keep docs/scripts repo-native (never .gemini/brain).",
-  hasPluginDocs ? `Docs index: ${docsIndexRel}; Architecture: docs/architecture/README.md; Hygiene: bun tooling/bun/repo-hygiene.ts.` : "",
+  "Rules: never create mod.rs files, never use .unwrap() on fallible calls, preserve README.md lines 1-2, keep docs/scripts repo-native.",
+  "Host & MCP: os-craft MCP (aphrody-os mcp) exposes Craft/Compositor/AI Pilot tools; CI/host tuning lives in tooling/bun/ci-host-optimize.ts.",
+  hasPluginDocs
+    ? `Docs index: ${docsIndexRel}; Architecture: docs/architecture/README.md; Hygiene: bun tooling/bun/repo-hygiene.ts.`
+    : "",
 ]
   .filter(Boolean)
   .join(" ");

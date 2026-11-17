@@ -36,7 +36,7 @@ cargo run --config 'profile.release.debug="full"'
 cargo build --config 'profile.release.debug="full"'
 ```
 
-> If you do not want to pass `--config` on every `cargo` command, you can also change the section in the [root `Cargo.toml`](https://github.com/zed-industries/zed/blob/main/Cargo.toml)
+> If you do not want to pass `--config` on every `cargo` command, you can also change the section in the [root `Cargo.toml`](https://github.com/aphrody-dev/aphrody/blob/main/Cargo.toml)
 >
 > from
 >
@@ -78,14 +78,14 @@ If you are new to these tools, see the `gdb` docs [here](https://www.gnu.org/sof
 
 ### Usage with Zed
 
-After enabling full debug info and building with `cargo build`, run `rust-gdb` or `rust-lldb` against the compiled Zed binary:
+After enabling full debug info and building with `cargo build -p zed`, run `rust-gdb` or `rust-lldb` against the compiled Aphrody binary:
 
 ```
-rust-gdb target/debug/zed
-rust-lldb target/debug/zed
+rust-gdb target/debug/aphrody
+rust-lldb target/debug/aphrody
 ```
 
-You can also attach to a running Zed process (for example, one started with `cargo run`):
+You can also attach to a running Aphrody process (for example, one started with `cargo run -p zed`):
 
 ```
 rust-gdb -p <pid>

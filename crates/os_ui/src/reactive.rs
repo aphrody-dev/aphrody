@@ -1,11 +1,9 @@
 use std::marker::PhantomData;
+use std::rc::Rc;
 use std::time::Duration;
 
-use gpui::{
-    AnyElement, App, ClickEvent, Context, ElementId, Render, Role, SharedString, Subscription,
-    Task, Window, div, prelude::*, px,
-};
-use ui::{Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
+use gpui::{ClickEvent, Render, Role, Subscription, Task, Toggled};
+use ui::{ButtonSize, ButtonStyle, IconButton, ProgressBar, Tooltip, prelude::*};
 
 use crate::cosmic_theme::OsTheme;
 
@@ -153,6 +151,155 @@ impl<P: ReactiveProgram> Render for ReactiveHost<P> {
 }
 
 /// Accessible focus-visible action pill meeting WCAG contrast, 2px focus ring, and 36-44px target ergonomics.
+#[derive(IntoElement)]
+pub struct FocusableActionChip {
+    id: ElementId,
+    icon: IconName,
+    label: SharedString,
+    badge: Option<SharedString>,
+    aria_label: SharedString,
+    selected: bool,
+    toggled: Option<bool>,
+    tab_index: isize,
+    theme: OsTheme,
+    on_click: Box<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>,
+}
+
+impl FocusableActionChip {
+    pub fn new(
+        id: impl Into<ElementId>,
+        icon: IconName,
+        label: impl Into<SharedString>,
+        aria_label: impl Into<SharedString>,
+        theme: &OsTheme,
+        on_click: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        Self {
+            id: id.into(),
+            icon,
+            label: label.into(),
+            badge: None,
+            aria_label: aria_label.into(),
+            selected: false,
+            toggled: None,
+            tab_index: 0,
+            theme: theme.clone(),
+            on_click: Box::new(on_click),
+        }
+    }
+
+    pub fn badge(mut self, badge: impl Into<Option<SharedString>>) -> Self {
+        self.badge = badge.into();
+        self
+    }
+
+    pub fn selected(mut self, selected: bool) -> Self {
+        self.selected = selected;
+        self
+    }
+
+    pub fn toggled(mut self, toggled: impl Into<Option<bool>>) -> Self {
+        self.toggled = toggled.into();
+        self
+    }
+
+    pub fn tab_index(mut self, tab_index: isize) -> Self {
+        self.tab_index = tab_index;
+        self
+    }
+}
+
+impl RenderOnce for FocusableActionChip {
+    fn render(self, _window: &mut Window, _cx: &mut App) -> impl IntoElement {
+        let bg = if self.selected {
+            self.theme.colors.primary_container
+        } else {
+            self.theme.colors.surface_container_high
+        };
+        let fg = if self.selected {
+            self.theme.colors.on_primary_container
+        } else {
+            self.theme.colors.on_surface
+        };
+        let border = if self.selected {
+            self.theme.colors.primary
+        } else {
+            self.theme.colors.outline_variant
+        };
+        let hover_bg = if self.selected {
+            self.theme.colors.primary_container
+        } else {
+            self.theme.colors.surface_container_highest
+        };
+        let focus_ring = self.theme.colors.primary;
+        let aria_label = self.aria_label;
+
+        h_flex()
+            .id(self.id)
+            .min_w_0()
+            .min_h(rems_from_px(self.theme.layout.min_control_height))
+            .px_2p5()
+            .gap_2()
+            .items_center()
+            .rounded(rems_from_px(8.0_f32))
+            .bg(bg)
+            .border_1()
+            .border_color(border)
+            .text_color(fg)
+            .cursor_pointer()
+            .focusable()
+            .tab_index(self.tab_index)
+            .tab_stop(true)
+            .role(Role::Button)
+            .aria_label(aria_label.clone())
+            .when_some(self.toggled, |el, toggled| {
+                el.aria_toggled(if toggled {
+                    Toggled::True
+                } else {
+                    Toggled::False
+                })
+            })
+            .tooltip(Tooltip::text(aria_label))
+            .hover(move |style| style.bg(hover_bg))
+            .focus_visible(move |style| style.border_2().border_color(focus_ring))
+            .on_click(self.on_click)
+            .child(
+                Icon::new(self.icon)
+                    .size(IconSize::Small)
+                    .color(Color::Custom(fg)),
+            )
+            .when(!self.label.is_empty(), |el| {
+                el.child(
+                    div().min_w_0().overflow_hidden().child(
+                        Label::new(self.label)
+                            .size(LabelSize::Small)
+                            .color(Color::Custom(fg))
+                            .truncate(),
+                    ),
+                )
+            })
+            .when_some(self.badge, |el, badge_text| {
+                el.child(
+                    div()
+                        .flex_shrink_0()
+                        .px_1p5()
+                        .py_0p5()
+                        .rounded(rems_from_px(6.0_f32))
+                        .bg(self.theme.colors.surface_container_lowest)
+                        .border_1()
+                        .border_color(self.theme.colors.outline_variant)
+                        .child(
+                            Label::new(badge_text)
+                                .size(LabelSize::XSmall)
+                                .color(Color::Custom(self.theme.colors.on_surface_variant))
+                                .single_line(),
+                        ),
+                )
+            })
+    }
+}
+
+/// Accessible focus-visible action pill meeting WCAG contrast, 2px focus ring, and 36-44px target ergonomics.
 pub fn focusable_action_chip<F>(
     id: impl Into<ElementId>,
     icon: IconName,
@@ -167,66 +314,145 @@ pub fn focusable_action_chip<F>(
 where
     F: Fn(&ClickEvent, &mut Window, &mut App) + 'static,
 {
-    let label = label.into();
-    let aria_label = aria_label.into();
-    let bg = if selected {
-        theme.colors.primary_container
-    } else {
-        theme.colors.surface_container_high
-    };
-    let fg = if selected {
-        theme.colors.on_primary_container
-    } else {
-        theme.colors.on_surface
-    };
-    let border = if selected {
-        theme.colors.primary
-    } else {
-        theme.colors.outline_variant
-    };
-    let hover_bg = if selected {
-        theme.colors.primary_container
-    } else {
-        theme.colors.surface_container_highest
-    };
-    let focus_ring = theme.colors.primary;
-
-    h_flex()
-        .id(id)
-        .min_h(px(theme.layout.min_control_height))
-        .px_2p5()
-        .gap_2()
-        .items_center()
-        .rounded(px(8.0))
-        .bg(bg)
-        .border_1()
-        .border_color(border)
-        .text_color(fg)
-        .cursor_pointer()
-        .focusable()
+    FocusableActionChip::new(id, icon, label, aria_label, theme, on_click)
+        .badge(badge)
+        .selected(selected)
         .tab_index(tab_index)
-        .tab_stop(true)
-        .role(Role::Button)
-        .aria_label(aria_label)
-        .hover(move |style| style.bg(hover_bg))
-        .focus_visible(move |style| style.border_2().border_color(focus_ring))
-        .on_click(on_click)
-        .child(Icon::new(icon).size(IconSize::Small))
-        .when(!label.is_empty(), |el| {
-            el.child(Label::new(label).size(LabelSize::Small))
-        })
-        .when_some(badge, |el, badge_text| {
-            el.child(
-                div()
-                    .px_1p5()
-                    .py_0p5()
-                    .rounded(px(6.0))
-                    .bg(theme.colors.surface_container_lowest)
-                    .text_color(theme.colors.on_surface_variant)
-                    .child(Label::new(badge_text).size(LabelSize::XSmall)),
-            )
-        })
         .into_any_element()
+}
+
+/// Accessible slider bar with explicit keyboard/button steppers and visible value text (`iced`/`libcosmic` pattern).
+#[derive(IntoElement)]
+pub struct SliderControl {
+    id: SharedString,
+    label: SharedString,
+    value: f32,
+    min: f32,
+    max: f32,
+    unit: SharedString,
+    theme: OsTheme,
+    on_change: Rc<dyn Fn(f32, &mut Window, &mut App) + 'static>,
+}
+
+impl SliderControl {
+    pub fn new(
+        id: impl Into<SharedString>,
+        label: impl Into<SharedString>,
+        value: f32,
+        min: f32,
+        max: f32,
+        unit: impl Into<SharedString>,
+        theme: &OsTheme,
+        on_change: impl Fn(f32, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        Self {
+            id: id.into(),
+            label: label.into(),
+            value,
+            min,
+            max,
+            unit: unit.into(),
+            theme: theme.clone(),
+            on_change: Rc::new(on_change),
+        }
+    }
+}
+
+impl RenderOnce for SliderControl {
+    fn render(self, _window: &mut Window, _cx: &mut App) -> impl IntoElement {
+        let dec_id = SharedString::from(format!("{}-dec", self.id));
+        let inc_id = SharedString::from(format!("{}-inc", self.id));
+        let span = (self.max - self.min).max(0.0001);
+        let ratio = ((self.value - self.min) / span).clamp(0.0, 1.0);
+        let step = (span * 0.05).max(0.01);
+
+        let on_dec = Rc::clone(&self.on_change);
+        let on_inc = self.on_change;
+        let value = self.value;
+        let min = self.min;
+        let max = self.max;
+
+        v_flex()
+            .id(self.id)
+            .w_full()
+            .min_w_0()
+            .gap_1()
+            .child(
+                h_flex()
+                    .w_full()
+                    .min_w_0()
+                    .justify_between()
+                    .gap_2()
+                    .child(
+                        div().flex_1().min_w_0().overflow_hidden().child(
+                            Label::new(self.label.clone())
+                                .size(LabelSize::Small)
+                                .truncate(),
+                        ),
+                    )
+                    .child(
+                        div().flex_shrink_0().child(
+                            Label::new(format!("{value:.2}{}", self.unit))
+                                .size(LabelSize::XSmall)
+                                .color(Color::Muted)
+                                .single_line(),
+                        ),
+                    ),
+            )
+            .child(
+                h_flex()
+                    .w_full()
+                    .min_w_0()
+                    .gap_2()
+                    .items_center()
+                    .child(
+                        IconButton::new(dec_id, IconName::Dash)
+                            .style(ButtonStyle::Outlined)
+                            .size(ButtonSize::Medium)
+                            .width(rems_from_px(28.0_f32))
+                            .icon_size(IconSize::XSmall)
+                            .icon_color(Color::Custom(self.theme.colors.on_surface))
+                            .tab_index(0_isize)
+                            .aria_label(SharedString::from(format!("Decrease {}", self.label)))
+                            .tooltip(Tooltip::text(format!("Decrease {}", self.label)))
+                            .on_click(move |_, window, cx| {
+                                on_dec((value - step).clamp(min, max), window, cx);
+                            }),
+                    )
+                    .child(
+                        div()
+                            .flex_1()
+                            .min_w_0()
+                            .h(rems_from_px(8.0_f32))
+                            .rounded(rems_from_px(4.0_f32))
+                            .overflow_hidden()
+                            .bg(self.theme.colors.surface_container_highest)
+                            .border_1()
+                            .border_color(self.theme.colors.outline_variant)
+                            .child(
+                                div()
+                                    .h_full()
+                                    .w(relative(ratio))
+                                    .rounded(rems_from_px(4.0_f32))
+                                    .bg(self.theme.colors.primary),
+                            ),
+                    )
+                    .child(
+                        IconButton::new(inc_id, IconName::Plus)
+                            .style(ButtonStyle::Outlined)
+                            .size(ButtonSize::Medium)
+                            .width(rems_from_px(28.0_f32))
+                            .icon_size(IconSize::XSmall)
+                            .icon_color(Color::Custom(self.theme.colors.on_surface))
+                            .tab_index(0_isize)
+                            .aria_label(SharedString::from(format!("Increase {}", self.label)))
+                            .tooltip(Tooltip::text(format!("Increase {}", self.label)))
+                            .on_click(move |_, window, cx| {
+                                on_inc((value + step).clamp(min, max), window, cx);
+                            }),
+                    ),
+            )
+    }
 }
 
 /// Accessible slider bar with explicit keyboard/button steppers and visible value text (`iced`/`libcosmic` pattern).
@@ -243,107 +469,73 @@ pub fn slider_control<F>(
 where
     F: Fn(f32, &mut Window, &mut App) + Clone + 'static,
 {
-    let id_root = SharedString::from(id.to_owned());
-    let dec_id = SharedString::from(format!("{id}-dec"));
-    let inc_id = SharedString::from(format!("{id}-inc"));
-    let label = label.into();
-    let span = (max - min).max(0.0001);
-    let ratio = ((value - min) / span).clamp(0.0, 1.0);
-    let step = (span * 0.05).max(0.01);
+    SliderControl::new(
+        id.to_owned(),
+        label,
+        value,
+        min,
+        max,
+        unit.to_owned(),
+        theme,
+        on_change,
+    )
+    .into_any_element()
+}
 
-    let on_dec = on_change.clone();
-    let on_inc = on_change;
+/// Accessible on/off toggle control with explicit state text (`On`/`Off` — never color-only).
+#[derive(IntoElement)]
+pub struct ToggleControl {
+    id: ElementId,
+    label: SharedString,
+    checked: bool,
+    theme: OsTheme,
+    on_toggle: Box<dyn Fn(bool, &mut Window, &mut App) + 'static>,
+}
 
-    v_flex()
-        .id(id_root)
-        .w_full()
-        .gap_1()
-        .child(
-            h_flex()
-                .w_full()
-                .justify_between()
-                .child(Label::new(label.clone()).size(LabelSize::Small))
-                .child(
-                    Label::new(format!("{value:.2}{unit}"))
-                        .size(LabelSize::XSmall)
-                        .color(ui::Color::Muted),
-                ),
+impl ToggleControl {
+    pub fn new(
+        id: impl Into<ElementId>,
+        label: impl Into<SharedString>,
+        checked: bool,
+        theme: &OsTheme,
+        on_toggle: impl Fn(bool, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        Self {
+            id: id.into(),
+            label: label.into(),
+            checked,
+            theme: theme.clone(),
+            on_toggle: Box::new(on_toggle),
+        }
+    }
+}
+
+impl RenderOnce for ToggleControl {
+    fn render(self, _window: &mut Window, _cx: &mut App) -> impl IntoElement {
+        let checked = self.checked;
+        let on_toggle = self.on_toggle;
+        let aria_label = SharedString::from(format!(
+            "{}, {}",
+            self.label,
+            if checked { "enabled" } else { "disabled" }
+        ));
+        FocusableActionChip::new(
+            self.id,
+            if checked {
+                IconName::Check
+            } else {
+                IconName::Dash
+            },
+            self.label,
+            aria_label,
+            &self.theme,
+            move |_, window, cx| on_toggle(!checked, window, cx),
         )
-        .child(
-            h_flex()
-                .w_full()
-                .gap_2()
-                .items_center()
-                .child(
-                    div()
-                        .id(dec_id)
-                        .w(px(28.0))
-                        .h(px(28.0))
-                        .flex()
-                        .items_center()
-                        .justify_center()
-                        .rounded(px(6.0))
-                        .bg(theme.colors.surface_container_high)
-                        .border_1()
-                        .border_color(theme.colors.outline_variant)
-                        .cursor_pointer()
-                        .focusable()
-                        .tab_stop(true)
-                        .role(Role::Button)
-                        .aria_label(SharedString::from(format!("Decrease {label}")))
-                        .focus_visible({
-                            let ring = theme.colors.primary;
-                            move |s| s.border_2().border_color(ring)
-                        })
-                        .on_click(move |_, window, cx| {
-                            on_dec((value - step).clamp(min, max), window, cx);
-                        })
-                        .child(Icon::new(IconName::Dash).size(IconSize::XSmall)),
-                )
-                .child(
-                    div()
-                        .flex_1()
-                        .h(px(8.0))
-                        .rounded(px(4.0))
-                        .bg(theme.colors.surface_container_highest)
-                        .border_1()
-                        .border_color(theme.colors.outline_variant)
-                        .child(
-                            div()
-                                .h_full()
-                                .w(gpui::relative(ratio))
-                                .rounded(px(4.0))
-                                .bg(theme.colors.primary),
-                        ),
-                )
-                .child(
-                    div()
-                        .id(inc_id)
-                        .w(px(28.0))
-                        .h(px(28.0))
-                        .flex()
-                        .items_center()
-                        .justify_center()
-                        .rounded(px(6.0))
-                        .bg(theme.colors.surface_container_high)
-                        .border_1()
-                        .border_color(theme.colors.outline_variant)
-                        .cursor_pointer()
-                        .focusable()
-                        .tab_stop(true)
-                        .role(Role::Button)
-                        .aria_label(SharedString::from(format!("Increase {label}")))
-                        .focus_visible({
-                            let ring = theme.colors.primary;
-                            move |s| s.border_2().border_color(ring)
-                        })
-                        .on_click(move |_, window, cx| {
-                            on_inc((value + step).clamp(min, max), window, cx);
-                        })
-                        .child(Icon::new(IconName::Plus).size(IconSize::XSmall)),
-                ),
-        )
-        .into_any_element()
+        .badge(Some(SharedString::from(if checked { "ON" } else { "OFF" })))
+        .selected(checked)
+        .toggled(Some(checked))
+        .tab_index(0)
+    }
 }
 
 /// Accessible on/off toggle control with explicit state text (`On`/`Off` — never color-only).
@@ -357,25 +549,67 @@ pub fn toggle_control<F>(
 where
     F: Fn(bool, &mut Window, &mut App) + 'static,
 {
-    let label = label.into();
-    focusable_action_chip(
-        id,
-        if checked {
-            IconName::Check
-        } else {
-            IconName::Dash
-        },
-        label.clone(),
-        Some(SharedString::from(if checked { "ON" } else { "OFF" })),
-        SharedString::from(format!(
-            "{label}, {}",
-            if checked { "enabled" } else { "disabled" }
-        )),
-        checked,
-        0,
-        theme,
-        move |_, window, cx| on_toggle(!checked, window, cx),
-    )
+    ToggleControl::new(id, label, checked, theme, on_toggle).into_any_element()
+}
+
+/// Accessible labeled progress meter built on [`ui::ProgressBar`].
+#[derive(IntoElement)]
+pub struct ProgressMeter {
+    id: ElementId,
+    label: SharedString,
+    fraction: f32,
+    theme: OsTheme,
+}
+
+impl ProgressMeter {
+    #[must_use]
+    pub fn new(label: impl Into<SharedString>, fraction: f32, theme: &OsTheme) -> Self {
+        let label = label.into();
+        let id = ElementId::Name(SharedString::from(format!("progress-{label}")));
+        Self {
+            id,
+            label,
+            fraction,
+            theme: theme.clone(),
+        }
+    }
+}
+
+impl RenderOnce for ProgressMeter {
+    fn render(self, _window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let clamped = self.fraction.clamp(0.0, 1.0);
+        let pct = (clamped * 100.0).round() as u32;
+        v_flex()
+            .w_full()
+            .min_w_0()
+            .gap_1()
+            .child(
+                h_flex()
+                    .w_full()
+                    .min_w_0()
+                    .justify_between()
+                    .gap_2()
+                    .child(
+                        div()
+                            .flex_1()
+                            .min_w_0()
+                            .overflow_hidden()
+                            .child(Label::new(self.label).size(LabelSize::XSmall).truncate()),
+                    )
+                    .child(
+                        div().flex_shrink_0().child(
+                            Label::new(format!("{pct}%"))
+                                .size(LabelSize::XSmall)
+                                .single_line(),
+                        ),
+                    ),
+            )
+            .child(
+                ProgressBar::new(self.id, clamped, 1.0, cx)
+                    .bg_color(self.theme.colors.surface_container_highest)
+                    .fg_color(self.theme.colors.primary),
+            )
+    }
 }
 
 /// Accessible labeled progress meter.
@@ -385,31 +619,5 @@ pub fn progress_meter(
     fraction: f32,
     theme: &OsTheme,
 ) -> AnyElement {
-    let clamped = fraction.clamp(0.0, 1.0);
-    let pct = (clamped * 100.0).round() as u32;
-    v_flex()
-        .w_full()
-        .gap_1()
-        .child(
-            h_flex()
-                .w_full()
-                .justify_between()
-                .child(Label::new(label.into()).size(LabelSize::XSmall))
-                .child(Label::new(format!("{pct}%")).size(LabelSize::XSmall)),
-        )
-        .child(
-            div()
-                .w_full()
-                .h(px(6.0))
-                .rounded(px(3.0))
-                .bg(theme.colors.surface_container_highest)
-                .child(
-                    div()
-                        .h_full()
-                        .w(gpui::relative(clamped))
-                        .rounded(px(3.0))
-                        .bg(theme.colors.primary),
-                ),
-        )
-        .into_any_element()
+    ProgressMeter::new(label, fraction, theme).into_any_element()
 }

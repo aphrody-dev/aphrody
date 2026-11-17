@@ -31,7 +31,7 @@ const tipCard = plotTooltip;
 /** A wash under a line: `color` at `top` opacity fading out to the baseline. */
 const wash = plotWash;
 const fixed = (n: number, digits = 2) => n.toFixed(digits);
-const count = (n: number) => Math.round(n).toLocaleString("en-US");
+const count = (n: number) => Math.round(n).toLocaleString(undefined);
 const signed = (n: number, digits = 2) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(digits)}`;
 /** Grid values at a "nice" step (1, 2 or 5 × 10^k) strictly inside `lo..hi`, about `want` of them. */
 function ticks(lo: number, hi: number, want = 4) {

@@ -1,0 +1,52 @@
+[package]
+name = "gpui_store"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Awesome GPUI Store catalog, NSH + GPUI cross-platform store UI, unified upt package manager integration, and 22-target store/distro packager."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/gpui_store.rs"
+doctest = false
+
+[features]
+default = ["desktop", "nsh-ui"]
+desktop = ["gpui_ui/desktop", "gpui_ui/nsh", "nsh-ui", "dep:nsh-platform-gpui"]
+nsh-ui = ["dep:nsh-core", "dep:nsh-base"]
+nsh-js = ["desktop", "gpui_ui/nsh-js", "dep:nsh-engine"]
+nsh-dev = ["nsh-js", "gpui_ui/nsh-dev", "dep:nsh-bundler"]
+web = ["nsh-ui"]
+mobile = ["nsh-ui"]
+test-support = ["gpui/test-support", "os_ui/test-support", "gpui_ui/test-support"]
+
+[dependencies]
+anyhow.workspace = true
+brand.workspace = true
+dirs.workspace = true
+gpui.workspace = true
+gpui_ui.workspace = true
+icons.workspace = true
+log.workspace = true
+nsh-base = { workspace = true, optional = true }
+nsh-bundler = { workspace = true, optional = true }
+nsh-core = { workspace = true, optional = true }
+nsh-engine = { workspace = true, optional = true }
+nsh-platform-gpui = { workspace = true, optional = true }
+os_ui.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+ui.workspace = true
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+upt.workspace = true
+
+[dev-dependencies]
+quick-xml.workspace = true
+serde_yaml_ng.workspace = true
+tempfile.workspace = true

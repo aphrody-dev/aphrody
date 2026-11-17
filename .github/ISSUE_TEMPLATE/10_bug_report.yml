@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Search existing [issues](https://github.com/aphrody-dev/aphrody/issues) first. For feature ideas or design feedback, open a [Discussion](https://github.com/aphrody-dev/aphrody/discussions).
+        Search existing [issues](https://github.com/aphrody-dev/aphrody/issues) first. For feature ideas or design feedback, open a [Discussion](https://github.com/aphrody-dev/aphrody/discussions/new?category=feature-requests) instead.
   - type: dropdown
     id: component
     attributes:
@@ -18,28 +18,80 @@ body:
         - Vulkan / SPIR-V
         - DirectX 12 / HLSL
         - WebGPU / WGSL
+        - Aphrody GPUI OS (os_desktop / os_craft / os_session)
         - CLI / Build / xtask
     validations:
       required: true
   - type: textarea
     attributes:
       label: Reproduction steps
-      description: Minimal reproducible command, shader, TSX snippet, or UI steps.
+      description: Minimal step-by-step description from a clean setup (command, shader, TSX snippet, or UI steps).
       placeholder: |
-        1. Run `target/debug/aphrody.exe` or `cargo run -p wgpu_cli -- ...`
-        2. Observe behavior
+        1. Run `target/debug/aphrody` (or `cargo run -p wgpu_cli -- ...`)
+        2. Perform action
     validations:
       required: true
   - type: textarea
     attributes:
       label: Current vs. Expected behavior
+      description: Current behavior (screenshots, videos, or CLI output) vs. expected behavior.
       validations:
         required: true
   - type: textarea
     id: environment
     attributes:
-      label: System specs & GPU backend
+      label: Aphrody version, system specs & GPU backend
+      description: |
+        Run `zed: copy system specs into clipboard` (`CopySystemSpecsIntoClipboard`) from the command palette and/or `cargo run -p wgpu_cli -- adapters --json`.
       placeholder: |
+        Aphrody: v1.30.0 / commit SHA
         OS / GPU / Vulkan or DX12 or WebGPU backend / `gpui-wgpu adapters --json`
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: Attach Aphrody log file
+      description: |
+        Open the command palette and run `OpenLog` / `RevealLogInFileManager` (or launch with `--foreground`).
+
+        ⚠️ **Please review your log file for secrets (API keys, tokens, etc.) and redact them before posting.**
+      value: |
+        <details><summary>Aphrody.log</summary>
+
+        <!-- Paste your log inside the code block. -->
+        ```log
+
+        ```
+
+        </details>
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Relevant settings and keymap
+      description: |
+        Paste any relevant settings or keymap overrides.
+
+        ⚠️ **Please review your settings for secrets (API keys, tokens, etc.) and redact them before posting.**
+      value: |
+        <details><summary>settings.json / keymap.json</summary>
+
+        ```json
+
+        ```
+
+        </details>
+    validations:
+      required: false
+  - type: dropdown
+    attributes:
+      label: If using WSL on Windows, which distribution are you running?
+      multiple: false
+      options:
+        - Not using WSL
+        - Ubuntu
+        - Arch Linux
+        - Fedora
+        - Debian
+        - NixOS
+        - Other

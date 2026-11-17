@@ -1,0 +1,80 @@
+# Declarative CI/CD & Dev Host Optimization Profiles for Aphrody (derived from Zed's
+# script/setup-sccache, script/linux, script/clear-target-dir-if-larger-than, and
+# tooling/xtask/src/tasks/workflows/runners.rs + Ubuntu 26.10 / Linux 7.3 / XFS / KVM probing).
+
+schema_version = 1
+product_manifest = "product.toml"
+toolchain_manifest = "rust-toolchain.toml"
+cargo_config = ".cargo/config.toml"
+
+[zed_baseline]
+sccache_script = "script/setup-sccache"
+linux_deps_script = "script/linux"
+target_gc_script = "script/clear-target-dir-if-larger-than"
+runners_spec = "tooling/xtask/src/tasks/workflows/runners.rs"
+bootstrap_script = "script/bootstrap"
+
+[tiers.tmpfs]
+role = "ram_scratch"
+mount = "/tmp"
+purpose = ["linker_temp", "proc_macro_scratch", "ephemeral_sandboxes", "wasm_opt_tmp"]
+min_free_gb = 4
+
+[tiers.local_nvme]
+role = "fast_random_io"
+purpose = ["sccache", "hot_cargo_registry", "hot_target_dir", "ci_runner_work"]
+min_free_gb = 25
+
+[tiers.xfs_reflink]
+role = "high_capacity_cow"
+mount = "/srv/xbuild"
+fs = "xfs"
+required_features = ["reflink=1", "ftype=1", "crc=1"]
+recommended_mount_options = ["rw", "noatime", "inode64", "logbufs=8", "logbsize=32k"]
+purpose = ["reflink_worktrees", "target_cold_snapshots", "large_repo_mirrors", "cas_archives", "vm_images"]
+min_free_gb = 100
+
+[sysctl.kernel_7_3_ci_host]
+# Compatible companion drop-in alongside existing 90-*-chromium-host.conf
+dropin_path = "/etc/sysctl.d/96-aphrody-ci-kernel73.conf"
+"kernel.io_uring_disabled" = 0
+"kernel.sched_autogroup_enabled" = 0
+"kernel.perf_event_paranoid" = 1
+"kernel.unprivileged_userns_clone" = 1
+"kernel.apparmor_restrict_unprivileged_userns" = 0
+"vm.swappiness" = 100
+"vm.page-cluster" = 0
+"vm.vfs_cache_pressure" = 50
+"vm.compaction_proactiveness" = 20
+"vm.dirty_background_bytes" = 268435456
+"vm.dirty_bytes" = 1073741824
+"fs.inotify.max_user_watches" = 2097152
+"fs.inotify.max_user_instances" = 8192
+"fs.aio-max-nr" = 1048576
+"vm.max_map_count" = 2147483642
+"net.core.default_qdisc" = "fq"
+"net.ipv4.tcp_congestion_control" = "bbr"
+
+[udev.kvm_virtio_block]
+rule_path = "/etc/udev/rules.d/67-aphrody-ci-block.rules"
+# Mark virtual KVM/QEMU SCSI disks non-rotational so XFS/BFQ/readahead do not apply HDD seek penalties.
+non_rotational_pattern = "sd[a-z]|vd[a-z]"
+# Keep bfq on secondary cgroup-weighted disks (sdb/sdc) ONLY when IOWeight slices are used;
+# keep none on primary NVMe root (sda).
+root_scheduler = "none"
+weighted_scheduler = "bfq"
+read_ahead_kb = 1024
+nr_requests = 512
+
+[sccache]
+preferred_wrapper = "/usr/local/bin/sccache"
+fallback_wrapper = "sccache"
+default_cache_size = "40G"
+compression_level = 3
+base_dirs = ["/srv/xbuild", "/home/ubuntu", "/srv"]
+preferred_linkers = ["wild", "mold", "lld", "ld.lld"]
+
+[systemd]
+runner_slice = "build.slice"
+runner_dropin_name = "50-aphrody-ci.conf"
+target_gc_max_days = 7

@@ -908,6 +908,8 @@ mod tests {
                 store: "https://aphrody.com/store".into(),
                 server: "https://zed.dev".into(),
                 extension_registry: "https://api.zed.dev".into(),
+                releases: Some("https://releases.aphrody.com".into()),
+                download: Some("https://aphrody.com/download".into()),
             },
             env: EnvSection {
                 prefix: "APHRODY".into(),
@@ -948,6 +950,11 @@ mod tests {
             },
             colors: ColorsSection {
                 channels: ChannelsColorSection {
+                    lts: Some(ChannelPaletteConfig {
+                        top: [14, 30, 48, 255],
+                        bottom: [8, 16, 28, 255],
+                        foreground: [186, 230, 253, 255],
+                    }),
                     stable: ChannelPaletteConfig {
                         top: [18, 22, 36, 255],
                         bottom: [10, 12, 20, 255],
@@ -958,6 +965,11 @@ mod tests {
                         bottom: [18, 10, 32, 255],
                         foreground: [233, 213, 255, 255],
                     },
+                    canary: Some(ChannelPaletteConfig {
+                        top: [54, 18, 36, 255],
+                        bottom: [26, 8, 18, 255],
+                        foreground: [251, 207, 232, 255],
+                    }),
                     nightly: ChannelPaletteConfig {
                         top: [42, 28, 14, 255],
                         bottom: [20, 14, 8, 255],

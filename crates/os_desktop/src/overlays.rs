@@ -48,6 +48,12 @@ pub(crate) fn render_context_drawer_pane(
         }
     });
 
+    crate::pilot_hud::append_pilot_drawer_section(
+        &mut ui,
+        shell.pilot.active_adapter().backend_name(),
+        &shell.pilot.recent_hud_activity,
+    );
+
     let close_entity = cx.entity();
     render_context_drawer(
         "Inspector Drawer",
@@ -161,21 +167,29 @@ pub(crate) fn render_launcher_modal(
                 .child(
                     h_flex()
                         .w_full()
+                        .min_w_0()
+                        .gap_2()
                         .justify_between()
                         .items_center()
                         .child(
                             h_flex()
+                                .flex_1()
+                                .min_w_0()
                                 .gap_2()
                                 .items_center()
+                                .overflow_hidden()
                                 .child(Icon::new(IconName::MagnifyingGlass).size(IconSize::Small))
                                 .child(
-                                    Label::new(if shell.launcher_query.is_empty() {
-                                        "Type to filter 17 ArtCraft apps + system desktop entries…"
-                                            .to_owned()
-                                    } else {
-                                        format!("Filter: {}", shell.launcher_query)
-                                    })
-                                    .size(LabelSize::Default),
+                                    div().flex_1().min_w_0().overflow_hidden().child(
+                                        Label::new(if shell.launcher_query.is_empty() {
+                                            "Type to filter 17 ArtCraft apps + system desktop entries…"
+                                                .to_owned()
+                                        } else {
+                                            format!("Filter: {}", shell.launcher_query)
+                                        })
+                                        .size(LabelSize::Default)
+                                        .truncate(),
+                                    ),
                                 ),
                         )
                         .child(focusable_action_chip(
