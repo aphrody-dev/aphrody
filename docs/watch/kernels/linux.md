@@ -2,7 +2,7 @@
 
 Mainline, stable and linux-next trees published by kernel.org.
 
-Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
+Generated from the watch store as of 2026-11-17T06:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
 
 ## Kernel versions
 
@@ -21,8 +21,8 @@ Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun to
 
 | Window | Commits | Releases | Issues opened | PRs opened | PRs merged | Discussions | Mail | Tags |
 | :-- | --: | --: | --: | --: | --: | --: | --: | --: |
-| 24h | ≥15 | 0 | 0 | 0 | 0 | 0 | 50 | 0 |
-| 7d | ≥22 | 4 | 0 | 0 | 0 | 0 | 50 | 1 |
+| 24h | ≥15 | 0 | 0 | 0 | 0 | 0 | 75 | 0 |
+| 7d | ≥22 | 4 | 0 | 0 | 0 | 0 | 75 | 1 |
 
 A leading ≥ marks a lower bound: the polled feed page does not reach back to the start of the window.
 

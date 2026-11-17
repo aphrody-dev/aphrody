@@ -2,14 +2,14 @@
 
 Rust framekernel with Linux ABI compatibility (OSTD).
 
-Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
+Generated from the watch store as of 2026-11-17T06:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
 
 ## Activity
 
 | Window | Commits | Releases | Issues opened | PRs opened | PRs merged | Discussions | Mail | Tags |
 | :-- | --: | --: | --: | --: | --: | --: | --: | --: |
-| 24h | 12 | 0 | 3 | 6 | 4 | 0 | 0 | 0 |
-| 7d | 31 | 0 | 10 | 25 | 15 | 0 | 0 | 0 |
+| 24h | 14 | 0 | 3 | 6 | 5 | 0 | 0 | 0 |
+| 7d | 33 | 0 | 10 | 25 | 16 | 0 | 0 | 0 |
 
 A leading ≥ marks a lower bound: the polled feed page does not reach back to the start of the window.
 
@@ -17,25 +17,25 @@ A leading ≥ marks a lower bound: the polled feed page does not reach back to t
 | :-- | --: | --: | --: |
 | forks | 420 | n/a | n/a |
 | open_issues | 267 | n/a | n/a |
-| open_prs | 160 | n/a | n/a |
-| size_kb | 19567 | n/a | n/a |
+| open_prs | 159 | n/a | n/a |
+| size_kb | 19576 | n/a | n/a |
 | stars | 5110 | n/a | n/a |
 
 ## Notable (7d)
 
+- 2026-11-17T05:00Z commit: [Revise some comments](https://github.com/asterinas/asterinas/commit/28f9d9adc16c0d489487754a6748b0cf36a3d2e0)
+- 2026-11-17T05:00Z commit: [Use `DropGuard` for ext2 rollback](https://github.com/asterinas/asterinas/commit/f691f8ecccce1973120cabd66a13d5e8f92f33e6)
 - 2026-11-17T04:42Z commit: [Improve allocation contiguity](https://github.com/asterinas/asterinas/commit/0d38f078f584ba1ea5b96226ac670ae310a90004)
 - 2026-11-17T04:42Z commit: [Simplify cache storage](https://github.com/asterinas/asterinas/commit/53909f9b03c2b0b6ddd53b866aa7af83eb1c457e)
 - 2026-11-17T04:42Z commit: [Fix cache aligment check](https://github.com/asterinas/asterinas/commit/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc)
-- 2026-11-17T04:26Z commit: [Fix `SIGEV_THREAD` panic](https://github.com/asterinas/asterinas/commit/562d65e7a1ef2e6f1095d3613d420ccd980cb434)
-- 2026-11-17T04:26Z commit: [Remove `Box` from `registered_callback`](https://github.com/asterinas/asterinas/commit/5ecdf99b9c41d7f41c3938065c5485971b948a4d)
 - 2026-11-16T11:45Z issue: [Implement POSIX message queues (`/dev/mqueue` and `mq_*` syscalls)](https://github.com/asterinas/asterinas/issues/4226)
 - 2026-11-16T10:20Z pr: [Fix a race between UDP socket close and packet delivery](https://github.com/asterinas/asterinas/pull/4225)
 - 2026-11-16T08:19Z issue: [x86-64 `sched_getcpu` reports an incorrect CPU through the bundled vDSO](https://github.com/asterinas/asterinas/issues/4223)
 - 2026-11-16T08:18Z issue: [sched_setaffinity` leaves a runnable or running thread on a disallowed CPU](https://github.com/asterinas/asterinas/issues/4222)
+- 2026-11-16T03:58Z pr: [Use `DropGuard` for ext2 rollback](https://github.com/asterinas/asterinas/pull/4218)
 - 2026-11-16T02:59Z pr: [Improve allocation contiguity in `CacheArray` and fix bugs](https://github.com/asterinas/asterinas/pull/4217)
 - 2026-11-13T07:24Z pr: [Fix some wrong behavior in `set_priority`](https://github.com/asterinas/asterinas/pull/4211)
 - 2026-11-13T01:04Z pr: [Refactor `Timer` and fill timer `si_info`](https://github.com/asterinas/asterinas/pull/4205)
-- 2026-11-10T09:43Z pr: [Use `return_errno{,_with_message}` macros if possible](https://github.com/asterinas/asterinas/pull/4194)
 
 ## Latest releases
 

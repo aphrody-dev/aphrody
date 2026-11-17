@@ -1,6 +1,6 @@
 # Kernel versions
 
-Generated as of 2026-11-17T05:00Z from the watch store. Reference: mainline 7.4-rc3, stable 7.3.4, longterm 5.10.274, 5.15.225, 6.1.192, 6.6.162, 6.12.117, 6.18.63.
+Generated as of 2026-11-17T06:00Z from the watch store. Reference: mainline 7.4-rc3, stable 7.3.4, longterm 5.10.274, 5.15.225, 6.1.192, 6.6.162, 6.12.117, 6.18.63.
 
 ## Newest kernel per distribution, closest to mainline first
 

@@ -2,7 +2,7 @@
 
 Arch-based distro shipping linux-cachyos and linux-cachyos-rc.
 
-Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
+Generated from the watch store as of 2026-11-17T06:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
 
 ## Kernel versions
 
@@ -48,7 +48,7 @@ A leading ≥ marks a lower bound: the polled feed page does not reach back to t
 | [CachyOS/packageinstaller](https://github.com/CachyOS/packageinstaller) | 40 | 2026-11-16 | Simple Software Application Package Installer for CachyOS which helps setting u… |
 | [CachyOS/CachyOS-PKGBUILDS](https://github.com/CachyOS/CachyOS-PKGBUILDS) | 399 | 2026-11-16 | PKGBUILDs for CachyOS |
 | [CachyOS/website](https://github.com/CachyOS/website) | 25 | 2026-11-16 | Website for CachyOS |
-| [CachyOS/linux-cachyos](https://github.com/CachyOS/linux-cachyos) | 4863 | 2026-11-16 | Archlinux Kernel based on different schedulers and some other performance impro… |
+| [CachyOS/linux-cachyos](https://github.com/CachyOS/linux-cachyos) | 4864 | 2026-11-16 | Archlinux Kernel based on different schedulers and some other performance impro… |
 | [CachyOS/linux](https://github.com/CachyOS/linux) | 110 | 2026-11-16 | Linux kernel source tree |
 | [CachyOS/proton-cachyos](https://github.com/CachyOS/proton-cachyos) | 1587 | 2026-11-16 | Compatibility tool for Steam Play based on Wine and additional components |
 | [CachyOS/wine-cachyos](https://github.com/CachyOS/wine-cachyos) | 58 | 2026-11-16 | Wine with a bit of extra spice (CachyOS Version) |

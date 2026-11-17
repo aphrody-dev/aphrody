@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-11-17T05:00Z",
+  "asOf": "2026-11-17T06:00Z",
   "kernels": [
     {
       "id": "linux",
@@ -246,7 +246,7 @@
           "name": "asterinas/asterinas",
           "url": "https://github.com/asterinas/asterinas",
           "stars": 5110,
-          "pushed": "2026-11-17T04:42Z",
+          "pushed": "2026-11-17T05:00Z",
           "description": "Asterinas aims to be a production-grade Linux alternative—memory safe, high-performance, and more."
         },
         {
@@ -1125,7 +1125,7 @@
         {
           "name": "CachyOS/linux-cachyos",
           "url": "https://github.com/CachyOS/linux-cachyos",
-          "stars": 4863,
+          "stars": 4864,
           "pushed": "2026-11-16T12:18Z",
           "description": "Archlinux Kernel based on different schedulers and some other performance improvements."
         },

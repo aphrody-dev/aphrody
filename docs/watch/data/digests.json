@@ -1,20 +1,20 @@
 {
-  "asOf": "2026-11-17T05:00Z",
+  "asOf": "2026-11-17T06:00Z",
   "digests": [
     {
       "kernel": "linux",
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 15,
             "release": 0,
             "issue": 0,
             "pr": 0,
             "discussion": 0,
-            "mail": 50,
+            "mail": 75,
             "tag": 0,
             "package": 0,
             "news": 0,
@@ -63,15 +63,15 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 22,
             "release": 4,
             "issue": 0,
             "pr": 0,
             "discussion": 0,
-            "mail": 50,
+            "mail": 75,
             "tag": 1,
             "package": 0,
             "news": 0,
@@ -149,10 +149,10 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
-            "commit": 12,
+            "commit": 14,
             "release": 0,
             "issue": 3,
             "pr": 6,
@@ -167,7 +167,7 @@
             "issue": 4,
             "pr": 13
           },
-          "mergedPrs": 4,
+          "mergedPrs": 5,
           "commitsLowerBound": false,
           "versionChanges": [],
           "metrics": {
@@ -176,7 +176,7 @@
               "delta": null
             },
             "open_prs": {
-              "current": 160,
+              "current": 159,
               "delta": null
             },
             "forks": {
@@ -184,7 +184,7 @@
               "delta": null
             },
             "size_kb": {
-              "current": 19567,
+              "current": 19576,
               "delta": null
             },
             "stars": {
@@ -193,6 +193,18 @@
             }
           },
           "notable": [
+            {
+              "kind": "commit",
+              "title": "Revise some comments",
+              "url": "https://github.com/asterinas/asterinas/commit/28f9d9adc16c0d489487754a6748b0cf36a3d2e0",
+              "time": "2026-11-17T05:00Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Use `DropGuard` for ext2 rollback",
+              "url": "https://github.com/asterinas/asterinas/commit/f691f8ecccce1973120cabd66a13d5e8f92f33e6",
+              "time": "2026-11-17T05:00Z"
+            },
             {
               "kind": "commit",
               "title": "Improve allocation contiguity",
@@ -210,18 +222,6 @@
               "title": "Fix cache aligment check",
               "url": "https://github.com/asterinas/asterinas/commit/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
               "time": "2026-11-17T04:42Z"
-            },
-            {
-              "kind": "commit",
-              "title": "Fix `SIGEV_THREAD` panic",
-              "url": "https://github.com/asterinas/asterinas/commit/562d65e7a1ef2e6f1095d3613d420ccd980cb434",
-              "time": "2026-11-17T04:26Z"
-            },
-            {
-              "kind": "commit",
-              "title": "Remove `Box` from `registered_callback`",
-              "url": "https://github.com/asterinas/asterinas/commit/5ecdf99b9c41d7f41c3938065c5485971b948a4d",
-              "time": "2026-11-17T04:26Z"
             },
             {
               "kind": "issue",
@@ -246,6 +246,12 @@
               "title": "sched_setaffinity` leaves a runnable or running thread on a disallowed CPU",
               "url": "https://github.com/asterinas/asterinas/issues/4222",
               "time": "2026-11-16T08:18Z"
+            },
+            {
+              "kind": "pr",
+              "title": "Use `DropGuard` for ext2 rollback",
+              "url": "https://github.com/asterinas/asterinas/pull/4218",
+              "time": "2026-11-16T03:58Z"
             },
             {
               "kind": "pr",
@@ -269,10 +275,10 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
-            "commit": 31,
+            "commit": 33,
             "release": 0,
             "issue": 10,
             "pr": 25,
@@ -287,7 +293,7 @@
             "issue": 24,
             "pr": 43
           },
-          "mergedPrs": 15,
+          "mergedPrs": 16,
           "commitsLowerBound": false,
           "versionChanges": [],
           "metrics": {
@@ -296,7 +302,7 @@
               "delta": null
             },
             "open_prs": {
-              "current": 160,
+              "current": 159,
               "delta": null
             },
             "forks": {
@@ -304,7 +310,7 @@
               "delta": null
             },
             "size_kb": {
-              "current": 19567,
+              "current": 19576,
               "delta": null
             },
             "stars": {
@@ -313,6 +319,18 @@
             }
           },
           "notable": [
+            {
+              "kind": "commit",
+              "title": "Revise some comments",
+              "url": "https://github.com/asterinas/asterinas/commit/28f9d9adc16c0d489487754a6748b0cf36a3d2e0",
+              "time": "2026-11-17T05:00Z"
+            },
+            {
+              "kind": "commit",
+              "title": "Use `DropGuard` for ext2 rollback",
+              "url": "https://github.com/asterinas/asterinas/commit/f691f8ecccce1973120cabd66a13d5e8f92f33e6",
+              "time": "2026-11-17T05:00Z"
+            },
             {
               "kind": "commit",
               "title": "Improve allocation contiguity",
@@ -330,18 +348,6 @@
               "title": "Fix cache aligment check",
               "url": "https://github.com/asterinas/asterinas/commit/f8b6cfca092f5a6139aa6ba37b04b3fda17732cc",
               "time": "2026-11-17T04:42Z"
-            },
-            {
-              "kind": "commit",
-              "title": "Fix `SIGEV_THREAD` panic",
-              "url": "https://github.com/asterinas/asterinas/commit/562d65e7a1ef2e6f1095d3613d420ccd980cb434",
-              "time": "2026-11-17T04:26Z"
-            },
-            {
-              "kind": "commit",
-              "title": "Remove `Box` from `registered_callback`",
-              "url": "https://github.com/asterinas/asterinas/commit/5ecdf99b9c41d7f41c3938065c5485971b948a4d",
-              "time": "2026-11-17T04:26Z"
             },
             {
               "kind": "issue",
@@ -369,6 +375,12 @@
             },
             {
               "kind": "pr",
+              "title": "Use `DropGuard` for ext2 rollback",
+              "url": "https://github.com/asterinas/asterinas/pull/4218",
+              "time": "2026-11-16T03:58Z"
+            },
+            {
+              "kind": "pr",
               "title": "Improve allocation contiguity in `CacheArray` and fix bugs",
               "url": "https://github.com/asterinas/asterinas/pull/4217",
               "time": "2026-11-16T02:59Z"
@@ -384,12 +396,6 @@
               "title": "Refactor `Timer` and fill timer `si_info`",
               "url": "https://github.com/asterinas/asterinas/pull/4205",
               "time": "2026-11-13T01:04Z"
-            },
-            {
-              "kind": "pr",
-              "title": "Use `return_errno{,_with_message}` macros if possible",
-              "url": "https://github.com/asterinas/asterinas/pull/4194",
-              "time": "2026-11-10T09:43Z"
             }
           ]
         }
@@ -400,8 +406,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -443,8 +449,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 2,
             "release": 0,
@@ -516,8 +522,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 151,
             "release": 0,
@@ -648,8 +654,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 300,
             "release": 0,
@@ -797,8 +803,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 4,
             "release": 0,
@@ -848,8 +854,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 7,
             "release": 0,
@@ -910,8 +916,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 2,
             "release": 1,
@@ -955,8 +961,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 6,
             "release": 2,
@@ -1029,8 +1035,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 1,
             "release": 0,
@@ -1062,8 +1068,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 1,
             "release": 0,
@@ -1100,8 +1106,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -1126,8 +1132,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 1,
             "release": 0,
@@ -1164,8 +1170,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 1,
             "release": 0,
@@ -1197,8 +1203,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 12,
             "release": 0,
@@ -1259,8 +1265,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 14,
             "release": 0,
@@ -1363,8 +1369,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 150,
             "release": 0,
@@ -1496,8 +1502,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -1522,8 +1528,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -1553,8 +1559,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -1579,8 +1585,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -1623,8 +1629,8 @@
       "windows": [
         {
           "label": "24h",
-          "since": "2026-11-16T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-16T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 0,
             "release": 0,
@@ -1649,8 +1655,8 @@
         },
         {
           "label": "7d",
-          "since": "2026-11-10T05:00Z",
-          "until": "2026-11-17T05:00Z",
+          "since": "2026-11-10T06:00Z",
+          "until": "2026-11-17T06:00Z",
           "counts": {
             "commit": 30,
             "release": 0,

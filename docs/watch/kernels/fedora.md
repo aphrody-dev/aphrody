@@ -2,7 +2,7 @@
 
 Rawhide and stable Fedora kernels (Bodhi) plus the upstream-tracking kernel-ark tree.
 
-Generated from the watch store as of 2026-11-17T05:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
+Generated from the watch store as of 2026-11-17T06:00Z. Do not edit; run `bun tooling/kernel-watch/cli.ts build`.
 
 ## Kernel versions
 
