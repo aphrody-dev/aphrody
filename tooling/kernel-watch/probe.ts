@@ -23,6 +23,20 @@ tmp=$(mktemp -d /tmp/kernel-probe.XXXXXX) && {
   if pacman -Sy --dbpath "$tmp" --logfile /dev/null >/dev/null 2>"$tmp/err"; then pacman -Qu --dbpath "$tmp" 2>/dev/null; else echo "@@pending-error"; head -c 300 "$tmp/err"; fi
   rm -rf "$tmp"
 }
+echo "@@boot"
+if [ -d /sys/firmware/efi ]; then echo "firmware uefi"; else echo "firmware bios"; fi
+echo "virt $(systemd-detect-virt 2>/dev/null)"
+echo "cmdline $(cat /proc/cmdline)"
+[ -f /boot/grub/grub.cfg ] && echo "grub-cfg yes"
+[ -d /boot/loader/entries ] && echo "systemd-boot-entries yes"
+echo "boot-files $(ls /boot | tr '\n' ' ')"
+echo "root $(findmnt -n -o FSTYPE /)"
+echo "vfat $(lsblk -nro NAME,FSTYPE,SIZE,MOUNTPOINT | awk '$2=="vfat" {print $1 "/" $3 "/" ($4 == "" ? "unmounted" : $4)}' | tr '\n' ' ')"
+echo "mkinitcpio-hooks $(grep -E '^HOOKS=' /etc/mkinitcpio.conf)"
+echo "mkinitcpio-presets $(ls /etc/mkinitcpio.d | tr '\n' ' ')"
+echo "btrfs-subvolumes $(btrfs subvolume list / 2>&1 | awk '{print $NF}' | tr '\n' ' ')"
+if [ -e /sys/class/tty/ttyS0 ]; then echo "serial ttyS0"; else echo "serial none"; fi
+echo "boot-free-mb $(df -Pm /boot | awk 'NR==2 {print $4}')"
 echo "@@end"
 `;
 
@@ -39,6 +53,8 @@ export interface RemoteFacts {
   /** Pending updates against a freshly synced temporary database; null when that sync failed. */
   pending: { name: string; from: string; to: string }[] | null;
   pendingError: string | null;
+  /** Boot setup as read from the host, key to text (firmware, bootloader files, initramfs hooks, serial console, free space on /boot). */
+  boot: Record<string, string>;
 }
 
 export function parseRemote(output: string): RemoteFacts {
@@ -66,6 +82,7 @@ export function parseRemote(output: string): RemoteFacts {
     repos: lines("repos"),
     pending: pendingError ? null : pendingLines.map((l) => /^(\S+) (\S+) -> (\S+)$/.exec(l)).filter((m): m is RegExpExecArray => m !== null).map((m) => ({ name: m[1]!, from: m[2]!, to: m[3]! })),
     pendingError,
+    boot: Object.fromEntries(lines("boot").map((l) => [l.slice(0, l.indexOf(" ")), l.slice(l.indexOf(" ") + 1).trim()] as [string, string]).filter(([k]) => k)),
   };
 }
 
@@ -101,6 +118,7 @@ export interface ProbeReport {
   syncedAt: number | null;
   repos: string[];
   pendingError: string | null;
+  boot: Record<string, string>;
   pendingTotal: number | null;
   /** Newest version of anything kernel-like that the host could install, and how far the running kernel is from it. */
   summary: {
@@ -275,6 +293,7 @@ export function buildReport(host: ProbeHost, collected: { facts: RemoteFacts; ca
     syncedAt: collected.facts.syncedAt,
     repos: collected.facts.repos,
     pendingError: collected.facts.pendingError,
+    boot: collected.facts.boot,
     pendingTotal: collected.facts.pending === null ? null : collected.facts.pending.length,
     summary: {
       runningCyclesBehindNewestRepo: running && newestRepo ? Math.max(0, cyclesBetween(cycles, parsedOf(running), parsedOf(newestRepo))) : null,
@@ -321,6 +340,7 @@ export function renderProbePage(reports: ProbeReport[]): string {
     lines.push(`| Pending updates (all packages) | ${r.pendingTotal === null ? `unknown (${cell(r.pendingError ?? "no result", 90)})` : r.pendingTotal} |`);
     lines.push(`| Host database sync | ${r.syncedAt === null ? "n/a" : isoOf(r.syncedAt)} |`);
     lines.push(`| Repositories | ${r.repos.length ? r.repos.join(", ") : "n/a"} |`, "");
+    if (Object.keys(r.boot).length) lines.push("| Boot setup | |", "| :-- | :-- |", ...Object.entries(r.boot).map(([k, v]) => `| ${k} | ${cell(v, 160)} |`), "");
     lines.push("| Rank | Origin | Package | Version | Where | Behind mainline rc | Behind stable |", "| --: | :-- | :-- | :-- | :-- | :-- | :-- |");
     r.candidates.forEach((c, i) => {
       const name = c.url ? `[${cell(c.name)}](${c.url})` : cell(c.name);

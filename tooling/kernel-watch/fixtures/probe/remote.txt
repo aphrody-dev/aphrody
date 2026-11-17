@@ -21,4 +21,17 @@ extra
 examplepkg 1.0-1 -> 1.1-1
 linux 7.0.3.arch1-1 -> 7.3.4.arch1-2
 otherpkg 2.0-1 -> 2.0-2
+@@boot
+firmware bios
+virt kvm
+cmdline BOOT_IMAGE=/boot/vmlinuz-linux root=UUID=00000000-0000-0000-0000-000000000000 rw console=tty0 console=ttyS0,115200
+grub-cfg yes
+boot-files grub initramfs-linux.img vmlinuz-linux
+root btrfs
+vfat sda2/300M/unmounted
+mkinitcpio-hooks HOOKS=(base systemd autodetect modconf kms keyboard block filesystems fsck)
+mkinitcpio-presets linux.preset
+btrfs-subvolumes swap var/lib/machines
+serial ttyS0
+boot-free-mb 800
 @@end

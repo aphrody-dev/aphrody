@@ -54,6 +54,13 @@ describe("probe", () => {
     expect(facts.pending!.find((p) => p.name === "linux")).toEqual({ name: "linux", from: "7.0.3.arch1-1", to: "7.3.4.arch1-2" });
   });
 
+  test("reads the boot setup facts needed to plan a kernel install", () => {
+    const facts = parseRemote(read("remote.txt"));
+    expect(facts.boot).toMatchObject({ firmware: "bios", virt: "kvm", "grub-cfg": "yes", root: "btrfs", serial: "ttyS0", "boot-free-mb": "800" });
+    expect(facts.boot.cmdline).toContain("console=ttyS0");
+    expect(facts.boot["boot-files"]).toContain("vmlinuz-linux");
+  });
+
   test("reports a failed temporary sync as unknown, not as zero", () => {
     const facts = parseRemote("@@uname-r\n7.2.1-arch1-1\n@@pending\n@@pending-error\nerror: nope\n@@end\n");
     expect(facts.pending).toBeNull();
