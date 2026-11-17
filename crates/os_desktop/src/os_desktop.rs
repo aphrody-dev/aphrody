@@ -142,3 +142,13 @@ impl gpui_app_shell::AppModule for ArtCraftShellModule {
     ) {
     }
 }
+
+/// Runs the Zed app shell hosting the ArtCraft module and, with the `vpn` feature, the VPN client.
+#[cfg(feature = "shell-module")]
+pub fn run_app_shell() {
+    let builder =
+        gpui_app_shell::AppShellBuilder::new(brand::APP_NAME).with_module(ArtCraftShellModule);
+    #[cfg(feature = "vpn")]
+    let builder = builder.with_module(vpn_ui::VpnModule::new());
+    builder.run();
+}

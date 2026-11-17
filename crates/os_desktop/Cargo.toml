@@ -29,6 +29,7 @@ web = []
 mobile = []
 cli = ["dep:clap", "dep:env_logger"]
 shell-module = ["dep:gpui_app_shell"]
+vpn = ["shell-module", "dep:vpn_ui"]
 
 [dependencies]
 anyhow.workspace = true
@@ -51,6 +52,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 theme.workspace = true
 ui.workspace = true
+vpn_ui = { workspace = true, optional = true }
 web-time.workspace = true
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]

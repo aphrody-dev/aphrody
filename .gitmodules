@@ -145,3 +145,6 @@
 	path = vendor/cosmic/cosmic-icons
 	url = ../../aphrody-labs/cosmic-icons.git
 	branch = master
+[submodule "vendor/ayvpn"]
+	path = vendor/ayvpn
+	url = ../ayvpn.git

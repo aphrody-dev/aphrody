@@ -40,6 +40,9 @@ struct Cli {
 enum Command {
     /// Launch the COSMIC-style GPUI desktop shell (`aphrody-os`).
     Desktop,
+    /// Launch the Zed app shell hosting the ArtCraft module and, with the `vpn` feature, the VPN client.
+    #[cfg(feature = "shell-module")]
+    Shell,
     /// Inspect an arbitrary image/vector/binary/Wasm/Plist artifact via `craft-libs` & `object`/`wasmparser`.
     Inspect {
         path: PathBuf,
@@ -108,6 +111,8 @@ fn main() -> anyhow::Result<()> {
             };
             os_desktop::run_desktop_app(opts)?;
         }
+        #[cfg(feature = "shell-module")]
+        Some(Command::Shell) => os_desktop::run_app_shell(),
         Some(Command::Inspect { path, json }) => {
             let catalog = CraftCatalog::load_with_user_override()?;
             let report = inspect_path(&path, Some(&catalog))?;
