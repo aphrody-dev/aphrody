@@ -9,7 +9,7 @@ active_originals = 52
 aphrody_root_submodules = 37
 
 [owners]
-aphrody = "C:/src/aphrody (Rust OS, GPUI, Craft, NSH, Wasm/WebGPU, W3C i18n, Tooling)"
+aphrody = "aphrody-dev/aphrody (Rust OS, GPUI, Craft, NSH, Wasm/WebGPU, W3C i18n, Tooling)"
 ai_os = "aphrody-dev/ai-os (Relay, ACP/A2A/HTTP/MCP daemon, OS automation)"
 ay = "aphrody-dev/ay (SDK, packages/machine, fleet & shell automation)"
 anu = "aphrody-dev/anu (ANU monorepo)"
