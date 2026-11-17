@@ -21,7 +21,7 @@ import {
   stripNullish,
   TARGET_SUBMODULES,
 } from "./gpui-vs-dioxus-audit.ts";
-import { checkRepoHygiene } from "./repo-hygiene.ts";
+import { checkRepoHygiene, isInsideUninitialisedSubmodule } from "./repo-hygiene.ts";
 
 describe("gpui-vs-dioxus-audit pure parsers & classifiers", () => {
   test("parseSubmoduleStatusOutput parses clean, modified, uninitialized, and conflict rows", () => {
@@ -414,7 +414,7 @@ describe("live Aphrody GPUI vs Dioxus audit artifacts", () => {
       const rawTarget = match[1].split("#")[0].trim();
       if (!rawTarget || rawTarget.startsWith("http://") || rawTarget.startsWith("https://")) continue;
       const resolved = resolve(dirname(docPath), rawTarget);
-      expect(existsSync(resolved)).toBe(true);
+      expect(existsSync(resolved) || isInsideUninitialisedSubmodule(resolved, REPO_ROOT)).toBe(true);
     }
   });
 

@@ -30,6 +30,13 @@ jobs:
         with:
           submodules: false
       - uses: oven-sh/setup-bun@v2
+      - name: Read pinned Rust toolchain
+        id: toolchain
+        run: bun -e 'console.log(`channel=${Bun.TOML.parse(await Bun.file("rust-toolchain.toml").text()).toolchain.channel}`)' >> "$GITHUB_OUTPUT"
+      # tooling/bun/toolchain-audit.test.ts probes rustc and cargo; without the pinned toolchain rustup downloads it mid-test.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.toolchain.outputs.channel }}
       - name: Validate product manifest, plugin manifests, workflow YAML, and Bun hooks
         run: |
           bun -e '

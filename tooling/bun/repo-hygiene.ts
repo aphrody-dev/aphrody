@@ -35,6 +35,26 @@ const GUARD_ALLOWLIST = new Set([
   "tooling/bun/tooling.test.ts",
 ]);
 
+/**
+ * Submodule checkouts are optional (CI jobs that do not build vendored crates skip them), so a link into a gitlink
+ * whose working tree is not initialised cannot be verified on disk; the pinned gitlink is the contract.
+ */
+export function isInsideUninitialisedSubmodule(absolutePath: string, root = repoRoot): boolean {
+  const staged = Bun.spawnSync(["git", "-C", root, "ls-files", "--stage"], { stdout: "pipe", stderr: "pipe" });
+  const relativePath = relative(root, absolutePath).split(sep).join("/");
+  return new TextDecoder()
+    .decode(staged.stdout)
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith("160000 "))
+    .map((line) => line.split("\t")[1])
+    .some(
+      (path) =>
+        path !== undefined &&
+        (relativePath === path || relativePath.startsWith(`${path}/`)) &&
+        !existsSync(join(root, path, ".git")),
+    );
+}
+
 export function checkRepoHygiene(root = repoRoot): HygieneReport {
   const readmePath = join(root, "README.md");
   const readmeLines = existsSync(readmePath) ? readFileSync(readmePath, "utf8").split(/\r?\n/) : [];
@@ -70,20 +90,6 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
     if (!files.includes(extra)) files.push(extra);
   }
 
-  // Submodule checkouts are optional (CI jobs that do not build vendored crates skip them), so a link into a
-  // gitlink whose working tree is not initialised cannot be verified on disk; the pinned gitlink is the contract.
-  const staged = Bun.spawnSync(["git", "-C", root, "ls-files", "--stage"], { stdout: "pipe", stderr: "pipe" });
-  const uninitialisedSubmodules = new TextDecoder()
-    .decode(staged.stdout)
-    .split(/\r?\n/)
-    .filter((line) => line.startsWith("160000 "))
-    .map((line) => line.split("\t")[1])
-    .filter((path) => path && !existsSync(join(root, path, ".git")));
-  const insideUninitialisedSubmodule = (resolved: string) => {
-    const rel = relative(root, resolved).split(sep).join("/");
-    return uninitialisedSubmodules.some((path) => rel === path || rel.startsWith(`${path}/`));
-  };
-
   const ephemeralLeaks: string[] = [];
   const brokenArchLinks: string[] = [];
   const invalidManifests: string[] = [];
@@ -106,7 +112,7 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
           continue;
         }
         const resolved = resolve(dirname(full), rawTarget);
-        if (!existsSync(resolved) && !insideUninitialisedSubmodule(resolved)) {
+        if (!existsSync(resolved) && !isInsideUninitialisedSubmodule(resolved, root)) {
           brokenArchLinks.push(`${rel} -> ${rawTarget}`);
         }
       }

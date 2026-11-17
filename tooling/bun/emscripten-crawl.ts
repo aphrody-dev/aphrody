@@ -15,6 +15,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { isInsideUninitialisedSubmodule } from "./repo-hygiene.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const EMSCRIPTEN_ORIGIN = "https://emscripten.org";
@@ -1358,7 +1359,7 @@ export function findBrokenRelativeLinks(docRelPaths: readonly string[], root = R
       const target = (match[1] ?? "").split("#")[0]!.trim();
       if (!target || /^(https?:|mailto:|#)/i.test(target)) continue;
       const resolved = resolve(dirname(full), target);
-      if (!existsSync(resolved)) {
+      if (!existsSync(resolved) && !isInsideUninitialisedSubmodule(resolved, root)) {
         broken.push(`${rel} -> ${target}`);
       }
     }
