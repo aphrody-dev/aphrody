@@ -36,7 +36,7 @@ echo "mkinitcpio-hooks $(grep -E '^HOOKS=' /etc/mkinitcpio.conf)"
 echo "mkinitcpio-presets $(ls /etc/mkinitcpio.d | tr '\n' ' ')"
 echo "btrfs-subvolumes $(btrfs subvolume list / 2>&1 | awk '{print $NF}' | tr '\n' ' ')"
 if [ -e /sys/class/tty/ttyS0 ]; then echo "serial ttyS0"; else echo "serial none"; fi
-echo "boot-free-mb $(df -Pm /boot | awk 'NR==2 {print $4}')"
+echo "boot-free-mb $(stat -f -c '%a %S' /boot | awk '{print int($1 * $2 / 1048576)}')"
 echo "@@end"
 `;
 
@@ -82,7 +82,7 @@ export function parseRemote(output: string): RemoteFacts {
     repos: lines("repos"),
     pending: pendingError ? null : pendingLines.map((l) => /^(\S+) (\S+) -> (\S+)$/.exec(l)).filter((m): m is RegExpExecArray => m !== null).map((m) => ({ name: m[1]!, from: m[2]!, to: m[3]! })),
     pendingError,
-    boot: Object.fromEntries(lines("boot").map((l) => [l.slice(0, l.indexOf(" ")), l.slice(l.indexOf(" ") + 1).trim()] as [string, string]).filter(([k]) => k)),
+    boot: Object.fromEntries(lines("boot").map((l): [string, string] => { const i = l.indexOf(" "); return i < 0 ? [l, ""] : [l.slice(0, i), l.slice(i + 1).trim()]; })),
   };
 }
 
