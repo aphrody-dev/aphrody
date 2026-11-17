@@ -68,8 +68,8 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
     "tooling/bun",
     ".github",
     ".cloudflare",
-    "crates/os_desktop",
-    "crates/os_ui",
+    "crates/aphrody_desktop",
+    "crates/aphrody_ui",
   ];
   const tracked = Bun.spawnSync(["git", "-C", root, "ls-files", ...managedScopes], {
     stdout: "pipe",

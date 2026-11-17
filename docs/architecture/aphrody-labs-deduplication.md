@@ -39,7 +39,7 @@
 
 ## 4. High-Confidence Archive Candidates Verified
 
-- `aphrody-labs/agent-desktop`: 100% migrated into [`crates/os_pilot`](../../crates/os_pilot/src/os_pilot.rs), [`crates/os_craft`](../../crates/os_craft/src/os_craft.rs), and [`crates/os_desktop`](../../crates/os_desktop/src/os_desktop.rs) (see [`agent-desktop-ai-os.md`](./agent-desktop-ai-os.md)).
+- `aphrody-labs/agent-desktop`: 100% migrated into [`crates/aphrody_pilot`](../../crates/aphrody_pilot/src/aphrody_pilot.rs), [`crates/aphrody_craft`](../../crates/aphrody_craft/src/aphrody_craft.rs), and [`crates/aphrody_desktop`](../../crates/aphrody_desktop/src/aphrody_desktop.rs) (see [`agent-desktop-ai-os.md`](./agent-desktop-ai-os.md)).
 - `aphrody-labs/browse`, `aphrody-labs/opentui`, `aphrody-labs/opentunnel`, `aphrody-labs/models.dev`: absorbed into `aphrody-labs/open` (0 custom commits ahead).
-- Standalone legacy `artcraft`, `artcraftx`, `anicraft`, `autocraft`, `brandcraft`, `cadcraft`: consolidated into `vendor/craft-anything`, `vendor/craft-libs`, and `crates/os_craft`.
+- Standalone legacy `artcraft`, `artcraftx`, `anicraft`, `autocraft`, `brandcraft`, `cadcraft`: consolidated into `vendor/craft-anything`, `vendor/craft-libs`, and `crates/aphrody_craft`.
 - Standalone `apify-client-*`, `apify-sdk-*` unreferenced 0-ahead forks: consolidated via `aphrody-labs/open` / npm on `bun`.

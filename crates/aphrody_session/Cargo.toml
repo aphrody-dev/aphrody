@@ -1,0 +1,29 @@
+[package]
+name = "aphrody_session"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "COSMIC-inspired session supervisor, Taffy layer-shell & tiling compositor state, and live cross-platform app/distro discovery for Aphrody GPUI OS."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_session.rs"
+doctest = false
+
+[features]
+default = []
+test-support = []
+
+[dependencies]
+bitflags.workspace = true
+brand.workspace = true
+dirs.workspace = true
+log.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+taffy = { workspace = true, features = ["std", "taffy_tree", "flexbox", "grid"] }
+thiserror.workspace = true
+toml.workspace = true

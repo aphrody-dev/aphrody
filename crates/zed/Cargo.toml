@@ -71,11 +71,11 @@ crash-reporting = [
     "dep:hang_telemetry",
 ]
 nsh = [
-    "dep:nsh_workspace",
+    "dep:aphrody_nsh",
 ]
 studio = [
     "nsh",
-    "nsh_workspace/studio",
+    "aphrody_nsh/studio",
 ]
 grammars = [
     "languages/load-grammars",
@@ -157,6 +157,7 @@ agent_settings.workspace = true
 agent_skills = { workspace = true, optional = true }
 agent_ui = { workspace = true, optional = true }
 anyhow.workspace = true
+aphrody_pilot.workspace = true
 askpass.workspace = true
 assets.workspace = true
 audio = { workspace = true, optional = true }
@@ -250,7 +251,7 @@ mimalloc = { workspace = true, optional = true }
 miniprofiler_ui.workspace = true
 node_runtime.workspace = true
 notifications.workspace = true
-nsh_workspace = { workspace = true, optional = true }
+aphrody_nsh = { workspace = true, optional = true }
 onboarding.workspace = true
 outline.workspace = true
 outline_panel.workspace = true

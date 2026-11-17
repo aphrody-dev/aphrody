@@ -8,12 +8,12 @@ describe("NSH AGY & Storytold Parity Studio app model", () => {
       {
         id: "aace0256-452b-4cd1-83a0-64b5bbce9f27",
         source: "agy",
-        title: "Google Design Stitch, Wasmtime AOT & 24-Tool wgpu_cli MCP",
+        title: "Google Design Stitch, Wasmtime AOT & 24-Tool aphrody_cli MCP",
         stepCount: 214,
         toolCallCount: 168,
         artifactCount: 3,
         updatedAt: "2026-11-17T13:00:00Z",
-        highlights: ["e544b6b90d", "google_design_stitch", "starter_pack"],
+        highlights: ["e544b6b90d", "aphrody_design", "starter_pack"],
       },
       {
         id: "4b7bb484-ef0e-44b2-a766-b0becc2adca3",
@@ -23,7 +23,7 @@ describe("NSH AGY & Storytold Parity Studio app model", () => {
         toolCallCount: 84,
         artifactCount: 1,
         updatedAt: "2026-11-17T14:30:00Z",
-        highlights: ["egui_gpui", "bevy_gpui", "craft_studio"],
+        highlights: ["egui_gpui", "bevy_gpui", "aphrody_craft"],
       },
     ]);
 

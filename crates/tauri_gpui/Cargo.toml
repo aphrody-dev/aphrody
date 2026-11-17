@@ -1,0 +1,25 @@
+[package]
+name = "tauri_gpui"
+version = "3.0.0"
+edition.workspace = true
+publish.workspace = true
+license = "Apache-2.0 OR MIT"
+description = "Tauri v3 IPC command router, ACL permission scopes, Wry WebView descriptor, and 22-target packager alignment placed cleanly beside GPUI."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/tauri_gpui.rs"
+doctest = false
+
+[features]
+default = ["ipc", "bundle"]
+ipc = []
+bundle = []
+
+[dependencies]
+anyhow.workspace = true
+aphrody_store = { workspace = true, default-features = false }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true

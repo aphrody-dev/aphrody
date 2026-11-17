@@ -119,10 +119,10 @@ export const FEATURE_MANIFEST_TARGETS: ManifestTargetSpec[] = [
   { manifestRel: "crates/gpui_macos/Cargo.toml", ecosystem: "aphrody-gpui", role: "Native macOS Metal + CAMetalDisplayLink backend" },
   { manifestRel: "crates/gpui_linux/Cargo.toml", ecosystem: "aphrody-gpui", role: "Native Wayland/X11 + gpui_wgpu Linux backend" },
   { manifestRel: "crates/gpui_ios/Cargo.toml", ecosystem: "aphrody-gpui", role: "Native iOS UIKit + Metal backend" },
-  { manifestRel: "crates/gpui_store/Cargo.toml", ecosystem: "aphrody-gpui", role: "Awesome GPUI Store + upt 0.9.0 + 22-target packager" },
+  { manifestRel: "crates/aphrody_store/Cargo.toml", ecosystem: "aphrody-gpui", role: "Awesome GPUI Store + upt 0.9.0 + 22-target packager" },
   { manifestRel: "crates/gpui_app_shell/Cargo.toml", ecosystem: "aphrody-gpui", role: "Modular GPUI app starter shell (docks, panes, palette)" },
-  { manifestRel: "crates/os_ui/Cargo.toml", ecosystem: "aphrody-gpui", role: "Adaptive viewport + 12-layer unified runtime profile" },
-  { manifestRel: "crates/os_desktop/Cargo.toml", ecosystem: "aphrody-gpui", role: "Aphrody OS desktop shell + ArtCraft workbench" },
+  { manifestRel: "crates/aphrody_ui/Cargo.toml", ecosystem: "aphrody-gpui", role: "Adaptive viewport + 12-layer unified runtime profile" },
+  { manifestRel: "crates/aphrody_desktop/Cargo.toml", ecosystem: "aphrody-gpui", role: "Aphrody OS desktop shell + ArtCraft workbench" },
   { manifestRel: "crates/nsh-core/Cargo.toml", ecosystem: "aphrody-nsh", role: "NSH platform-independent shadow tree + Taffy layout core" },
   { manifestRel: "crates/nsh-platform-gpui/Cargo.toml", ecosystem: "aphrody-nsh", role: "NSH desktop GPUI host embedding bridge" },
   { manifestRel: "crates/nsh-platform-web/Cargo.toml", ecosystem: "aphrody-nsh", role: "NSH wasm32 browser DOM + QuickJS/WebGL host" },
@@ -547,13 +547,13 @@ export function scanIntegrationBridges(root = REPO_ROOT): BridgeFinding[] {
     files: [wgpuCtxFile, "crates/gpui_wgpu/Cargo.toml", "Cargo.toml"].filter((f) => existsSync(join(root, f))),
     symbols: ["SharedWgpuHandles", "WgpuContext::shared_handles", "wgpu v30.0.0"],
     summary:
-      "gpui_wgpu::WgpuContext::shared_handles exports cloned WGPU v30 Instance/Adapter/Device/Queue handles explicitly documented to share one GPU device with `os_ui`, `egui-wgpu`, `iced_wgpu`, `anyrender`, and `cef` OSR.",
+      "gpui_wgpu::WgpuContext::shared_handles exports cloned WGPU v30 Instance/Adapter/Device/Queue handles explicitly documented to share one GPU device with `aphrody_ui`, `egui-wgpu`, `iced_wgpu`, `anyrender`, and `cef` OSR.",
     verifiedLines: wgpuLines,
   });
 
   // 3. OS UI / OS Desktop Multi-Framework Layer Registry
-  const osUiFile = "crates/os_ui/src/unified_runtime.rs";
-  const visualSmokeFile = "crates/os_desktop/tests/visual_smoke.rs";
+  const osUiFile = "crates/aphrody_ui/src/unified_runtime.rs";
+  const visualSmokeFile = "crates/aphrody_desktop/tests/visual_smoke.rs";
   const osLines = [
     ...(hitsByFile.get(osUiFile) ?? []).map((h) => ({ file: osUiFile, ...h })),
     ...(hitsByFile.get(visualSmokeFile) ?? []).map((h) => ({ file: visualSmokeFile, ...h })),
@@ -564,7 +564,7 @@ export function scanIntegrationBridges(root = REPO_ROOT): BridgeFinding[] {
     files: [osUiFile, visualSmokeFile].filter((f) => existsSync(join(root, f))),
     symbols: ["FrameworkLayer::Blitz", "FrameworkLayer::Taffy", "FrameworkLayer::Wgpu", "UnifiedPlatformProfile"],
     summary:
-      "os_ui::unified_runtime::FrameworkLayer models 12 unified UI/render layers including Gpui, Nsh, GpuiKit, Craft, Cosmic, Iced, Egui, Wgpu, Taffy, Blitz, Winit, and TauriBun.",
+      "aphrody_ui::unified_runtime::FrameworkLayer models 12 unified UI/render layers including Gpui, Nsh, GpuiKit, Craft, Cosmic, Iced, Egui, Wgpu, Taffy, Blitz, Winit, and TauriBun.",
     verifiedLines: osLines,
   });
 
@@ -586,7 +586,7 @@ export function scanIntegrationBridges(root = REPO_ROOT): BridgeFinding[] {
       ),
       symbols: ["FRAMEWORK_SPECS[id=blitz]", "wasm_hello", "anyrender_vello"],
       summary:
-        "tooling/bun/web-build.ts registers `vendor/blitz/examples/wasm_hello` (`wasm_hello`) alongside `os_desktop`, `gpui_store`, `gpui_web`, `nsh`, `craft`, `egui`, `iced`, and `wgpu` for unified Wasm/WebGPU cohort audits.",
+        "tooling/bun/web-build.ts registers `vendor/blitz/examples/wasm_hello` (`wasm_hello`) alongside `aphrody_desktop`, `aphrody_store`, `gpui_web`, `nsh`, `craft`, `egui`, `iced`, and `wgpu` for unified Wasm/WebGPU cohort audits.",
       verifiedLines: blitzHits,
     });
   }
@@ -739,7 +739,7 @@ export function buildArchitectureComparison(report: Pick<GpuiVsDioxusAuditReport
       title: "Asset Bundling & Resolution",
       gpuiAphrody: "Compile-time rust-embed 8.11 (crates/assets) implementing gpui::AssetSource plus brand/theme TOML catalogs (include_str!).",
       dioxusBlitzAnyrender: "manganis::asset!() macro embeds link-section asset metadata consumed by dx CLI (lightningcss, grass, mozjpeg, imagequant, brotli) + dioxus-asset-resolver.",
-      nshBridge: "nsh-core asset loader + gpui_store embedded TOML catalog.",
+      nshBridge: "nsh-core asset loader + aphrody_store embedded TOML catalog.",
       unificationPath: "Keep rust-embed/include_str! for zero-external-CLI Cargo builds of Aphrody OS; use Manganis only inside Dioxus/dx-managed sub-apps.",
     },
     {
@@ -747,7 +747,7 @@ export function buildArchitectureComparison(report: Pick<GpuiVsDioxusAuditReport
       title: "Multi-Platform & Windowing",
       gpuiAphrody: "gpui_platform selects custom per-OS native crates (gpui_macos, gpui_windows, gpui_linux, gpui_ios, gpui_web) without Winit overhead.",
       dioxusBlitzAnyrender: "Unified dioxus crate feature-gates web, desktop (Wry/Tao), mobile, native (Blitz + Winit 0.31), liveview (Axum WS), ssr, and fullstack.",
-      nshBridge: "nsh spans GPUI, Web DOM, TUI (Ratatui), Android, iOS, macOS, Linux, and Windows; os_ui tracks all 12 layers.",
+      nshBridge: "nsh spans GPUI, Web DOM, TUI (Ratatui), Android, iOS, macOS, Linux, and Windows; aphrody_ui tracks all 12 layers.",
       unificationPath: "Use GPUI native platforms for OS/IDE windows (avoiding Winit beta drift) and optionally mount Blitz/Dioxus Native documents as embedded HTML/CSS panes.",
     },
     {
@@ -755,7 +755,7 @@ export function buildArchitectureComparison(report: Pick<GpuiVsDioxusAuditReport
       title: "Bundle Size & Cross-Compile Tooling",
       gpuiAphrody: "tooling/bun/web-build.ts builds 3 Wasm cohorts (baseline, simd128, --coi) with [profile.web] + wasm-opt -Oz; tooling/bun/cross-build.ts drives cargo-xwin/cargo-zigbuild.",
       dioxusBlitzAnyrender: "dx bundle + wasm-split-cli + [profile.wasm-split-release] / [profile.rg-wasm] (opt-level=z, fat LTO, strip) across Web, Desktop, Android, and iOS.",
-      nshBridge: "nsh-platform-web linkable Wasm + tooling/bun/web-build.ts tracks blitz wasm_hello alongside os_desktop and gpui_web.",
+      nshBridge: "nsh-platform-web linkable Wasm + tooling/bun/web-build.ts tracks blitz wasm_hello alongside aphrody_desktop and gpui_web.",
       unificationPath: "Port Blitz/Taffy [profile.rg-wasm] insights into Aphrody WebGPU CI budgets and reuse wasm-split patterns in tooling/bun/web-build.ts.",
     },
     {
@@ -1399,7 +1399,7 @@ export function buildArchitectureMermaid(report: GpuiVsDioxusAuditReport): strin
     `    APH_ROOT["Cargo.toml (${report.rootRepo.workspaceMembersCount} members, ${zedDelta} vs zed)"]`,
     '    GPUI_CORE["crates/gpui (hot-reload: subsecond + dx-cli-config)"]',
     '    GPUI_WGPU["crates/gpui_wgpu (SharedWgpuHandles + WebGPU/Linux)"]',
-    '    GPUI_UI["crates/gpui_ui + os_ui (FrameworkLayer::Blitz + nsh.rs)"]',
+    '    GPUI_UI["crates/gpui_ui + aphrody_ui (FrameworkLayer::Blitz + nsh.rs)"]',
     '    WEB_BUILD["tooling/bun/web-build.ts (wasm_hello cohort)"]',
     "  end",
     "",
@@ -1624,7 +1624,7 @@ ${featuresBlock}
 
 ## 6. Code-Verified Integration Bridges & Manifest Version Splits
 
-Verified by scanning \`crates/\` plus [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts), [\`crates/gpui/src/hot_reload.rs\`](../../crates/gpui/src/hot_reload.rs), [\`crates/gpui/src/view.rs\`](../../crates/gpui/src/view.rs), [\`crates/gpui/build.rs\`](../../crates/gpui/build.rs), [\`crates/gpui_wgpu/src/wgpu_context.rs\`](../../crates/gpui_wgpu/src/wgpu_context.rs), [\`crates/os_ui/src/unified_runtime.rs\`](../../crates/os_ui/src/unified_runtime.rs), and [\`crates/os_desktop/tests/visual_smoke.rs\`](../../crates/os_desktop/tests/visual_smoke.rs):
+Verified by scanning \`crates/\` plus [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts), [\`crates/gpui/src/hot_reload.rs\`](../../crates/gpui/src/hot_reload.rs), [\`crates/gpui/src/view.rs\`](../../crates/gpui/src/view.rs), [\`crates/gpui/build.rs\`](../../crates/gpui/build.rs), [\`crates/gpui_wgpu/src/wgpu_context.rs\`](../../crates/gpui_wgpu/src/wgpu_context.rs), [\`crates/aphrody_ui/src/unified_runtime.rs\`](../../crates/aphrody_ui/src/unified_runtime.rs), and [\`crates/aphrody_desktop/tests/visual_smoke.rs\`](../../crates/aphrody_desktop/tests/visual_smoke.rs):
 
 <!-- BEGIN GPUI_DIOXUS_BRIDGES -->
 ${bridgesBlock}

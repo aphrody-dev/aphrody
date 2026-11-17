@@ -82,7 +82,6 @@ test-support = [
 ]
 
 [dependencies]
-anyhow.workspace = true
 buffer_diff = { workspace = true, optional = true }
 fuzzy.workspace = true
 fuzzy_nucleo.workspace = true

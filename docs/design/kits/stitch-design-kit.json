@@ -11,7 +11,7 @@
       "title": "Google FigCraft & Stitch Vector/Token Studio",
       "deviceType": "DESKTOP",
       "gpuiAction": "google_design_studio::OpenGoogleFigCraftStudio",
-      "dualParityTarget": "craft_studio::StudioPillar::FigCraftGoogle",
+      "dualParityTarget": "aphrody_craft::StudioPillar::FigCraftGoogle",
       "slots": [
         "stitch-figcraft-root",
         "stitch-figcraft-omnibar",
@@ -24,7 +24,7 @@
       "title": "Google Craft Anything Clean-Room Disassembly & AST Workbench",
       "deviceType": "DESKTOP",
       "gpuiAction": "google_design_studio::OpenGoogleCraftAnythingStudio",
-      "dualParityTarget": "craft_studio::StudioPillar::CraftAnythingGoogle",
+      "dualParityTarget": "aphrody_craft::StudioPillar::CraftAnythingGoogle",
       "slots": [
         "stitch-ca-disasm-grid",
         "stitch-ca-oxc-ast",
@@ -37,7 +37,7 @@
       "title": "Unreal Engine 5.8 Bevy Viewport (Nanite Meshlets + Solari GI + MaterialX)",
       "deviceType": "DESKTOP",
       "gpuiAction": "google_design_studio::OpenUnrealBevyStudio",
-      "dualParityTarget": "craft_studio::StudioPillar::UnrealBevy58",
+      "dualParityTarget": "aphrody_craft::StudioPillar::UnrealBevy58",
       "slots": [
         "stitch-bevy-viewport",
         "stitch-bevy-outliner",
@@ -49,7 +49,7 @@
       "stitchId": "stitch-agy-studio-root",
       "title": "AGY & Gemini Live Auto-Reload Session Studio",
       "deviceType": "DESKTOP",
-      "gpuiAction": "nsh_workspace::OpenShowcaseSurface",
+      "gpuiAction": "aphrody_nsh::OpenShowcaseSurface",
       "dualParityTarget": "examples/nsh/agy-session-studio",
       "slots": [
         "stitch-agy-rail",

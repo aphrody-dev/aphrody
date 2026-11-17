@@ -18,7 +18,7 @@ body:
         - Vulkan / SPIR-V
         - DirectX 12 / HLSL
         - WebGPU / WGSL
-        - Aphrody GPUI OS (os_desktop / os_craft / os_session)
+        - Aphrody GPUI OS (aphrody_desktop / aphrody_craft / aphrody_session)
         - CLI / Build / xtask
     validations:
       required: true
@@ -27,7 +27,7 @@ body:
       label: Reproduction steps
       description: Minimal step-by-step description from a clean setup (command, shader, TSX snippet, or UI steps).
       placeholder: |
-        1. Run `target/debug/aphrody` (or `cargo run -p wgpu_cli -- ...`)
+        1. Run `target/debug/aphrody` (or `cargo run -p aphrody_cli -- ...`)
         2. Perform action
     validations:
       required: true
@@ -42,7 +42,7 @@ body:
     attributes:
       label: Aphrody version, system specs & GPU backend
       description: |
-        Run `zed: copy system specs into clipboard` (`CopySystemSpecsIntoClipboard`) from the command palette and/or `cargo run -p wgpu_cli -- adapters --json`.
+        Run `zed: copy system specs into clipboard` (`CopySystemSpecsIntoClipboard`) from the command palette and/or `cargo run -p aphrody_cli -- adapters --json`.
       placeholder: |
         Aphrody: v1.30.0 / commit SHA
         OS / GPU / Vulkan or DX12 or WebGPU backend / `gpui-wgpu adapters --json`

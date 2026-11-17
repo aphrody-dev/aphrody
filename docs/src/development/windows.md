@@ -247,7 +247,7 @@ For more information on this, please see [win32 docs](https://learn.microsoft.co
 
 #### Aphrody fails to launch
 
-Aphrody uses WGPU (Vulkan/DX12) and GPUI graphics APIs on Windows. If Aphrody fails to launch, inspect GPU adapters with `cargo run -p wgpu_cli -- adapters --json` and check the log at:
+Aphrody uses WGPU (Vulkan/DX12) and GPUI graphics APIs on Windows. If Aphrody fails to launch, inspect GPU adapters with `cargo run -p aphrody_cli -- adapters --json` and check the log at:
 `C:\Users\YOU\AppData\Local\Aphrody\logs\Aphrody.log`
 
 If you see messages like:

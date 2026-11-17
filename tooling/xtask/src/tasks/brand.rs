@@ -1043,7 +1043,7 @@ mod tests {
                 modular_code_crate: "gpui_code".into(),
                 modular_shell_crate: "gpui_app_shell".into(),
                 modular_shell_features: "nsh".into(),
-                wgpu_cli_package: "wgpu_cli".into(),
+                wgpu_cli_package: "aphrody_cli".into(),
                 wgpu_cli_bin: "gpui-wgpu".into(),
             },
             design: DesignSection {

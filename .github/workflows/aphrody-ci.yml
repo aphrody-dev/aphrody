@@ -176,7 +176,7 @@ jobs:
       - name: Build & audit optimized WebGPU cohorts (baseline + simd128)
         run: bun run web:build:release
       - name: Validate WGSL shaders & WGPU adapter tooling
-        run: cargo test -j 4 -p wgpu_cli --bins
+        run: cargo test -j 4 -p aphrody_cli --bins
 
   windows-aphrody-and-gpu:
     runs-on: windows-latest
@@ -216,3 +216,25 @@ jobs:
           cargo check -j 4 -p "${{ steps.cfg.outputs.wgpu_pkg }}" --examples
           cargo check -j 4 -p zed --bin "${{ steps.cfg.outputs.app_bin }}" --features "${{ steps.cfg.outputs.app_features }}"
           cargo check -j 4 -p cli --bin cli
+
+  cloudflare-and-framework:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+      - uses: ./.github/actions/vendor-submodules
+      - uses: oven-sh/setup-bun@v2
+      - name: Validate Cloudflare Workers and fleet deploy manifests
+        run: bun tooling/bun/cloudflare-deploy.ts audit --dry-run
+      - name: Read toolchain via Bun
+        id: cfg
+        run: bun -e 'import { readFileSync } from "node:fs"; console.log(`toolchain=${(Bun.TOML.parse(readFileSync("rust-toolchain.toml","utf8")) as any).toolchain.channel}`);' >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.cfg.outputs.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Check aphrody fullstack facade, backends, and clippy hygiene
+        run: |
+          cargo clippy -j 4 --no-deps -p aphrody -p aphrody_session -p aphrody_design -p aphrody_pilot -p aphrody_craft -p aphrody_installer -p aphrody_cli -p iced_gpui -p tauri_gpui -p cosmic_gpui -p egui_gpui -p bevy_gpui -- -D warnings
+          cargo test -j 4 --lib -p brand -p aphrody -p aphrody_session -p aphrody_design -p aphrody_pilot -p aphrody_craft -p aphrody_installer -p cosmic_gpui -p iced_gpui -p egui_gpui -p bevy_gpui -p tauri_gpui

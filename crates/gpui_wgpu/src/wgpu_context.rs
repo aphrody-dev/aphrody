@@ -799,7 +799,7 @@ impl WgpuContext {
     }
 
     /// Exports cloned shared WGPU instance, adapter, device, and queue handles so secondary UI
-    /// bridges (`os_ui`, `egui-wgpu`, `iced_wgpu`, `anyrender`, `cef` OSR) render onto one GPU device.
+    /// bridges (`aphrody_ui`, `egui-wgpu`, `iced_wgpu`, `anyrender`, `cef` OSR) render onto one GPU device.
     pub fn shared_handles(&self) -> SharedWgpuHandles {
         SharedWgpuHandles {
             instance: self.instance.clone(),

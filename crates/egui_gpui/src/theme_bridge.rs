@@ -6,9 +6,9 @@ use ecolor::Color32;
 use egui::{CornerRadius, Stroke, Style, Visuals};
 use epaint::Shadow;
 use gpui::{Hsla, Rgba};
-use os_ui::AppearanceMode;
-use os_ui::google_design::GoogleDesignTokens;
-use os_ui::starter_pack::ShadcnGpuiTheme;
+use aphrody_ui::AppearanceMode;
+use aphrody_ui::google_design::GoogleDesignTokens;
+use aphrody_ui::starter_pack::ShadcnGpuiTheme;
 
 /// Converts a `gpui::Hsla` color into an sRGB unpremultiplied `egui::Color32`.
 #[must_use]

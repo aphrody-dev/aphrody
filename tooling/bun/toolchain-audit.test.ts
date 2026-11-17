@@ -88,7 +88,7 @@ default-members = ["crates/a"]
 [profile.dev]
 debug = "limited"
 `;
-    const baselineReport = analyzeProfiles(unoptimizedCargo, cargoConfig, lockStats, bundleConfig);
+    const baselineReport = analyzeProfiles(unoptimizedCargo, "[build]\njobs = 4\n", lockStats, "[build]\n");
     const ids = new Set(baselineReport.findings.map((f) => f.id));
     expect(ids.has("profile.dev.debug-line-tables")).toBe(true);
     expect(ids.has("profile.dev.deps-no-debug")).toBe(true);

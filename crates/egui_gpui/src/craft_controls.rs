@@ -1,5 +1,5 @@
 use egui::{CornerRadius, RichText, Stroke, Ui};
-use os_ui::ShadcnGpuiTheme;
+use aphrody_ui::ShadcnGpuiTheme;
 
 use crate::theme_bridge::hsla_to_color32;
 
@@ -208,7 +208,7 @@ impl<'a> CraftImeBanner<'a> {
 
 #[cfg(test)]
 mod tests {
-    use os_ui::AppearanceMode;
+    use aphrody_ui::AppearanceMode;
 
     use super::*;
     use crate::host::EguiGpuiHost;

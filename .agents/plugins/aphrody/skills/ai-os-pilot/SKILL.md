@@ -1,9 +1,9 @@
 ---
 name: ai-os-pilot
-description: Control the entire Aphrody GPUI OS (COSMIC compositor, workspaces, ArtCraft studio, AccessKit UI trees) and external native applications (Windows UIA, Linux AT-SPI2/X11, macOS AXUIElement) through one unified MCP/CLI control plane (`aphrody-os pilot` / `os_craft` MCP).
+description: Control the entire Aphrody GPUI OS (COSMIC compositor, workspaces, ArtCraft studio, AccessKit UI trees) and external native applications (Windows UIA, Linux AT-SPI2/X11, macOS AXUIElement) through one unified MCP/CLI control plane (`aphrody-os pilot` / `aphrody_craft` MCP).
 ---
 
-# AI OS Pilot (`os_pilot` + `os_craft` MCP + `aphrody-os`)
+# AI OS Pilot (`aphrody_pilot` + `aphrody_craft` MCP + `aphrody-os`)
 
 Unified AI computer-use and OS control engine migrating [`aphrody-labs/agent-desktop`](https://github.com/aphrody-labs/agent-desktop) into Zed/GPUI idioms without external C-ABI, Next.js, or legacy cursor-overlay bloat.
 
@@ -24,7 +24,7 @@ Unified AI computer-use and OS control engine migrating [`aphrody-labs/agent-des
 
 ## Target Selection (`target`)
 
-- `gpui` / `auto`: pilots Aphrody GPUI OS in-process via `accesskit::TreeUpdate` + `os_session::CompositorState` (works natively on desktop, headless Linux CI, and `wasm32` WebGPU).
+- `gpui` / `auto`: pilots Aphrody GPUI OS in-process via `accesskit::TreeUpdate` + `aphrody_session::CompositorState` (works natively on desktop, headless Linux CI, and `wasm32` WebGPU).
 - `native`: pilots external OS windows via Windows `CUIAutomation` + `SendInput`, Linux `AT-SPI2` (`zbus`) + `x11rb`, or macOS `AXUIElement` + `CGEvent`.
 
 ## References

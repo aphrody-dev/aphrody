@@ -45,4 +45,4 @@ ispc -O3 --target=avx2-i32x8,avx512skx-x16 kernel.ispc -o kernel.obj -h kernel.h
 
 - [`examples/gpu/intel/xe_tiled_conv.wgsl`](../../../examples/gpu/intel/xe_tiled_conv.wgsl): 2D convolution kernel structured for Intel Xe vector units.
 - [`examples/gpu/intel/vector_fma.ispc`](../../../examples/gpu/intel/vector_fma.ispc): High-performance ISPC SIMD vector FMA kernel for AVX2 and AVX-512.
-- [`crates/wgpu_cli/examples/ihv_vendor_matrix.rs`](../../../crates/wgpu_cli/examples/ihv_vendor_matrix.rs): Multi-vendor enumeration and compute dispatch test.
+- [`crates/aphrody_cli/examples/ihv_vendor_matrix.rs`](../../../crates/aphrody_cli/examples/ihv_vendor_matrix.rs): Multi-vendor enumeration and compute dispatch test.

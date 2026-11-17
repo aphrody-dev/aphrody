@@ -5,8 +5,8 @@
 ## Standards & Design Contracts
 - Design source of truth: https://design.google/ (Material 3 Expressive + Google Sans Flex)
 - Workspace token spec: DESIGN.md + assets/os/google_design_tokens.toml
-- Web standards & Lighthouse auditor: crates/google_design_stitch/src/web_standards.rs
-- Pure-Rust GPUI starter pack (shadcn / Base UI / Tailwind v4): crates/os_ui/src/starter_pack.rs
+- Web standards & Lighthouse auditor: crates/aphrody_design/src/web_standards.rs
+- Pure-Rust GPUI starter pack (shadcn / Base UI / Tailwind v4): crates/aphrody_ui/src/starter_pack.rs
 - NSH workspace studio actions: OpenGoogleDesignMirror, OpenStitchStudio, OpenGpuiStarterPack
 
 ## Verification Commands
@@ -18,7 +18,7 @@
 - `gpui-wgpu mcp` — 24-tool JSON-RPC MCP server for Wasm/WGPU/Google Design/Lighthouse/Starter Pack
 
 ## Audited Stacks (17 entries)
-- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,os_ui,gpui_wgpu,google_design_stitch} (396 source modules)
+- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,aphrody_ui,gpui_wgpu,aphrody_design} (396 source modules)
 - bun: Bun (aphrody-labs/bun) -> vendor/bun (254 source modules)
 - wgpu: WGPU v30 + Naga (aphrody-labs/wgpu) -> vendor/wgpu (500 source modules)
 - taffy: Taffy Layout (aphrody-labs/taffy) -> vendor/taffy (115 source modules)

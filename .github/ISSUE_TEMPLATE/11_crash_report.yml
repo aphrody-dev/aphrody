@@ -16,7 +16,7 @@ body:
     attributes:
       label: Aphrody version, GPU & OS environment
       description: |
-        Run `CopySystemSpecsIntoClipboard` if accessible, or provide OS, GPU adapter (`cargo run -p wgpu_cli -- adapters --json`), and driver version.
+        Run `CopySystemSpecsIntoClipboard` if accessible, or provide OS, GPU adapter (`cargo run -p aphrody_cli -- adapters --json`), and driver version.
       placeholder: |
         OS, GPU adapter (`gpui-wgpu adapters`), driver version
     validations:

@@ -11,7 +11,7 @@ description: >-
 
 # WGPU & Naga (`aphrody` v30.0.0)
 
-`aphrody` vendors `gfx-rs/wgpu` v30.0.0 (`cddb2f5d80dc0009b2ef6767635140cacf90a007`) and `naga` v30.0.0 in `vendor/wgpu`. Every GPU subsystem in the workspace — `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/wgpu_cli` (`gpui-wgpu`) — shares this exact single revision.
+`aphrody` vendors `gfx-rs/wgpu` v30.0.0 (`cddb2f5d80dc0009b2ef6767635140cacf90a007`) and `naga` v30.0.0 in `vendor/wgpu`. Every GPU subsystem in the workspace — `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/aphrody_cli` (`gpui-wgpu`) — shares this exact single revision.
 
 ## Read the Right Reference First
 
@@ -53,26 +53,26 @@ Resolve `references/` relative to `.agents/skills/wgpu/`:
 
 ## Fast Verification & Debugging Workflow (`gpui-wgpu`)
 
-Use the workspace CLI crate `crates/wgpu_cli` (`gpui-wgpu`) to validate shaders, inspect layouts, test cross-compilation, and verify visual/compute output without spinning up a full UI window:
+Use the workspace CLI crate `crates/aphrody_cli` (`gpui-wgpu`) to validate shaders, inspect layouts, test cross-compilation, and verify visual/compute output without spinning up a full UI window:
 
 ```sh
 # 1. Inspect available hardware/software GPU adapters, PCI IDs, formats, limits & features
-cargo run -p wgpu_cli -- adapters --limits --features
+cargo run -p aphrody_cli -- adapters --limits --features
 
 # 2. Validate WGSL syntax, types, uniformity, entry points, and exact byte offsets/alignments
-cargo run -p wgpu_cli -- validate path/to/shader.wgsl
+cargo run -p aphrody_cli -- validate path/to/shader.wgsl
 
 # 3. Cross-compile WGSL to HLSL, Metal MSL, GLSL (or WebGL2 ES 300), or SPIR-V
-cargo run -p wgpu_cli -- transpile path/to/shader.wgsl --target hlsl
-cargo run -p wgpu_cli -- transpile path/to/shader.wgsl --target msl
-cargo run -p wgpu_cli -- transpile path/to/shader.wgsl --target glsl-webgl2 --stage fragment --entry fs_main
+cargo run -p aphrody_cli -- transpile path/to/shader.wgsl --target hlsl
+cargo run -p aphrody_cli -- transpile path/to/shader.wgsl --target msl
+cargo run -p aphrody_cli -- transpile path/to/shader.wgsl --target glsl-webgl2 --stage fragment --entry fs_main
 
 # 4. Render a fragment shader offscreen to a PNG for visual proof
-cargo run -p wgpu_cli -- render path/to/shader.wgsl -o out.png --width 800 --height 600 --time 0.5
+cargo run -p aphrody_cli -- render path/to/shader.wgsl -o out.png --width 800 --height 600 --time 0.5
 
 # 5. Execute a headless compute shader and inspect storage buffer output
-cargo run -p wgpu_cli -- compute path/to/compute.wgsl --workgroups 4,1,1 --output-floats 32
+cargo run -p aphrody_cli -- compute path/to/compute.wgsl --workgroups 4,1,1 --output-floats 32
 
 # 6. Benchmark adapter init, upload bandwidth, compute dispatch, and offscreen render throughput
-cargo run -p wgpu_cli -- bench --iterations 50 --size 1024
+cargo run -p aphrody_cli -- bench --iterations 50 --size 1024
 ```

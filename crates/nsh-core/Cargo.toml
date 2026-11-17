@@ -117,5 +117,5 @@ nsh-core = { workspace = true, features = ["shader"] }
 # The tests use `futures_util` directly.
 futures-util.workspace = true
 # The `unit_types` check reads the crate's public API.
-syn = { workspace = true, features = ["visit"] }
+syn = { workspace = true, features = ["full", "parsing", "visit"] }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "time"] }

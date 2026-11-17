@@ -97,20 +97,54 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    if (path === "/download" || path === "/download/") {
+    if (path === "/healthz" || path === "/api/health") {
+      return Response.json(
+        {
+          ok: true,
+          service: "aphrody-releases",
+          channels: [...VALID_CHANNELS],
+          r2_bucket: "aphrody-releases",
+        },
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    }
+    if (path === "/api/channels") {
+      return Response.json(
+        {
+          channels: [...VALID_CHANNELS],
+          latest_endpoint: "/api/releases/{channel}/latest",
+        },
+        { headers: { "Cache-Control": "public, max-age=60" } },
+      );
+    }
+    if (path === "/" || path === "/download" || path === "/download/") {
       return renderDownloadPortal(request);
     }
     if (path === "/install.sh") {
       const obj = await env.RELEASES_BUCKET.get("scripts/install.sh");
       return obj
-        ? new Response(obj.body, { headers: { "Content-Type": "text/x-shellscript; charset=utf-8" } })
-        : new Response("Installer unavailable\n", { status: 404 });
+        ? new Response(obj.body, {
+            headers: {
+              "Content-Type": "text/x-shellscript; charset=utf-8",
+              "Cache-Control": "public, max-age=300",
+            },
+          })
+        : new Response("Installer unavailable — run deploy to populate scripts/install.sh\n", {
+            status: 404,
+          });
     }
     if (path === "/install.ps1") {
       const obj = await env.RELEASES_BUCKET.get("scripts/install.ps1");
       return obj
-        ? new Response(obj.body, { headers: { "Content-Type": "text/plain; charset=utf-8" } })
-        : new Response("Installer unavailable\n", { status: 404 });
+        ? new Response(obj.body, {
+            headers: {
+              "Content-Type": "text/plain; charset=utf-8",
+              "Cache-Control": "public, max-age=300",
+            },
+          })
+        : new Response("Installer unavailable — run deploy to populate scripts/install.ps1\n", {
+            status: 404,
+          });
     }
 
     const assetMatch = /^\/releases\/([^/]+)\/([^/]+)\/asset$/.exec(path);

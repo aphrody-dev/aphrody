@@ -4,7 +4,7 @@ Single authoritative operating contract for agents working inside `<repo-root>` 
 
 ## Architecture & Product Stack
 
-- **Product**: `Aphrody` (`product.toml`, `crates/brand`, binary `aphrody` from `crates/zed`) uniting **GPUI**, **NSH** (`crates/nsh-*`), **gpui-kit**, **WGPU/Naga v30.0.0** (`vendor/wgpu`, `crates/gpui_wgpu`, `crates/wgpu_cli`), and **Bun** (`vendor/bun`) with **100% Zed ecosystem compatibility**.
+- **Product**: `Aphrody` (`product.toml`, `crates/brand`, binary `aphrody` from `crates/zed`) uniting **GPUI**, **NSH** (`crates/nsh-*`), **gpui-kit**, **WGPU/Naga v30.0.0** (`vendor/wgpu`, `crates/gpui_wgpu`, `crates/aphrody_cli`), and **Bun** (`vendor/bun`) with **100% Zed ecosystem compatibility**.
 - **Modularity boundaries**:
   - Keep `gpui_ui` free of `settings_content`, `cloud_llm_client`, and `language_model_core`.
   - Keep `gpui_code --no-default-features` free of `buffer_diff`, `language`, `rpc`, and `proto`.
@@ -17,7 +17,7 @@ Single authoritative operating contract for agents working inside `<repo-root>` 
 3. **README Line Guard**: Never remove lines 1–2 (`> [!IMPORTANT]` header) of root `README.md`.
 4. **Bun First for JS/TS**: Use `bun` (`bun test`, `bun check`, `bun fmt`, `bun build`) for all TypeScript/TSX/hook tooling — never `node`, `npm`, `npx`, or `tsc`.
 5. **Repo-Native Artifacts & Typed CLI Tooling Only**: Never store architecture plans, repeatable scripts, or guides inside `~/.gemini/antigravity-cli/brain/`, `%TEMP%`, or `/tmp`. Version architectural blueprints in [`docs/architecture/README.md`](../../../../docs/architecture/README.md) with repo-relative links, put repeatable workflows in [`tooling/bun/`](../../../../tooling/bun/) (exposed via root [`package.json`](../../../../package.json)) or `tooling/xtask/`, direct ephemeral outputs to gitignored `target/`, and enforce via `bun tooling/bun/repo-hygiene.ts`.
-6. **Reproducible Brand & Google Design Source of Truth**: Never hardcode product strings or ad-hoc color/motion values; consume `brand::*` + `os_ui::google_design` (`assets/os/google_design_tokens.toml`, anchored to `https://design.google/`) and run `cargo xtask brand check` + `bun run design:audit` after edits.
+6. **Reproducible Brand & Google Design Source of Truth**: Never hardcode product strings or ad-hoc color/motion values; consume `brand::*` + `aphrody_ui::google_design` (`assets/os/google_design_tokens.toml`, anchored to `https://design.google/`) and run `cargo xtask brand check` + `bun run design:audit` after edits.
 7. **GPU & Shader Pipeline**:
    - Validate WGSL with `gpui-wgpu validate` (`naga` v30) and test backends across Vulkan (`glslangValidator`, `spirv-val`), DirectX 12 (`dxc.exe` SM 6.x), and WebGPU.
    - Respect `COPY_BYTES_PER_ROW_ALIGNMENT = 256` on texture readbacks and D3D/Metal clip-space depth `[0, 1]`.

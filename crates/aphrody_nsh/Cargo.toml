@@ -1,0 +1,36 @@
+[package]
+name = "aphrody_nsh"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Unified Native Shell (nsh) Workspace integration for gpui_app_shell and zed: live TSX hot-reload preview, embedded GpuiCodeEditor native component, Google Design/Stitch, and Storytold Craft Studio."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_nsh.rs"
+doctest = false
+
+[features]
+default = ["studio"]
+design-stitch = ["dep:aphrody_design"]
+craft-studio = ["design-stitch", "dep:aphrody_craft"]
+studio = ["design-stitch", "craft-studio"]
+webview = ["gpui_ui/nsh-webview"]
+
+[dependencies]
+anyhow.workspace = true
+brand.workspace = true
+aphrody_craft = { workspace = true, features = ["studio"], optional = true }
+editor.workspace = true
+file_icons.workspace = true
+aphrody_design = { workspace = true, optional = true }
+gpui_ui = { workspace = true, features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }
+language.workspace = true
+log.workspace = true
+aphrody_ui.workspace = true
+serde_json.workspace = true
+util.workspace = true
+workspace.workspace = true

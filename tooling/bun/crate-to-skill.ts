@@ -7,7 +7,7 @@
  * to emit progressive-disclosure `SKILL.md` + `references/*.md` + optional `.well-known/agent-skills/index.json`.
  *
  * Usage:
- *   bun tooling/bun/crate-to-skill.ts --crate os_craft [--out target/skills] [--install-target .agents/skills]
+ *   bun tooling/bun/crate-to-skill.ts --crate aphrody_craft [--out target/skills] [--install-target .agents/skills]
  *   bun tooling/bun/crate-to-skill.ts --docsrs tokio [--out target/skills]
  */
 import { createHash } from "node:crypto";

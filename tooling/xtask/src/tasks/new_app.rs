@@ -168,8 +168,8 @@ gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell", features = ["
             r#"gpui_ui = {{ path = "{aphrody_path}/crates/gpui_ui", features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }}
 gpui_code = {{ path = "{aphrody_path}/crates/gpui_code", features = ["full"] }}
 gpui_app_shell = {{ path = "{aphrody_path}/crates/gpui_app_shell", features = ["studio"] }}
-craft_studio = {{ path = "{aphrody_path}/crates/craft_studio" }}
-os_ui = {{ path = "{aphrody_path}/crates/os_ui" }}"#
+aphrody_craft = {{ path = "{aphrody_path}/crates/aphrody_craft" }}
+aphrody_ui = {{ path = "{aphrody_path}/crates/aphrody_ui" }}"#
         ),
     };
 

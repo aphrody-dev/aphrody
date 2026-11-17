@@ -31,11 +31,11 @@ For a debug build of Aphrody Studio:
 cargo run -p zed
 ```
 
-Or for the local-first editor core (`--no-default-features`) or Aphrody GPUI OS shell (`os_desktop`):
+Or for the local-first editor core (`--no-default-features`) or Aphrody GPUI OS shell (`aphrody_desktop`):
 
 ```sh
 cargo run -p zed --no-default-features
-cargo run -p os_desktop --bin aphrody-os
+cargo run -p aphrody_desktop --bin aphrody-os
 ```
 
 And to run the workspace tests:

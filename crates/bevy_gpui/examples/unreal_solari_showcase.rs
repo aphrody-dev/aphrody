@@ -4,7 +4,7 @@ use bevy_gpui::{
     default_openpbr_materialx_xml, render_bevy_egui_inspector, render_viewport_rgba8,
 };
 use egui_gpui::EguiGpuiHost;
-use os_ui::AppearanceMode;
+use aphrody_ui::AppearanceMode;
 use serde_json::json;
 
 fn main() -> Result<()> {

@@ -12,7 +12,7 @@ Audited directly via [`tooling/bun/toolchain-audit.ts`](../../tooling/bun/toolch
 
 | Dimension | Live Observed State | Key Bottleneck / Action |
 | :--- | :--- | :--- |
-| **Workspace Scale** ([`Cargo.toml`](../../Cargo.toml)) | `302` members (`294` `crates/*`, `4` `extensions/*`, `4` `tooling/*`), `20` excluded `vendor/*`, `10` `default-members` | Switching between `gpui_ui`, `os_desktop`, `nsh-cli`, and `zed` triggers feature-unification rebuilds without `cargo-hakari` or `[resolver] feature-unification`. |
+| **Workspace Scale** ([`Cargo.toml`](../../Cargo.toml)) | `302` members (`294` `crates/*`, `4` `extensions/*`, `4` `tooling/*`), `20` excluded `vendor/*`, `10` `default-members` | Switching between `gpui_ui`, `aphrody_desktop`, `nsh-cli`, and `zed` triggers feature-unification rebuilds without `cargo-hakari` or `[resolver] feature-unification`. |
 | **`Cargo.lock` Footprint** ([`Cargo.lock`](../../Cargo.lock)) | `2,069` package entries across `1,804` unique crates; **`183` duplicated crate names** (`hashbrown` x5, `itertools` x5, `quick-xml` x5, `rand*` x5, `windows*` x5, `darling*` x4, `toml_edit` x4) | Deduplicate top offenders and unify features to cut duplicate LLVM bitcode & metadata emission. |
 | **Pinned Toolchain** ([`rust-toolchain.toml`](../../rust-toolchain.toml)) | `1.98.1` (`rustc 1.98.1 48a229cea`, LLVM `22.1.8`, `cargo 1.98.1`, `clippy 0.1.98`, `rustfmt 1.9.0-stable`); locally `1.100.0` (LLVM `23.1.5`) & `1.102.0-nightly` are also installed | `1.98.1` accepts `-Zthreads=8`, while `1.100.0+` / `1.102.0-nightly` deprecates `-Zthreads` in favor of `--jobs-frontend=8`. System LLVM (`clang`/`lld-link` `23.1.5`) matches `1.100.0`. |
 | **Active `.cargo/config.toml`** ([`.cargo/config.toml`](../../.cargo/config.toml)) | Sets `RUSTC_BOOTSTRAP = "1"`, `symbol-mangling-version=v0`, `--cfg tokio_unstable`, Windows `+crt-static`/`windows_slim_errors`, and `aarch64-unknown-linux-gnu` `-fuse-ld=lld` | Missing `x86_64-pc-windows-msvc` `lld`, `x86_64-unknown-linux-gnu` `mold`/`wild`, `build.build-dir` separation, `[cache] auto-clean-frequency`, and feature unification. |
@@ -60,7 +60,7 @@ Audited directly via [`tooling/bun/toolchain-audit.ts`](../../tooling/bun/toolch
 
 ### 2.2 Workspace Feature Unification (`cargo-hakari` vs `[resolver] feature-unification`)
 
-Without feature unification across 302 workspace members, Cargo recomputes dependency feature sets per command (`gpui_ui`, `os_desktop`, `nsh-cli`, `zed`, `--tests`), repeatedly rebuilding `nsh-core`, `gpui`, `tokio`, and `windows`/`windows-sys`:
+Without feature unification across 302 workspace members, Cargo recomputes dependency feature sets per command (`gpui_ui`, `aphrody_desktop`, `nsh-cli`, `zed`, `--tests`), repeatedly rebuilding `nsh-core`, `gpui`, `tokio`, and `windows`/`windows-sys`:
 
 - **Strategy A — Native `[resolver] feature-unification = "workspace"` (`-Zfeature-unification`, Cargo `#15157`)**:
   - Works immediately because [`.cargo/config.toml`](../../.cargo/config.toml) already sets `RUSTC_BOOTSTRAP = "1"`.
@@ -89,7 +89,7 @@ Without feature unification across 302 workspace members, Cargo recomputes depen
     cargo build -p zed --timings
     node script/cargo-timing-info.js target/cargo-timings/cargo-timing-*.html
     ```
-  - Use non-generic inner functions + `#[inline(never)]` boundaries behind thin generic wrappers in `gpui_ui` / `os_ui` / `settings_content`.
+  - Use non-generic inner functions + `#[inline(never)]` boundaries behind thin generic wrappers in `gpui_ui` / `aphrody_ui` / `settings_content`.
 
 ### 2.4 `build-dir` Separation, Cache GC & Fine-Grain Locking
 
@@ -171,7 +171,7 @@ Per fleet role separation ([`tooling/bun/fleet-sync.ts`](../../tooling/bun/fleet
   cargo fmt --all -- --check
   ```
 - **Targeted `cargo check` & Parallel Worktrees**:
-  - Bare `cargo check` uses the 10 `default-members` (`gpui_wgpu`, `gpui_web`, `gpui_ui`, `gpui_code`, `gpui_store`, `os_session`, `os_craft`, `os_ui`, `os_desktop`, `wgpu_cli`) instead of all 302 members.
+  - Bare `cargo check` uses the 10 `default-members` (`gpui_wgpu`, `gpui_web`, `gpui_ui`, `gpui_code`, `aphrody_store`, `aphrody_session`, `aphrody_craft`, `aphrody_ui`, `aphrody_desktop`, `aphrody_cli`) instead of all 302 members.
   - Use [`tooling/bun/worktree.ts`](../../tooling/bun/worktree.ts) (`bun run worktree:create -- --id <name>`) so parallel agents get separate `CARGO_TARGET_DIR` paths (`../target-worktrees/aphrody-<id>`) and never stall on Cargo file locks (`rust-lang/cargo#16804`).
 
 ### 4.2 Fast `clippy` & the `nsh-core` / `nsh-*` Lint Boundary
@@ -184,7 +184,7 @@ Per fleet role separation ([`tooling/bun/fleet-sync.ts`](../../tooling/bun/fleet
    - Passing `--release --all-targets --all-features` across 302 members forces LLVM release codegen/optimization passes for proc-macros, tests, benchmarks, and optional feature matrices simultaneously.
    - **Fast Local Inner Loop** (check modified crates without re-linting 1,800 upstream crates):
      ```sh
-     cargo clippy -p gpui_ui -p os_desktop --no-deps --all-targets -- -D warnings
+     cargo clippy -p gpui_ui -p aphrody_desktop --no-deps --all-targets -- -D warnings
      cargo shear --locked --deny-warnings
      ```
 2. **Audited `nsh-core` / `nsh-*` Lint Boundary Conflict**:
@@ -210,7 +210,7 @@ Per fleet role separation ([`tooling/bun/fleet-sync.ts`](../../tooling/bun/fleet
   ```sh
   rustup component add rustc-codegen-cranelift-preview --toolchain nightly
   CARGO_PROFILE_DEV_CODEGEN_BACKEND=cranelift \
-    cargo +nightly build -Zcodegen-backend -p gpui_ui -p os_desktop
+    cargo +nightly build -Zcodegen-backend -p gpui_ui -p aphrody_desktop
   ```
 - **Hybrid Profile (Cranelift for Workspace, LLVM for `opt-level = 3` Deps)**:
   ```toml
@@ -394,6 +394,6 @@ Extend [`.github/workflows/aphrody-upstream-sync.yml`](../../.github/workflows/a
 +    "toolchain:doctor": "bun tooling/bun/toolchain-audit.ts doctor",
 +    "toolchain:profile-diff": "bun tooling/bun/toolchain-audit.ts profile-diff",
 +    "toolchain:fork-plan": "bun tooling/bun/toolchain-audit.ts fork-plan",
-+    "clippy:fast": "cargo clippy -p gpui_ui -p gpui_code -p os_desktop --no-deps --all-targets -- -D warnings",
++    "clippy:fast": "cargo clippy -p gpui_ui -p gpui_code -p aphrody_desktop --no-deps --all-targets -- -D warnings",
      "test:tooling": "bun test tooling/bun"
 ```

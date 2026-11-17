@@ -10,17 +10,17 @@
 https://github.com/zed-industries/awesome-gpui (README.md + gh api graphql)
         │
         ▼  bun run tooling/bun/awesome-gpui-store.ts sync
-assets/os/awesome_gpui_store.toml   (bundled via include_str! in gpui_store)
+assets/os/awesome_gpui_store.toml   (bundled via include_str! in aphrody_store)
         │
-        ├──▶ crates/gpui_store/src/gpui_store.rs  (AwesomeGpuiCatalog + upt 0.9.0 OS resolver)
-        ├──▶ crates/gpui_store/src/nsh_store.rs   (STORE_NSH_TSX + StoreNshRoot + os_ui/GPUI view)
-        └──▶ crates/gpui_store/src/packagers.rs & tooling/bun/awesome-gpui-store.ts
+        ├──▶ crates/aphrody_store/src/aphrody_store.rs  (AwesomeGpuiCatalog + upt 0.9.0 OS resolver)
+        ├──▶ crates/aphrody_store/src/nsh_store.rs   (STORE_NSH_TSX + StoreNshRoot + aphrody_ui/GPUI view)
+        └──▶ crates/aphrody_store/src/packagers.rs & tooling/bun/awesome-gpui-store.ts
                  └── 22 Target Store, Distro, Mobile, Browser & OCI Manifests
 ```
 
 - **Live Catalog**: [`assets/os/awesome_gpui_store.toml`](../../assets/os/awesome_gpui_store.toml) merges first-party identity metadata from [`product.toml`](../../product.toml) (`aphrody`, `aphrody-os`, `gpui-store`) with every entry parsed from live `zed-industries/awesome-gpui` and enriched via batched `gh api graphql` queries (stars, SPDX license, default branch, topics, archive state, and `HEAD:Cargo.toml` crate/version/binary inspection).
 - **Bun Automation CLI**: [`tooling/bun/awesome-gpui-store.ts`](../../tooling/bun/awesome-gpui-store.ts) provides `sync`, `list`, `package`, and `verify`, backed by unit/integration tests in [`tooling/bun/awesome-gpui-store.test.ts`](../../tooling/bun/awesome-gpui-store.test.ts).
-- **Rust Store Crate**: [`crates/gpui_store/Cargo.toml`](../../crates/gpui_store/Cargo.toml) (`gpui_store`) runs natively on Windows/macOS/Linux desktop, `wasm32-unknown-unknown` WebGPU, and iOS/Android mobile surfaces.
+- **Rust Store Crate**: [`crates/aphrody_store/Cargo.toml`](../../crates/aphrody_store/Cargo.toml) (`aphrody_store`) runs natively on Windows/macOS/Linux desktop, `wasm32-unknown-unknown` WebGPU, and iOS/Android mobile surfaces.
 
 ---
 
@@ -48,7 +48,7 @@ Each `[[entries]]` table defines:
 
 ## 3. All 22 Store, Distro, Mobile, Browser & OCI Packaging Targets
 
-Generated deterministically by both [`crates/gpui_store/src/packagers.rs`](../../crates/gpui_store/src/packagers.rs) and [`tooling/bun/awesome-gpui-store.ts`](../../tooling/bun/awesome-gpui-store.ts):
+Generated deterministically by both [`crates/aphrody_store/src/packagers.rs`](../../crates/aphrody_store/src/packagers.rs) and [`tooling/bun/awesome-gpui-store.ts`](../../tooling/bun/awesome-gpui-store.ts):
 
 | Target Slug | Ecosystem | Generated Artifacts |
 | :--- | :--- | :--- |
@@ -83,7 +83,7 @@ Live versions verified against `crates.io`:
 
 | Crate | Verified Version | Role in Aphrody Store Ecosystem |
 | :--- | :--- | :--- |
-| **`upt`** ([`sigoden/upt`](https://github.com/sigoden/upt)) | `0.9.0` | **Wired directly into `gpui_store`** (`upt.workspace = true`). Lightweight zero-bloat runtime command translator (`upt::{detect_os, detect_vendor, init_vendor, Vendor}`) mapping `install`/`remove`/`upgrade`/`search`/`info`/`update`/`list` cleanly across 28 OS vendors (`apk`, `apt`, `brew`, `cards`, `choco`, `dnf`, `emerge`, `eopkg`, `flatpak`, `guix`, `nala`, `nix-env`, `opkg`, `pacman`, `pkg`, `pkg(termux)`, `pkgman`, `prt-get`, `scoop`, `slackpkg`, `snap`, `upt`, `urpm`, `winget`, `xbps`, `yay`, `yum`, `zypper`). |
+| **`upt`** ([`sigoden/upt`](https://github.com/sigoden/upt)) | `0.9.0` | **Wired directly into `aphrody_store`** (`upt.workspace = true`). Lightweight zero-bloat runtime command translator (`upt::{detect_os, detect_vendor, init_vendor, Vendor}`) mapping `install`/`remove`/`upgrade`/`search`/`info`/`update`/`list` cleanly across 28 OS vendors (`apk`, `apt`, `brew`, `cards`, `choco`, `dnf`, `emerge`, `eopkg`, `flatpak`, `guix`, `nala`, `nix-env`, `opkg`, `pacman`, `pkg`, `pkg(termux)`, `pkgman`, `prt-get`, `scoop`, `slackpkg`, `snap`, `upt`, `urpm`, `winget`, `xbps`, `yay`, `yum`, `zypper`). |
 | **`metapac`** ([`ripytide/metapac`](https://github.com/ripytide/metapac)) | `0.10.3` | Declarative multi-package-manager sync CLI/tool useful for reproducible workstation provisioning alongside `upt`. |
 | **`cargo-packager`** ([`crabnebula-dev/cargo-packager`](https://github.com/crabnebula-dev/cargo-packager)) | `0.11.8` | End-to-end Rust binary bundler emitting DMG, NSIS/WiX MSI, AppImage, `.deb`, and Pacman archives directly from compiled binaries (complements [`cross-compile-and-depot-tools.md`](./cross-compile-and-depot-tools.md) and [`production-guide.md`](./production-guide.md)). |
 | **`rpm`** ([`rpm-rs/rpm`](https://github.com/rpm-rs/rpm)) | `0.30.2` | Pure-Rust RPM archive reader/builder library without needing host `rpmbuild`. |
@@ -94,11 +94,11 @@ Live versions verified against `crates.io`:
 
 ## 5. NSH + GPUI Cross-Platform Store UI
 
-Implemented in [`crates/gpui_store/src/nsh_store.rs`](../../crates/gpui_store/src/nsh_store.rs):
+Implemented in [`crates/aphrody_store/src/nsh_store.rs`](../../crates/aphrody_store/src/nsh_store.rs):
 
 - **`STORE_NSH_TSX`**: Portable NSH TSX application using `"nsh"` (`signal`, `computed`, `host`, `mount`, `View`, `Text`, `Scroll`), `"nsh/base"` (`Button`, `Input`), global `<Each>` / `<If>`, and `env(safe-area-inset-*)` mobile/desktop/web padding. Compiles cleanly via `nsh_bundler::compile_module` under `nsh-dev`.
 - **`StoreNshRoot`**: Native Rust `#[component]` reactive tree built with `nsh_core` + `nsh_base` (`button`, `theme`, `input`, `scroll`, `each`), mountable via `store_nsh_root()` or desktop `mount_store_nsh_surface` (`gpui_ui::nsh::AppView` with live GPUI theme sync and `package_preview` / `upt_command` host handlers).
-- **`render_store_window`**: Adaptive `gpui` + `os_ui` Store interface using `AdaptiveViewport` (`Compact` / `Medium` / `Expanded`), `render_nav_rail`, category & 22-target filter chips, live `upt` host detection badge, compatibility matrix, and `ImmediateUi` manifest preview/export inspector.
+- **`render_store_window`**: Adaptive `gpui` + `aphrody_ui` Store interface using `AdaptiveViewport` (`Compact` / `Medium` / `Expanded`), `render_nav_rail`, category & 22-target filter chips, live `upt` host detection badge, compatibility matrix, and `ImmediateUi` manifest preview/export inspector.
 
 ---
 
@@ -122,5 +122,5 @@ bun test tooling/bun/awesome-gpui-store.test.ts
 ```
 
 Coordinator wiring for root `Cargo.toml`:
-- `[workspace].members`: add `"crates/gpui_store"`
-- `[workspace.dependencies]`: add `gpui_store = { path = "crates/gpui_store" }` and `upt = "0.9.0"`
+- `[workspace].members`: add `"crates/aphrody_store"`
+- `[workspace.dependencies]`: add `aphrody_store = { path = "crates/aphrody_store" }` and `upt = "0.9.0"`

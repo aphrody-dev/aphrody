@@ -14,7 +14,7 @@ This directory provides working, production-grade examples demonstrating the Web
 | **`package.json`** | Zero-dependency Bun package setup with `@webgpu/types` (`^0.1.74`). |
 | **`tsconfig.json`** | Strict TypeScript configuration including `["bun", "@webgpu/types"]`. |
 | **`verify.ps1`** | End-to-end PowerShell automated test script executing typechecking, inspection, multi-target transpilation, and headless rendering/compute. |
-| **`crates/wgpu_cli/examples/webgpu_naga_pipeline.rs`** | Complete Rust example demonstrating Naga IR validation, multi-target transpilation (WGSL, SPIR-V, HLSL, MSL, GLSL ES 300), headless render to PNG, and storage buffer compute dispatch. |
+| **`crates/aphrody_cli/examples/webgpu_naga_pipeline.rs`** | Complete Rust example demonstrating Naga IR validation, multi-target transpilation (WGSL, SPIR-V, HLSL, MSL, GLSL ES 300), headless render to PNG, and storage buffer compute dispatch. |
 
 ---
 

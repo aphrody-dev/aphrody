@@ -77,7 +77,7 @@ Aphrody targets three complementary WebAssembly ABIs documented across [`rust-to
 
 | Dimension | `wasm32-unknown-unknown` (Aphrody Browser UI) | `wasm32-wasip2` (Aphrody Extensions) | `wasm32-unknown-emscripten` (C/C++ POSIX & Emscripten) |
 | :--- | :--- | :--- | :--- |
-| **Primary Aphrody Crates** | [`gpui_web`](../../crates/gpui_web/Cargo.toml), `os_desktop`, `nsh-platform-web`, `gpui_wgpu` | [`extension_host`](../../crates/extension_host/Cargo.toml) (Wasmtime `48.0.7`), `extension_api` (WIT) | [`nsh-core`](../../crates/nsh-core/Cargo.toml#L99-L100) (`target_os = "emscripten"`), [`wgpu-core-deps-emscripten`](../../vendor/wgpu/wgpu-core/platform-deps/emscripten/Cargo.toml) |
+| **Primary Aphrody Crates** | [`gpui_web`](../../crates/gpui_web/Cargo.toml), `aphrody_desktop`, `nsh-platform-web`, `gpui_wgpu` | [`extension_host`](../../crates/extension_host/Cargo.toml) (Wasmtime `48.0.7`), `extension_api` (WIT) | [`nsh-core`](../../crates/nsh-core/Cargo.toml#L99-L100) (`target_os = "emscripten"`), [`wgpu-core-deps-emscripten`](../../vendor/wgpu/wgpu-core/platform-deps/emscripten/Cargo.toml) |
 | **Standard C Library (`libc`)** | None (pure Rust `std` stub + JS bindings) | WASI Preview 2 component model + `wasi-libc` | Full POSIX/musl `libc` (`emscripten-core/musl`), `cfg(unix)`, signals, pthreads, virtual FS |
 | **JS / Host Bindings** | `wasm-bindgen 0.2.129` + `web-sys` / `js-sys` | Canonical ABI / `wit-bindgen` host imports | Embind (`bind.h` link-time invokers in 7.0.1), `EM_JS`, `EM_ASM`, `ccall`/`cwrap`, `WebIDL Binder` |
 | **WebGPU API Bridge** | Browser `navigator.gpu` via `wgpu` -> `web-sys` | Host-mediated WIT GPU/UI capability | **Emdawnwebgpu** (`--use-port=emdawnwebgpu`, `<webgpu/webgpu.h>`, replacing removed `-sUSE_WEBGPU`) |
@@ -85,7 +85,7 @@ Aphrody targets three complementary WebAssembly ABIs documented across [`rust-to
 | **Threads & Shared Memory** | Opt-in `wasm_thread` (`target-feature=+atomics`, COOP/COEP) | Host thread pool outside guest sandbox | `-pthread -sPTHREAD_POOL_SIZE=...` (COOP/COEP `SharedArrayBuffer`) or `-sWASM_WORKERS` |
 | **Linker & Optimizer** | `rust-lld` + `wasm-bindgen` + Binaryen `wasm-opt -Oz` | `wasm-tools component` + Wasmtime Cranelift | `emcc` -> `wasm-ld` (LLVM `24`) + Binaryen `wasm-opt` + Closure (`--closure=1`) |
 
-> **When to choose Emscripten in Aphrody**: Reach for Emscripten only when integrating C/C++ libraries that require POSIX `libc`, C++ exceptions/RTTI, `pthreads`, virtual POSIX filesystems (`MEMFS`/`IDBFS`), or native C/C++ `webgpu.h` libraries (via Emdawnwebgpu). Keep pure-Rust Aphrody UI/apps (`os_desktop`, `gpui_web`, `nsh-platform-web`) on `wasm32-unknown-unknown` via [`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts) and sandboxed IDE plugins on `wasm32-wasip2`.
+> **When to choose Emscripten in Aphrody**: Reach for Emscripten only when integrating C/C++ libraries that require POSIX `libc`, C++ exceptions/RTTI, `pthreads`, virtual POSIX filesystems (`MEMFS`/`IDBFS`), or native C/C++ `webgpu.h` libraries (via Emdawnwebgpu). Keep pure-Rust Aphrody UI/apps (`aphrody_desktop`, `gpui_web`, `nsh-platform-web`) on `wasm32-unknown-unknown` via [`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts) and sandboxed IDE plugins on `wasm32-wasip2`.
 
 ---
 

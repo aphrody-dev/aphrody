@@ -66,18 +66,10 @@
 	path = vendor/tauri/wry
 	url = ../../aphrody-labs/wry.git
 	branch = dev
-[submodule "vendor/tauri/tao"]
-	path = vendor/tauri/tao
-	url = ../../aphrody-labs/tao.git
-	branch = dev
 [submodule "vendor/tauri/cef-rs"]
 	path = vendor/tauri/cef-rs
 	url = ../../aphrody-labs/cef-rs.git
 	branch = dev
-[submodule "vendor/tauri/plugins-workspace"]
-	path = vendor/tauri/plugins-workspace
-	url = ../../aphrody-labs/plugins-workspace.git
-	branch = v3
 [submodule "vendor/libcosmic"]
 	path = vendor/libcosmic
 	url = ../../aphrody-labs/libcosmic.git
@@ -90,63 +82,15 @@
 	path = vendor/smithay
 	url = ../../aphrody-labs/smithay.git
 	branch = master
-[submodule "vendor/cosmic/cosmic-session"]
-	path = vendor/cosmic/cosmic-session
-	url = ../../aphrody-labs/cosmic-session.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-comp"]
-	path = vendor/cosmic/cosmic-comp
-	url = ../../aphrody-labs/cosmic-comp.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-panel"]
-	path = vendor/cosmic/cosmic-panel
-	url = ../../aphrody-labs/cosmic-panel.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-launcher"]
-	path = vendor/cosmic/cosmic-launcher
-	url = ../../aphrody-labs/cosmic-launcher.git
-	branch = master
-[submodule "vendor/cosmic/pop-launcher"]
-	path = vendor/cosmic/pop-launcher
-	url = ../../aphrody-labs/pop-launcher.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-settings"]
-	path = vendor/cosmic/cosmic-settings
-	url = ../../aphrody-labs/cosmic-settings.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-files"]
-	path = vendor/cosmic/cosmic-files
-	url = ../../aphrody-labs/cosmic-files.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-term"]
-	path = vendor/cosmic/cosmic-term
-	url = ../../aphrody-labs/cosmic-term.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-edit"]
-	path = vendor/cosmic/cosmic-edit
-	url = ../../aphrody-labs/cosmic-edit.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-store"]
-	path = vendor/cosmic/cosmic-store
-	url = ../../aphrody-labs/cosmic-store.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-workspaces-epoch"]
-	path = vendor/cosmic/cosmic-workspaces-epoch
-	url = ../../aphrody-labs/cosmic-workspaces-epoch.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-notifications"]
-	path = vendor/cosmic/cosmic-notifications
-	url = ../../aphrody-labs/cosmic-notifications.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-osd"]
-	path = vendor/cosmic/cosmic-osd
-	url = ../../aphrody-labs/cosmic-osd.git
-	branch = master
-[submodule "vendor/cosmic/cosmic-icons"]
-	path = vendor/cosmic/cosmic-icons
-	url = ../../aphrody-labs/cosmic-icons.git
-	branch = master
 [submodule "vendor/ayvpn"]
 	path = vendor/ayvpn
 	url = ../ayvpn.git
+	branch = main
+[submodule "vendor/new-cli-installer"]
+	path = vendor/new-cli-installer
+	url = ../../aphrody-labs/New-Cli-Installer.git
+	branch = master
+[submodule "vendor/browser"]
+	path = vendor/browser
+	url = ../../aphrody-labs/browser.git
 	branch = main

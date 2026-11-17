@@ -2,7 +2,7 @@
 //! and Craft Studio immediate-mode controls styled with Google Design Material 3 Expressive tokens.
 //!
 //! Aligns `egui` onto the monorepo's `vendor/wgpu` v30, `vendor/accesskit` 0.25, and
-//! [`os_ui::GoogleDesignTokens`] (`https://design.google/` Material 3 Expressive) without requiring
+//! [`aphrody_ui::GoogleDesignTokens`] (`https://design.google/` Material 3 Expressive) without requiring
 //! a secondary `winit` event loop inside GPUI windows.
 
 pub mod craft_controls;

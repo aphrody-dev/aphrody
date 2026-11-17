@@ -10,7 +10,7 @@ This directory documents the Vulkan graphics and compute architecture, compilati
 
 1. **`gpui_wgpu`**: High-level UI surface rendering and glyph composition via WGPU's hardware abstraction layer.
 2. **`vendor/wgpu/wgpu-hal/src/vulkan`**: Low-overhead Rust translation layer dynamically dispatching to the Vulkan driver via `ash` (`0.38`) and suballocating memory blocks with `gpu-allocator` (`0.28`).
-3. **`crates/wgpu_cli` (`gpui-wgpu`)**: Hardware diagnostic, shader validation, cross-compilation, and offscreen compute benchmarking CLI.
+3. **`crates/aphrody_cli` (`gpui-wgpu`)**: Hardware diagnostic, shader validation, cross-compilation, and offscreen compute benchmarking CLI.
 
 ```
 +-----------------------------------------------------------+

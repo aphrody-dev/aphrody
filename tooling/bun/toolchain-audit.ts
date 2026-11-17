@@ -449,7 +449,7 @@ export function analyzeProfiles(
         current: "Only aarch64-unknown-linux-gnu specifies -fuse-ld=lld; x86_64 falls back to GNU ld",
         recommended: '[target.x86_64-unknown-linux-gnu] rustflags = ["-C", "link-arg=-fuse-ld=mold"] (or wild / lld)',
         rationale:
-          "GNU ld is single-threaded and dominates incremental relinks of `zed` and `os_desktop` on Linux hosts (`fr1`/`fr2`).",
+          "GNU ld is single-threaded and dominates incremental relinks of `zed` and `aphrody_desktop` on Linux hosts (`fr1`/`fr2`).",
       });
     }
 
@@ -488,7 +488,7 @@ export function analyzeProfiles(
         current: `No workspace-hack crate and no [resolver] feature-unification across ${members.length} workspace members`,
         recommended: "Generate `crates/workspace-hack` via `cargo hakari` (or enable `[resolver] feature-unification = \"workspace\"` with RUSTC_BOOTSTRAP=1)",
         rationale:
-          "Without unified features, switching between `-p gpui_ui`, `-p os_desktop`, `-p nsh-cli`, and `-p zed` re-compiles shared crates (`tokio`, `syn`, `taffy`, `wgpu`, `windows`) under differing feature bitsets.",
+          "Without unified features, switching between `-p gpui_ui`, `-p aphrody_desktop`, `-p nsh-cli`, and `-p zed` re-compiles shared crates (`tokio`, `syn`, `taffy`, `wgpu`, `windows`) under differing feature bitsets.",
       });
     }
 
@@ -609,7 +609,7 @@ export function auditWorkspaceHotspots(root = repoRoot): WorkspaceHotspotReport 
     {
       crateName: "nsh-core",
       variants: ["default=[] (apps/gpui_ui)", "features=[declarations,websocket,updater] (nsh-cli)", "features=[shader] (dev-deps)"],
-      impact: "Rebuilds nsh-core + optional naga/resvg/rustls trees when switching between os_desktop, gpui_ui, and nsh-cli",
+      impact: "Rebuilds nsh-core + optional naga/resvg/rustls trees when switching between aphrody_desktop, gpui_ui, and nsh-cli",
     },
     {
       crateName: "gpui",
@@ -791,7 +791,7 @@ export function buildForkPlan(options?: {
       buildCommand: "cargo build --manifest-path vendor/toolchain/wild/Cargo.toml --release --bin wild",
       verificationGates: [
         "cargo test --manifest-path vendor/toolchain/wild/Cargo.toml",
-        "hyperfine link time benchmark on `zed` / `os_desktop` (fr1)",
+        "hyperfine link time benchmark on `zed` / `aphrody_desktop` (fr1)",
       ],
     },
     {
@@ -1159,7 +1159,7 @@ channel = "1.100.0" # or retain "1.98.1" for strict upstream zed-industries/zed 
   "toolchain:doctor": "bun tooling/bun/toolchain-audit.ts doctor",
   "toolchain:profile-diff": "bun tooling/bun/toolchain-audit.ts profile-diff",
   "toolchain:fork-plan": "bun tooling/bun/toolchain-audit.ts fork-plan",
-  "clippy:fast": "cargo clippy -p gpui_ui -p gpui_code -p os_desktop --no-deps --all-targets -- -D warnings",
+  "clippy:fast": "cargo clippy -p gpui_ui -p gpui_code -p aphrody_desktop --no-deps --all-targets -- -D warnings",
   "test:nextest": "cargo nextest run --workspace"
 }`,
   };

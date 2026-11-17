@@ -1,6 +1,6 @@
 # WGPU & Naga in aphrody (v30.0.0)
 
-> Pure-Rust WebGPU graphics/compute stack (`wgpu` v30.0.0, rev `cddb2f5d80dc0009b2ef6767635140cacf90a007`) and `naga` v30.0.0 shader compiler vendored in `vendor/wgpu`, driving GPU UI rendering in `crates/gpui_wgpu`, live WGSL shader views/effects/transitions in `crates/nsh-core` + `crates/nsh-engine`, and CLI diagnostics/transpilation/headless execution in `crates/wgpu_cli` (`gpui-wgpu`).
+> Pure-Rust WebGPU graphics/compute stack (`wgpu` v30.0.0, rev `cddb2f5d80dc0009b2ef6767635140cacf90a007`) and `naga` v30.0.0 shader compiler vendored in `vendor/wgpu`, driving GPU UI rendering in `crates/gpui_wgpu`, live WGSL shader views/effects/transitions in `crates/nsh-core` + `crates/nsh-engine`, and CLI diagnostics/transpilation/headless execution in `crates/aphrody_cli` (`gpui-wgpu`).
 
 ## Core Facts & Revision Invariants
 
@@ -40,14 +40,14 @@
 - [crates/nsh-core/src/shader.rs](../../crates/nsh-core/src/shader.rs): App-authored `fn shade(uv: vec2f) -> vec4f` compiler. Validates user source via `naga`, forbids user resource bindings/entry points, reflects `struct Uniforms` offsets/types, detects `nsh.time` animation and `sample_content`/`sample_backdrop`/`sample_from`/`sample_to` dependencies, wraps with `nsh_vertex` + `nsh_fragment`, and optionally cross-compiles to GLSL ES 300 for WebGL2.
 - [crates/nsh-engine/src/shader.rs](../../crates/nsh-engine/src/shader.rs): Non-blocking offscreen WGPU renderer (`Renderer` + per-view `ShaderView`) with double-buffered `MAP_READ` staging readback (`IDLE` -> `MAPPING` -> `MAPPED`), `MemoryHints::MemoryUsage`, 65,536 `max_non_sampler_bindings` cap for DX12 heap sizing, and zero-copy Apple `IOSurface` rendering.
 
-## CLI Tool (`gpui-wgpu` in `crates/wgpu_cli`)
+## CLI Tool (`gpui-wgpu` in `crates/aphrody_cli`)
 
-- `cargo run -p wgpu_cli -- adapters [--backends all|vulkan|dx12|metal|gl] [--limits] [--features] [--json]`: Enumerates physical/software GPU adapters, PCI IDs, driver info, subgroup sizes, downlevel capabilities, texture format support, features, and limits.
-- `cargo run -p wgpu_cli -- validate <shader.wgsl> [--json]`: Parses and validates WGSL via `naga`, emits source-span diagnostics on failure, and reflects entry points, workgroup sizes, `@group`/`@binding` globals, address spaces, struct layouts (`Layouter`), overrides, and immediates.
-- `cargo run -p wgpu_cli -- transpile <shader.wgsl> --target <wgsl|glsl|glsl-webgl2|hlsl|msl|spv> [--stage vertex|fragment|compute] [--entry <name>] [-o <out>]`: Cross-compiles validated WGSL to HLSL, Metal MSL, Desktop/ES/WebGL2 GLSL, canonical WGSL, or SPIR-V binary.
-- `cargo run -p wgpu_cli -- render <shader.wgsl> -o <output.png> [--width 800] [--height 600] [--time 0.0] [--entry fs_main]`: Headless offscreen fullscreen render with optional `@group(0) @binding(0)` uniform `{ resolution: vec2<f32>, time: f32, _pad: f32 }`, 256-byte row alignment stripping, and PNG export.
-- `cargo run -p wgpu_cli -- compute <shader.wgsl> [--entry main] [--workgroups 1,1,1] [--output-floats 64] [--json]`: Headless WGSL compute dispatch with `@group(0) @binding(0)` `read_write` storage buffer and `MAP_READ` staging readback.
-- `cargo run -p wgpu_cli -- bench [--iterations 50] [--size 1024] [--json]`: Measures GPU adapter/device startup latency, `queue.write_buffer` upload bandwidth (GB/s), compute dispatch latency, and offscreen render pass throughput.
+- `cargo run -p aphrody_cli -- adapters [--backends all|vulkan|dx12|metal|gl] [--limits] [--features] [--json]`: Enumerates physical/software GPU adapters, PCI IDs, driver info, subgroup sizes, downlevel capabilities, texture format support, features, and limits.
+- `cargo run -p aphrody_cli -- validate <shader.wgsl> [--json]`: Parses and validates WGSL via `naga`, emits source-span diagnostics on failure, and reflects entry points, workgroup sizes, `@group`/`@binding` globals, address spaces, struct layouts (`Layouter`), overrides, and immediates.
+- `cargo run -p aphrody_cli -- transpile <shader.wgsl> --target <wgsl|glsl|glsl-webgl2|hlsl|msl|spv> [--stage vertex|fragment|compute] [--entry <name>] [-o <out>]`: Cross-compiles validated WGSL to HLSL, Metal MSL, Desktop/ES/WebGL2 GLSL, canonical WGSL, or SPIR-V binary.
+- `cargo run -p aphrody_cli -- render <shader.wgsl> -o <output.png> [--width 800] [--height 600] [--time 0.0] [--entry fs_main]`: Headless offscreen fullscreen render with optional `@group(0) @binding(0)` uniform `{ resolution: vec2<f32>, time: f32, _pad: f32 }`, 256-byte row alignment stripping, and PNG export.
+- `cargo run -p aphrody_cli -- compute <shader.wgsl> [--entry main] [--workgroups 1,1,1] [--output-floats 64] [--json]`: Headless WGSL compute dispatch with `@group(0) @binding(0)` `read_write` storage buffer and `MAP_READ` staging readback.
+- `cargo run -p aphrody_cli -- bench [--iterations 50] [--size 1024] [--json]`: Measures GPU adapter/device startup latency, `queue.write_buffer` upload bandwidth (GB/s), compute dispatch latency, and offscreen render pass throughput.
 
 ## Detailed Reference Documentation
 

@@ -1,0 +1,48 @@
+[package]
+name = "aphrody_vpn"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Native GPUI VPN client for the Aphrody VPN daemon: tunnel state, location, account and settings, as a gpui_app_shell module."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_vpn.rs"
+doctest = false
+
+[[bin]]
+name = "aphrody-vpn"
+path = "src/main.rs"
+
+[[example]]
+name = "vpn_screenshot"
+path = "examples/vpn_screenshot.rs"
+
+[features]
+default = ["nsh"]
+nsh = ["gpui_app_shell/nsh"]
+
+[dependencies]
+anyhow.workspace = true
+dirs.workspace = true
+ayvpn-daemon.workspace = true
+futures.workspace = true
+gpui.workspace = true
+gpui_app_shell.workspace = true
+gpui_tokio.workspace = true
+gpui_ui.workspace = true
+log.workspace = true
+util.workspace = true
+workspace.workspace = true
+
+[dev-dependencies]
+assets.workspace = true
+brand.workspace = true
+gpui = { workspace = true, features = ["test-support"] }
+gpui_platform = { workspace = true, features = ["test-support"] }
+gpui_ui = { workspace = true, features = ["test-support"] }
+gpui_wgpu = { workspace = true, features = ["test-support"] }
+image.workspace = true

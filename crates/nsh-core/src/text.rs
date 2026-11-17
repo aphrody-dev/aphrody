@@ -2167,10 +2167,50 @@ mod tests {
         );
     }
 
+    fn ttf_to_uncompressed_woff1(ttf: &[u8]) -> Vec<u8> {
+        let num_tables = u16::from_be_bytes([ttf[4], ttf[5]]) as usize;
+        let flavor = &ttf[0..4];
+        let dir_offset = 44;
+        let mut out = Vec::with_capacity(ttf.len() + 64);
+        // Header (44 bytes), totalLength filled at the end.
+        out.extend_from_slice(b"wOFF");
+        out.extend_from_slice(flavor);
+        out.extend_from_slice(&0u32.to_be_bytes());
+        out.extend_from_slice(&(num_tables as u16).to_be_bytes());
+        out.extend_from_slice(&0u16.to_be_bytes());
+        out.extend_from_slice(&(ttf.len() as u32).to_be_bytes());
+        out.extend_from_slice(&[0u8; 24]);
+        let mut next_data_offset = dir_offset + num_tables * 20;
+        let mut tables = Vec::with_capacity(num_tables);
+        for i in 0..num_tables {
+            let rec = 12 + i * 16;
+            let tag = &ttf[rec..rec + 4];
+            let csum = &ttf[rec + 4..rec + 8];
+            let orig_off = u32::from_be_bytes(ttf[rec + 8..rec + 12].try_into().expect("4 bytes")) as usize;
+            let orig_len = u32::from_be_bytes(ttf[rec + 12..rec + 16].try_into().expect("4 bytes")) as usize;
+            let aligned_len = (orig_len + 3) & !3;
+            out.extend_from_slice(tag);
+            out.extend_from_slice(&(next_data_offset as u32).to_be_bytes());
+            out.extend_from_slice(&(orig_len as u32).to_be_bytes());
+            out.extend_from_slice(&(orig_len as u32).to_be_bytes());
+            out.extend_from_slice(csum);
+            next_data_offset += aligned_len;
+            tables.push((orig_off, orig_len, aligned_len));
+        }
+        for (off, len, aligned_len) in tables {
+            out.extend_from_slice(&ttf[off..off + len]);
+            out.resize(out.len() + (aligned_len - len), 0);
+        }
+        let total = out.len() as u32;
+        out[8..12].copy_from_slice(&total.to_be_bytes());
+        out
+    }
+
     #[test]
     fn woff_and_woff2_fonts_decompress_to_the_font_they_hold() {
         let ttf: &[u8] =
-            include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.ttf");
+            include_bytes!("../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf");
+        let woff1 = ttf_to_uncompressed_woff1(ttf);
         let face = |data: &[u8]| {
             let face = ttf_parser::Face::parse(data, 0).expect("a font");
             let family = face
@@ -2185,8 +2225,8 @@ mod tests {
         // TrueType comes back as it is.
         assert!(matches!(font_data(ttf), Ok(std::borrow::Cow::Borrowed(_))));
         for wrapped in [
-            &include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff")[..],
-            &include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff2")[..],
+            woff1.as_slice(),
+            &include_bytes!("../../nsh-testing/tests/testing/fonts/Pacifico-Regular.woff2")[..],
         ] {
             let data = font_data(wrapped).expect("decompressed");
             assert_eq!(face(&data), original);
@@ -2195,7 +2235,7 @@ mod tests {
         assert_eq!(font_family(ttf).as_deref(), Ok("Pacifico"));
         assert_eq!(
             font_family(include_bytes!(
-                "../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff2"
+                "../../nsh-testing/tests/testing/fonts/Pacifico-Regular.woff2"
             ))
             .as_deref(),
             Ok("Pacifico")

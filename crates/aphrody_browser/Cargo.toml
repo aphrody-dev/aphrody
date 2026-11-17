@@ -1,0 +1,32 @@
+[package]
+name = "aphrody_browser"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Complete Chromium //ui/views browser in GPUI fused with ayvpn per-tab WireGuard/Mullvad routing, anomalyco/browse real-browser MCP relay, Kitesurf/Servo/Blink escalation, and the Full WebGPU OS (ai-os + cloudflare-os + nysh)."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_browser.rs"
+doctest = false
+
+[features]
+default = ["gpui-views"]
+gpui-views = ["dep:gpui", "dep:aphrody_ui", "dep:ui"]
+vpn-daemon = ["dep:aphrody_vpn"]
+
+[dependencies]
+aphrody_ui = { workspace = true, optional = true }
+aphrody_vpn = { workspace = true, optional = true }
+browser-browse.workspace = true
+browser-detect.workspace = true
+browser-engine.workspace = true
+browser-views.workspace = true
+browser-vpn.workspace = true
+gpui = { workspace = true, optional = true }
+serde = { workspace = true, features = ["derive"] }
+ui = { workspace = true, optional = true }
+url.workspace = true

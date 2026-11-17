@@ -1,6 +1,6 @@
 # AI OS Pilot Command & MCP Surface
 
-Every `desktop_*` tool runs identically in-process via `os_craft` MCP (`/mcp` HTTP or stdio JSON-RPC) and CLI (`aphrody-os pilot <op> --json`). All responses use envelope version `2.6` (`version`, `ok`, `command`, `data` | `error`).
+Every `desktop_*` tool runs identically in-process via `aphrody_craft` MCP (`/mcp` HTTP or stdio JSON-RPC) and CLI (`aphrody-os pilot <op> --json`). All responses use envelope version `2.6` (`version`, `ok`, `command`, `data` | `error`).
 
 | Group | Operations / MCP Tools |
 |---|---|
@@ -14,4 +14,4 @@ Every `desktop_*` tool runs identically in-process via `os_craft` MCP (`/mcp` HT
 
 ## Held Input in Daemon / Session Mode
 
-Because `os_pilot` runs inside stateful `PilotEngine` (`os_craft` MCP server / GPUI session), `desktop_key_down` / `desktop_key_up` and `desktop_mouse_down` / `desktop_mouse_up` track active held keys/buttons inside `HeldInputState` rather than refusing outright.
+Because `aphrody_pilot` runs inside stateful `PilotEngine` (`aphrody_craft` MCP server / GPUI session), `desktop_key_down` / `desktop_key_up` and `desktop_mouse_down` / `desktop_mouse_up` track active held keys/buttons inside `HeldInputState` rather than refusing outright.

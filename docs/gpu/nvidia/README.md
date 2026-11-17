@@ -51,4 +51,4 @@ nsys profile -t vulkan,cuda,osrt --output profile_report ./my_app
 ## 4. Code Examples
 
 - [`examples/gpu/nvidia/sm89_matmul_warp.wgsl`](../../../examples/gpu/nvidia/sm89_matmul_warp.wgsl): Tiled matrix multiplication optimized for 32-thread warp execution with shared memory padding.
-- [`crates/wgpu_cli/examples/ihv_vendor_matrix.rs`](../../../crates/wgpu_cli/examples/ihv_vendor_matrix.rs): Multi-vendor enumeration and compute dispatch test.
+- [`crates/aphrody_cli/examples/ihv_vendor_matrix.rs`](../../../crates/aphrody_cli/examples/ihv_vendor_matrix.rs): Multi-vendor enumeration and compute dispatch test.

@@ -5,7 +5,7 @@ use anyhow::Result;
 use ecolor::Color32;
 use egui::{ClippedPrimitive, Context, Event, FullOutput, ImeEvent, Pos2, RawInput, Rect, Ui};
 use epaint::Primitive;
-use os_ui::AppearanceMode;
+use aphrody_ui::AppearanceMode;
 use serde::{Deserialize, Serialize};
 use web_time::Instant;
 

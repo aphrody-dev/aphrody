@@ -181,7 +181,7 @@ export function mapAphrodyBinding(name: string, category: WasmRepoCategory): str
     return "templates/wasm-wgpu/wasi-p2-aot-compute & emscripten skill";
   }
   if (category === "spec-and-testsuite") {
-    return "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli";
+    return "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli";
   }
   return "tooling/bun/web-build.ts & crates/gpui_web";
 }

@@ -1,0 +1,27 @@
+[package]
+name = "cosmic_gpui"
+version = "1.0.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "COSMIC Epoch + Pop!_OS compositor, layer-shell panel/dock, applet, launcher, portal, and unified CLI/MCP/Web/Desktop deploy layer aligned onto GPUI and aphrody_session."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/cosmic_gpui.rs"
+doctest = false
+
+[features]
+default = ["mcp", "web", "desktop"]
+wayland-contract = []
+mcp = []
+web = []
+desktop = []
+
+[dependencies]
+aphrody_session.workspace = true
+aphrody_store = { workspace = true, default-features = false }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true

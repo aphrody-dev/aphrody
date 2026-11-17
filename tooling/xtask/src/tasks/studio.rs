@@ -65,11 +65,11 @@ pub struct StudioStatusReport {
 }
 
 const CONSOLIDATED_CRATES: &[(&str, &str, Option<&str>)] = &[
-    ("os_ui", "crates/os_ui/Cargo.toml", None),
-    ("os_craft", "crates/os_craft/Cargo.toml", None),
+    ("aphrody_ui", "crates/aphrody_ui/Cargo.toml", None),
+    ("aphrody_craft", "crates/aphrody_craft/Cargo.toml", None),
     (
-        "google_design_stitch",
-        "crates/google_design_stitch/Cargo.toml",
+        "aphrody_design",
+        "crates/aphrody_design/Cargo.toml",
         None,
     ),
     (
@@ -83,15 +83,15 @@ const CONSOLIDATED_CRATES: &[(&str, &str, Option<&str>)] = &[
         Some("crates/bevy_gpui/examples/unreal_solari_showcase.rs"),
     ),
     (
-        "craft_studio",
-        "crates/craft_studio/Cargo.toml",
-        Some("crates/craft_studio/examples/studio_parity_report.rs"),
+        "aphrody_craft",
+        "crates/aphrody_craft/Cargo.toml",
+        Some("crates/aphrody_craft/examples/studio_parity_report.rs"),
     ),
-    ("nsh_workspace", "crates/nsh_workspace/Cargo.toml", None),
+    ("aphrody_nsh", "crates/aphrody_nsh/Cargo.toml", None),
     (
-        "wgpu_cli",
-        "crates/wgpu_cli/Cargo.toml",
-        Some("crates/wgpu_cli/examples/webgpu_naga_pipeline.rs"),
+        "aphrody_cli",
+        "crates/aphrody_cli/Cargo.toml",
+        Some("crates/aphrody_cli/examples/webgpu_naga_pipeline.rs"),
     ),
 ];
 
@@ -193,7 +193,7 @@ pub fn run_studio(command: StudioCommand) -> Result<()> {
             let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_owned());
             let status = Command::new(cargo)
                 .current_dir(root)
-                .args(["run", "-p", "craft_studio", "--example", "studio_parity_report"])
+                .args(["run", "-p", "aphrody_craft", "--example", "studio_parity_report"])
                 .status()
                 .context("failed to run studio_parity_report example")?;
             if !status.success() {

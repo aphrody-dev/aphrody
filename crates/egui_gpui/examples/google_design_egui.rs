@@ -3,7 +3,7 @@ use egui_gpui::{
     CraftComboMenu, CraftDockTab, CraftDockTabs, CraftImeBanner, CraftPropertyRow,
     CraftToolbarChip, EguiGpuiHost, ImeWireEvent, egui,
 };
-use os_ui::{AppearanceMode, ShadcnGpuiTheme};
+use aphrody_ui::{AppearanceMode, ShadcnGpuiTheme};
 
 fn main() -> Result<()> {
     let mut host = EguiGpuiHost::new(AppearanceMode::Dark)?;

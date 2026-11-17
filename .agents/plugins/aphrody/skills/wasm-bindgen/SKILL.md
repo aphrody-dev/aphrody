@@ -3,7 +3,7 @@ name: wasm-bindgen
 description: >-
   Authoritative wasm-bindgen, js-sys, web-sys, wasm-bindgen-futures, walrus,
   weedle, ts-gen, and Browser Wasm FFI skill for aphrody. Use when editing
-  crates/gpui_web, crates/os_desktop web builds, tooling/bun/web-build.ts,
+  crates/gpui_web, crates/aphrody_desktop web builds, tooling/bun/web-build.ts,
   wasm32-unknown-unknown exports, Closure lifetimes, Uint8Array views, or
   optimizing Wasm binaries with walrus + wasm-opt.
 ---
@@ -44,11 +44,11 @@ Resolve all paths relative to `.agents/plugins/aphrody/skills/wasm-bindgen/`:
 ## Fast Verification Commands
 
 ```powershell
-# Check exact wasm-bindgen lockstep + compile gpui_web / gpui_wgpu / os_desktop
+# Check exact wasm-bindgen lockstep + compile gpui_web / gpui_wgpu / aphrody_desktop
 bun tooling/bun/web-build.ts check
 
 # Build optimized release cohorts (baseline + simd-baseline) with wasm-opt v133
-bun tooling/bun/web-build.ts build --package os_desktop --release --opt
+bun tooling/bun/web-build.ts build --package aphrody_desktop --release --opt
 
 # Refresh live 8-repo GitIngest digests, llms.txt, skills, and architecture telemetry
 bun tooling/bun/wasm-bindgen-ingest.ts all

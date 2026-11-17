@@ -79,7 +79,7 @@ modular_ui_features = "nsh-full"
 modular_code_crate = "gpui_code"
 modular_shell_crate = "gpui_app_shell"
 modular_shell_features = "nsh"
-wgpu_cli_package = "wgpu_cli"
+wgpu_cli_package = "aphrody_cli"
 wgpu_cli_bin = "gpui-wgpu"
 
 [design]

@@ -162,7 +162,7 @@ describe("wasm-bindgen-ingest Aphrody workspace & fixture emit", () => {
     try {
       mkdirSync(join(fixture, "crates/gpui_web/src"), { recursive: true });
       mkdirSync(join(fixture, "crates/gpui_wgpu"), { recursive: true });
-      mkdirSync(join(fixture, "crates/os_desktop/examples"), { recursive: true });
+      mkdirSync(join(fixture, "crates/aphrody_desktop/examples"), { recursive: true });
       mkdirSync(join(fixture, "crates/nsh-platform-web/src/browser"), { recursive: true });
       mkdirSync(join(fixture, "tooling/bun"), { recursive: true });
       writeFileSync(join(fixture, "Cargo.toml"), "[package]\nname = 'root'");
@@ -176,7 +176,7 @@ describe("wasm-bindgen-ingest Aphrody workspace & fixture emit", () => {
       writeFileSync(join(fixture, "crates/gpui_web/src/http_client.rs"), "");
       writeFileSync(join(fixture, "crates/gpui_web/src/platform.rs"), "");
       writeFileSync(join(fixture, "crates/gpui_wgpu/Cargo.toml"), "");
-      writeFileSync(join(fixture, "crates/os_desktop/examples/web_os.rs"), "");
+      writeFileSync(join(fixture, "crates/aphrody_desktop/examples/web_os.rs"), "");
       writeFileSync(join(fixture, "crates/nsh-platform-web/Cargo.toml"), "");
       writeFileSync(join(fixture, "crates/nsh-platform-web/src/browser/values.rs"), "");
       writeFileSync(join(fixture, "tooling/bun/web-build.ts"), "");

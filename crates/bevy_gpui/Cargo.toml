@@ -19,7 +19,7 @@ path = "examples/unreal_solari_showcase.rs"
 
 [features]
 default = []
-wgpu = ["egui_gpui/wgpu", "dep:gpui_wgpu", "dep:wgpu"]
+wgpu = ["egui_gpui/wgpu"]
 
 [dependencies]
 anyhow.workspace = true
@@ -28,12 +28,10 @@ craft-materialx.workspace = true
 craft-timeline.workspace = true
 craft-usd.workspace = true
 egui_gpui = { workspace = true, default-features = false }
-gpui.workspace = true
-gpui_wgpu = { workspace = true, optional = true }
 naga.workspace = true
-os_ui.workspace = true
+aphrody_ui.workspace = true
 serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-thiserror.workspace = true
 web-time.workspace = true
-wgpu = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json.workspace = true

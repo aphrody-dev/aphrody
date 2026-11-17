@@ -60,7 +60,7 @@ flowchart LR
     GPUI["crates/gpui + gpui_wgpu + gpui_web + gpui_ios"]
     NSHC["crates/nsh-core / nsh-base / nsh-js / nsh-platform-gpui"]
     GPUIUI["crates/ui + crates/gpui_ui + crates/gpui_app_shell"]
-    OSC["crates/os_craft + os_ui + os_desktop"]
+    OSC["crates/aphrody_craft + aphrody_ui + aphrody_desktop"]
     ACP["crates/acp_thread + context_server"]
   end
 
@@ -107,13 +107,13 @@ flowchart LR
 | Upstream / Community Repo | Target Aphrody Crates | Technical Gap & Merge Plan |
 | :--- | :--- | :--- |
 | `longbridge/gpui-fast` | [`crates/gpui/src/taffy.rs`](../../crates/gpui/src/taffy.rs), `tooling/perf` | Local `TaffyLayoutEngine::clear()` still clears the entire `TaffyTree` every frame; adopt dirty-tracking layout retention & `gpui_perf` microbenchmarks. |
-| `longbridge/gpui-kit` | `crates/ui`, `crates/gpui_ui`, `crates/os_ui` | Reconcile 60+ GPUI desktop widgets (`gpui-kit` / `gpui-component` 0.10.0), virtualized tables, dock, and `fps` monitor without duplicating `nsh-base` primitives. |
+| `longbridge/gpui-kit` | `crates/ui`, `crates/gpui_ui`, `crates/aphrody_ui` | Reconcile 60+ GPUI desktop widgets (`gpui-kit` / `gpui-component` 0.10.0), virtualized tables, dock, and `fps` monitor without duplicating `nsh-base` primitives. |
 | `longbridge/gpui-mobile` | [`crates/gpui_ios/Cargo.toml`](../../crates/gpui_ios/Cargo.toml), `crates/nsh-platform-android`, `crates/gpui_platform` | Port Android Vulkan surface lifecycle and unified mobile device/hardware features from `gpui-pre-mobile` onto centralized `gpui_platform`. |
-| `longbridge/wef` | `crates/nsh-platform-gpui`, `vendor/tauri/cef-rs`, `crates/os_desktop` | Evaluate offscreen CEF3 rendering (`wef 0.6.0`, `gpui-webview 0.10.0`) alongside `vendor/tauri/cef-rs` for consistent embedded web surfaces. |
-| `longbridge/purview` | [`crates/os_craft/src/mcp.rs`](../../crates/os_craft/src/mcp.rs), `crates/inspector_ui`, `crates/gpui_ui` | Adopt structured semantic multi-window GPUI projection over `rmcp` so AI agents inspect and drive live GPUI windows without screenshot guessing. |
+| `longbridge/wef` | `crates/nsh-platform-gpui`, `vendor/tauri/cef-rs`, `crates/aphrody_desktop` | Evaluate offscreen CEF3 rendering (`wef 0.6.0`, `gpui-webview 0.10.0`) alongside `vendor/tauri/cef-rs` for consistent embedded web surfaces. |
+| `longbridge/purview` | [`crates/aphrody_craft/src/mcp.rs`](../../crates/aphrody_craft/src/mcp.rs), `crates/inspector_ui`, `crates/gpui_ui` | Adopt structured semantic multi-window GPUI projection over `rmcp` so AI agents inspect and drive live GPUI windows without screenshot guessing. |
 | `longbridge/longbridge-ai-acp` & `acp-registry` | `crates/acp_thread`, `crates/acp_tools`, `crates/agent_servers` | Align ACP auth/rich-content contracts with root `agent-client-protocol =5.3.0`. |
-| `longbridge/longbridge-mcp` & `longbridge-terminal` | `crates/os_craft`, `crates/context_server`, `crates/terminal_view`, `crates/nsh-platform-tui` | Harmonize streamable-HTTP `rmcp` servers and Ratatui/CLI release packaging profiles. |
-| Community GPUI Libs (`gpui-ce`, `gpui-motion`, `gpui-rsx`, `native-theme`, `gpuix`) | `crates/gpui`, `crates/ui`, `crates/gpui_ui`, `crates/os_ui` | Harvest native OS theming, spring/motion presets, RSX ergonomics, and JS/TS host bindings without introducing duplicate `gpui` versions. |
+| `longbridge/longbridge-mcp` & `longbridge-terminal` | `crates/aphrody_craft`, `crates/context_server`, `crates/terminal_view`, `crates/nsh-platform-tui` | Harmonize streamable-HTTP `rmcp` servers and Ratatui/CLI release packaging profiles. |
+| Community GPUI Libs (`gpui-ce`, `gpui-motion`, `gpui-rsx`, `native-theme`, `gpuix`) | `crates/gpui`, `crates/ui`, `crates/gpui_ui`, `crates/aphrody_ui` | Harvest native OS theming, spring/motion presets, RSX ergonomics, and JS/TS host bindings without introducing duplicate `gpui` versions. |
 
 ---
 

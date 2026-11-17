@@ -295,6 +295,29 @@ fn main() {
         return;
     }
 
+    if args.mcp {
+        let root = args.paths_or_urls.first().map(PathBuf::from);
+        if let Err(err) = aphrody_pilot::run_headless_mcp_stdio(root) {
+            eprintln!("headless MCP server failed: {err:#}");
+            process::exit(1);
+        }
+        return;
+    }
+
+    if args.headless {
+        let root = args.paths_or_urls.first().map(PathBuf::from).unwrap_or_else(|| PathBuf::from("."));
+        let mut headless = aphrody_pilot::HeadlessZedController::new(root);
+        let status = headless.execute_tool("zed_headless_status", &serde_json::json!({}));
+        match status {
+            Ok(val) => println!("{val}"),
+            Err(err) => {
+                eprintln!("headless status failed: {err:#}");
+                process::exit(1);
+            }
+        }
+        return;
+    }
+
     let restart_arguments = if let Some(directory) = args.user_data_dir.as_deref() {
         let directory = paths::set_custom_data_dir(directory);
         vec![
@@ -856,7 +879,7 @@ fn main() {
         tabular_data_preview::init(cx);
         svg_preview::init(cx);
         #[cfg(feature = "nsh")]
-        nsh_workspace::init(cx);
+        aphrody_nsh::init(cx);
         onboarding::init(cx);
         #[cfg(feature = "ai")]
         settings_ui::init(cx);
@@ -2330,6 +2353,14 @@ struct Args {
     #[cfg(target_os = "windows")]
     #[arg(long, hide = true)]
     record_etw_trace: bool,
+
+    /// Run Zed / Aphrody headlessly without spawning any native GUI window.
+    #[arg(long)]
+    headless: bool,
+
+    /// Run headless stdio JSON-RPC 2.0 MCP server (Zed Tree-sitter, Agent-Browser CDP, Pilot OS).
+    #[arg(long)]
+    mcp: bool,
 
     /// The PID of the Zed process to trace for heap analysis.
     #[cfg(target_os = "windows")]

@@ -8,6 +8,10 @@ pattern = "releases.aphrody.com/*"
 zone_name = "aphrody.com"
 
 [[routes]]
+pattern = "downloads.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[routes]]
 pattern = "aphrody.com/download*"
 zone_name = "aphrody.com"
 

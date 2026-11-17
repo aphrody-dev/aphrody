@@ -1,15 +1,17 @@
-We have two cloudflare workers that let us serve some assets of this repo
-from Cloudflare.
+# Aphrody Cloudflare Workers & R2 Edge Distribution
 
-- `open-source-website-assets` is used for `install.sh`
-- `docs-proxy` is used for `https://zed.dev/docs`
+All Workers deploy to the `aphrody-labs` Cloudflare account via `bun tooling/bun/cloudflare-deploy.ts` (and CI `.github/workflows/aphrody-release.yml`).
 
-During docs deployments, both of these (and the files they depend on) are uploaded to Cloudflare.
+## Workers
 
-### Deployment
+- `aphrody-releases`: Serves `releases.aphrody.com/*`, `downloads.aphrody.com/*`, and `aphrody.com/download*` backed by R2 bucket `aphrody-releases` (`/download`, `/install.sh`, `/install.ps1`, `/api/releases/:channel/latest`, `/api/channels`, `/assets/*`, `/healthz`).
+- `docs-proxy`: Markdown/HTML documentation proxy worker (`docs.aphrody.com` fallback/mirror).
+- `open-source-website-assets`: R2 asset passthrough backed by `aphrody-assets`.
 
-These functions are deployed by the docs deployment workflows. Worker Rules in Cloudflare intercept requests to zed.dev and proxy them to the appropriate workers.
+## Local Dev & Deploy
 
-### Testing
-
-You can use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/install-update) to test these workers locally, or to deploy custom versions.
+```sh
+bun run cf:dev:releases
+bun run cf:audit
+bun run cf:deploy
+```

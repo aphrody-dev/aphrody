@@ -5,7 +5,7 @@ Anchored to **`https://design.google/`** (*Material 3 Neural Expressive* + *Code
 ## Visual Atmosphere & Token Rules
 - **Zero raw colors in presentation code**: Every control in `src/ui/` and every page in `src/pages/` consumes semantic theme tokens (`bg-background`, `bg-card`, `bg-popover`, `text-foreground`, `text-muted-foreground`, `bg-primary`, `border-border`) defined in [`theme.json`](./theme.json).
 - **Typography**: `Google Sans Flex` (`opsz`, `wght`, `ROND`) for titles, navigation pills, and KPI summaries; `JetBrains Mono` for session UUIDs, step timings, SHA-256 digests, and tool calls.
-- **Targets**: Web (Chrome SSE auto-reload + portable offline `.html`) and Desktop (`nsh_workspace` inside Aphrody IDE).
+- **Targets**: Web (Chrome SSE auto-reload + portable offline `.html`) and Desktop (`aphrody_nsh` inside Aphrody IDE).
 
 ## Motion Inventory (Normative NSH Design Guide Requirement)
 

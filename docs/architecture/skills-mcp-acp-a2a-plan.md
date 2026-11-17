@@ -8,10 +8,10 @@
 
 - **Slim Default Binary ([`crates/zed/Cargo.toml`](../../crates/zed/Cargo.toml))**: `default = ["nsh"]`; heavy features (`ai`, `extensions`, `debugger`, `repl`, `collab`, `updater`, `crash-reporting`, `grammars`) are strictly opt-in behind `full`.
 - **ACP ([`crates/acp_thread`](../../crates/acp_thread/Cargo.toml), [`crates/agent_servers`](../../crates/agent_servers/Cargo.toml))**: Pins `agent-client-protocol = "=5.3.0"` (`unstable_protocol_v2` with v1 fallback), but has not yet enabled `unstable_mcp_over_acp`, `unstable_agent_skills`, or `agent-client-protocol-rmcp`.
-- **MCP Duplication**: [`crates/context_server`](../../crates/context_server/Cargo.toml) implements a hand-rolled MCP client (`2024-11-05`..`2025-11-25`, stdio + Streamable HTTP + OAuth refresh), while [`crates/os_craft/src/mcp.rs`](../../crates/os_craft/src/mcp.rs) runs a separate raw `TcpListener` + JSON-RPC 2.0 MCP server (`2025-03-26`, exposing 10 `os_*`/`craft_*` tools and `/.well-known/webmcp.json`).
+- **MCP Duplication**: [`crates/context_server`](../../crates/context_server/Cargo.toml) implements a hand-rolled MCP client (`2024-11-05`..`2025-11-25`, stdio + Streamable HTTP + OAuth refresh), while [`crates/aphrody_craft/src/mcp.rs`](../../crates/aphrody_craft/src/mcp.rs) runs a separate raw `TcpListener` + JSON-RPC 2.0 MCP server (`2025-03-26`, exposing 10 `os_*`/`craft_*` tools and `/.well-known/webmcp.json`).
 - **Skills ([`crates/agent_skills`](../../crates/agent_skills/Cargo.toml), [`skill_tool.rs`](../../crates/agent/src/tools/skill_tool.rs))**: Strictly validates `SKILL.md` (`name <= 64 [a-z0-9-]`, `description <= 1024`, 100 KB file cap, 50 KB catalog cap, XML-escaped envelopes) over `.agents/skills/` and `create-skill`, lacking `.well-known/agent-skills/index.json` discovery, `{baseDir}` substitution (OpenClaw), and `skills-lock.json` integrity checks (Vercel `skills`).
 - **OpenAI HTTP ([`crates/open_ai/src/responses.rs`](../../crates/open_ai/src/responses.rs))**: Implements `/responses`, `/responses/compact`, `/responses/input_tokens`, and `ToolDefinition::{Function, Custom}`, missing built-in `type: "mcp"` and `text.format.json_schema` (`strict: true`).
-- **Plugins & Runtimes**: [`crates/extension_api`](../../crates/extension_api/Cargo.toml) (`wit-bindgen 0.41`, WIT v0.8.0) + `extension_host` (`wasmtime 48.0.7`); [`vendor/tauri/plugins-workspace`](../../vendor/tauri/plugins-workspace/Cargo.toml) (`tauri 3.0.0-alpha.4`, `specta`, `schemars`); [`crates/nsh-js`](../../crates/nsh-js/Cargo.toml) (`quickjs-jit 0.14.2`, custom `HeapAllocator`, CPU `Budget`, `.nsh/types`); and [`.agents/plugins/aphrody/`](../../.agents/plugins/aphrody/plugin.json).
+- **Plugins & Runtimes**: [`crates/extension_api`](../../crates/extension_api/Cargo.toml) (`wit-bindgen 0.41`, WIT v0.8.0) + `extension_host` (`wasmtime 48.0.7`); [`vendor/tauri/tauri`](../../vendor/tauri/tauri/Cargo.toml) (`tauri 3.0.0-alpha.4`, `specta`, `schemars`); [`crates/nsh-js`](../../crates/nsh-js/Cargo.toml) (`quickjs-jit 0.14.2`, custom `HeapAllocator`, CPU `Budget`, `.nsh/types`); and [`.agents/plugins/aphrody/`](../../.agents/plugins/aphrody/plugin.json).
 
 ---
 
@@ -32,7 +32,7 @@
 ## 3. Four Composable AI-Ready-First Pipelines
 
 1. **CLI -> MCP**:
-   - **Rust (`clap`)**: Wrap `aphrody-os` ([`os_desktop/src/main.rs`](../../crates/os_desktop/src/main.rs)) and `nsh-cli` ([`nsh-cli/src/main.rs`](../../crates/nsh-cli/src/main.rs)) with feature-gated `brontes 0.7.3` (`mcp start` stdio / `mcp stream` HTTP, grouped tool namespaces, `TaskMode::Detached` for builds/tests).
+   - **Rust (`clap`)**: Wrap `aphrody-os` ([`aphrody_desktop/src/main.rs`](../../crates/aphrody_desktop/src/main.rs)) and `nsh-cli` ([`nsh-cli/src/main.rs`](../../crates/nsh-cli/src/main.rs)) with feature-gated `brontes 0.7.3` (`mcp start` stdio / `mcp stream` HTTP, grouped tool namespaces, `TaskMode::Detached` for builds/tests).
    - **TypeScript / Bun**: Generate MCP stdio/Streamable HTTP facades from typed CLI schemas via `@modelcontextprotocol/server 2.4.0` + `readOnlyHint`/`destructiveHint` annotations.
 2. **CLI -> Skills (`SKILL.md`)**:
    - Probe `<bin> --help` & `--version` (stripping ANSI/emails, capping inline summary <= 70 lines, placing deep flags in `references/subcommands.md`), emit OpenClaw `{baseDir}` paths, verify deterministic CI drift (`--check`), and index into `/.well-known/agent-skills/index.json` (`0.2.0`).
@@ -46,7 +46,7 @@
 
 ## 4. Phased Implementation Plan & Security Boundaries
 
-1. **Phase 1 (MCP Core + `brontes` + `open_ai`)**: Replace raw TCP loop in `os_craft/src/mcp.rs` with feature-gated `rmcp 3.10.0` + `axum` (`Host` validation, bearer auth, bounded SEP-2663 `task_ttl`, loopback bind); mount `brontes` behind opt-in features; extend `open_ai/src/responses.rs` with `ToolDefinition::Mcp` and strict JSON Schema outputs.
+1. **Phase 1 (MCP Core + `brontes` + `open_ai`)**: Replace raw TCP loop in `aphrody_craft/src/mcp.rs` with feature-gated `rmcp 3.10.0` + `axum` (`Host` validation, bearer auth, bounded SEP-2663 `task_ttl`, loopback bind); mount `brontes` behind opt-in features; extend `open_ai/src/responses.rs` with `ToolDefinition::Mcp` and strict JSON Schema outputs.
 2. **Phase 2 (ACP <-> MCP & Opt-In A2A)**: Enable `agent-client-protocol-rmcp 5.3.0` (`unstable_mcp_over_acp`, `unstable_agent_skills`) in `acp_thread` / `agent_servers`; add feature-gated `agent_a2a` (`a2a-mcp 0.11.3`).
 3. **Phase 3 (Unified Skills & AI-Ready Generator)**: Extend `agent_skills` with opt-in OpenClaw `{baseDir}`, `skills-lock.json`, and SHA-256 verified `index.json` (`0.2.0`) discovery; batch-generate Tier-1 workspace crate & CLI skills cleanly into CI-verified targets.
 4. **Phase 4 (App -> Plugin Multi-Target)**: Add `webmcp` native module in `nsh-js` (`HeapAllocator` + `Budget` enforced), WIT `v0.9.0` MCP/skill interfaces in `extension_api`, and exporters projecting `CraftCatalog` / Tauri plugins cleanly.

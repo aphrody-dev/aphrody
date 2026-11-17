@@ -38,24 +38,24 @@
 
 | Benchmark | Iterations | Throughput (ops/sec) | p50 (us) | p95 (us) |
 | --- | ---: | ---: | ---: | ---: |
-| `design_md_frontmatter_parse` | 200 | 379147 | 2.9 | 4.6 |
-| `shadcn_tailwind_v4_css_emit` | 200 | 172771 | 5.2 | 9.1 |
-| `cwv_lighthouse_w3c_html_audit` | 200 | 1366120 | 0.4 | 2.2 |
-| `submodule_parity_graph_resolve` | 50 | 27420 | 35.9 | 46.2 |
+| `design_md_frontmatter_parse` | 200 | 195293 | 5.9 | 10.8 |
+| `shadcn_tailwind_v4_css_emit` | 200 | 94500 | 9.7 | 17.4 |
+| `cwv_lighthouse_w3c_html_audit` | 200 | 858369 | 0.7 | 3.4 |
+| `submodule_parity_graph_resolve` | 50 | 19430 | 50.1 | 61.8 |
 
 ## Monorepo TS -> Rust AI-Agent Readiness Audit
 
-- TypeScript files checked via `Bun.Transpiler`: **52** (syntax errors: 0, explicit `any` warnings: 8)
-- Pure-Rust core crate files checked: **45** (`mod.rs` violations: 0, production `.unwrap()`: 0)
+- TypeScript files checked via `Bun.Transpiler`: **54** (syntax errors: 0, explicit `any` warnings: 8)
+- Pure-Rust core crate files checked: **52** (`mod.rs` violations: 0, production `.unwrap()`: 0)
 - Machine path leaks across TS + Rust: **0**
 
 ## Key Source Files
 
 - [Root `DESIGN.md`](../../DESIGN.md)
 - [`assets/os/submodule_parity_matrix.toml`](../../assets/os/submodule_parity_matrix.toml)
-- [`crates/google_design_stitch`](../../crates/google_design_stitch/src/google_design_stitch.rs)
-- [`crates/os_ui`](../../crates/os_ui/src/os_ui.rs)
+- [`crates/aphrody_design`](../../crates/aphrody_design/src/aphrody_design.rs)
+- [`crates/aphrody_ui`](../../crates/aphrody_ui/src/aphrody_ui.rs)
 - [`crates/ui`](../../crates/ui/src/ui.rs)
 - [`crates/nsh-base`](../../crates/nsh-base/src/lib.rs)
-- [`crates/wgpu_cli`](../../crates/wgpu_cli/src/main.rs)
+- [`crates/aphrody_cli`](../../crates/aphrody_cli/src/main.rs)
 - [`tooling/bun/prod-standards-starterpack.ts`](../../tooling/bun/prod-standards-starterpack.ts)

@@ -177,7 +177,7 @@ describe("gpui-vs-dioxus-audit offline fixture workflow", () => {
     try {
       mkdirSync(join(fixtureRoot, "crates/gpui/src"), { recursive: true });
       mkdirSync(join(fixtureRoot, "crates/gpui_wgpu/src"), { recursive: true });
-      mkdirSync(join(fixtureRoot, "crates/os_ui/src"), { recursive: true });
+      mkdirSync(join(fixtureRoot, "crates/aphrody_ui/src"), { recursive: true });
       mkdirSync(join(fixtureRoot, "vendor/dioxus/packages/dioxus"), { recursive: true });
       mkdirSync(join(fixtureRoot, "vendor/blitz/examples/wasm_hello"), { recursive: true });
       mkdirSync(join(fixtureRoot, "vendor/anyrender"), { recursive: true });
@@ -202,7 +202,7 @@ describe("gpui-vs-dioxus-audit offline fixture workflow", () => {
         join(fixtureRoot, "Cargo.toml"),
         `
 [workspace]
-members = ["crates/gpui", "crates/gpui_wgpu", "crates/os_ui"]
+members = ["crates/gpui", "crates/gpui_wgpu", "crates/aphrody_ui"]
 exclude = ["vendor/dioxus", "vendor/blitz", "vendor/anyrender", "vendor/taffy"]
 
 [workspace.package]
@@ -242,14 +242,14 @@ subsecond = { version = "=0.7.10", optional = true }
       );
       writeFileSync(
         join(fixtureRoot, "crates/gpui_wgpu/src/wgpu_context.rs"),
-        "/// bridges (`os_ui`, `anyrender`) share one device.\npub fn shared_handles() {}\n",
+        "/// bridges (`aphrody_ui`, `anyrender`) share one device.\npub fn shared_handles() {}\n",
       );
       writeFileSync(
-        join(fixtureRoot, "crates/os_ui/Cargo.toml"),
-        `[package]\nname = "os_ui"\nversion = "0.1.0"\n`,
+        join(fixtureRoot, "crates/aphrody_ui/Cargo.toml"),
+        `[package]\nname = "aphrody_ui"\nversion = "0.1.0"\n`,
       );
       writeFileSync(
-        join(fixtureRoot, "crates/os_ui/src/unified_runtime.rs"),
+        join(fixtureRoot, "crates/aphrody_ui/src/unified_runtime.rs"),
         "pub enum FrameworkLayer { Gpui, Blitz }\n",
       );
       writeFileSync(

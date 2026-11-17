@@ -1,21 +1,21 @@
 # Aphrody x orgs/WebAssembly llms.txt (sorted by stars)
 # total_repos=100 synced_at=2026-11-17T11:15:47.510Z
 
-- WebAssembly/design (11647★, spec-and-testsuite): WebAssembly Design Documents -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/design (11647★, spec-and-testsuite): WebAssembly Design Documents -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/binaryen (8680★, toolchain-optimizer): Optimizer and compiler/toolchain library for WebAssembly -> gpui-wgpu wasm optimize (-Oz + simd + bulk-memory)
 - WebAssembly/wabt (8208★, toolchain-optimizer): The WebAssembly Binary Toolkit -> wat2wasm / wasm2wat verified in shell-path-doctor & gpui-wgpu doctor
 - WebAssembly/WASI (5848★, component-model-wasi): WebAssembly System Interface -> crates/extension_host (.cwasm AOT cache) & wasm32-wasip2 templates
-- WebAssembly/spec (3472★, spec-and-testsuite): WebAssembly specification, reference interpreter, and test suite. -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/spec (3472★, spec-and-testsuite): WebAssembly specification, reference interpreter, and test suite. -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/wasi-sdk (1664★, toolchain-optimizer): WASI-enabled WebAssembly C/C++ toolchain -> templates/wasm-wgpu/wasi-p2-aot-compute & emscripten skill
 - WebAssembly/component-model (1389★, component-model-wasi): Repository for design and specification of the Component Model -> crates/extension_host (.cwasm AOT cache) & wasm32-wasip2 templates
 - WebAssembly/proposals (1142★, proposal): Tracking WebAssembly proposals -> tooling/bun/web-build.ts & crates/gpui_web
-- WebAssembly/gc (1056★, spec-and-testsuite): Branch of the spec repo scoped to discussion of GC integration in WebAssembly -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/gc (1056★, spec-and-testsuite): Branch of the spec repo scoped to discussion of GC integration in WebAssembly -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/wasi-libc (1046★, toolchain-optimizer): WASI libc implementation for WebAssembly -> templates/wasm-wgpu/wasi-p2-aot-compute & emscripten skill
 - WebAssembly/threads (773★, runtime-and-api): Threads and Atomics in WebAssembly -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/interface-types (643★, component-model-wasi):  -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/wasm-c-api (612★, runtime-and-api): Wasm C API prototype -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/wasi-nn (562★, component-model-wasi): Neural Network proposal for WASI -> tooling/bun/web-build.ts & crates/gpui_web
-- WebAssembly/simd (557★, spec-and-testsuite): Branch of the spec repo scoped to discussion of SIMD in WebAssembly  -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/simd (557★, spec-and-testsuite): Branch of the spec repo scoped to discussion of SIMD in WebAssembly  -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/meetings (548★, proposal): WebAssembly meetings (VC or in-person), agendas, and notes -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/esm-integration (457★, runtime-and-api): ECMAScript module integration -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/tool-conventions (374★, toolchain-optimizer): Conventions supporting interoperatibility between tools working with WebAssembly. -> tooling/bun/web-build.ts & crates/gpui_web
@@ -23,7 +23,7 @@
 - WebAssembly/wasi-sockets (296★, component-model-wasi): WASI API proposal for managing sockets -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/website (289★, proposal): WebAssembly website -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/memory64 (270★, component-model-wasi): Memory with 64-bit indexes -> tooling/bun/web-build.ts & crates/gpui_web
-- WebAssembly/testsuite (249★, spec-and-testsuite): Mirror of the spec testsuite -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/testsuite (249★, spec-and-testsuite): Mirror of the spec testsuite -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/wasi-filesystem (236★, component-model-wasi): Filesystem API for WASI -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/wasi-http (223★, component-model-wasi): A collection of interfaces for sending and receiving HTTP requests and responses -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/stack-switching (220★, component-model-wasi): A repository for the stack switching proposal. -> tooling/bun/web-build.ts & crates/gpui_web
@@ -31,13 +31,13 @@
 - WebAssembly/wasi-crypto (183★, component-model-wasi): WASI Cryptography API Proposal -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/wasi-threads (178★, component-model-wasi):  -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/exception-handling (172★, proposal): Proposal to add exception handling to WebAssembly -> tooling/bun/web-build.ts & crates/gpui_web
-- WebAssembly/reference-types (170★, spec-and-testsuite): Proposal for adding basic reference types (anyref) -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/reference-types (170★, spec-and-testsuite): Proposal for adding basic reference types (anyref) -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/multi-memory (139★, proposal): Multiple per-module memories for Wasm -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/js-promise-integration (120★, proposal): JavaScript Promise Integration -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/module-linking (118★, proposal): Proposal for allowing modules to define, import and export modules and instances -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/wasp (118★, proposal): WebAssembly module decoder in C++ -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/tail-call (116★, proposal): Proposal to add tail calls to WebAssembly -> tooling/bun/web-build.ts & crates/gpui_web
-- WebAssembly/debugging (109★, spec-and-testsuite): Design documents and discussions about debug support in WebAssembly -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
-- WebAssembly/function-references (105★, spec-and-testsuite): Proposal for Typed Function References -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli
+- WebAssembly/debugging (109★, spec-and-testsuite): Design documents and discussions about debug support in WebAssembly -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
+- WebAssembly/function-references (105★, spec-and-testsuite): Proposal for Typed Function References -> wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli
 - WebAssembly/wasmint (97★, proposal): Library for interpreting / debugging wasm code -> tooling/bun/web-build.ts & crates/gpui_web
 - WebAssembly/wasi-testsuite (88★, component-model-wasi): WASI Testsuite -> tooling/bun/web-build.ts & crates/gpui_web

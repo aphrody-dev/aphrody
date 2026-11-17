@@ -1,13 +1,13 @@
 # Awesome Wasm, WebGPU & GPUI Unified Toolchain
 
-> Complete LTO / AOT WebAssembly (`wasm32-unknown-unknown`, `wasm32-wasip2`) and WGPU / Naga v30 ecosystem guide anchored to [`https://design.google/`](https://design.google/), [`DESIGN.md`](../../DESIGN.md), and [`crates/os_ui/src/starter_pack.rs`](../../crates/os_ui/src/starter_pack.rs).
+> Complete LTO / AOT WebAssembly (`wasm32-unknown-unknown`, `wasm32-wasip2`) and WGPU / Naga v30 ecosystem guide anchored to [`https://design.google/`](https://design.google/), [`DESIGN.md`](../../DESIGN.md), and [`crates/aphrody_ui/src/starter_pack.rs`](../../crates/aphrody_ui/src/starter_pack.rs).
 
 ## Cargo Profiles (`[profile.web-lto]` & `[profile.aot]`)
 
 - `[profile.web-lto]` (`Cargo.toml`): `inherits = "web"`, `opt-level = "z"`, `lto = "fat"`, `codegen-units = 1`, `strip = "debuginfo"` — used cleanly with `bun tooling/bun/web-build.ts build --lto` and Binaryen `wasm-opt -Oz`.
 - `[profile.aot]` (`Cargo.toml`): `inherits = "release"`, `opt-level = 3`, `lto = "fat"`, `codegen-units = 1` — paired with `wasmtime compile` (`.cwasm`) for zero-startup host execution in [`crates/extension_host`](../../crates/extension_host/src/wasm_host.rs) and `gpui-wgpu wasm aot`.
 
-## Unified CLI & 24-Tool MCP Server (`crates/wgpu_cli`)
+## Unified CLI & 24-Tool MCP Server (`crates/aphrody_cli`)
 
 - `gpui-wgpu wasm inspect|validate|optimize|aot|bindgen|compose|strip`: Binary inspection (`wasmparser` + gzip/SHA-256), strict validation, `wasm-opt -Oz`, Wasmtime AOT `.cwasm`, lockstep `wasm-bindgen`, component composition (`wac`), and pure-Rust section stripping (`wasm-encoder`).
 - `gpui-wgpu doctor`: Probes installed `wasm32` Rust targets, Binaryen/Wasmtime/SH/DXC/SPIR-V tools, and active GPU adapters.

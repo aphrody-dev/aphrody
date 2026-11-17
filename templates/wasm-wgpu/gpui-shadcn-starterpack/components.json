@@ -13,6 +13,6 @@
   "aliases": {
     "components": "@/components",
     "ui": "@/components/ui",
-    "gpui": "os_ui::starter_pack"
+    "gpui": "aphrody_ui::starter_pack"
   }
 }

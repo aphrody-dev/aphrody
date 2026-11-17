@@ -37,6 +37,6 @@ description: Bun integration in aphrody via the `vendor/bun` submodule (aphrody-
 
 ## 4. In-Memory Live TSX Preview inside `gpui_app_shell` and `zed`
 
-Inside `gpui_ui` (`feature = "nsh-dev"`), `nsh_workspace`, `gpui_app_shell` (`feature = "nsh"`), and `zed` (`feature = "nsh"` / `full`):
+Inside `gpui_ui` (`feature = "nsh-dev"`), `aphrody_nsh`, `gpui_app_shell` (`feature = "nsh"`), and `zed` (`feature = "nsh"` / `full`):
 - Single-module `.tsx` buffers compile directly in memory via `nsh_bundler::compile_module` (pure `oxc` AST JSX compiler, **zero `rolldown` crates** in `gpui_ui`, `gpui_app_shell`, or `zed`).
-- Opening **`nsh_workspace: Open Live Tsx Preview`** splits the active `.tsx` editor and live-reloads the native `gpui` `AppView` surface on every keystroke, synchronized with `GlobalTheme` and supporting embedded `<GpuiCodeEditor>` (`gpui_code::Editor`) native components.
+- Opening **`aphrody_nsh: Open Live Tsx Preview`** splits the active `.tsx` editor and live-reloads the native `gpui` `AppView` surface on every keystroke, synchronized with `GlobalTheme` and supporting embedded `<GpuiCodeEditor>` (`gpui_code::Editor`) native components.

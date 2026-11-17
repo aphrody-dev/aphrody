@@ -1,0 +1,100 @@
+[package]
+name = "aphrody"
+version = "0.5.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Full-stack Rust OS, GUI & AI framework uniting Zed, GPUI, Iced/COSMIC, egui, Bevy UE5.8, Tauri v3, NSH, Craft, Agent-Browser CDP, Tree-sitter, and Headless MCP."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody.rs"
+doctest = false
+
+[features]
+default = ["desktop"]
+# Lean core runtime (minimal binary footprint, zero heavy editor or 3D deps)
+minimal = ["session", "design", "installer"]
+# Library surface for downstream crates
+lib = ["minimal", "store", "craft", "cosmic"]
+
+# Target platforms
+desktop = ["lib", "gpui", "pilot"]
+web = ["minimal", "store"]
+mobile = ["minimal"]
+server = ["minimal", "pilot", "headless"]
+headless = ["minimal", "pilot", "craft", "cosmic", "mcp"]
+fullstack = ["desktop", "web", "server", "mcp"]
+
+# Unified Rust UI & Compositor backends placed cleanly alongside GPUI
+gpui = ["dep:gpui", "dep:gpui_ui", "dep:aphrody_ui", "dep:aphrody_nsh"]
+iced = ["dep:iced_gpui", "dep:aphrody_ui"]
+egui = ["dep:egui_gpui", "dep:aphrody_ui"]
+bevy = ["egui", "dep:bevy_gpui"]
+tauri = ["dep:tauri_gpui", "store"]
+cosmic = ["dep:cosmic_gpui"]
+nsh = ["dep:nsh-core", "dep:nsh-base"]
+
+# Subsystems
+session = ["dep:aphrody_session"]
+design = ["dep:aphrody_design"]
+ui = ["dep:aphrody_ui"]
+craft = ["dep:aphrody_craft"]
+craft-studio = ["craft", "aphrody_craft/studio"]
+pilot = ["dep:aphrody_pilot"]
+browser = ["pilot", "dep:aphrody_browser"]
+mcp = ["craft", "pilot"]
+store = ["dep:aphrody_store"]
+installer = ["dep:aphrody_installer"]
+editor = ["dep:gpui_code", "dep:editor", "dep:language", "dep:workspace", "dep:project"]
+tree-sitter = ["dep:tree-sitter", "dep:language"]
+vpn = ["dep:aphrody_vpn"]
+
+full = [
+    "fullstack",
+    "gpui",
+    "iced",
+    "egui",
+    "bevy",
+    "tauri",
+    "cosmic",
+    "nsh",
+    "craft-studio",
+    "browser",
+    "editor",
+    "tree-sitter",
+    "store",
+    "installer",
+    "design",
+    "vpn",
+]
+
+[dependencies]
+aphrody_browser = { workspace = true, optional = true }
+aphrody_craft = { workspace = true, optional = true }
+aphrody_design = { workspace = true, optional = true }
+aphrody_installer = { workspace = true, optional = true }
+aphrody_nsh = { workspace = true, optional = true }
+aphrody_pilot = { workspace = true, optional = true }
+aphrody_session = { workspace = true, optional = true }
+aphrody_store = { workspace = true, optional = true }
+aphrody_ui = { workspace = true, optional = true }
+aphrody_vpn = { workspace = true, optional = true }
+bevy_gpui = { workspace = true, optional = true }
+brand.workspace = true
+cosmic_gpui = { workspace = true, optional = true }
+editor = { workspace = true, optional = true }
+egui_gpui = { workspace = true, optional = true }
+gpui = { workspace = true, optional = true }
+gpui_code = { workspace = true, optional = true }
+gpui_ui = { workspace = true, optional = true }
+iced_gpui = { workspace = true, optional = true }
+language = { workspace = true, optional = true }
+nsh-base = { workspace = true, optional = true }
+nsh-core = { workspace = true, optional = true }
+project = { workspace = true, optional = true }
+tauri_gpui = { workspace = true, optional = true }
+tree-sitter = { workspace = true, optional = true }
+workspace = { workspace = true, optional = true }

@@ -21,7 +21,7 @@ Verify live settings on `aphrody-dev/aphrody` with `gh api repos/aphrody-dev/aph
 
 ## Workflow Suite (`.github/workflows/aphrody-*.yml`)
 
-1. **`aphrody-ci.yml`**: Fast verification on PRs and `main` pushes (`cargo xtask brand check`, `cargo test -p brand -p xtask --bins -p wgpu_cli`, modular SDK checks `gpui_ui`, `gpui_code`, `gpui_app_shell`, Windows `aphrody` bin check, plugin/hook JSON & Bun validation).
+1. **`aphrody-ci.yml`**: Fast verification on PRs and `main` pushes (`cargo xtask brand check`, `cargo test -p brand -p xtask --bins -p aphrody_cli`, modular SDK checks `gpui_ui`, `gpui_code`, `gpui_app_shell`, Windows `aphrody` bin check, plugin/hook JSON & Bun validation).
 2. **`aphrody-upstream-sync.yml`**: Scheduled (`cron`) & `workflow_dispatch` upstream sync tracking:
    - `zed-industries/zed` (git merge/cherry-pick candidates & commit digest / PR creation)
    - `longbridge/nsh` (`crates/nsh-*`, `docs/nsh`)

@@ -1,0 +1,29 @@
+[package]
+name = "iced_gpui"
+version = "0.14.0"
+edition.workspace = true
+publish.workspace = true
+license = "MIT OR Apache-2.0"
+description = "Iced Elm-style reactive runtime and libcosmic COSMIC RON theme adapter placed cleanly alongside GPUI and aligned to workspace WGPU v30 + AccessKit 0.25."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/iced_gpui.rs"
+doctest = false
+
+[features]
+default = []
+cosmic-theme = []
+wgpu = ["dep:wgpu"]
+
+[dependencies]
+anyhow.workspace = true
+aphrody_ui.workspace = true
+gpui.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+ui.workspace = true
+web-time.workspace = true
+wgpu = { workspace = true, optional = true }

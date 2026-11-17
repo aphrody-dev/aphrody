@@ -22,7 +22,7 @@ process.chdir(repoRoot);
 
 const args = Bun.argv.slice(2);
 const command = args[0] ?? "check";
-const targetPkg = opt("--package") ?? "os_desktop";
+const targetPkg = opt("--package") ?? "aphrody_desktop";
 const useLto = args.includes("--lto");
 const useAot = args.includes("--aot");
 const release = args.includes("--release") || useLto;
@@ -49,10 +49,10 @@ interface FrameworkWebSpec {
 
 const FRAMEWORK_SPECS: FrameworkWebSpec[] = [
   {
-    id: "os_desktop",
+    id: "aphrody_desktop",
     label: "Aphrody OS + GPUI + Craft + COSMIC",
-    manifest: "crates/os_desktop/Cargo.toml",
-    packageName: "os_desktop",
+    manifest: "crates/aphrody_desktop/Cargo.toml",
+    packageName: "aphrody_desktop",
     example: "web_os",
     features: ["web"],
     legacyTooling: "Unified (web-build.ts + [profile.web])",
@@ -60,10 +60,10 @@ const FRAMEWORK_SPECS: FrameworkWebSpec[] = [
     coiRequired: false,
   },
   {
-    id: "gpui_store",
+    id: "aphrody_store",
     label: "Awesome GPUI Store (NSH + 22 Packagers)",
-    manifest: "crates/gpui_store/Cargo.toml",
-    packageName: "gpui_store",
+    manifest: "crates/aphrody_store/Cargo.toml",
+    packageName: "aphrody_store",
     features: ["web"],
     legacyTooling: "Unified (web-build.ts + awesome-gpui-store.ts)",
     wasmBackend: "WebGPU + NSH adaptive Store surface",
@@ -408,11 +408,11 @@ function generateCohortHtml(pkg: string, entryName: string, wgVersion: string, c
 
 function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditReport> } {
   const wgVersion = verifyBindgenVersion();
-  const entryName = targetPkg === "os_desktop" ? "web_os" : targetPkg;
-  const cargoArgs = targetPkg === "os_desktop" ? ["--example", "web_os"] : [];
+  const entryName = targetPkg === "aphrody_desktop" ? "web_os" : targetPkg;
+  const cargoArgs = targetPkg === "aphrody_desktop" ? ["--example", "web_os"] : [];
   const features = targetPkg === "gpui_web" ? [] : ["web"];
   const profileDir = useLto ? "web-lto" : release ? "web" : "debug";
-  const wasmSrc = targetPkg === "os_desktop"
+  const wasmSrc = targetPkg === "aphrody_desktop"
     ? join("target", "wasm32-unknown-unknown", profileDir, "examples", `${entryName}.wasm`)
     : join("target", "wasm32-unknown-unknown", profileDir, `${entryName}.wasm`);
 
@@ -566,15 +566,15 @@ if (command === "matrix" || command === "audit") {
   const wgVersion = verifyBindgenVersion();
   console.log(`Verified wasm-bindgen ${wgVersion} == Cargo.lock`);
   runCargoWasm(
-    ["gpui", "gpui_web", "gpui_wgpu", "gpui_platform", "gpui_ui", "gpui_code", "os_session", "os_craft", "os_ui", "nsh-core", "nsh-platform-web"],
+    ["gpui", "gpui_web", "gpui_wgpu", "gpui_platform", "gpui_ui", "gpui_code", "aphrody_session", "aphrody_craft", "aphrody_ui", "nsh-core", "nsh-platform-web"],
     [],
     [],
     "",
     "check",
   );
-  runCargoWasm(["os_desktop"], ["web"], ["--example", "web_os"], "", "check");
-  if (existsSync(resolve(repoRoot, "crates/gpui_store/Cargo.toml"))) {
-    runCargoWasm(["gpui_store"], ["web"], [], "", "check");
+  runCargoWasm(["aphrody_desktop"], ["web"], ["--example", "web_os"], "", "check");
+  if (existsSync(resolve(repoRoot, "crates/aphrody_store/Cargo.toml"))) {
+    runCargoWasm(["aphrody_store"], ["web"], [], "", "check");
   }
   const wasiEnv = { ...process.env, RUSTC_WRAPPER: "", RUSTC_BOOTSTRAP: "1" };
   const wasiCmd = [
@@ -583,9 +583,9 @@ if (command === "matrix" || command === "audit") {
     "--target",
     "wasm32-wasip2",
     "-p",
-    "os_session",
+    "aphrody_session",
     "-p",
-    "os_craft",
+    "aphrody_craft",
     "-p",
     "release_channel",
     "-p",

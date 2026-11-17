@@ -82,7 +82,7 @@ windows-sys = { workspace = true, features = ["Win32_Foundation", "Win32_System_
 # The shader tests compile the apps' WGSL (nsh-core `shader`).
 nsh-core = { workspace = true, features = ["shader"] }
 # The typed API check reads the crate's public API.
-syn = { workspace = true, features = ["visit"] }
+syn = { workspace = true, features = ["full", "parsing", "visit"] }
 nsh-base = { workspace = true, features = ["editor", "highlight", "plot", "rich-editor", "term"] }
 # The host's shared data in `nativeModule`'s tests.
 tokio = { workspace = true, features = ["sync"] }

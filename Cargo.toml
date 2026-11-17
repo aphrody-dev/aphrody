@@ -13,6 +13,19 @@ members = [
     "crates/agent_ui_benchmarks",
     "crates/ai_onboarding",
     "crates/anthropic",
+    "crates/aphrody",
+    "crates/aphrody_browser",
+    "crates/aphrody_cli",
+    "crates/aphrody_craft",
+    "crates/aphrody_design",
+    "crates/aphrody_desktop",
+    "crates/aphrody_installer",
+    "crates/aphrody_nsh",
+    "crates/aphrody_pilot",
+    "crates/aphrody_session",
+    "crates/aphrody_store",
+    "crates/aphrody_ui",
+    "crates/aphrody_vpn",
     "crates/askpass",
     "crates/assets",
     "crates/audio",
@@ -47,7 +60,7 @@ members = [
     "crates/copilot",
     "crates/copilot_chat",
     "crates/copilot_ui",
-    "crates/craft_studio",
+    "crates/cosmic_gpui",
     "crates/crashes",
     "crates/credentials_provider",
     "crates/dap",
@@ -97,7 +110,6 @@ members = [
     "crates/github_releases",
     "crates/go_to_line",
     "crates/google_ai",
-    "crates/google_design_stitch",
     "crates/gpui",
     "crates/gpui_apple",
     "crates/gpui_ios",
@@ -114,13 +126,13 @@ members = [
     "crates/gpui_ui",
     "crates/gpui_code",
     "crates/gpui_app_shell",
-    "crates/gpui_store",
     "crates/grammars",
     "crates/hang_telemetry",
     "crates/html_to_markdown",
     "crates/http_client",
     "crates/http_client_tls",
     "crates/http_proxy",
+    "crates/iced_gpui",
     "crates/icons",
     "crates/image_viewer",
     "crates/input_latency_ui",
@@ -191,7 +203,6 @@ members = [
     "crates/nsh-updater",
     "crates/nsh-windows-app",
     "crates/nsh-windows-host",
-    "crates/nsh_workspace",
     "crates/oauth_callback_server",
     "crates/ollama",
     "crates/onboarding",
@@ -200,11 +211,6 @@ members = [
     "crates/open_router",
     "crates/openai_subscribed",
     "crates/opencode",
-    "crates/os_craft",
-    "crates/os_desktop",
-    "crates/os_pilot",
-    "crates/os_session",
-    "crates/os_ui",
     "crates/outline",
     "crates/outline_panel",
     "crates/path",
@@ -259,6 +265,7 @@ members = [
     "crates/tabular_data_preview",
     "crates/task",
     "crates/tasks_ui",
+    "crates/tauri_gpui",
     "crates/telemetry",
     "crates/telemetry_events",
     "crates/terminal",
@@ -280,12 +287,10 @@ members = [
     "crates/util_macros",
     "crates/vim",
     "crates/vim_mode_setting",
-    "crates/vpn_ui",
     "crates/watch",
     "crates/web_search",
     "crates/web_search_providers",
     "crates/which_key",
-    "crates/wgpu_cli",
     "crates/windows_resources",
     "crates/workspace",
     "crates/worktree",
@@ -325,8 +330,8 @@ exclude = [
     "vendor/ayvpn",
     "vendor/anyrender",
     "vendor/blitz",
+    "vendor/browser",
     "vendor/bun",
-    "vendor/cosmic",
     "vendor/cosmic-epoch",
     "vendor/cosmic-text",
     "vendor/craft-anything",
@@ -335,6 +340,7 @@ exclude = [
     "vendor/egui",
     "vendor/iced",
     "vendor/libcosmic",
+    "vendor/new-cli-installer",
     "vendor/smithay",
     "vendor/softbuffer",
     "vendor/taffy",
@@ -344,7 +350,27 @@ exclude = [
     "vendor/winit",
     "templates/wasm-wgpu/*",
 ]
-default-members = ["crates/gpui_wgpu", "crates/gpui_web", "crates/gpui_ui", "crates/gpui_code", "crates/gpui_store", "crates/google_design_stitch", "crates/egui_gpui", "crates/bevy_gpui", "crates/craft_studio", "crates/os_session", "crates/os_craft", "crates/os_pilot", "crates/os_ui", "crates/os_desktop", "crates/wgpu_cli"]
+default-members = [
+    "crates/aphrody",
+    "crates/gpui_wgpu",
+    "crates/gpui_web",
+    "crates/gpui_ui",
+    "crates/gpui_code",
+    "crates/aphrody_store",
+    "crates/aphrody_design",
+    "crates/egui_gpui",
+    "crates/bevy_gpui",
+    "crates/iced_gpui",
+    "crates/tauri_gpui",
+    "crates/cosmic_gpui",
+    "crates/aphrody_session",
+    "crates/aphrody_craft",
+    "crates/aphrody_installer",
+    "crates/aphrody_pilot",
+    "crates/aphrody_ui",
+    "crates/aphrody_desktop",
+    "crates/aphrody_cli",
+]
 
 [workspace.package]
 version = "0.5.0"
@@ -373,6 +399,7 @@ agent_skills = { path = "crates/agent_skills" }
 agent_ui = { path = "crates/agent_ui" }
 ai_onboarding = { path = "crates/ai_onboarding" }
 anthropic = { path = "crates/anthropic" }
+aphrody = { path = "crates/aphrody", default-features = false }
 askpass = { path = "crates/askpass" }
 assets = { path = "crates/assets" }
 audio = { path = "crates/audio" }
@@ -406,7 +433,7 @@ context_server = { path = "crates/context_server" }
 copilot = { path = "crates/copilot" }
 copilot_chat = { path = "crates/copilot_chat" }
 copilot_ui = { path = "crates/copilot_ui" }
-craft_studio = { path = "crates/craft_studio" }
+cosmic_gpui = { path = "crates/cosmic_gpui" }
 crashes = { path = "crates/crashes" }
 credentials_provider = { path = "crates/credentials_provider" }
 dap = { path = "crates/dap" }
@@ -450,7 +477,7 @@ git_ui_core = { path = "crates/git_ui_core" }
 github_releases = { path = "crates/github_releases" }
 go_to_line = { path = "crates/go_to_line" }
 google_ai = { path = "crates/google_ai" }
-google_design_stitch = { path = "crates/google_design_stitch" }
+aphrody_design = { path = "crates/aphrody_design" }
 gpui = { path = "crates/gpui", default-features = false }
 gpui_apple = { path = "crates/gpui_apple" }
 gpui_ios = { path = "crates/gpui_ios" }
@@ -464,6 +491,7 @@ gpui_util = { path = "crates/gpui_util" }
 gpui_web = { path = "crates/gpui_web", default-features = false }
 gpui_wgpu = { path = "crates/gpui_wgpu" }
 gpui_windows = { path = "crates/gpui_windows", default-features = false }
+aphrody_store = { path = "crates/aphrody_store", default-features = false }
 gpui_ui = { path = "crates/gpui_ui" }
 gpui_code = { path = "crates/gpui_code" }
 gpui_app_shell = { path = "crates/gpui_app_shell" }
@@ -473,6 +501,7 @@ html_to_markdown = { path = "crates/html_to_markdown" }
 http_client = { path = "crates/http_client" }
 http_client_tls = { path = "crates/http_client_tls" }
 http_proxy = { path = "crates/http_proxy" }
+iced_gpui = { path = "crates/iced_gpui" }
 icons = { path = "crates/icons" }
 image_viewer = { path = "crates/image_viewer" }
 input_latency_ui = { path = "crates/input_latency_ui" }
@@ -530,7 +559,8 @@ nsh-platform-tui = { version = "0.5.0", path = "crates/nsh-platform-tui", defaul
 nsh-platform-windows = { version = "0.5.0", path = "crates/nsh-platform-windows", default-features = false }
 nsh-testing = { version = "0.5.0", path = "crates/nsh-testing", default-features = false }
 nsh-updater = { version = "0.5.0", path = "crates/nsh-updater" }
-nsh_workspace = { path = "crates/nsh_workspace" }
+aphrody_nsh = { path = "crates/aphrody_nsh" }
+aphrody_browser = { path = "crates/aphrody_browser" }
 oauth_callback_server = { path = "crates/oauth_callback_server" }
 ollama = { path = "crates/ollama" }
 onboarding = { path = "crates/onboarding" }
@@ -539,10 +569,11 @@ open_path_prompt = { path = "crates/open_path_prompt" }
 open_router = { path = "crates/open_router", features = ["schemars"] }
 openai_subscribed = { path = "crates/openai_subscribed" }
 opencode = { path = "crates/opencode" }
-os_craft = { path = "crates/os_craft" }
-os_pilot = { path = "crates/os_pilot" }
-os_session = { path = "crates/os_session" }
-os_ui = { path = "crates/os_ui" }
+aphrody_craft = { path = "crates/aphrody_craft" }
+aphrody_installer = { path = "crates/aphrody_installer", default-features = false }
+aphrody_pilot = { path = "crates/aphrody_pilot" }
+aphrody_session = { path = "crates/aphrody_session" }
+aphrody_ui = { path = "crates/aphrody_ui" }
 outline = { path = "crates/outline" }
 outline_panel = { path = "crates/outline_panel" }
 path = { path = "crates/path" }
@@ -596,6 +627,7 @@ tab_switcher = { path = "crates/tab_switcher" }
 tabular_data_preview = { path = "crates/tabular_data_preview"}
 task = { path = "crates/task" }
 tasks_ui = { path = "crates/tasks_ui" }
+tauri_gpui = { path = "crates/tauri_gpui" }
 telemetry = { path = "crates/telemetry" }
 telemetry_events = { path = "crates/telemetry_events" }
 terminal = { path = "crates/terminal" }
@@ -616,7 +648,7 @@ util = { path = "crates/util" }
 util_macros = { path = "crates/util_macros" }
 vim = { path = "crates/vim" }
 vim_mode_setting = { path = "crates/vim_mode_setting" }
-vpn_ui = { path = "crates/vpn_ui" }
+aphrody_vpn = { path = "crates/aphrody_vpn" }
 watch = { path = "crates/watch" }
 web_search = { path = "crates/web_search" }
 web_search_providers = { path = "crates/web_search_providers" }
@@ -640,6 +672,11 @@ ztracing_macro = { path = "crates/ztracing_macro" }
 #
 
 ayvpn-daemon = { path = "vendor/ayvpn/crates/ayvpn-daemon" }
+browser-browse = { path = "vendor/browser/components/browser-browse" }
+browser-detect = { path = "vendor/browser/components/browser-detect", default-features = false }
+browser-engine = { path = "vendor/browser/components/browser-engine" }
+browser-views = { path = "vendor/browser/components/browser-views" }
+browser-vpn = { path = "vendor/browser/components/browser-vpn" }
 accesskit = { path = "vendor/accesskit/accesskit", features = ["enumn"] }
 accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
 accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
@@ -853,7 +890,6 @@ jsonschema = { version = "0.51", default-features = false }
 jsonwebtoken = { version = "10.0", default-features = false }
 jupyter-protocol = "2.0.3"
 jupyter-websocket-client = "3.0.0"
-kurbo = "0.13"
 libc = "0.2"
 libsqlite3-sys = { version = "0.30.1", features = ["bundled"] }
 libwebrtc = "0.3.26"
@@ -1795,6 +1831,16 @@ lto = "thin"
 codegen-units = 1
 debug = false
 strip = "debuginfo"
+
+# Bun-style binary size & startup optimization (LTO fat, opt-level="z", cg=1, stripped, abort)
+[profile.bun-release]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+debug = false
+strip = "symbols"
+panic = "abort"
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "allow" }

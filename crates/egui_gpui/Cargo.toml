@@ -19,7 +19,7 @@ path = "examples/google_design_egui.rs"
 
 [features]
 default = []
-wgpu = ["dep:egui-wgpu", "dep:gpui_wgpu", "dep:wgpu"]
+wgpu = ["dep:egui-wgpu"]
 
 [dependencies]
 anyhow.workspace = true
@@ -30,9 +30,7 @@ egui_extras.workspace = true
 emath.workspace = true
 epaint.workspace = true
 gpui.workspace = true
-gpui_wgpu = { workspace = true, optional = true }
-os_ui.workspace = true
+aphrody_ui.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-wgpu = { workspace = true, optional = true }
 web-time.workspace = true

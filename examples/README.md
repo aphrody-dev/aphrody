@@ -8,11 +8,11 @@ Matching `crates/gpui/examples/*.rs` in Zed upstream, runnable Rust examples liv
 
 - **GPUI Core & Web**: [`crates/gpui/examples/`](../crates/gpui/examples/) (`cargo xtask web-examples`)
 - **GPUI App Shell**: [`crates/gpui_app_shell/examples/studio_starter.rs`](../crates/gpui_app_shell/examples/studio_starter.rs)
-- **Aphrody OS Web**: [`crates/os_desktop/examples/web_os.rs`](../crates/os_desktop/examples/web_os.rs)
-- **WGPU & Naga Pipeline**: [`crates/wgpu_cli/examples/webgpu_naga_pipeline.rs`](../crates/wgpu_cli/examples/webgpu_naga_pipeline.rs)
+- **Aphrody OS Web**: [`crates/aphrody_desktop/examples/web_os.rs`](../crates/aphrody_desktop/examples/web_os.rs)
+- **WGPU & Naga Pipeline**: [`crates/aphrody_cli/examples/webgpu_naga_pipeline.rs`](../crates/aphrody_cli/examples/webgpu_naga_pipeline.rs)
 - **`egui 0.37` + Google Design Bridge**: [`crates/egui_gpui/examples/google_design_egui.rs`](../crates/egui_gpui/examples/google_design_egui.rs)
 - **Unreal Bevy 5.8 + Solari GI + MaterialX**: [`crates/bevy_gpui/examples/unreal_solari_showcase.rs`](../crates/bevy_gpui/examples/unreal_solari_showcase.rs)
-- **Storytold 82-Repo + Dual-GUI Parity Studio**: [`crates/craft_studio/examples/studio_parity_report.rs`](../crates/craft_studio/examples/studio_parity_report.rs)
+- **Storytold 82-Repo + Dual-GUI Parity Studio**: [`crates/aphrody_craft/examples/studio_parity_report.rs`](../crates/aphrody_craft/examples/studio_parity_report.rs)
 
 ## 2. Standalone Project Scaffolding (`cargo xtask new-app` & `templates/`)
 

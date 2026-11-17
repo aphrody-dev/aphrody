@@ -243,3 +243,5 @@ jobs:
           if [ -f artifacts/manifests/linux-x86_64.json ]; then
             bunx wrangler r2 object put "aphrody-releases/channels/$CHANNEL/latest.json" --file artifacts/manifests/linux-x86_64.json --content-type application/json
           fi
+          bun tooling/bun/cloudflare-deploy.ts publish-scripts
+          bun tooling/bun/cloudflare-deploy.ts deploy

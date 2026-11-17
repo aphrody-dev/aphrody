@@ -1,6 +1,6 @@
 # wasm-bindgen Ecosystem & Aphrody WebAssembly Best Practices Guide
 
-> Live architectural audit across all **8 repositories** in `github.com/wasm-bindgen`, `crates.io` upstream releases, GitIngest digests, and Aphrody's pinned `wasm-bindgen 0.2.129` + `v133` stack (`crates/gpui_web`, `crates/os_desktop`, `tooling/bun/web-build.ts`).
+> Live architectural audit across all **8 repositories** in `github.com/wasm-bindgen`, `crates.io` upstream releases, GitIngest digests, and Aphrody's pinned `wasm-bindgen 0.2.129` + `v133` stack (`crates/gpui_web`, `crates/aphrody_desktop`, `tooling/bun/web-build.ts`).
 
 ---
 

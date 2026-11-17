@@ -2565,6 +2565,7 @@ mod tests {
             ]
         );
     }
+    #[cfg(unix)]
     use std::cell::Cell;
 
     use super::*;

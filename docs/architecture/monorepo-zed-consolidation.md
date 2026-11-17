@@ -1,6 +1,6 @@
 # Monorepo Consolidation & Alignment with Zed Upstream (`zed-industries/zed`)
 
-> Canonical structural reference ensuring that every Aphrody subsystem — **Google Design (`https://design.google/`)**, **Storytold 82-Repo Suite**, **`egui 0.37` (`egui_gpui`)**, **Unreal Bevy 5.8 (`bevy_gpui`)**, **NSH (`nsh_workspace`)**, and **Wasm/WebGPU (`gpui_wgpu` / `wgpu_cli`)** — follows `zed-industries/zed`'s exact repository layout, Cargo feature composition, example placement, and `cargo xtask` tooling contract.
+> Canonical structural reference ensuring that every Aphrody subsystem — **Google Design (`https://design.google/`)**, **Storytold 82-Repo Suite**, **`egui 0.37` (`egui_gpui`)**, **Unreal Bevy 5.8 (`bevy_gpui`)**, **NSH (`aphrody_nsh`)**, and **Wasm/WebGPU (`gpui_wgpu` / `aphrody_cli`)** — follows `zed-industries/zed`'s exact repository layout, Cargo feature composition, example placement, and `cargo xtask` tooling contract.
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Directory | Zed Upstream Role | Aphrody Consolidated Role |
 | --- | --- | --- |
-| [`crates/`](../../crates/) | First-party Rust crates (`src/<crate>.rs`, zero `mod.rs`, `[lints] workspace = true`) | Identical rule across all Zed crates + `os_ui`, `os_craft`, `google_design_stitch`, `egui_gpui`, `bevy_gpui`, `craft_studio`, `nsh_workspace`, `wgpu_cli` |
-| `crates/<crate>/examples/` | Crate-owned runnable Rust examples (e.g. [`crates/gpui/examples/`](../../crates/gpui/examples/)) | Every studio crate owns its Rust examples (`egui_gpui`, `bevy_gpui`, `craft_studio`, `gpui_app_shell`, `os_desktop`, `wgpu_cli`) |
+| [`crates/`](../../crates/) | First-party Rust crates (`src/<crate>.rs`, zero `mod.rs`, `[lints] workspace = true`) | Identical rule across all Zed crates + `aphrody_ui`, `aphrody_craft`, `aphrody_design`, `egui_gpui`, `bevy_gpui`, `aphrody_craft`, `aphrody_nsh`, `aphrody_cli` |
+| `crates/<crate>/examples/` | Crate-owned runnable Rust examples (e.g. [`crates/gpui/examples/`](../../crates/gpui/examples/)) | Every studio crate owns its Rust examples (`egui_gpui`, `bevy_gpui`, `aphrody_craft`, `gpui_app_shell`, `aphrody_desktop`, `aphrody_cli`) |
 | [`tooling/xtask/`](../../tooling/xtask/src/main.rs) | Single authoritative Rust workspace CLI (`cargo xtask ...`) | Extended cleanly with `brand`, `new-app` (`--template craft-studio`), and [`studio`](../../tooling/xtask/src/tasks/studio.rs) (`status`, `check`, `parity`, `session`) |
 | [`tooling/bun/`](../../tooling/bun/README.md) | N/A upstream (Node/Python scripts) | Single typed Bun router [`tooling/bun/cli.ts`](../../tooling/bun/cli.ts) (`bun run xtask -- <domain> <action>`) over 7 domains |
 | [`script/`](../../script/) | Thin shell/PowerShell wrappers (`./script/clippy`, `./script/bundle-*`) | Preserved 1:1 + [`script/studio`](../../script/studio) & [`script/studio.ps1`](../../script/studio.ps1) |
@@ -33,13 +33,13 @@ zed (default = ["nsh"])
 ├── updater
 ├── crash-reporting
 ├── grammars
-├── nsh ──────────────► nsh_workspace (GpuiCodeEditor + Live TSX hot-reload)
-├── studio ───────────► nsh_workspace/studio
-│                       ├── google_design_stitch (design.google mirror + DESIGN.md + Lighthouse)
-│                       └── craft_studio (FigCraft + Craft Anything + 18 Storytold Apps)
+├── nsh ──────────────► aphrody_nsh (GpuiCodeEditor + Live TSX hot-reload)
+├── studio ───────────► aphrody_nsh/studio
+│                       ├── aphrody_design (design.google mirror + DESIGN.md + Lighthouse)
+│                       └── aphrody_craft (FigCraft + Craft Anything + 18 Storytold Apps)
 │                           ├── egui_gpui (egui 0.37 + Craft Controls + AccessKit 0.25)
 │                           ├── bevy_gpui (Unreal 5.8 ECS + Nanite Meshlets + MaterialX->WGSL + Solari GI)
-│                           └── os_craft (storytold-suite: 50+ pure-Rust format & disasm crates)
+│                           └── aphrody_craft (storytold-suite: 50+ pure-Rust format & disasm crates)
 └── full ─────────────► [extensions, debugger, repl, collab, ai, updater, crash-reporting, nsh, studio, grammars]
 ```
 

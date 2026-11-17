@@ -1,6 +1,6 @@
 # WGPU v30.0.0 & Naga v30.0.0 — Complete Technical Reference (`aphrody`)
 
-> Authoritative source-verified reference for `wgpu` v30.0.0 and `naga` v30.0.0 vendored at `vendor/wgpu` (upstream `gfx-rs/wgpu` commit `cddb2f5d80dc0009b2ef6767635140cacf90a007`), `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/wgpu_cli` (`gpui-wgpu`).
+> Authoritative source-verified reference for `wgpu` v30.0.0 and `naga` v30.0.0 vendored at `vendor/wgpu` (upstream `gfx-rs/wgpu` commit `cddb2f5d80dc0009b2ef6767635140cacf90a007`), `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/aphrody_cli` (`gpui-wgpu`).
 
 ---
 
@@ -11,7 +11,7 @@
 1. **Vulkan surface-drop ordering fix** (`wgpu#10230`) preventing driver crashes when windows close or recreate surfaces.
 2. **WebGL2 canvas resize fix** (`wgpu#10348`) required by `gpui_web`.
 
-All GPU crates in `aphrody` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from `vendor/wgpu` so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `wgpu_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
+All GPU crates in `aphrody` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from `vendor/wgpu` so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `aphrody_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
 
 ### 1.2 Directory & Crate Map (`vendor/wgpu/`)
 
@@ -1038,24 +1038,24 @@ When native interop is needed (e.g., Vulkan external memory, Metal `IOSurfaceRef
 
 ---
 
-## 10. `gpui-wgpu` CLI Reference (`crates/wgpu_cli`)
+## 10. `gpui-wgpu` CLI Reference (`crates/aphrody_cli`)
 
-Binary name: `gpui-wgpu` (package `wgpu_cli`).
+Binary name: `gpui-wgpu` (package `aphrody_cli`).
 
 ### 10.1 Subcommands & Flags
 
 1. **Enumerate Adapters & Capabilities**
    ```sh
-   cargo run -p wgpu_cli -- adapters
-   cargo run -p wgpu_cli -- adapters --backends vulkan --limits --features
-   cargo run -p wgpu_cli -- adapters --json
+   cargo run -p aphrody_cli -- adapters
+   cargo run -p aphrody_cli -- adapters --backends vulkan --limits --features
+   cargo run -p aphrody_cli -- adapters --json
    ```
    Outputs adapter name, backend (`vulkan`/`dx12`/`metal`/`gl`), `DeviceType`, PCI `vendor` & `device` hex IDs, PCI bus ID, driver version, subgroup min/max sizes, `DownlevelCapabilities` WebGPU compliance status, core surface/render `TextureFormat` feature matrices (`Rgba8Unorm`, `Bgra8Unorm`, `R8Unorm`, `Rgba16Float`, `Depth32Float`), and optional full `Features` & `Limits`.
 
 2. **Validate & Reflect WGSL Shaders**
    ```sh
-   cargo run -p wgpu_cli -- validate path/to/shader.wgsl
-   cargo run -p wgpu_cli -- validate path/to/shader.wgsl --json
+   cargo run -p aphrody_cli -- validate path/to/shader.wgsl
+   cargo run -p aphrody_cli -- validate path/to/shader.wgsl --json
    ```
    Runs `naga::front::wgsl::parse_str` + `naga::valid::Validator::new(ValidationFlags::all(), Capabilities::all())` + `naga::proc::Layouter`. Prints rich source-span diagnostics on parse/validation errors, and on success prints:
    - Entry points (`Vertex`, `Fragment`, `Compute` + `@workgroup_size(x, y, z)`).
@@ -1064,31 +1064,31 @@ Binary name: `gpui-wgpu` (package `wgpu_cli`).
 
 3. **Transpile WGSL to HLSL / MSL / GLSL / SPIR-V / WGSL**
    ```sh
-   cargo run -p wgpu_cli -- transpile shader.wgsl --target hlsl
-   cargo run -p wgpu_cli -- transpile shader.wgsl --target msl -o shader.metal
-   cargo run -p wgpu_cli -- transpile shader.wgsl --target glsl --stage fragment --entry fs_main
-   cargo run -p wgpu_cli -- transpile shader.wgsl --target glsl-webgl2 --stage fragment --entry fs_main
-   cargo run -p wgpu_cli -- transpile shader.wgsl --target spv -o shader.spv
+   cargo run -p aphrody_cli -- transpile shader.wgsl --target hlsl
+   cargo run -p aphrody_cli -- transpile shader.wgsl --target msl -o shader.metal
+   cargo run -p aphrody_cli -- transpile shader.wgsl --target glsl --stage fragment --entry fs_main
+   cargo run -p aphrody_cli -- transpile shader.wgsl --target glsl-webgl2 --stage fragment --entry fs_main
+   cargo run -p aphrody_cli -- transpile shader.wgsl --target spv -o shader.spv
    ```
    Resolves overrides via `naga::back::pipeline_constants::process_overrides` and invokes the corresponding `naga::back::*` writer with clean sequential resource binding maps where needed (so MSL and HLSL compile cleanly without missing-binding errors).
 
 4. **Headless Offscreen Fragment Shader Render to PNG**
    ```sh
-   cargo run -p wgpu_cli -- render shader.wgsl -o output.png --width 800 --height 600 --time 1.5 --entry fs_main
+   cargo run -p aphrody_cli -- render shader.wgsl -o output.png --width 800 --height 600 --time 1.5 --entry fs_main
    ```
    Automatically supplies a built-in fullscreen triangle vertex shader (`@builtin(vertex_index)` with `uv` at `@location(0)` if the module has no `@vertex` entry point), inspects the module with `naga` to detect whether `@group(0) @binding(0)` uniform `{ resolution: vec2<f32>, time: f32, _pad: f32 }` is declared (binding it automatically when declared, or using an empty layout when not), renders into an `Rgba8Unorm` attachment, strips 256-byte row padding, and writes `output.png`.
 
 5. **Headless Compute Shader Dispatch & Readback**
    ```sh
-   cargo run -p wgpu_cli -- compute compute.wgsl --entry main --workgroups 4,1,1 --output-floats 64
-   cargo run -p wgpu_cli -- compute compute.wgsl --json
+   cargo run -p aphrody_cli -- compute compute.wgsl --entry main --workgroups 4,1,1 --output-floats 64
+   cargo run -p aphrody_cli -- compute compute.wgsl --json
    ```
    Allocates a `STORAGE | COPY_SRC` buffer bound at `@group(0) @binding(0)` (or zero bindings if none declared), dispatches `(x, y, z)` workgroups, copies to a `MAP_READ` staging buffer, and prints the resulting `f32` values.
 
 6. **GPU Micro-Benchmark Suite**
    ```sh
-   cargo run -p wgpu_cli -- bench --iterations 50 --size 1024
-   cargo run -p wgpu_cli -- bench --json
+   cargo run -p aphrody_cli -- bench --iterations 50 --size 1024
+   cargo run -p aphrody_cli -- bench --json
    ```
    Measures and reports:
    - Adapter enumeration + `request_device` cold-start latency (ms).

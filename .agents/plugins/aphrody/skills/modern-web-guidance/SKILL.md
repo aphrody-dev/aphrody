@@ -5,7 +5,7 @@ description: GoogleChrome/modern-web-guidance-src Baseline web standards, Cohere
 
 # Modern Web Guidance (`GoogleChrome/modern-web-guidance-src`)
 
-Applies Google Chrome Baseline web standards natively across Aphrody web builds, `gpui_web`, NSH HTML/TSX surfaces, and `templates/wasm-wgpu/*` via `google_design_stitch::modern_web_guidance` and `gpui-wgpu design web-guidance`.
+Applies Google Chrome Baseline web standards natively across Aphrody web builds, `gpui_web`, NSH HTML/TSX surfaces, and `templates/wasm-wgpu/*` via `aphrody_design::modern_web_guidance` and `gpui-wgpu design web-guidance`.
 
 ## Checklist
 

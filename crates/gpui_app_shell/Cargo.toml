@@ -24,7 +24,7 @@ panels = [
     "dep:tasks_ui",
 ]
 nsh = [
-    "dep:nsh_workspace",
+    "dep:aphrody_nsh",
     "gpui_ui/nsh-dev",
     "gpui_ui/nsh-shader",
     "gpui_ui/nsh-math",
@@ -32,11 +32,11 @@ nsh = [
 ]
 studio = [
     "nsh",
-    "nsh_workspace/studio",
+    "aphrody_nsh/studio",
 ]
 nsh-webview = [
     "nsh",
-    "nsh_workspace/webview",
+    "aphrody_nsh/webview",
     "gpui_ui/nsh-webview",
 ]
 test-support = [
@@ -55,7 +55,6 @@ activity_indicator.workspace = true
 anyhow.workspace = true
 breadcrumbs.workspace = true
 client.workspace = true
-clock.workspace = true
 command_palette.workspace = true
 command_palette_hooks.workspace = true
 db.workspace = true
@@ -65,12 +64,11 @@ futures.workspace = true
 gpui_code = { workspace = true, features = ["full"] }
 gpui_tokio.workspace = true
 gpui_ui.workspace = true
-http_client.workspace = true
 keymap_editor.workspace = true
 log.workspace = true
 node_runtime.workspace = true
 notifications.workspace = true
-nsh_workspace = { workspace = true, optional = true }
+aphrody_nsh = { workspace = true, optional = true }
 paths.workspace = true
 picker.workspace = true
 platform_title_bar.workspace = true

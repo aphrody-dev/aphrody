@@ -523,7 +523,7 @@ const KNOWN_ABSORBED_SPECS: Record<
   },
   "longbridge/nsh": {
     category: "nsh-runtime",
-    targets: ["crates/nsh-core", "crates/nsh-base", "crates/nsh-engine", "crates/nsh-js", "crates/nsh-platform-gpui", "crates/nsh_workspace", "crates/gpui_ui/src/nsh.rs"],
+    targets: ["crates/nsh-core", "crates/nsh-base", "crates/nsh-engine", "crates/nsh-js", "crates/nsh-platform-gpui", "crates/aphrody_nsh", "crates/gpui_ui/src/nsh.rs"],
     rationale: "Longbridge Native Shell (v0.5.0) already flattened into crates/nsh-* and bridged into gpui_ui + gpui_app_shell.",
   },
   "longbridge/native-shell-v1": {
@@ -554,7 +554,7 @@ const KNOWN_MERGE_CANDIDATES: Record<
 > = {
   "longbridge/gpui-kit": {
     category: "gpui-ui-components",
-    targets: ["crates/ui", "crates/gpui_ui", "crates/os_ui"],
+    targets: ["crates/ui", "crates/gpui_ui", "crates/aphrody_ui"],
     score: 98,
     rationale: "60+ desktop GPUI widgets, virtualized tables, dock, webview, fps monitor, and gpui-component/gpui-kit ecosystem alignment.",
   },
@@ -572,13 +572,13 @@ const KNOWN_MERGE_CANDIDATES: Record<
   },
   "longbridge/wef": {
     category: "gpui-cef-webview",
-    targets: ["crates/nsh-platform-gpui", "vendor/tauri/cef-rs", "crates/os_desktop"],
+    targets: ["crates/nsh-platform-gpui", "vendor/tauri/cef-rs", "crates/aphrody_desktop"],
     score: 91,
     rationale: "Offscreen CEF3 gpui-webview + cargo-wef complements local wry and vendor/tauri/cef-rs without OS WebView inconsistencies.",
   },
   "longbridge/purview": {
     category: "gpui-mcp-inspection",
-    targets: ["crates/os_craft", "crates/inspector_ui", "crates/gpui_ui"],
+    targets: ["crates/aphrody_craft", "crates/inspector_ui", "crates/gpui_ui"],
     score: 90,
     rationale: "Live multi-window GPUI projection & rmcp automation bridge (purview + purview-gpui) for AI-native app control.",
   },
@@ -590,9 +590,9 @@ const KNOWN_MERGE_CANDIDATES: Record<
   },
   "longbridge/longbridge-mcp": {
     category: "ai-mcp",
-    targets: ["crates/os_craft", "crates/context_server"],
+    targets: ["crates/aphrody_craft", "crates/context_server"],
     score: 82,
-    rationale: "Production rmcp streamable-HTTP + stdio MCP server patterns relevant to os_craft MCP hardening.",
+    rationale: "Production rmcp streamable-HTTP + stdio MCP server patterns relevant to aphrody_craft MCP hardening.",
   },
   "longbridge/longbridge-terminal": {
     category: "tui-ai-cli",
@@ -608,7 +608,7 @@ const KNOWN_MERGE_CANDIDATES: Record<
   },
   "longbridge/open-pencil": {
     category: "design-canvas",
-    targets: ["crates/os_desktop", "crates/os_craft"],
+    targets: ["crates/aphrody_desktop", "crates/aphrody_craft"],
     score: 75,
     rationale: "AI-native Figma/design canvas concepts aligned with FigCraft studio in assets/os/craft_catalog.toml.",
   },
@@ -732,7 +732,7 @@ export function classifyRepo(
       category: isBench ? "benchmark-compat" : isShowcase ? "showcase-app" : "docs-skills-reference",
       relevanceScore: isBench || isShowcase ? 78 : 55,
       localMatches: findLocalAnchorsForRepo(shortName, localIndex),
-      targetCrates: shortName.includes("bench") ? ["tooling/perf", "crates/bench_metrics"] : ["docs/architecture", "crates/os_desktop"],
+      targetCrates: shortName.includes("bench") ? ["tooling/perf", "crates/bench_metrics"] : ["docs/architecture", "crates/aphrody_desktop"],
       rationale: isBench
         ? "Benchmark/compatibility harness retained as reference validation suite."
         : isShowcase
@@ -756,7 +756,7 @@ export function classifyRepo(
       category: isLib ? "community-gpui-lib" : "community-gpui-app",
       relevanceScore: Math.min(95, (isLib ? 74 : 58) + Math.round(Math.log10(Math.max(10, repo.stars)) * 5)),
       localMatches: localMatch,
-      targetCrates: isLib ? ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"] : ["docs/architecture"],
+      targetCrates: isLib ? ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"] : ["docs/architecture"],
       rationale: isLib
         ? "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
         : "Community GPUI production application benchmarked for UX patterns and ecosystem showcase parity.",
@@ -783,7 +783,7 @@ export function classifyRepo(
       category: "discovered-gpui-ai",
       relevanceScore: 72,
       localMatches: findLocalAnchorsForRepo(shortName, localIndex),
-      targetCrates: ["crates/gpui_ui", "crates/os_desktop"],
+      targetCrates: ["crates/gpui_ui", "crates/aphrody_desktop"],
       rationale: "Active GPUI/NSH/Wasm/AI repository matched by live keyword and language classifier.",
     };
   }
@@ -1429,7 +1429,13 @@ export function isCoreFeatureMatrixCrate(name: string): boolean {
   return (
     name.startsWith("gpui") ||
     name.startsWith("nsh") ||
+    name.startsWith("aphrody") ||
     name.startsWith("os_") ||
+    name === "iced_gpui" ||
+    name === "egui_gpui" ||
+    name === "bevy_gpui" ||
+    name === "tauri_gpui" ||
+    name === "cosmic_gpui" ||
     name === "ui" ||
     name === "ui_input" ||
     name === "brand" ||
@@ -2276,7 +2282,7 @@ export function buildMermaidTopology(graph: GraphifyDocument): string {
     "    GPUI[\"crates/gpui + gpui_wgpu + gpui_web + gpui_ios\"]",
     "    NSHC[\"crates/nsh-core / nsh-base / nsh-js / nsh-platform-gpui\"]",
     "    GPUIUI[\"crates/ui + crates/gpui_ui + crates/gpui_app_shell\"]",
-    "    OSC[\"crates/os_craft + os_ui + os_desktop\"]",
+    "    OSC[\"crates/aphrody_craft + aphrody_ui + aphrody_desktop\"]",
     "    ACP[\"crates/acp_thread + context_server\"]",
     "  end",
     "",

@@ -29,8 +29,8 @@ describe("agent-desktop purge & AI OS pilot migration", () => {
     }
   });
 
-  it("enforces Zed style (zero mod.rs in crates/os_pilot) and zero Vercel brand leaks", () => {
-    const modRs = findModRsRecursive(`${repoRoot}/crates/os_pilot/src`);
+  it("enforces Zed style (zero mod.rs in crates/aphrody_pilot) and zero Vercel brand leaks", () => {
+    const modRs = findModRsRecursive(`${repoRoot}/crates/aphrody_pilot/src`);
     expect(modRs).toEqual([]);
     const migrated = scanMigratedTree(repoRoot);
     for (const file of migrated) {
@@ -41,7 +41,7 @@ describe("agent-desktop purge & AI OS pilot migration", () => {
 
   it("maintains 100% parity across all 55+ desktop/AI OS pilot tools", () => {
     const { present, missing } = checkToolParity(
-      `${repoRoot}/crates/os_pilot/src/os_pilot.rs`,
+      `${repoRoot}/crates/aphrody_pilot/src/aphrody_pilot.rs`,
     );
     expect(missing).toEqual([]);
     expect(present.length).toBe(REQUIRED_PILOT_TOOLS.length);

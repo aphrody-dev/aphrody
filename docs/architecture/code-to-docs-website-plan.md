@@ -12,7 +12,7 @@
 
 ### Ready Internal Sources to Wire Directly
 - **Brand & URLs**: [`product.toml`](../../product.toml) (`https://aphrody.com`, `https://docs.aphrody.com`, `brand check`).
-- **Rust & Schema Truth**: [`crates/schema_generator`](../../crates/schema_generator/Cargo.toml), [`crates/json_schema_store`](../../crates/json_schema_store/Cargo.toml) (`schemars 1.0.4`), `zed --dump-all-actions`, [`crates/extension_api/wit/since_v0.8.0/`](../../crates/extension_api/wit/since_v0.8.0/extension.wit) (11 WIT interfaces), [`crates/grammars/`](../../crates/grammars/Cargo.toml) (`tree-sitter`), [`crates/os_craft/src/mcp.rs`](../../crates/os_craft/src/mcp.rs) (`builtin_tools()`), and [`assets/os/`](../../assets/os/craft_catalog.toml).
+- **Rust & Schema Truth**: [`crates/schema_generator`](../../crates/schema_generator/Cargo.toml), [`crates/json_schema_store`](../../crates/json_schema_store/Cargo.toml) (`schemars 1.0.4`), `zed --dump-all-actions`, [`crates/extension_api/wit/since_v0.8.0/`](../../crates/extension_api/wit/since_v0.8.0/extension.wit) (11 WIT interfaces), [`crates/grammars/`](../../crates/grammars/Cargo.toml) (`tree-sitter`), [`crates/aphrody_craft/src/mcp.rs`](../../crates/aphrody_craft/src/mcp.rs) (`builtin_tools()`), and [`assets/os/`](../../assets/os/craft_catalog.toml).
 - **TypeScript & Skill Generators**: [`crates/nsh-js/src/declarations.rs`](../../crates/nsh-js/src/declarations.rs) (parity-tested `.nsh/types/*.d.ts`), [`tooling/bun/crate-to-skill.ts`](../../tooling/bun/crate-to-skill.ts) (`cargo-doc-md` / `rustdoc-md`), [`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts) (live WebGPU demo bundles), and [`.cloudflare/docs-proxy/src/worker.js`](../../.cloudflare/docs-proxy/src/worker.js) (`Accept: text/markdown` worker logic).
 
 ---

@@ -6,7 +6,7 @@
  * and saves PNG proof under gitignored `target/web-screenshots/<pkg>.png`.
  *
  * Usage:
- *   bun tooling/bun/web-verify.ts [--package os_desktop] [--out-dir target/web-dist] [--shot target/web-screenshots/os_desktop.png]
+ *   bun tooling/bun/web-verify.ts [--package aphrody_desktop] [--out-dir target/web-dist] [--shot target/web-screenshots/aphrody_desktop.png]
  */
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
@@ -45,7 +45,7 @@ function findBrowserExecutable(): string {
   throw new Error("No Chromium/Chrome/Edge executable found; set APHRODY_CHROME_BIN or CHROME_BIN.");
 }
 
-const pkg = opt("--package") ?? "os_desktop";
+const pkg = opt("--package") ?? "aphrody_desktop";
 const metaRes = Bun.spawnSync(["cargo", "metadata", "--no-deps", "--format-version", "1"], {
   cwd: repoRoot,
   stdout: "pipe",

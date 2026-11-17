@@ -53,5 +53,5 @@ export XWIN_ARCH=x86_64,aarch64
 
 # Cross-check OS crates from Windows or Linux targeting glibc 2.28 / Windows MSVC
 bun run cross:doctor
-bun run cross:check -- --target x86_64-unknown-linux-gnu --package os_session
+bun run cross:check -- --target x86_64-unknown-linux-gnu --package aphrody_session
 ```

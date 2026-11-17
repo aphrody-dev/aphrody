@@ -46,4 +46,4 @@ rga -s vk-spv-offline -c gfx1100 --comp shader.spv --isa isa.txt --analysis stat
 ## 4. Code Examples
 
 - [`examples/gpu/amd/wave_reduce_rdna.wgsl`](../../../examples/gpu/amd/wave_reduce_rdna.wgsl): Wavefront parallel reduction shader tuned for RDNA Wave32/Wave64 pipelines.
-- [`crates/wgpu_cli/examples/ihv_vendor_matrix.rs`](../../../crates/wgpu_cli/examples/ihv_vendor_matrix.rs): Multi-vendor enumeration and compute dispatch test.
+- [`crates/aphrody_cli/examples/ihv_vendor_matrix.rs`](../../../crates/aphrody_cli/examples/ihv_vendor_matrix.rs): Multi-vendor enumeration and compute dispatch test.

@@ -287,7 +287,7 @@ pub fn render_bevy_egui_inspector(
 
 #[cfg(test)]
 mod tests {
-    use os_ui::AppearanceMode;
+    use aphrody_ui::AppearanceMode;
 
     use super::*;
     use crate::ecs_world::decode_usd_crate_frame;

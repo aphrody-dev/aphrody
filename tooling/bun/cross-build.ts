@@ -104,7 +104,7 @@ if (import.meta.main) {
     console.log(JSON.stringify({ platform: process.platform, arch: process.arch, tools, installedTargets }, null, 2));
   } else if (cmd === "check") {
     const target = opt("--target") ?? "x86_64-unknown-linux-gnu.2.28";
-    const pkg = opt("--package") ?? "os_session";
+    const pkg = opt("--package") ?? "aphrody_session";
     const spec = CROSS_MATRIX.find((s) => s.target === target || s.target.startsWith(`${target}.`));
     const driver = spec?.driver ?? "cargo";
     const sub = driver === "cargo-xwin" ? ["xwin", "check"] : driver === "cargo-zigbuild" ? ["zigbuild"] : ["check"];

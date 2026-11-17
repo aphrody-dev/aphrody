@@ -1,0 +1,53 @@
+[package]
+name = "aphrody_installer"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Aphrody OS & Arch Net-Installer + Live Desktop Environment Switcher (Aphrody GPUI, Iced COSMIC, egui Craft, WebGPU, GNOME, KDE, Hyprland, Sway, Niri) rewritten from cachyos/new-cli-installer in Rust + NSH."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_installer.rs"
+doctest = false
+
+[[bin]]
+name = "aphrody-installer"
+path = "src/main.rs"
+required-features = ["desktop"]
+
+[features]
+default = ["nsh-ui"]
+nsh-ui = ["dep:nsh-core", "dep:nsh-base"]
+desktop = [
+    "nsh-ui",
+    "dep:env_logger",
+    "dep:nsh-platform-windows",
+    "dep:nsh-platform-linux",
+    "dep:nsh-platform-macos",
+]
+
+[dependencies]
+brand.workspace = true
+env_logger = { workspace = true, optional = true }
+nsh-base = { workspace = true, optional = true }
+nsh-core = { workspace = true, optional = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+toml.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+nsh-platform-linux = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+nsh-platform-macos = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+nsh-platform-windows = { workspace = true, optional = true }
+
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
+nsh-engine.workspace = true
+nsh-testing = { workspace = true, features = ["live"] }

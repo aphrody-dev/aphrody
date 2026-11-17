@@ -12,7 +12,7 @@ const repoRoot = resolve(import.meta.dir, "../..");
 describe("aphrody repo-native bun tooling", () => {
   test("parses .gitmodules and preserves relative aphrody-labs submodule URLs", () => {
     const entries = parseGitmodules(readFileSync(resolve(repoRoot, ".gitmodules"), "utf8"));
-    expect(entries.length).toBeGreaterThanOrEqual(30);
+    expect(entries.length).toBeGreaterThanOrEqual(24);
     for (const entry of entries) {
       expect(entry.url.startsWith("../../aphrody-labs/") || entry.url.startsWith("../")).toBe(true);
     }

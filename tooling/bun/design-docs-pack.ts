@@ -253,7 +253,7 @@ ${emitPaletteVars(d)}
   --md-sys-shape-corner-xl: ${tokens.sys.shape.extra_large_px}px;
   --md-sys-shape-corner-full: ${tokens.sys.shape.full_px}px;
 
-  /* Analytical Damped Harmonic Oscillator Springs (os_ui::google_design::SpringSpec) */
+  /* Analytical Damped Harmonic Oscillator Springs (aphrody_ui::google_design::SpringSpec) */
   --md-sys-motion-spring-spatial-fast: 240ms ${spFast};
   --md-sys-motion-spring-spatial-default: 340ms ${spDefault};
   --md-sys-motion-spring-effects-default: 200ms ${efDefault};
@@ -470,7 +470,7 @@ function buildStitchKitJson(): object {
         title: "Google FigCraft & Stitch Vector/Token Studio",
         deviceType: "DESKTOP",
         gpuiAction: "google_design_studio::OpenGoogleFigCraftStudio",
-        dualParityTarget: "craft_studio::StudioPillar::FigCraftGoogle",
+        dualParityTarget: "aphrody_craft::StudioPillar::FigCraftGoogle",
         slots: ["stitch-figcraft-root", "stitch-figcraft-omnibar", "stitch-figcraft-cta"],
       },
       {
@@ -479,7 +479,7 @@ function buildStitchKitJson(): object {
         title: "Google Craft Anything Clean-Room Disassembly & AST Workbench",
         deviceType: "DESKTOP",
         gpuiAction: "google_design_studio::OpenGoogleCraftAnythingStudio",
-        dualParityTarget: "craft_studio::StudioPillar::CraftAnythingGoogle",
+        dualParityTarget: "aphrody_craft::StudioPillar::CraftAnythingGoogle",
         slots: ["stitch-ca-disasm-grid", "stitch-ca-oxc-ast", "stitch-ca-evidence-ledger"],
       },
       {
@@ -488,7 +488,7 @@ function buildStitchKitJson(): object {
         title: "Unreal Engine 5.8 Bevy Viewport (Nanite Meshlets + Solari GI + MaterialX)",
         deviceType: "DESKTOP",
         gpuiAction: "google_design_studio::OpenUnrealBevyStudio",
-        dualParityTarget: "craft_studio::StudioPillar::UnrealBevy58",
+        dualParityTarget: "aphrody_craft::StudioPillar::UnrealBevy58",
         slots: ["stitch-bevy-viewport", "stitch-bevy-outliner", "stitch-bevy-solari-controls"],
       },
       {
@@ -496,7 +496,7 @@ function buildStitchKitJson(): object {
         stitchId: "stitch-agy-studio-root",
         title: "AGY & Gemini Live Auto-Reload Session Studio",
         deviceType: "DESKTOP",
-        gpuiAction: "nsh_workspace::OpenShowcaseSurface",
+        gpuiAction: "aphrody_nsh::OpenShowcaseSurface",
         dualParityTarget: "examples/nsh/agy-session-studio",
         slots: ["stitch-agy-rail", "stitch-agy-kpis", "stitch-agy-timeline", "stitch-agy-inspector"],
       },
@@ -516,7 +516,7 @@ source: "https://design.google/library/code-is-a-design-material"
 
 # Code is a Design Material
 
-In Aphrody, live Rust GPUI entities (\`crates/os_ui\`, \`crates/craft_studio\`), NSH TSX signals (\`examples/nsh/agy-session-studio\`), migrated \`egui 0.37\` surfaces (\`crates/egui_gpui\`), and Naga v30 WGSL shaders (\`crates/bevy_gpui\`) operate directly on one shared token graph rather than static handoff mocks.
+In Aphrody, live Rust GPUI entities (\`crates/aphrody_ui\`, \`crates/aphrody_craft\`), NSH TSX signals (\`examples/nsh/agy-session-studio\`), migrated \`egui 0.37\` surfaces (\`crates/egui_gpui\`), and Naga v30 WGSL shaders (\`crates/bevy_gpui\`) operate directly on one shared token graph rather than static handoff mocks.
 
 - **Single Token Source**: \`assets/os/google_design_tokens.toml\` -> \`DESIGN.md\` -> \`docs/design/stylesheet.css\` -> \`ShadcnGpuiTheme\` & \`egui::Visuals\`.
 - **Dual-Engine Verification**: Every Craft Studio screen renders both in **GPUI Google Design** and **\`egui 0.37\`** side-by-side to validate layout ergonomics, AccessKit node parity, and sub-millisecond tessellation budgets.
@@ -566,7 +566,7 @@ source: "https://m3.material.io/"
 
 # Spatial vs Effects Spring Motion Physics
 
-Implemented analytically in \`os_ui::google_design::SpringSpec::sample_position\` and exported to CSS \`linear(...)\` in \`docs/design/stylesheet.css\`:
+Implemented analytically in \`aphrody_ui::google_design::SpringSpec::sample_position\` and exported to CSS \`linear(...)\` in \`docs/design/stylesheet.css\`:
 
 - **Spatial Springs (\`damping_ratio = 0.9\`)**: \`spatial_fast\` (\`k=1400\`), \`spatial_default\` (\`k=700\`), \`spatial_slow\` (\`k=300\`) for bounds, drawers, and corner morphing.
 - **Effects Springs (\`damping_ratio = 1.0\`, critically damped)**: \`effects_fast\` (\`k=3800\`), \`effects_default\` (\`k=1600\`), \`effects_slow\` (\`k=800\`) for opacity and color washes with zero overshoot.
@@ -583,7 +583,7 @@ source: "https://github.com/GoogleChrome/modern-web-guidance-src"
 
 # Modern Web Guidance & Wasm/WebGPU Baseline
 
-Audited automatically by \`google_design_stitch::modern_web_guidance\` and \`web_standards::audit_html_standards\`:
+Audited automatically by \`aphrody_design::modern_web_guidance\` and \`web_standards::audit_html_standards\`:
 
 - Semantic HTML5 landmarks (\`<header>\`, \`<nav>\`, \`<main>\`, \`<aside>\`), responsive \`<meta name="viewport">\`, zero \`document.write()\`, and \`--md-sys-*\` custom properties.
 - Portable single-file exports compress session payloads with \`CompressionStream("gzip")\` / \`DecompressionStream("gzip")\` for instant offline startup.
@@ -602,10 +602,10 @@ source: "https://design.google/?home"
 
 | Component Contract | GPUI Symbol | \`egui 0.37\` / Bevy Symbol | NSH Element |
 | --- | --- | --- | --- |
-| \`expressive-app-shell\` | \`os_ui::render_nav_rail\` + \`Workspace\` | \`egui::SidePanel\` + \`CentralPanel\` | \`<NavStack>\` + \`<View>\` |
-| \`expressive-pill-button\` | \`os_ui::starter_pack::StarterButton\` | \`egui::Button\` (M3 \`CornerRadius\`) | \`<Press>\` / \`<Button>\` |
-| \`surface-kpi-card\` | \`os_ui::starter_pack::StarterKpiCard\` | \`egui::Frame::group\` | \`<SurfaceCard>\` |
-| \`figcraft-canvas\` | \`craft_studio::render_gpui_studio_panel\` | \`craft_studio::CraftStudioSession::run_egui_equivalent\` | \`<FigCraftGoogleScreen>\` |
+| \`expressive-app-shell\` | \`aphrody_ui::render_nav_rail\` + \`Workspace\` | \`egui::SidePanel\` + \`CentralPanel\` | \`<NavStack>\` + \`<View>\` |
+| \`expressive-pill-button\` | \`aphrody_ui::starter_pack::StarterButton\` | \`egui::Button\` (M3 \`CornerRadius\`) | \`<Press>\` / \`<Button>\` |
+| \`surface-kpi-card\` | \`aphrody_ui::starter_pack::StarterKpiCard\` | \`egui::Frame::group\` | \`<SurfaceCard>\` |
+| \`figcraft-canvas\` | \`aphrody_craft::render_gpui_studio_panel\` | \`aphrody_craft::CraftStudioSession::run_egui_equivalent\` | \`<FigCraftGoogleScreen>\` |
 | \`unreal-bevy-viewport\` | \`bevy_gpui::render_viewport_rgba8\` | \`bevy_gpui::render_bevy_egui_inspector\` | \`<Shader>\` / \`<Canvas>\` |
 `,
   },
@@ -615,7 +615,7 @@ const COMPONENT_CONTRACTS = [
   {
     id: "expressive-app-shell",
     category: "shell",
-    gpuiSymbol: "os_ui::cosmic_shell::render_nav_rail",
+    gpuiSymbol: "aphrody_ui::cosmic_shell::render_nav_rail",
     eguiEquivalentSymbol: "egui::SidePanel",
     nshElement: "AppShell",
     stitchSlotId: "stitch-agy-rail",
@@ -625,7 +625,7 @@ const COMPONENT_CONTRACTS = [
   {
     id: "expressive-pill-button",
     category: "navigation",
-    gpuiSymbol: "os_ui::starter_pack::StarterButton",
+    gpuiSymbol: "aphrody_ui::starter_pack::StarterButton",
     eguiEquivalentSymbol: "egui::Button",
     nshElement: "PillButton",
     stitchSlotId: "stitch-figcraft-cta",
@@ -655,7 +655,7 @@ const COMPONENT_CONTRACTS = [
   {
     id: "grounding-card-stack",
     category: "data_display",
-    gpuiSymbol: "os_ui::starter_pack::StarterCard",
+    gpuiSymbol: "aphrody_ui::starter_pack::StarterCard",
     eguiEquivalentSymbol: "egui::Frame",
     nshElement: "GroundingCard",
     stitchSlotId: "stitch-grounding-stack",
@@ -665,7 +665,7 @@ const COMPONENT_CONTRACTS = [
   {
     id: "telemetry-kpi-strip",
     category: "data_display",
-    gpuiSymbol: "os_ui::starter_pack::StarterKpiCard",
+    gpuiSymbol: "aphrody_ui::starter_pack::StarterKpiCard",
     eguiEquivalentSymbol: "egui_gpui::EguiFrameStats",
     nshElement: "KpiTile",
     stitchSlotId: "stitch-agy-kpis",
@@ -675,7 +675,7 @@ const COMPONENT_CONTRACTS = [
   {
     id: "figcraft-auto-layout-frame",
     category: "data_display",
-    gpuiSymbol: "craft_studio::FigCraftFrameNode",
+    gpuiSymbol: "aphrody_craft::FigCraftFrameNode",
     eguiEquivalentSymbol: "egui_gpui::EguiGpuiHost",
     nshElement: "FigCraftGoogleScreen",
     stitchSlotId: "stitch-figcraft-root",

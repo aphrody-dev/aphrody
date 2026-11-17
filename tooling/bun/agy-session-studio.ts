@@ -300,7 +300,7 @@ export function buildStudioState(customAgyDir?: string): StudioStatePayload {
         {
           id: "gpui-google-design",
           label: "GPUI + Google Design Expressive",
-          cratePath: "crates/os_ui + crates/craft_studio",
+          cratePath: "crates/aphrody_ui + crates/aphrody_craft",
           paradigm: "Retained Entity + Taffy Grid/Flex",
           gpuBackend: "vendor/wgpu v30 (Vulkan / DX12 / Metal / WebGPU)",
           wcagContrastDark: 14.76,

@@ -1,6 +1,6 @@
 # Aphrody Best Practices: WebAssembly & `wasm-bindgen` Pipeline
 
-> Grounded directly in [`Cargo.toml`](../../../../../../Cargo.toml), [`tooling/bun/web-build.ts`](../../../../../../tooling/bun/web-build.ts), [`crates/gpui_web/`](../../../../../../crates/gpui_web/Cargo.toml), [`crates/os_desktop/examples/web_os.rs`](../../../../../../crates/os_desktop/examples/web_os.rs), and [`crates/nsh-platform-web/`](../../../../../../crates/nsh-platform-web/Cargo.toml).
+> Grounded directly in [`Cargo.toml`](../../../../../../Cargo.toml), [`tooling/bun/web-build.ts`](../../../../../../tooling/bun/web-build.ts), [`crates/gpui_web/`](../../../../../../crates/gpui_web/Cargo.toml), [`crates/aphrody_desktop/examples/web_os.rs`](../../../../../../crates/aphrody_desktop/examples/web_os.rs), and [`crates/nsh-platform-web/`](../../../../../../crates/nsh-platform-web/Cargo.toml).
 
 ## 1. Why Aphrody Uses `cargo build + wasm-bindgen CLI + wasm-opt` Over Legacy `wasm-pack`
 
@@ -23,12 +23,12 @@
 
 Aphrody consciously maintains two complementary Wasm bridge architectures:
 
-1. **`crates/gpui_web` (`wasm-bindgen` + `web-sys` + `gpui_wgpu`)**: Full Rust-rendered GPU UI (`os_desktop`, `zed`, `gpui`) targeting WebGPU/WebGL2 canvases, browser Fetch streams, Clipboard API, ResizeObserver, and optional `wasm_thread` workers.
+1. **`crates/gpui_web` (`wasm-bindgen` + `web-sys` + `gpui_wgpu`)**: Full Rust-rendered GPU UI (`aphrody_desktop`, `zed`, `gpui`) targeting WebGPU/WebGL2 canvases, browser Fetch streams, Clipboard API, ResizeObserver, and optional `wasm_thread` workers.
 2. **`crates/nsh-platform-web` (Custom Slot Bridge [`src/browser/values.rs`](../../../../../../crates/nsh-platform-web/src/browser/values.rs))**: Compact `#[link(wasm_import_module = "nsh_browser")]` integer-op FFI (`Value(pub u32)` + packed binary buffers) built for NSH DOM/QuickJS TSX payloads where `nsh package` performs custom Wasm symbol dead-code pruning across `linkable` artifacts without shipping full `web-sys` bindings.
 
 ## 4. Cohort Verification Checklist
 
 1. Confirm `wasm-bindgen --version` matches `Cargo.lock` (`0.2.129`).
-2. Run `bun tooling/bun/web-build.ts check` across `gpui_web`, `gpui_wgpu`, `os_session`, `os_craft`, `os_ui`, `os_desktop`.
-3. Build release cohorts with `bun tooling/bun/web-build.ts build --package os_desktop --release --opt --brotli-budget 6500000`.
+2. Run `bun tooling/bun/web-build.ts check` across `gpui_web`, `gpui_wgpu`, `aphrody_session`, `aphrody_craft`, `aphrody_ui`, `aphrody_desktop`.
+3. Build release cohorts with `bun tooling/bun/web-build.ts build --package aphrody_desktop --release --opt --brotli-budget 6500000`.
 4. Verify `manifest.json` confirms `baseline.importsSharedMemory === false` and verify rendered canvas / DOM semantics using [`tooling/bun/web-verify.ts`](../../../../../../tooling/bun/web-verify.ts).

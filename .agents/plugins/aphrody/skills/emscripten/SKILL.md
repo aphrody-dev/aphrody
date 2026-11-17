@@ -45,7 +45,7 @@ Read only the targeted reference file needed for your task:
 4. **Gate `-pthread` Behind COOP/COEP Headers**:
    Browser `SharedArrayBuffer` requires `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` (or `credentialless`). Test locally with Bun + `xh` header verification before shipping.
 5. **Respect Aphrody Target Boundaries**:
-   - Keep pure-Rust browser UI (`os_desktop`, `gpui_web`, `nsh-platform-web`) on `wasm32-unknown-unknown` via `tooling/bun/web-build.ts`.
+   - Keep pure-Rust browser UI (`aphrody_desktop`, `gpui_web`, `nsh-platform-web`) on `wasm32-unknown-unknown` via `tooling/bun/web-build.ts`.
    - Keep sandboxed extensions on `wasm32-wasip2` (`wasmtime 48.0.7`).
    - Use `wasm32-unknown-emscripten` only for C/C++ POSIX, pthreads, virtual FS, or native `webgpu.h` workloads (`nsh-core` `cfg(target_os = "emscripten")`).
 6. **Emscripten 7.0.0–7.0.1 ABI & Linker Changes**:

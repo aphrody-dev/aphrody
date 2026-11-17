@@ -21,7 +21,7 @@ aphrody/
 │   ├── src/directx_devices.rs            # DXGI factory & D3D device initialization
 │   ├── src/directx_atlas.rs              # Glyph & texture atlas allocation
 │   └── src/shaders.hlsl                  # Direct2D/DirectWrite subpixel correction shaders
-├── crates/wgpu_cli/                      # Hardware diagnostics, validation & transpile CLI
+├── crates/aphrody_cli/                      # Hardware diagnostics, validation & transpile CLI
 │   └── examples/directx_backend_probe.rs # Headless DX12 compute & Naga SM 6.6 verification
 └── examples/gpu/directx/                 # Pure HLSL & WGSL reference shaders + verify script
     ├── prefix_sum.hlsl                   # Wave Intrinsics compute shader (SM 6.6)
@@ -93,5 +93,5 @@ To probe the D3D12 adapter and run an offscreen compute pass via Rust:
 
 ```powershell
 # Run by the coordinator via cargo:
-cargo run -p wgpu_cli --example directx_backend_probe
+cargo run -p aphrody_cli --example directx_backend_probe
 ```

@@ -8,6 +8,9 @@ perf-test = ["test", "--profile", "release-fast", "--lib", "--bins", "--tests", 
 # Keep similar flags here to share some ccache
 perf-compare = ["run", "--profile", "release-fast", "-p", "perf", "--config", "target.'cfg(true)'.rustflags=[\"--cfg\", \"perf_enabled\"]", "--", "compare"]
 
+[target.x86_64-pc-windows-msvc]
+linker = "lld-link.exe"
+
 [target.'cfg(target_os = "windows")']
 rustflags = [
     "--cfg",

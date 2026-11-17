@@ -56,6 +56,6 @@ A floor, not a substitute for the guide.
   trigger.
 - **Copy.** Name the object and the verb: `Delete "Roadmap"?` with a `Delete`
   button, not `Are you sure?` with `OK`.
-- **Google Design Source of Truth (`https://design.google/`).** Derive semantic color roles, Material 3 Expressive spring physics (`spatial` vs `effects`), corner radius scales, and typescale hierarchy from [`google_design_tokens.toml`](../../../../assets/os/google_design_tokens.toml) (`os_ui::google_design` and theme `"google-expressive"`).
+- **Google Design Source of Truth (`https://design.google/`).** Derive semantic color roles, Material 3 Expressive spring physics (`spatial` vs `effects`), corner radius scales, and typescale hierarchy from [`google_design_tokens.toml`](../../../../assets/os/google_design_tokens.toml) (`aphrody_ui::google_design` and theme `"google-expressive"`).
 
 Finish by running the Design review checklist against the work.

@@ -143,18 +143,19 @@ export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAud
   const geminiRoot = join(home, ".gemini");
   const checks: AgyCheckResult[] = [];
   const agyBin = resolveAgyBin(home);
-
-  const verRes = Bun.spawnSync([agyBin, "--version"], { stdout: "pipe", stderr: "pipe", stdin: "ignore" });
-  const cliVersion = verRes.exitCode === 0 ? verRes.stdout.toString().trim() : "missing";
-  checks.push({
-    name: "cli:agy-version",
-    ok: verRes.exitCode === 0 && cliVersion.length > 0,
-    detail: cliVersion,
-  });
-
-  // 1. Validate ~/.gemini/antigravity-cli/settings.json + run statusLine & title
   const settingsPath = join(geminiRoot, "antigravity-cli", "settings.json");
-  if (existsSync(settingsPath)) {
+  const hasWorkstationGemini = existsSync(settingsPath);
+
+  if (hasWorkstationGemini) {
+    const verRes = Bun.spawnSync([agyBin, "--version"], { stdout: "pipe", stderr: "pipe", stdin: "ignore" });
+    const cliVersion = verRes.exitCode === 0 ? verRes.stdout.toString().trim() : "missing";
+    checks.push({
+      name: "cli:agy-version",
+      ok: verRes.exitCode === 0 && cliVersion.length > 0,
+      detail: cliVersion,
+    });
+
+    // 1. Validate ~/.gemini/antigravity-cli/settings.json + run statusLine & title
     const settings = JSON.parse(readFileSync(settingsPath, "utf8")) as Record<string, unknown>;
     checks.push(...auditSettingsObject(settings));
 
@@ -177,101 +178,109 @@ export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAud
         });
       }
     }
-  } else {
-    checks.push({ name: "settings:exists", ok: false, detail: `missing ${settingsPath}` });
-  }
 
-  // 2. Validate projects.json + config/config.json sidecars + config/mcp_config.json
-  const projectsPath = join(geminiRoot, "projects.json");
-  if (existsSync(projectsPath)) {
-    const doc = JSON.parse(readFileSync(projectsPath, "utf8")) as Record<string, unknown>;
-    checks.push(...auditProjectsObject(doc, repoRoot));
-  } else {
-    checks.push({ name: "projects:exists", ok: false, detail: `missing ${projectsPath}` });
-  }
+    // 2. Validate projects.json + config/config.json sidecars + config/mcp_config.json
+    const projectsPath = join(geminiRoot, "projects.json");
+    if (existsSync(projectsPath)) {
+      const doc = JSON.parse(readFileSync(projectsPath, "utf8")) as Record<string, unknown>;
+      checks.push(...auditProjectsObject(doc, repoRoot));
+    } else {
+      checks.push({ name: "projects:exists", ok: false, detail: `missing ${projectsPath}` });
+    }
 
-  const configPath = join(geminiRoot, "config", "config.json");
-  if (existsSync(configPath)) {
-    const cfg = JSON.parse(readFileSync(configPath, "utf8")) as { sidecars?: Record<string, unknown> };
-    const stale = LEGACY_SIDECARS.filter((k) => Boolean(cfg.sidecars && k in cfg.sidecars));
-    checks.push({
-      name: "config:zero-stale-sidecars",
-      ok: stale.length === 0,
-      detail: stale.length === 0 ? "clean" : `stale: ${stale.join(", ")}`,
-    });
-  }
+    const configPath = join(geminiRoot, "config", "config.json");
+    if (existsSync(configPath)) {
+      const cfg = JSON.parse(readFileSync(configPath, "utf8")) as { sidecars?: Record<string, unknown> };
+      const stale = LEGACY_SIDECARS.filter((k) => Boolean(cfg.sidecars && k in cfg.sidecars));
+      checks.push({
+        name: "config:zero-stale-sidecars",
+        ok: stale.length === 0,
+        detail: stale.length === 0 ? "clean" : `stale: ${stale.join(", ")}`,
+      });
+    }
 
-  const mcpPath = join(geminiRoot, "config", "mcp_config.json");
-  if (existsSync(mcpPath)) {
-    const mcp = JSON.parse(readFileSync(mcpPath, "utf8")) as {
-      mcpServers?: Record<string, { command?: string; args?: string[]; url?: string; serverUrl?: string }>;
-    };
-    const servers = mcp.mcpServers ?? {};
-    let allExist = true;
-    const details: string[] = [];
-    for (const [name, entry] of Object.entries(servers)) {
-      if (entry.args) {
-        for (const a of entry.args) {
-          if (/\.(ts|js|mjs|cjs|py)$/i.test(a)) {
-            const target = expandHome(a, home);
-            const ok = existsSync(target);
-            if (!ok) allExist = false;
-            details.push(`${name}:${ok ? "ok" : "missing(" + target + ")"}`);
+    const mcpPath = join(geminiRoot, "config", "mcp_config.json");
+    if (existsSync(mcpPath)) {
+      const mcp = JSON.parse(readFileSync(mcpPath, "utf8")) as {
+        mcpServers?: Record<string, { command?: string; args?: string[]; url?: string; serverUrl?: string }>;
+      };
+      const servers = mcp.mcpServers ?? {};
+      let allExist = true;
+      const details: string[] = [];
+      for (const [name, entry] of Object.entries(servers)) {
+        if (entry.args) {
+          for (const a of entry.args) {
+            if (/\.(ts|js|mjs|cjs|py)$/i.test(a)) {
+              const target = expandHome(a, home);
+              const ok = existsSync(target);
+              if (!ok) allExist = false;
+              details.push(`${name}:${ok ? "ok" : "missing(" + target + ")"}`);
+            }
           }
+        } else {
+          details.push(`${name}:${entry.url ?? entry.serverUrl ?? "remote"}`);
         }
-      } else {
-        details.push(`${name}:${entry.url ?? entry.serverUrl ?? "remote"}`);
+      }
+      checks.push({
+        name: "config:mcp-targets",
+        ok: Object.keys(servers).length > 0 && allExist,
+        detail: details.join(", ") || "empty",
+      });
+
+      const relay = servers.relay;
+      if (relay?.command && relay.args) {
+        const initReq = JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "initialize",
+          params: {
+            protocolVersion: "2024-11-05",
+            capabilities: {},
+            clientInfo: { name: "agy-audit", version: "1.0" },
+          },
+        });
+        const r = Bun.spawnSync([relay.command, ...relay.args], {
+          stdin: Buffer.from(`${initReq}\n`, "utf8"),
+          stdout: "pipe",
+          stderr: "pipe",
+        });
+        const out = r.stdout.toString();
+        checks.push({
+          name: "mcp:relay-initialize",
+          ok: r.exitCode === 0 && out.includes('"serverInfo"'),
+          detail: out.split(/\r?\n/)[0]?.slice(0, 120) || r.stderr.toString().trim().slice(0, 120),
+        });
       }
     }
-    checks.push({
-      name: "config:mcp-targets",
-      ok: Object.keys(servers).length > 0 && allExist,
-      detail: details.join(", ") || "empty",
-    });
 
-    const relay = servers.relay;
-    if (relay?.command && relay.args) {
-      const initReq = JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "initialize",
-        params: {
-          protocolVersion: "2024-11-05",
-          capabilities: {},
-          clientInfo: { name: "agy-audit", version: "1.0" },
-        },
-      });
-      const r = Bun.spawnSync([relay.command, ...relay.args], {
-        stdin: Buffer.from(`${initReq}\n`, "utf8"),
+    // 3. Validate plugins with `agy plugin validate --strict`
+    const pluginDirs = [
+      resolve(repoRoot, ".agents", "plugins", "aphrody"),
+      join(geminiRoot, "config", "plugins", "aphrody"),
+      join(geminiRoot, "config", "plugins", "bun"),
+    ].filter((p) => existsSync(p));
+
+    for (const dir of pluginDirs) {
+      const r = Bun.spawnSync([agyBin, "plugin", "validate", dir, "--strict"], {
         stdout: "pipe",
         stderr: "pipe",
+        stdin: "ignore",
       });
-      const out = r.stdout.toString();
       checks.push({
-        name: "mcp:relay-initialize",
-        ok: r.exitCode === 0 && out.includes('"serverInfo"'),
-        detail: out.split(/\r?\n/)[0]?.slice(0, 120) || r.stderr.toString().trim().slice(0, 120),
+        name: `plugin:${dir.replaceAll("\\", "/").split("/").slice(-2).join("/")}`,
+        ok: r.exitCode === 0,
+        detail: (r.stdout.toString() + r.stderr.toString()).trim().split(/\r?\n/).pop() ?? "",
       });
     }
-  }
-
-  // 3. Validate plugins with `agy plugin validate --strict`
-  const pluginDirs = [
-    resolve(repoRoot, ".agents", "plugins", "aphrody"),
-    join(geminiRoot, "config", "plugins", "aphrody"),
-    join(geminiRoot, "config", "plugins", "bun"),
-  ].filter((p) => existsSync(p));
-
-  for (const dir of pluginDirs) {
-    const r = Bun.spawnSync([agyBin, "plugin", "validate", dir, "--strict"], {
-      stdout: "pipe",
-      stderr: "pipe",
-      stdin: "ignore",
-    });
+  } else {
+    // Headless CI checkout without developer ~/.gemini workstation state: verify repo-native plugin manifests.
+    const repoPlugin = resolve(repoRoot, ".agents", "plugins", "aphrody", "plugin.json");
+    const repoHooks = resolve(repoRoot, ".agents", "plugins", "aphrody", "hooks.json");
+    const manifestsOk = existsSync(repoPlugin) && existsSync(repoHooks) && Boolean(JSON.parse(readFileSync(repoPlugin, "utf8")));
     checks.push({
-      name: `plugin:${dir.replaceAll("\\", "/").split("/").slice(-2).join("/")}`,
-      ok: r.exitCode === 0,
-      detail: (r.stdout.toString() + r.stderr.toString()).trim().split(/\r?\n/).pop() ?? "",
+      name: "plugin:repo-manifest",
+      ok: manifestsOk,
+      detail: manifestsOk ? "headless CI plugin manifest valid (~/.gemini absent)" : "missing repo plugin.json/hooks.json",
     });
   }
 
@@ -297,11 +306,11 @@ export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAud
     });
   }
 
-  // 5. Python SDK smoke verification
+  // 5. Python SDK smoke verification (workstation only)
   const pyWin = join(geminiRoot, "sdk", ".venv", "Scripts", "python.exe");
   const pyUnix = join(geminiRoot, "sdk", ".venv", "bin", "python");
   const pyBin = existsSync(pyWin) ? pyWin : existsSync(pyUnix) ? pyUnix : null;
-  if (pyBin) {
+  if (pyBin && hasWorkstationGemini) {
     const r = Bun.spawnSync(
       [
         pyBin,
@@ -317,6 +326,7 @@ export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAud
     });
   }
 
+  const cliVersion = checks.find((c) => c.name === "cli:agy-version")?.detail ?? "ci-headless";
   const passed = checks.filter((c) => c.ok).length;
   const failed = checks.length - passed;
   return { cliVersion, geminiRoot, checks, passed, failed };

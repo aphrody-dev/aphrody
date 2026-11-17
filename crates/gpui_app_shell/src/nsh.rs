@@ -8,7 +8,7 @@
 use std::sync::Arc;
 
 use gpui_ui::gpui::{App, AppContext as _, Context, Window};
-pub use nsh_workspace::{
+pub use aphrody_nsh::{
     ConnectDevServer, GpuiCodeEditorComponent, NshSurfaceItem, OpenLiveTsxPreview,
     OpenShowcaseSurface,
 };

@@ -37,6 +37,9 @@ export interface BlockDeviceInfo {
 export interface HostProbeReport {
   host: string;
   osPrettyName: string;
+  osId?: string;
+  remoteUser?: string;
+  remoteHome?: string;
   kernelRelease: string;
   cpus: number;
   memTotalGb: number;
@@ -44,6 +47,7 @@ export interface HostProbeReport {
   vhostNetPresent: boolean;
   xfsMount: string | null;
   xfsReflinkSupported: boolean;
+  reflinkFsType?: string | null;
   rootFsUsePct: number;
   rootFsAvailGb: number;
   xfsAvailGb: number;
@@ -154,6 +158,11 @@ def read_file(p):
 os_rel = read_file("/etc/os-release")
 m_pretty = re.search(r'^PRETTY_NAME="?(.*?)"?$', os_rel, re.M)
 os_pretty = m_pretty.group(1) if m_pretty else "Linux"
+m_id = re.search(r'^ID="?(.*?)"?$', os_rel, re.M)
+os_id = m_id.group(1).lower() if m_id else "linux"
+remote_user, _ = run(["id", "-un"])
+remote_user = remote_user or "ubuntu"
+remote_home = os.path.expanduser("~")
 kernel, _ = run(["uname", "-r"])
 cpus = os.cpu_count() or 1
 
@@ -180,10 +189,15 @@ xfs_mount = "/srv/xbuild" if os.path.isdir("/srv/xbuild") else None
 xfs_avail, _ = df_info("/srv/xbuild") if xfs_mount else (0.0, 0)
 tmp_avail, _ = df_info("/tmp")
 
+fs_type_probe_path = xfs_mount or "/"
+fs_type_out, _ = run(["stat", "-f", "-c", "%T", fs_type_probe_path])
+reflink_fs_type = fs_type_out.lower() if fs_type_out else None
 xfs_reflink = False
-if xfs_mount:
+if xfs_mount and reflink_fs_type == "xfs":
     xinfo, _ = run(["xfs_info", xfs_mount])
     xfs_reflink = "reflink=1" in xinfo
+elif reflink_fs_type == "btrfs":
+    xfs_reflink = True
 
 blocks = []
 ls_out, rc = run(["lsblk", "-J", "-d", "-o", "NAME,SIZE,FSTYPE,ROTA,SCHED,RA"])
@@ -284,6 +298,9 @@ for p in cold_candidates:
 payload = {
     "host": os.uname().nodename,
     "osPrettyName": os_pretty,
+    "osId": os_id,
+    "remoteUser": remote_user,
+    "remoteHome": remote_home,
     "kernelRelease": kernel,
     "cpus": cpus,
     "memTotalGb": mem_gb,
@@ -291,6 +308,7 @@ payload = {
     "vhostNetPresent": os.path.exists("/dev/vhost-net"),
     "xfsMount": xfs_mount,
     "xfsReflinkSupported": xfs_reflink,
+    "reflinkFsType": reflink_fs_type,
     "rootFsUsePct": root_pct,
     "rootFsAvailGb": root_avail,
     "xfsAvailGb": xfs_avail,
@@ -469,14 +487,20 @@ export function analyzeProbe(probe: HostProbeReport, zedBaseline = inspectZedBas
 
   const score = Math.max(0, 100 - deductions);
 
-  const sysctlDropin = `# Managed by aphrody tooling/bun/ci-host-optimize.ts (Ubuntu 26.10 / Kernel ${probe.kernelRelease} / KVM / XFS)
-# Harmonizes with 90-fr1-chromium-host.conf and build.slice cgroup v2 controls.
+  const hasAppArmorSysctl =
+    probe.sysctl["kernel.apparmor_restrict_unprivileged_userns"] !== undefined ||
+    (probe.osId ?? "ubuntu") === "ubuntu";
+  const remoteUser = probe.remoteUser ?? "ubuntu";
+  const remoteHome = probe.remoteHome ?? "/home/ubuntu";
+  const sccachePath = probe.sccache.installed ? "/usr/local/bin/sccache" : "/usr/bin/sccache";
+
+  const sysctlDropin = `# Managed by aphrody tooling/bun/ci-host-optimize.ts (${probe.osPrettyName} / Kernel ${probe.kernelRelease} / KVM / ${probe.reflinkFsType ?? "XFS"})
+# Harmonizes with host kernel tuning and build.slice cgroup v2 controls.
 kernel.io_uring_disabled = 0
 kernel.sched_autogroup_enabled = 0
 kernel.perf_event_paranoid = 1
 kernel.unprivileged_userns_clone = 1
-kernel.apparmor_restrict_unprivileged_userns = 0
-vm.swappiness = 100
+${hasAppArmorSysctl ? "kernel.apparmor_restrict_unprivileged_userns = 0\n" : ""}vm.swappiness = 100
 vm.page-cluster = 0
 vm.vfs_cache_pressure = 50
 vm.compaction_proactiveness = 20
@@ -499,20 +523,20 @@ ACTION=="add|change", SUBSYSTEM=="block", KERNEL=="sda|vda", ATTR{queue/schedule
   const runnerDropin = `[Service]
 Slice=build.slice
 LimitNOFILE=1048576
-Environment="RUSTC_WRAPPER=/usr/local/bin/sccache"
+Environment="RUSTC_WRAPPER=sccache"
 Environment="SCCACHE_DIR=/var/cache/aphrody/sccache"
 Environment="SCCACHE_CACHE_SIZE=40G"
-Environment="SCCACHE_BASEDIRS=/srv/xbuild:/home/ubuntu:/srv"
+Environment="SCCACHE_BASEDIRS=/srv/xbuild:${remoteHome}:/srv"
 Environment="TMPDIR=/tmp"
 Environment="CARGO_INCREMENTAL=0"
 Environment="CARGO_PROFILE_DEV_DEBUG=line-tables-only"
 `;
 
   const profileEnvDropin = `# Managed by aphrody tooling/bun/ci-host-optimize.ts
-export RUSTC_WRAPPER="/usr/local/bin/sccache"
+export RUSTC_WRAPPER="\$(command -v sccache || echo ${sccachePath})"
 export SCCACHE_DIR="/var/cache/aphrody/sccache"
 export SCCACHE_CACHE_SIZE="40G"
-export SCCACHE_BASEDIRS="/srv/xbuild:/home/ubuntu:/srv"
+export SCCACHE_BASEDIRS="/srv/xbuild:${remoteHome}:/srv"
 export TMPDIR="/tmp"
 `;
 
@@ -529,6 +553,9 @@ export TMPDIR="/tmp"
 }
 
 function buildApplyScript(plan: HostOptimizationPlan, offloadCold: boolean): string {
+  const remoteUser = plan.probe.remoteUser ?? "ubuntu";
+  const remoteHome = plan.probe.remoteHome ?? "/home/ubuntu";
+  const osId = plan.probe.osId ?? "ubuntu";
   const runnerDropins = plan.probe.runners
     .map(
       (r) =>
@@ -536,10 +563,19 @@ function buildApplyScript(plan: HostOptimizationPlan, offloadCold: boolean): str
     )
     .join("\n");
 
+  const archBootstrap =
+    osId === "arch"
+      ? `
+if ! command -v sccache >/dev/null 2>&1; then
+  pacman -Sy --noconfirm --needed sccache || true
+fi
+`
+      : "";
+
   const offloadSnippet = offloadCold
     ? `
 mkdir -p /srv/xbuild/cold
-for src in /home/ubuntu/third_party-store; do
+for src in ${remoteHome}/third_party-store; do
   if [ -d "$src" ] && [ ! -L "$src" ]; then
     base=$(basename "$src")
     dst="/srv/xbuild/cold/$base"
@@ -560,29 +596,42 @@ done
     : "";
 
   return `set -euo pipefail
-mkdir -p /var/cache/aphrody
-if [ -d /home/ubuntu/.cache/sccache ] && [ ! -L /home/ubuntu/.cache/sccache ]; then
+mkdir -p /var/cache/aphrody /srv/xbuild/scratch /srv/xbuild/jobs
+${archBootstrap}
+SCCACHE_BIN=$(command -v sccache || echo /usr/local/bin/sccache)
+if [ -d "${remoteHome}/.cache/sccache" ] && [ ! -L "${remoteHome}/.cache/sccache" ]; then
   if [ ! -e /var/cache/aphrody/sccache ] || [ -z "$(ls -A /var/cache/aphrody/sccache 2>/dev/null)" ]; then
     rmdir /var/cache/aphrody/sccache 2>/dev/null || true
-    mv /home/ubuntu/.cache/sccache /var/cache/aphrody/sccache 2>/dev/null || {
+    mv "${remoteHome}/.cache/sccache" /var/cache/aphrody/sccache 2>/dev/null || {
       mkdir -p /var/cache/aphrody/sccache
-      rsync -a --remove-source-files /home/ubuntu/.cache/sccache/ /var/cache/aphrody/sccache/ 2>/dev/null || cp -a /home/ubuntu/.cache/sccache/. /var/cache/aphrody/sccache/
-      rm -rf /home/ubuntu/.cache/sccache
+      rsync -a --remove-source-files "${remoteHome}/.cache/sccache/" /var/cache/aphrody/sccache/ 2>/dev/null || cp -a "${remoteHome}/.cache/sccache/." /var/cache/aphrody/sccache/
+      rm -rf "${remoteHome}/.cache/sccache"
     }
   fi
 fi
-mkdir -p /var/cache/aphrody/sccache /home/ubuntu/.cache
-ln -sfn /var/cache/aphrody/sccache /home/ubuntu/.cache/sccache
-chown -R ubuntu:ubuntu /var/cache/aphrody
+mkdir -p /var/cache/aphrody/sccache /var/cache/aphrody/scratch /srv/xbuild/scratch /srv/xbuild/jobs "${remoteHome}/.cache"
+ln -sfn /var/cache/aphrody/sccache "${remoteHome}/.cache/sccache"
+chown "${remoteUser}:${remoteUser}" /var/cache/aphrody /var/cache/aphrody/sccache /var/cache/aphrody/scratch /srv/xbuild/scratch /srv/xbuild/jobs 2>/dev/null || true
+if [ "$(stat -c %U /var/cache/aphrody/sccache 2>/dev/null || true)" != "${remoteUser}" ]; then
+  chown -R "${remoteUser}:${remoteUser}" /var/cache/aphrody/sccache
+fi
+
+if [ -x "${remoteHome}/.local/bin/bun" ] && { [ -L "${remoteHome}/.local/bin/wrangler" ] || [ -f "${remoteHome}/.local/bin/wrangler" ]; }; then
+  if ! "${remoteHome}/.local/bin/wrangler" --version >/dev/null 2>&1; then
+    printf '#!/usr/bin/env sh\nexec "%s/.local/bin/bun" x wrangler "$@"\n' "${remoteHome}" > "${remoteHome}/.local/bin/wrangler"
+    chmod +x "${remoteHome}/.local/bin/wrangler"
+    chown "${remoteUser}:${remoteUser}" "${remoteHome}/.local/bin/wrangler"
+  fi
+fi
 
 cat <<'EOF' > /etc/sysctl.d/96-aphrody-ci-kernel73.conf
 ${plan.sysctlDropin}EOF
-sysctl --system >/dev/null
+sysctl --system >/dev/null || true
 
 cat <<'EOF' > /etc/udev/rules.d/67-aphrody-ci-block.rules
 ${plan.udevDropin}EOF
 udevadm control --reload-rules
-for dev in /dev/sd[a-z]; do
+for dev in /dev/sd[a-z] /dev/vd[a-z]; do
   [ -b "$dev" ] && udevadm trigger --action=change "$dev" || true
 done
 
@@ -590,14 +639,15 @@ cat <<'EOF' > /etc/profile.d/aphrody-ci.sh
 ${plan.profileEnvDropin}EOF
 chmod 0644 /etc/profile.d/aphrody-ci.sh
 
-python3 - <<'PY'
+SCCACHE_BIN="$SCCACHE_BIN" python3 - <<'PY'
+import os
 p = "/etc/environment"
-lines = open(p, "r", encoding="utf-8").read().splitlines()
+lines = open(p, "r", encoding="utf-8").read().splitlines() if os.path.exists(p) else []
 updates = {
     "SCCACHE_DIR": '"/var/cache/aphrody/sccache"',
     "SCCACHE_CACHE_SIZE": '"40G"',
-    "SCCACHE_BASEDIRS": '"/srv/xbuild:/home/ubuntu:/srv"',
-    "RUSTC_WRAPPER": '"/usr/local/bin/sccache"',
+    "SCCACHE_BASEDIRS": '"/srv/xbuild:${remoteHome}:/srv"',
+    "RUSTC_WRAPPER": f'"{os.environ["SCCACHE_BIN"]}"',
 }
 out = []
 seen = set()
@@ -623,7 +673,7 @@ for unit in ${plan.probe.runners.map((r) => `"${r.unit}"`).join(" ")}; do
 done
 
 ${offloadSnippet}
-echo "APPLIED aphrody ci-host-optimize cleanly."
+echo "APPLIED aphrody ci-host-optimize cleanly on ${plan.probe.host} (${remoteUser})."
 `;
 }
 
@@ -663,9 +713,24 @@ if (import.meta.main) {
   const asJson = args.includes("--json");
   const offloadCold = args.includes("--offload-cold");
 
+  const hostsIdx = args.indexOf("--hosts");
+  const allFlag = args.includes("--all");
+  const defaultFleet = (process.env.APHRODY_FLEET_HOSTS ?? "fr1,fr2,prd")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const targets = allFlag
+    ? defaultFleet
+    : hostsIdx >= 0
+      ? (args[hostsIdx + 1] ?? "fr1")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [host];
+
   if (cmd === "bench") {
     const script = buildBenchScript();
-    const res = Bun.spawnSync(host === "local" ? ["bash", "-s"] : ["ssh", host, "sudo bash -s"], {
+    const res = Bun.spawnSync(targets[0] === "local" ? ["bash", "-s"] : ["ssh", targets[0], "sudo bash -s"], {
       stdin: Buffer.from(script, "utf8"),
       stdout: "inherit",
       stderr: "inherit",
@@ -673,45 +738,60 @@ if (import.meta.main) {
     process.exit(res.exitCode);
   }
 
-  const probe = probeHost(host);
-  const plan = analyzeProbe(probe);
+  const plans = targets.map((targetHost) => {
+    const p = probeHost(targetHost);
+    return analyzeProbe(p);
+  });
 
   if (cmd === "audit") {
     if (asJson) {
-      console.log(JSON.stringify(plan, null, 2));
+      console.log(JSON.stringify(plans.length === 1 ? plans[0] : plans, null, 2));
     } else {
-      console.log(
-        `Host ${probe.host}: ${probe.osPrettyName} | Kernel ${probe.kernelRelease} | ${probe.cpus}c / ${probe.memTotalGb} GiB | Score ${plan.score}/100`,
-      );
-      console.log(
-        `Storage: /=${probe.rootFsUsePct}% (${probe.rootFsAvailGb}G free) | XFS=${probe.xfsMount ?? "none"} (${probe.xfsAvailGb}G free, reflink=${probe.xfsReflinkSupported}) | tmpfs=${probe.tmpfsAvailGb}G free`,
-      );
-      for (const f of plan.findings) {
+      for (const plan of plans) {
+        const p = plan.probe;
         console.log(
-          `- [${f.severity.toUpperCase()}] (${f.category}) ${f.title}\n    now: ${f.current}\n    fix: ${f.target}`,
+          `Host ${p.host}: ${p.osPrettyName} | Kernel ${p.kernelRelease} | ${p.cpus}c / ${p.memTotalGb} GiB | Score ${plan.score}/100`,
         );
+        console.log(
+          `Storage: /=${p.rootFsUsePct}% (${p.rootFsAvailGb}G free) | ReflinkRoot=${p.xfsMount ?? "none"} (${p.reflinkFsType ?? "unknown"}, reflink=${p.xfsReflinkSupported}) | tmpfs=${p.tmpfsAvailGb}G free`,
+        );
+        for (const f of plan.findings) {
+          console.log(
+            `- [${f.severity.toUpperCase()}] (${f.category}) ${f.title}\n    now: ${f.current}\n    fix: ${f.target}`,
+          );
+        }
       }
     }
     process.exit(0);
   }
 
   if (cmd === "plan") {
-    console.log(buildApplyScript(plan, offloadCold));
+    for (const plan of plans) {
+      console.log(`# === ${plan.probe.host} ===\n${buildApplyScript(plan, offloadCold)}`);
+    }
     process.exit(0);
   }
 
   if (cmd === "apply") {
-    const applyScript = buildApplyScript(plan, offloadCold);
-    const res = Bun.spawnSync(host === "local" ? ["sudo", "bash", "-s"] : ["ssh", host, "sudo bash -s"], {
-      stdin: Buffer.from(applyScript, "utf8"),
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    process.exit(res.exitCode);
+    let worstExit = 0;
+    for (const plan of plans) {
+      const targetHost = plan.probe.host;
+      const applyScript = buildApplyScript(plan, offloadCold);
+      const res = Bun.spawnSync(
+        targetHost === "local" ? ["sudo", "bash", "-s"] : ["ssh", targetHost, "sudo bash -s"],
+        {
+          stdin: Buffer.from(applyScript, "utf8"),
+          stdout: "inherit",
+          stderr: "inherit",
+        },
+      );
+      if (res.exitCode !== 0) worstExit = res.exitCode;
+    }
+    process.exit(worstExit);
   }
 
   console.error(
-    "Usage: bun tooling/bun/ci-host-optimize.ts [audit|plan|apply|bench] [--host fr1|local] [--json] [--offload-cold]",
+    "Usage: bun tooling/bun/ci-host-optimize.ts [audit|plan|apply|bench] [--host fr1|fr2|prd|local] [--hosts a,b] [--all] [--json] [--offload-cold]",
   );
   process.exit(1);
 }

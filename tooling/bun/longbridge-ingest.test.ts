@@ -229,7 +229,7 @@ taffy = "0.15"
 
     expect(isCoreFeatureMatrixCrate("gpui_ui")).toBe(true);
     expect(isCoreFeatureMatrixCrate("nsh-core")).toBe(true);
-    expect(isCoreFeatureMatrixCrate("os_desktop")).toBe(true);
+    expect(isCoreFeatureMatrixCrate("aphrody_desktop")).toBe(true);
     expect(isCoreFeatureMatrixCrate("unrelated_util")).toBe(false);
   });
 });

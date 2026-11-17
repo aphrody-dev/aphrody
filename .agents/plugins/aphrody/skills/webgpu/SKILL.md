@@ -9,7 +9,7 @@ description: >-
 
 # WebGPU & WGSL Architecture (`aphrody`)
 
-This skill governs all WebGPU, WGSL, Naga IR, Dawn/Tint, and browser/native GPU execution across `aphrody`. It covers the full graphics and compute pipeline across native desktop (`gpui_wgpu`, `nsh-engine`, `wgpu_cli`) and web/WASM targets (`gpui_web`, Bun/WebGPU TypeScript).
+This skill governs all WebGPU, WGSL, Naga IR, Dawn/Tint, and browser/native GPU execution across `aphrody`. It covers the full graphics and compute pipeline across native desktop (`gpui_wgpu`, `nsh-engine`, `aphrody_cli`) and web/WASM targets (`gpui_web`, Bun/WebGPU TypeScript).
 
 ## Quick Reference Map
 

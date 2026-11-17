@@ -24,10 +24,10 @@ Single source of truth for Zed contributor conformity, split licensing, vendor/t
   - CI action: [.github/actions/vendor-submodules/action.yml](../../.github/actions/vendor-submodules/action.yml)
   - Remote Linux hosts: [fleet-sync.ts](../../tooling/bun/fleet-sync.ts)
   - `[patch.crates-io]` overrides in [Cargo.toml](../../Cargo.toml) (`taffy`, `cosmic-text`, `wgpu*`, `naga`, `accesskit*`, plus Zed's upstream patches).
-- **WGPU Pinning Decision (`vendor/wgpu`)**: `vendor/wgpu` remains unified on `wgpu 30.0.0` / `naga 30.0.0` with Aphrody's custom Metal patch so `gpui_wgpu`, `wgpu_cli`, `nsh-*`, and `vendor/vello` resolve against a single `wgpu`/`naga` graph without dual-version conflicts vs `gfx-rs/wgpu` `v30.0.2` / `trunk`.
+- **WGPU Pinning Decision (`vendor/wgpu`)**: `vendor/wgpu` remains unified on `wgpu 30.0.0` / `naga 30.0.0` with Aphrody's custom Metal patch so `gpui_wgpu`, `aphrody_cli`, `nsh-*`, and `vendor/vello` resolve against a single `wgpu`/`naga` graph without dual-version conflicts vs `gfx-rs/wgpu` `v30.0.2` / `trunk`.
 
-## 4. WireGuard LAN Fleet & `vpn_ui` Local Network Sharing
+## 4. WireGuard LAN Fleet & `aphrody_vpn` Local Network Sharing
 
 - Heavy Linux workspace builds and integration tests offload from the Windows workstation to the WireGuard `wg1` mesh (`10.200.77.0/24` across `fr1`, `fr2`, and `prd`) via SSH aliases in [fleet-sync.ts](../../tooling/bun/fleet-sync.ts).
-- Local-network split tunneling inside `crates/vpn_ui` is wired through `Toggle::AllowLan` in [backend.rs](../../crates/vpn_ui/src/backend.rs) and enforced in [daemon_backend.rs](../../crates/vpn_ui/src/daemon_backend.rs) so local WireGuard/LAN traffic stays reachable alongside the tunnel.
+- Local-network split tunneling inside `crates/aphrody_vpn` is wired through `Toggle::AllowLan` in [backend.rs](../../crates/aphrody_vpn/src/backend.rs) and enforced in [daemon_backend.rs](../../crates/aphrody_vpn/src/daemon_backend.rs) so local WireGuard/LAN traffic stays reachable alongside the tunnel.
 - Automated full-stack audit: [vendor-lan-doctor.ts](../../tooling/bun/vendor-lan-doctor.ts) (`bun run vendor:doctor`).

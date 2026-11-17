@@ -8,7 +8,7 @@
  *   2. Root `Cargo.toml` `[patch.crates-io]` path & git consistency
  *   3. `deny.toml` policy readiness (`[licenses]`, `[sources]`, `unknown-git`)
  *   4. Companion workspace repos in parent directory (`../<repo>/.gitmodules`) without mutating them
- *   5. `crates/vpn_ui` LAN-sharing toggle (`Toggle::AllowLan`)
+ *   5. `crates/aphrody_vpn` LAN-sharing toggle (`Toggle::AllowLan`)
  *   6. WireGuard LAN SSH fleet (`fr1`, `fr2`, `prd`) via `ssh -G` (+ optional live probe)
  *
  * Usage:
@@ -191,8 +191,8 @@ export function inspectCompanionRepos(parentDir: string, selfRepoName: string): 
 }
 
 export function checkVpnAllowLan(root = repoRoot): boolean {
-  const backendPath = join(root, "crates/vpn_ui/src/backend.rs");
-  const daemonPath = join(root, "crates/vpn_ui/src/daemon_backend.rs");
+  const backendPath = join(root, "crates/aphrody_vpn/src/backend.rs");
+  const daemonPath = join(root, "crates/aphrody_vpn/src/daemon_backend.rs");
   if (!existsSync(backendPath) || !existsSync(daemonPath)) return false;
   const backend = readFileSync(backendPath, "utf8");
   const daemon = readFileSync(daemonPath, "utf8");
@@ -256,7 +256,7 @@ export function runAudit(root = repoRoot, offline = false): VendorLanReport {
 
   const vpnAllowLanWired = checkVpnAllowLan(root);
   if (!vpnAllowLanWired) {
-    errors.push("crates/vpn_ui missing Toggle::AllowLan wiring");
+    errors.push("crates/aphrody_vpn missing Toggle::AllowLan wiring");
   }
 
   const companionRepos = inspectCompanionRepos(dirname(root), basename(root));

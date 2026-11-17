@@ -16,7 +16,7 @@ fn main() {
         .args(["run", "--manifest-path"])
         .arg(example.join("Cargo.toml"))
         .arg("--target-dir")
-        .arg(example.join("../../target"));
+        .arg(example.join("../../../target"));
     if !cfg!(debug_assertions) {
         cargo.arg("--release");
     }

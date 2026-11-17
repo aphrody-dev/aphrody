@@ -5,5 +5,5 @@
 /product.toml                   @Aphrody-Dev
 /crates/auto_update/            @Aphrody-Dev
 /crates/release_channel/        @Aphrody-Dev
-/crates/os_craft/               @Aphrody-Dev
+/crates/aphrody_craft/               @Aphrody-Dev
 /tooling/bun/                   @Aphrody-Dev

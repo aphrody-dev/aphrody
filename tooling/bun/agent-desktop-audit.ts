@@ -115,7 +115,7 @@ const DEFAULT_PURGE_CATEGORIES: Omit<PurgeCategory, "count" | "bytes">[] = [
     category: "exploratory-probes",
     upstreamPatterns: [/^probes\//],
     purgedReason: "345 ad-hoc PowerShell/Python phase-discovery scripts",
-    aphrodyReplacement: "crates/os_pilot/src/backend_*.rs & platforms-matrix.md",
+    aphrodyReplacement: "crates/aphrody_pilot/src/backend_*.rs & platforms-matrix.md",
   },
   {
     category: "ffi-and-cross-lang-rigs",
@@ -129,19 +129,19 @@ const DEFAULT_PURGE_CATEGORIES: Omit<PurgeCategory, "count" | "bytes">[] = [
       /^tests\/npm\//,
     ],
     purgedReason: "External C-ABI cdylib & C#/Swift/ObjC/Python harness bloat",
-    aphrodyReplacement: "Pure Rust crates/os_pilot + GPUI AccessKit unit tests",
+    aphrodyReplacement: "Pure Rust crates/aphrody_pilot + GPUI AccessKit unit tests",
   },
   {
     category: "npm-and-vm-wrappers",
     upstreamPatterns: [/^npm\//, /^providers\/macos\//, /^skills\/jev-desktop\//],
     purgedReason: "Standalone JS launcher, macOS VM scripts, and personal skill",
-    aphrodyReplacement: "crates/gpui_store (22 packagers) + fleet:verify + ai-os-pilot skill",
+    aphrodyReplacement: "crates/aphrody_store (22 packagers) + fleet:verify + ai-os-pilot skill",
   },
   {
     category: "cursor-overlay-hack",
     upstreamPatterns: [/cursor_overlay/],
     purgedReason: "80+ native GDI/Cocoa/X11 cursor window overlay files",
-    aphrodyReplacement: "crates/os_desktop/src/pilot_hud.rs native GPUI HUD",
+    aphrodyReplacement: "crates/aphrody_desktop/src/pilot_hud.rs native GPUI HUD",
   },
 ];
 
@@ -167,18 +167,18 @@ export function categorizeUpstreamBlobs(
 
 export function scanMigratedTree(root: string): AgentDesktopAuditReport["migratedFiles"] {
   const targets = [
-    "crates/os_pilot/Cargo.toml",
-    "crates/os_pilot/src/os_pilot.rs",
-    "crates/os_pilot/src/model.rs",
-    "crates/os_pilot/src/refs.rs",
-    "crates/os_pilot/src/locator.rs",
-    "crates/os_pilot/src/action.rs",
-    "crates/os_pilot/src/policy.rs",
-    "crates/os_pilot/src/adapter.rs",
-    "crates/os_pilot/src/gpui_bridge.rs",
-    "crates/os_pilot/src/backend_windows.rs",
-    "crates/os_pilot/src/backend_linux.rs",
-    "crates/os_pilot/src/backend_macos.rs",
+    "crates/aphrody_pilot/Cargo.toml",
+    "crates/aphrody_pilot/src/aphrody_pilot.rs",
+    "crates/aphrody_pilot/src/model.rs",
+    "crates/aphrody_pilot/src/refs.rs",
+    "crates/aphrody_pilot/src/locator.rs",
+    "crates/aphrody_pilot/src/action.rs",
+    "crates/aphrody_pilot/src/policy.rs",
+    "crates/aphrody_pilot/src/adapter.rs",
+    "crates/aphrody_pilot/src/gpui_bridge.rs",
+    "crates/aphrody_pilot/src/backend_windows.rs",
+    "crates/aphrody_pilot/src/backend_linux.rs",
+    "crates/aphrody_pilot/src/backend_macos.rs",
     ".agents/plugins/aphrody/skills/ai-os-pilot/SKILL.md",
     "docs/architecture/agent-desktop-ai-os.md",
   ];
@@ -272,8 +272,8 @@ export function runAudit(root: string, offline = false): AgentDesktopAuditReport
   const totalBytes = blobs.reduce((acc, b) => acc + b.size, 0);
   const purgedCategories = categorizeUpstreamBlobs(blobs);
   const migratedFiles = scanMigratedTree(root);
-  const modRsFiles = findModRsRecursive(join(root, "crates/os_pilot/src"));
-  const { present, missing } = checkToolParity(join(root, "crates/os_pilot/src/os_pilot.rs"));
+  const modRsFiles = findModRsRecursive(join(root, "crates/aphrody_pilot/src"));
+  const { present, missing } = checkToolParity(join(root, "crates/aphrody_pilot/src/aphrody_pilot.rs"));
   const zeroModRsInOsPilot = modRsFiles.length === 0;
   const zeroBannedLeaks = migratedFiles.every((f) => f.bannedBrandLeaks.length === 0);
   const allMigratedExist = migratedFiles.every((f) => f.exists);

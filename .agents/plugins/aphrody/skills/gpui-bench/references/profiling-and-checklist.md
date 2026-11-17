@@ -6,7 +6,7 @@ Detailed reference guide extracted from the main `gpui-bench` skill so the skill
 
 `#[gpui::bench]` constructs its platform through `gpui::bench_platform` and requests `gpui_platform::current_headless_renderer`.
 
-On macOS, the headless renderer uses Metal without showing a window; on Linux/Windows headless CI (`os_desktop` / `gpui_wgpu`), verify real GPU submission explicitly or document headless no-op limits.
+On macOS, the headless renderer uses Metal without showing a window; on Linux/Windows headless CI (`aphrody_desktop` / `gpui_wgpu`), verify real GPU submission explicitly or document headless no-op limits.
 
 `BenchReport` metrics (per benchmark and per input):
 

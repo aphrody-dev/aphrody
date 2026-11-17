@@ -32,7 +32,7 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   { domain: "workspace", action: "agy-audit", scriptRel: "tooling/bun/agy-config-audit.ts", defaultArgs: [], summary: "Validate Antigravity settings, MCP schemas, hooks, and plugins" },
   { domain: "workspace", action: "shell-doctor", scriptRel: "tooling/bun/shell-path-doctor.ts", defaultArgs: ["audit"], summary: "Audit modern Windows/Linux CLI PATH tiering" },
   { domain: "workspace", action: "worktree", scriptRel: "tooling/bun/worktree.ts", defaultArgs: ["list"], summary: "Manage isolated out-of-tree Git worktrees" },
-  { domain: "workspace", action: "agent-desktop", scriptRel: "tooling/bun/agent-desktop-audit.ts", defaultArgs: [], summary: "Verify os_pilot zero-mod.rs & 58-tool MCP parity" },
+  { domain: "workspace", action: "agent-desktop", scriptRel: "tooling/bun/agent-desktop-audit.ts", defaultArgs: [], summary: "Verify aphrody_pilot zero-mod.rs & 58-tool MCP parity" },
   { domain: "workspace", action: "gpui-vs-dioxus", scriptRel: "tooling/bun/gpui-vs-dioxus-audit.ts", defaultArgs: ["all"], summary: "Audit 9-submodule GPUI/Wgpu/Taffy/AccessKit parity matrix" },
   { domain: "workspace", action: "crate-skill", scriptRel: "tooling/bun/crate-to-skill.ts", defaultArgs: ["--help"], summary: "Generate portable Agent Skill bundle from a workspace crate" },
 
@@ -48,8 +48,8 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   // 4. WebAssembly, WebGPU & Multi-Target Builds
   { domain: "web", action: "matrix", scriptRel: "tooling/bun/web-build.ts", defaultArgs: ["matrix"], summary: "Print Wasm32 & WebGPU framework cohort matrix" },
   { domain: "web", action: "check", scriptRel: "tooling/bun/web-build.ts", defaultArgs: ["check"], summary: "Type-check wasm32-unknown-unknown & wasm32-wasip2 targets" },
-  { domain: "web", action: "build", scriptRel: "tooling/bun/web-build.ts", defaultArgs: ["build", "--package", "os_desktop", "--opt"], summary: "Build optimized Wasm32 + WebGPU bundle" },
-  { domain: "web", action: "verify", scriptRel: "tooling/bun/web-verify.ts", defaultArgs: ["--package", "os_desktop"], summary: "Run headless Chrome CDP DOM/ARIA/WebGPU visual verification" },
+  { domain: "web", action: "build", scriptRel: "tooling/bun/web-build.ts", defaultArgs: ["build", "--package", "aphrody_desktop", "--opt"], summary: "Build optimized Wasm32 + WebGPU bundle" },
+  { domain: "web", action: "verify", scriptRel: "tooling/bun/web-verify.ts", defaultArgs: ["--package", "aphrody_desktop"], summary: "Run headless Chrome CDP DOM/ARIA/WebGPU visual verification" },
   { domain: "web", action: "cross", scriptRel: "tooling/bun/cross-build.ts", defaultArgs: ["doctor"], summary: "Inspect cargo-xwin, cargo-zigbuild, LLVM, and cross toolchains" },
   { domain: "web", action: "issues", scriptRel: "tooling/bun/zed-wasm-wgpu-issues.ts", defaultArgs: ["audit"], summary: "Verify upstream Zed Wasm/WGPU issue parity fixes" },
 

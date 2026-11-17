@@ -16,14 +16,14 @@ Modular, local-first, ultra-fast Rust **GPU UI Framework**, **Code Engine**, **N
 | **`crates/brand`** + **[`product.toml`](./product.toml)** | Single-source-of-truth product identity (`Aphrody`, `aphrody://`, `.aphrody/`, app IDs, icons) with transparent Zed compatibility (`.zed/`, `zed://`, `ZED_*`, `zed:extension`). | **Zero** (0 runtime deps) |
 | **`crates/gpui_ui`** | GPU-accelerated UI engine (`gpui`, `gpui_platform`, `Application::run_embedded`), design system (`ui`, `ui_input`, `component`), themes, icons, and optional Native Shell (`--features nsh-full`). | **Zero** (No WebRTC, No Wasmtime, No LLM SDKs, No `rolldown`) |
 | **`crates/gpui_code`** | Composable Rust code engine: pure text core (`rope`, `sum_tree`, `streaming_diff`, `imara-diff`, `fuzzy`) + opt-in Tree-sitter `syntax`/`grammars`, `buffer_diff`, `lsp`, `git`, `worktree`, `terminal` PTY, `editor`, and `vim`. | **Zero** WebRTC / Wasmtime / LLM SDKs (`--no-default-features` builds zero `rpc`/`proto`) |
-| **`crates/nsh-*` & `crates/nsh_workspace`** | Absorbed Native Shell v0.5.0 unified on `gpui 0.2.2` & `wgpu 30.0.0`: Solid-style signals, 35+ controls, live in-memory `.tsx` hot-reload preview, and `<GpuiCodeEditor>` native embedding. | **Zero** `gpui-fast` duplicate, **zero** npm TypeScript tarballs |
+| **`crates/nsh-*` & `crates/aphrody_nsh`** | Absorbed Native Shell v0.5.0 unified on `gpui 0.2.2` & `wgpu 30.0.0`: Solid-style signals, 35+ controls, live in-memory `.tsx` hot-reload preview, and `<GpuiCodeEditor>` native embedding. | **Zero** `gpui-fast` duplicate, **zero** npm TypeScript tarballs |
 | **`crates/gpui_app_shell`** | Production multi-window docked application starter pack (`Workspace`, `Dock`, `Pane`, Command Palette, Keymaps, JSON Settings, SQLite `db`, `AppModule` trait, `NshModule`). | **Zero** WebRTC / Wasmtime |
-| **`crates/wgpu_cli` (`gpui-wgpu`)** | Unified WGPU/Naga v30 adapter, shader validator/transpiler, headless PNG renderer, compute/bench, Wasm LTO/AOT toolchain, 5 standalone `templates/wasm-wgpu/` starters, `DESIGN.md` / Lighthouse CLI, and 24-tool JSON-RPC MCP server. | Standalone Apache-2.0 CLI + MCP |
-| **`crates/google_design_stitch`** | Pure-Rust `https://design.google/` HTTP/HTML5/sitemap mirror, `DESIGN.md` Tailwind v4/W3C/WGSL exporter, Google Stitch SDK + PNG capture, and Core Web Vitals / Lighthouse / W3C / Vercel auditor. | Zero subprocess `curl`/`wget`, `wasm32`-ready |
-| **`crates/os_session`** | Wayland/X11/Windows/macOS desktop session supervisor, topological unit startup (`assets/os/session.toml`), `taffy`-backed LayerShell/Dwindle/CosmicGrid/NiriScroll compositor geometry, XDG/StartMenu app discovery, and `.deb`/`.desktop`/Flatpak descriptors. | Pure Rust (`wasm32`-ready) |
-| **`crates/os_ui`** | Unified GPUI OS toolkit combining Material 3 & COSMIC RON theming (`assets/os/themes.json` + WCAG AA checks), [`google_design`](./crates/os_ui/src/google_design.rs) tokens/springs, [`starter_pack`](./crates/os_ui/src/starter_pack.rs) (shadcn/Base UI/Tailwind v4 GPUI components + submodule parity), `PanelApplet`/`NavRail`, `iced`-style `ReactiveProgram`, and `egui`-style `ImmediateUi`. | Pure GPUI (`ui` + `theme`) |
-| **`crates/os_craft`** | Unified **ArtCraft** 17-application studio catalog (`assets/os/craft_catalog.toml`), [`vendor/craft-libs`](./vendor/craft-libs) pure-Rust decoders (`craft-sniff`, `craft-psd`, `craft-exr`, `craft-plist`, `image`, `usvg`/`resvg`), `object`/`wasmparser` inspector, and Craft Anything stdio/HTTP JSON-RPC 2.0 MCP server. | Opt-in codecs (`--no-default-features` skips raster/native/Wasm) |
-| **`crates/os_desktop` (`bin = "aphrody-os"`)** | COSMIC Epoch GPU desktop shell (`TopPanel`, compositor tiling stage, `DockBar`, searchable `Launcher`, Files, Reactive Settings, System Monitor, unified ArtCraft Studio, and optional `ArtCraftShellModule`). | `default = ["desktop"]` |
+| **`crates/aphrody_cli` (`gpui-wgpu`)** | Unified WGPU/Naga v30 adapter, shader validator/transpiler, headless PNG renderer, compute/bench, Wasm LTO/AOT toolchain, 5 standalone `templates/wasm-wgpu/` starters, `DESIGN.md` / Lighthouse CLI, and 24-tool JSON-RPC MCP server. | Standalone Apache-2.0 CLI + MCP |
+| **`crates/aphrody_design`** | Pure-Rust `https://design.google/` HTTP/HTML5/sitemap mirror, `DESIGN.md` Tailwind v4/W3C/WGSL exporter, Google Stitch SDK + PNG capture, and Core Web Vitals / Lighthouse / W3C / Vercel auditor. | Zero subprocess `curl`/`wget`, `wasm32`-ready |
+| **`crates/aphrody_session`** | Wayland/X11/Windows/macOS desktop session supervisor, topological unit startup (`assets/os/session.toml`), `taffy`-backed LayerShell/Dwindle/CosmicGrid/NiriScroll compositor geometry, XDG/StartMenu app discovery, and `.deb`/`.desktop`/Flatpak descriptors. | Pure Rust (`wasm32`-ready) |
+| **`crates/aphrody_ui`** | Unified GPUI OS toolkit combining Material 3 & COSMIC RON theming (`assets/os/themes.json` + WCAG AA checks), [`google_design`](./crates/aphrody_ui/src/google_design.rs) tokens/springs, [`starter_pack`](./crates/aphrody_ui/src/starter_pack.rs) (shadcn/Base UI/Tailwind v4 GPUI components + submodule parity), `PanelApplet`/`NavRail`, `iced`-style `ReactiveProgram`, and `egui`-style `ImmediateUi`. | Pure GPUI (`ui` + `theme`) |
+| **`crates/aphrody_craft`** | Unified **ArtCraft** 17-application studio catalog (`assets/os/craft_catalog.toml`), [`vendor/craft-libs`](./vendor/craft-libs) pure-Rust decoders (`craft-sniff`, `craft-psd`, `craft-exr`, `craft-plist`, `image`, `usvg`/`resvg`), `object`/`wasmparser` inspector, and Craft Anything stdio/HTTP JSON-RPC 2.0 MCP server. | Opt-in codecs (`--no-default-features` skips raster/native/Wasm) |
+| **`crates/aphrody_desktop` (`bin = "aphrody-os"`)** | COSMIC Epoch GPU desktop shell (`TopPanel`, compositor tiling stage, `DockBar`, searchable `Launcher`, Files, Reactive Settings, System Monitor, unified ArtCraft Studio, and optional `ArtCraftShellModule`). | `default = ["desktop"]` |
 | **`crates/zed` (`bin = "aphrody"`)** | **Aphrody Studio**: full ecosystem profile by default (`default = ["full"]`), with `--no-default-features` stripping `nsh`, `extensions`, `debugger`, `repl`, `collab`, `ai`, `updater`, and `crash-reporting` down to the local-first editor core. | `--no-default-features` trims optional subsystems |
 
 ---
@@ -46,11 +46,11 @@ cargo run -p zed --no-default-features
 cargo run -p zed
 
 # Aphrody GPUI OS Shell & Unified 17-App ArtCraft + Craft Anything Workbench:
-cargo run -p os_desktop --bin aphrody-os
-cargo run -p os_desktop --bin aphrody-os -- doctor --json
-cargo run -p os_desktop --bin aphrody-os -- catalog
-cargo run -p os_desktop --bin aphrody-os -- inspect assets/images/aphrody_logo.svg --json
-cargo run -p os_desktop --bin aphrody-os -- mcp
+cargo run -p aphrody_desktop --bin aphrody-os
+cargo run -p aphrody_desktop --bin aphrody-os -- doctor --json
+cargo run -p aphrody_desktop --bin aphrody-os -- catalog
+cargo run -p aphrody_desktop --bin aphrody-os -- inspect assets/images/aphrody_logo.svg --json
+cargo run -p aphrody_desktop --bin aphrody-os -- mcp
 
 # Maximum-optimization LLVM FatLTO distribution build:
 cargo build -p zed --profile dist --features "nsh,extensions,debugger"
@@ -93,11 +93,11 @@ cargo run -p nsh-cli -- test examples/nsh/counter
 Backed by [`vendor/wgpu`](./vendor/wgpu), [`docs/wgpu/llms.txt`](./docs/wgpu/llms.txt), [`docs/wgpu/llms-full.txt`](./docs/wgpu/llms-full.txt), [`docs/gpu/`](./docs/gpu), and the unified agent plugin in [`.agents/plugins/aphrody/`](./.agents/plugins/aphrody/plugin.json) (bundling all skills, hooks, rules, and docs for Zed, GPUI, WGPU, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Brand, and GitHub Ops):
 
 ```sh
-cargo run -p wgpu_cli -- adapters
-cargo run -p wgpu_cli -- validate crates/gpui_wgpu/src/shaders.wgsl
-cargo run -p wgpu_cli -- transpile path/to/shader.wgsl --target hlsl
-cargo run -p wgpu_cli -- render path/to/shader.wgsl -o render.png --width 800 --height 600
-cargo run -p wgpu_cli -- bench --iterations 25
+cargo run -p aphrody_cli -- adapters
+cargo run -p aphrody_cli -- validate crates/gpui_wgpu/src/shaders.wgsl
+cargo run -p aphrody_cli -- transpile path/to/shader.wgsl --target hlsl
+cargo run -p aphrody_cli -- render path/to/shader.wgsl -o render.png --width 800 --height 600
+cargo run -p aphrody_cli -- bench --iterations 25
 ```
 
 ---
@@ -122,4 +122,4 @@ Aphrody isolates its user directories (`%APPDATA%\Aphrody` / `%LOCALAPPDATA%\Aph
 
 ## Licensing
 
-Derived from [Zed](https://github.com/zed-industries/zed) and [Native Shell](https://github.com/longbridge/nsh), with [`wgpu`](https://github.com/gfx-rs/wgpu) (Apache-2.0 / MIT) in `vendor/wgpu`, [`bun`](https://github.com/aphrody-labs/bun) in `vendor/bun`, [`craft-libs`](https://github.com/aphrody-labs/craft-libs) in `vendor/craft-libs`, and [`craft-anything`](https://github.com/aphrody-labs/craft-anything) in `vendor/craft-anything`. Source code is licensed under GPL-3.0-or-later and Apache-2.0 / MIT where marked (`gpui`, `brand`, `wgpu_cli`, `os_session`, `os_ui`, `os_craft`, and `nsh-*`).
+Derived from [Zed](https://github.com/zed-industries/zed) and [Native Shell](https://github.com/longbridge/nsh), with [`wgpu`](https://github.com/gfx-rs/wgpu) (Apache-2.0 / MIT) in `vendor/wgpu`, [`bun`](https://github.com/aphrody-labs/bun) in `vendor/bun`, [`craft-libs`](https://github.com/aphrody-labs/craft-libs) in `vendor/craft-libs`, and [`craft-anything`](https://github.com/aphrody-labs/craft-anything) in `vendor/craft-anything`. Source code is licensed under GPL-3.0-or-later and Apache-2.0 / MIT where marked (`gpui`, `brand`, `aphrody_cli`, `aphrody_session`, `aphrody_ui`, `aphrody_craft`, and `nsh-*`).

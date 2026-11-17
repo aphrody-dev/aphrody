@@ -1,20 +1,20 @@
-# Google Design GPUI, `egui_gpui` & `craft_studio` Component Mapping
+# Google Design GPUI, `egui_gpui` & `aphrody_craft` Component Mapping
 
-Canonical mapping between [`docs/design/manifest.json`](../../../../../docs/design/manifest.json), [`crates/os_ui`](../../../../../crates/os_ui/src/os_ui.rs), [`crates/egui_gpui`](../../../../../crates/egui_gpui/src/egui_gpui.rs), [`crates/bevy_gpui`](../../../../../crates/bevy_gpui/src/bevy_gpui.rs), and [`crates/craft_studio`](../../../../../crates/craft_studio/src/craft_studio.rs).
+Canonical mapping between [`docs/design/manifest.json`](../../../../../docs/design/manifest.json), [`crates/aphrody_ui`](../../../../../crates/aphrody_ui/src/aphrody_ui.rs), [`crates/egui_gpui`](../../../../../crates/egui_gpui/src/egui_gpui.rs), [`crates/bevy_gpui`](../../../../../crates/bevy_gpui/src/bevy_gpui.rs), and [`crates/aphrody_craft`](../../../../../crates/aphrody_craft/src/aphrody_craft.rs).
 
-| Surface / Pattern | Reference Capture (`docs/design/assets/reference-captures/`) | GPUI Component (`os_ui`) | `egui 0.37` Equivalent (`egui_gpui` / `craft_studio`) |
+| Surface / Pattern | Reference Capture (`docs/design/assets/reference-captures/`) | GPUI Component (`aphrody_ui`) | `egui 0.37` Equivalent (`egui_gpui` / `aphrody_craft`) |
 | --- | --- | --- | --- |
 | Floating AI Omnibar & Mode Pill | `gemini-home.png`, `google-in-chrome.png` | `ExpressiveOmnibar` | `CraftToolbarChip` + `egui::TextEdit::singleline` |
 | Cascading Model / Tool Picker | `gemini-opions.png` | `CascadingPopoverCard` (`PopoverMenuItem`) | `CraftComboMenu` |
 | AI Mode Grounding Citation Card | `google-ai-mode.png` | `GroundingSourceCard` | `egui::Frame` + `StarterCard` parity |
 | Chrome 157 / Studio Mode Switcher | `win11-chrome157.png` | `SegmentedStudioBar` | `CraftDockTabs` |
 | Live Agent / Shader Aura Pill | `gemini-home.png`, `google-ai-mode.png` | `ThinkingAuraBadge` | `CraftImeBanner` / `CraftToolbarChip` |
-| FigCraft Vector & Variable Canvas | `docs/design/kits/figma-design-kit.tokens.json` | `craft_studio::render_gpui_studio_card` (`FigCraftGoogle`) | `craft_studio::render_egui_studio_frame` |
-| Craft Anything Binary/Oxc JS Audit | `docs/design/kits/stitch-design-kit.json` | `craft_studio::CraftAnythingGoogleReport` | `craft_studio::render_egui_studio_frame` |
+| FigCraft Vector & Variable Canvas | `docs/design/kits/figma-design-kit.tokens.json` | `aphrody_craft::render_gpui_studio_card` (`FigCraftGoogle`) | `aphrody_craft::render_egui_studio_frame` |
+| Craft Anything Binary/Oxc JS Audit | `docs/design/kits/stitch-design-kit.json` | `aphrody_craft::CraftAnythingGoogleReport` | `aphrody_craft::render_egui_studio_frame` |
 | Unreal Bevy 5.8 3D Viewport | `docs/design/assets/svg/bevy-unreal-pipeline.svg` | `bevy_gpui::ViewportFrame` + GPUI telemetry | `bevy_gpui::render_bevy_egui_inspector` |
 
 ## Contract Rules
 
-1. Never hardcode hex values in Rust views or TSX pages — read `GoogleDesignTokens` in Rust (`os_ui::GoogleDesignTokens::dark()` / `light()`) and `--md-sys-color-*` CSS variables from `docs/design/stylesheet.css` in web/NSH apps.
+1. Never hardcode hex values in Rust views or TSX pages — read `GoogleDesignTokens` in Rust (`aphrody_ui::GoogleDesignTokens::dark()` / `light()`) and `--md-sys-color-*` CSS variables from `docs/design/stylesheet.css` in web/NSH apps.
 2. Maintain WCAG 2.2 AA contrast (`>= 4.5:1` body text, `>= 3.0:1` interactive outlines) across both Light and Dark palettes.
 3. Validate schema changes with `bun test tooling/bun/design-docs-pack.test.ts`.

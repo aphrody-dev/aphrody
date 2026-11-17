@@ -14,7 +14,7 @@ const candidates = [
 const bin = candidates.find((p) => existsSync(p));
 const cmd = bin
   ? [bin, "mcp"]
-  : ["cargo", "run", "--quiet", "-p", "os_desktop", "--bin", "aphrody-os", "--", "mcp"];
+  : ["cargo", "run", "--quiet", "-p", "aphrody_desktop", "--bin", "aphrody-os", "--", "mcp"];
 
 const proc = Bun.spawn(cmd, {
   cwd: repoRoot,

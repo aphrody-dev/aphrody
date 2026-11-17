@@ -8,7 +8,7 @@
   "suggestedPrompts": [
     "Audit workspace conformance with brand check, repo hygiene, and clippy",
     "Optimize fr1 XFS/KVM/sccache CI host and verify WebGPU + Linux desktop screenshots",
-    "Drive os_desktop and native windows via ai-os-pilot desktop_ai_act_verify"
+    "Drive aphrody_desktop and native windows via ai-os-pilot desktop_ai_act_verify"
   ],
   "author": {
     "name": "Aphrody Labs",

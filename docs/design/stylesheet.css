@@ -56,7 +56,7 @@
   --md-sys-shape-corner-xl: 28px;
   --md-sys-shape-corner-full: 9999px;
 
-  /* Analytical Damped Harmonic Oscillator Springs (os_ui::google_design::SpringSpec) */
+  /* Analytical Damped Harmonic Oscillator Springs (aphrody_ui::google_design::SpringSpec) */
   --md-sys-motion-spring-spatial-fast: 240ms linear(0.0000, 0.1128, 0.3252, 0.5330, 0.6988, 0.8174, 0.8959, 0.9446, 0.9730, 0.9886, 0.9965, 1.0000, 1.0013, 1.0015, 1.0013, 1.0010, 1.0007);
   --md-sys-motion-spring-spatial-default: 340ms linear(0.0000, 0.1131, 0.3260, 0.5340, 0.6998, 0.8183, 0.8965, 0.9450, 0.9733, 0.9887, 0.9965, 1.0000, 1.0013, 1.0015, 1.0013, 1.0010, 1.0007);
   --md-sys-motion-spring-effects-default: 200ms linear(0.0000, 0.0902, 0.2642, 0.4422, 0.5940, 0.7127, 0.8009, 0.8641, 0.9084, 0.9389, 0.9596, 0.9734, 0.9826, 0.9887, 0.9927, 0.9953, 0.9970);

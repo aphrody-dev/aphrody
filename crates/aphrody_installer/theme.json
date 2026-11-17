@@ -1,0 +1,51 @@
+{
+  "cssVars": {
+    "theme": {
+      "radius": "0.75rem",
+      "font-sans": "Google Sans Flex, Inter, system-ui, sans-serif",
+      "font-mono": "JetBrains Mono, Consolas, monospace"
+    },
+    "light": {
+      "background": "oklch(0.985 0.004 260)",
+      "foreground": "oklch(0.16 0.015 260)",
+      "card": "oklch(0.995 0.002 260)",
+      "card-foreground": "oklch(0.16 0.015 260)",
+      "popover": "oklch(0.995 0.002 260)",
+      "popover-foreground": "oklch(0.16 0.015 260)",
+      "primary": "oklch(0.49 0.19 258)",
+      "primary-foreground": "oklch(0.99 0 0)",
+      "secondary": "oklch(0.94 0.012 258)",
+      "secondary-foreground": "oklch(0.22 0.02 258)",
+      "muted": "oklch(0.94 0.008 258)",
+      "muted-foreground": "oklch(0.46 0.018 258)",
+      "accent": "oklch(0.91 0.035 200)",
+      "accent-foreground": "oklch(0.2 0.03 200)",
+      "destructive": "oklch(0.55 0.22 25)",
+      "destructive-foreground": "oklch(0.99 0 0)",
+      "border": "oklch(0.88 0.01 258)",
+      "input": "oklch(0.86 0.012 258)",
+      "ring": "oklch(0.49 0.19 258)"
+    },
+    "dark": {
+      "background": "oklch(0.145 0.014 258)",
+      "foreground": "oklch(0.955 0.008 258)",
+      "card": "oklch(0.19 0.016 258)",
+      "card-foreground": "oklch(0.955 0.008 258)",
+      "popover": "oklch(0.21 0.018 258)",
+      "popover-foreground": "oklch(0.955 0.008 258)",
+      "primary": "oklch(0.71 0.16 250)",
+      "primary-foreground": "oklch(0.14 0.02 250)",
+      "secondary": "oklch(0.25 0.018 258)",
+      "secondary-foreground": "oklch(0.93 0.01 258)",
+      "muted": "oklch(0.23 0.014 258)",
+      "muted-foreground": "oklch(0.71 0.016 258)",
+      "accent": "oklch(0.3 0.045 200)",
+      "accent-foreground": "oklch(0.92 0.02 200)",
+      "destructive": "oklch(0.64 0.21 25)",
+      "destructive-foreground": "oklch(0.99 0 0)",
+      "border": "oklch(0.3 0.018 258)",
+      "input": "oklch(0.32 0.02 258)",
+      "ring": "oklch(0.71 0.16 250)"
+    }
+  }
+}

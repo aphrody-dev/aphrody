@@ -1,0 +1,9 @@
+{
+  "name": "Aphrody OS Installer",
+  "id": "dev.aphrody.installer",
+  "version": "0.1.0",
+  "appearance": "system",
+  "rust": ".",
+  "root": "InstallerApp",
+  "theme": "theme.json"
+}

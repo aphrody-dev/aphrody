@@ -9,7 +9,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, posix, resolve, win32 } from "node:path";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 
@@ -110,7 +110,7 @@ export function normalizePathEntry(raw: string): string {
   return raw.trim().replace(/^"(.*)"$/, "$1").replace(/[\\/]+$/, "");
 }
 
-export function pathKey(raw: string, isWindows = process.platform === "win32"): string {
+export function pathKey(raw: string, isWindows = process.platform === "win32" || /^[a-z]:[\\/]/i.test(raw)): string {
   const norm = normalizePathEntry(raw).replaceAll("/", "\\");
   return isWindows ? norm.toLowerCase() : normalizePathEntry(raw);
 }
@@ -255,15 +255,17 @@ export function optimizeUserPathEntries(
   added: string[];
   reorderedToFront: string[];
 } {
-  const machineKeys = new Set(machineEntries.map((e) => pathKey(e)));
+  const winStyle = process.platform === "win32" || /^[a-z]:[\\/]/i.test(homeDir);
+  const pathJoin = winStyle ? win32.join : posix.join;
+  const machineKeys = new Set(machineEntries.map((e) => pathKey(e, winStyle)));
   const candidatesToEnsure = [
-    join(homeDir, ".bun", "bin"),
-    join(homeDir, ".cargo", "bin"),
-    join(homeDir, ".local", "bin"),
-    join(localAppData, "Programs", "nu", "bin"),
-    join(programFiles, "Wasmtime", "bin"),
-    join(localAppData, "Microsoft", "WinGet", "Links"),
-  ].filter((p) => checkExists(p) && !machineKeys.has(pathKey(p)));
+    pathJoin(homeDir, ".bun", "bin"),
+    pathJoin(homeDir, ".cargo", "bin"),
+    pathJoin(homeDir, ".local", "bin"),
+    pathJoin(localAppData, "Programs", "nu", "bin"),
+    pathJoin(programFiles, "Wasmtime", "bin"),
+    pathJoin(localAppData, "Microsoft", "WinGet", "Links"),
+  ].filter((p) => checkExists(p) && !machineKeys.has(pathKey(p, winStyle)));
 
   const rawSeen = new Set<string>();
   const kept: string[] = [];
@@ -273,7 +275,7 @@ export function optimizeUserPathEntries(
   for (const raw of userEntries) {
     const clean = normalizePathEntry(raw);
     if (!clean) continue;
-    const key = pathKey(clean);
+    const key = pathKey(clean, winStyle);
     if (!checkExists(clean)) {
       removed.push(`${clean} (missing)`);
       continue;
@@ -299,7 +301,7 @@ export function optimizeUserPathEntries(
   }
 
   for (const ensureDir of candidatesToEnsure) {
-    const key = pathKey(ensureDir);
+    const key = pathKey(ensureDir, winStyle);
     if (!rawSeen.has(key)) {
       rawSeen.add(key);
       kept.push(ensureDir);
@@ -308,19 +310,19 @@ export function optimizeUserPathEntries(
   }
 
   const tierZeroPriority = [
-    pathKey(join(homeDir, ".bun", "bin")),
-    pathKey(join(homeDir, ".cargo", "bin")),
-    pathKey(join(homeDir, ".local", "bin")),
-    pathKey(join(localAppData, "Programs", "nu", "bin")),
-    pathKey(join(programFiles, "Wasmtime", "bin")),
-    pathKey(join(localAppData, "Microsoft", "WinGet", "Links")),
+    pathKey(pathJoin(homeDir, ".bun", "bin"), winStyle),
+    pathKey(pathJoin(homeDir, ".cargo", "bin"), winStyle),
+    pathKey(pathJoin(homeDir, ".local", "bin"), winStyle),
+    pathKey(pathJoin(localAppData, "Programs", "nu", "bin"), winStyle),
+    pathKey(pathJoin(programFiles, "Wasmtime", "bin"), winStyle),
+    pathKey(pathJoin(localAppData, "Microsoft", "WinGet", "Links"), winStyle),
   ];
 
   const indexed = kept.map((entry, idx) => ({
     entry,
     idx,
     tier: classifyPriorityTier(entry, homeDir),
-    subRank: tierZeroPriority.indexOf(pathKey(entry)),
+    subRank: tierZeroPriority.indexOf(pathKey(entry, winStyle)),
   }));
 
   indexed.sort((a, b) => {

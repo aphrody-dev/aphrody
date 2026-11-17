@@ -205,8 +205,8 @@
       "title": "Code is a Design Material",
       "path": "./guidelines/01-code-is-a-design-material.mdx",
       "sourceUrl": "https://design.google/library/code-is-a-design-material",
-      "bytes": 824,
-      "sha256": "1b620d6c8ba269a394898ff60d54d3c2cd97ad476c4c091af17e2e777ba5c6ab"
+      "bytes": 830,
+      "sha256": "e0261cee8267e0b2f6f47fa16439a0c5ba21c99f653075b5a25cdda21058845e"
     },
     {
       "id": "02-material-3-expressive-and-neural-surfaces",
@@ -229,24 +229,24 @@
       "title": "Spatial vs Effects Spring Motion Physics",
       "path": "./guidelines/04-spatial-and-effects-spring-motion.mdx",
       "sourceUrl": "https://m3.material.io/",
-      "bytes": 653,
-      "sha256": "2e76735acf2288db0057629c74a58e63cc9bfb01fb2d62de8a8c8031dc543f91"
+      "bytes": 658,
+      "sha256": "272acef8def768d09b819f80c98b7e1bf2aeed4aa4b5a024045fffaab2885ac4"
     },
     {
       "id": "05-modern-web-and-wasm-webgpu-baseline",
       "title": "Modern Web Guidance & Wasm/WebGPU Baseline",
       "path": "./guidelines/05-modern-web-and-wasm-webgpu-baseline.mdx",
       "sourceUrl": "https://github.com/GoogleChrome/modern-web-guidance-src",
-      "bytes": 606,
-      "sha256": "a960896ead5e8be00bf3c77c6e969775db2af7dcdd3d79b7f9c5f52633f68a16"
+      "bytes": 600,
+      "sha256": "dbe567767f476ac218fe15581af91bb4c16675e19308438637716fefb320bc9d"
     },
     {
       "id": "06-gpui-egui-bevy-component-catalog",
       "title": "Unified GPUI, NSH, egui 0.37 & Bevy UE5.8 Component Catalog",
       "path": "./guidelines/06-gpui-egui-bevy-component-catalog.mdx",
       "sourceUrl": "https://design.google/?home",
-      "bytes": 933,
-      "sha256": "cff29b0b43d5a9e44494e5e7c0079fc7040e42b504afc0fefd8302d535774827"
+      "bytes": 950,
+      "sha256": "0e00145845151a266d9d5178781916e74780d781c823d8c37569baf6b3db2916"
     }
   ],
   "kits": {
@@ -258,7 +258,7 @@
     },
     "stitch": {
       "path": "./kits/stitch-design-kit.json",
-      "sha256": "6d8b5eb34b45827c0adde1256edbbaee0bd9a6f28dee21c49b5254187b9b57dd",
+      "sha256": "8995238a4f4a9e762833037848158d298a44c21505ded98bd59c40ad54400710",
       "screenCount": 4,
       "preserveDataStitchId": true
     }
@@ -267,7 +267,7 @@
     {
       "id": "expressive-app-shell",
       "category": "shell",
-      "gpuiSymbol": "os_ui::cosmic_shell::render_nav_rail",
+      "gpuiSymbol": "aphrody_ui::cosmic_shell::render_nav_rail",
       "eguiEquivalentSymbol": "egui::SidePanel",
       "nshElement": "AppShell",
       "stitchSlotId": "stitch-agy-rail",
@@ -284,7 +284,7 @@
     {
       "id": "expressive-pill-button",
       "category": "navigation",
-      "gpuiSymbol": "os_ui::starter_pack::StarterButton",
+      "gpuiSymbol": "aphrody_ui::starter_pack::StarterButton",
       "eguiEquivalentSymbol": "egui::Button",
       "nshElement": "PillButton",
       "stitchSlotId": "stitch-figcraft-cta",
@@ -339,7 +339,7 @@
     {
       "id": "grounding-card-stack",
       "category": "data_display",
-      "gpuiSymbol": "os_ui::starter_pack::StarterCard",
+      "gpuiSymbol": "aphrody_ui::starter_pack::StarterCard",
       "eguiEquivalentSymbol": "egui::Frame",
       "nshElement": "GroundingCard",
       "stitchSlotId": "stitch-grounding-stack",
@@ -356,7 +356,7 @@
     {
       "id": "telemetry-kpi-strip",
       "category": "data_display",
-      "gpuiSymbol": "os_ui::starter_pack::StarterKpiCard",
+      "gpuiSymbol": "aphrody_ui::starter_pack::StarterKpiCard",
       "eguiEquivalentSymbol": "egui_gpui::EguiFrameStats",
       "nshElement": "KpiTile",
       "stitchSlotId": "stitch-agy-kpis",
@@ -371,7 +371,7 @@
     {
       "id": "figcraft-auto-layout-frame",
       "category": "data_display",
-      "gpuiSymbol": "craft_studio::FigCraftFrameNode",
+      "gpuiSymbol": "aphrody_craft::FigCraftFrameNode",
       "eguiEquivalentSymbol": "egui_gpui::EguiGpuiHost",
       "nshElement": "FigCraftGoogleScreen",
       "stitchSlotId": "stitch-figcraft-root",

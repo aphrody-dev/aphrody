@@ -10,12 +10,12 @@
 
 ## 2. Paired Pure-Rust Full-Stack Mirror & Zed Integration
 
-- **Fused Core Crate**: [crates/google_design_stitch](../../crates/google_design_stitch/src/google_design_stitch.rs) combines pure-Rust live HTTP/sitemap mirroring (`http_mirror`), `DESIGN.md` parsing/linting/diff/export (`design_md`), `stitch-sdk` & `stitch.withgoogle.com` screen codegen (`stitch_client`), `GoogleChrome/modern-web-guidance-src` Baseline auditing (`modern_web_guidance`), and PNG screen captures (`screen_capture`).
-- **OS UI Design API**: [google_design.rs](../../crates/os_ui/src/google_design.rs) pairs `google_design_stitch` with `os_ui` for M3 Expressive analytical springs, `GoogleSansFlexAxes`, `WindowSizeClass`, CSS custom properties, and WGSL `GoogleDesignTheme` uniforms.
-- **Native Zed / Aphrody IDE Panels**: [design_stitch_studio.rs](../../crates/nsh_workspace/src/design_stitch_studio.rs) registers `OpenGoogleDesignMirror`, `OpenStitchStudio`, and `CaptureDesignScreen` directly inside `nsh_workspace` (loaded by default in [crates/zed](../../crates/zed/src/main.rs)).
+- **Fused Core Crate**: [crates/aphrody_design](../../crates/aphrody_design/src/aphrody_design.rs) combines pure-Rust live HTTP/sitemap mirroring (`http_mirror`), `DESIGN.md` parsing/linting/diff/export (`design_md`), `stitch-sdk` & `stitch.withgoogle.com` screen codegen (`stitch_client`), `GoogleChrome/modern-web-guidance-src` Baseline auditing (`modern_web_guidance`), and PNG screen captures (`screen_capture`).
+- **OS UI Design API**: [google_design.rs](../../crates/aphrody_ui/src/google_design.rs) pairs `aphrody_design` with `aphrody_ui` for M3 Expressive analytical springs, `GoogleSansFlexAxes`, `WindowSizeClass`, CSS custom properties, and WGSL `GoogleDesignTheme` uniforms.
+- **Native Zed / Aphrody IDE Panels**: [design_stitch_studio.rs](../../crates/aphrody_nsh/src/design_stitch_studio.rs) registers `OpenGoogleDesignMirror`, `OpenStitchStudio`, and `CaptureDesignScreen` directly inside `aphrody_nsh` (loaded by default in [crates/zed](../../crates/zed/src/main.rs)).
 
 ## 3. Sync & Audit Gates
 
 - Regenerate tokens, sitemap snapshot & `DESIGN.md`: `bun tooling/bun/google-design-sync.ts sync` (`bun run design:sync`).
 - Audit monorepo, themes & templates: `bun tooling/bun/google-design-sync.ts audit` (`bun run design:audit`).
-- Test pure-Rust mirror, Stitch & UI crates: `cargo test -p brand -p google_design_stitch -p os_ui`.
+- Test pure-Rust mirror, Stitch & UI crates: `cargo test -p brand -p aphrody_design -p aphrody_ui`.

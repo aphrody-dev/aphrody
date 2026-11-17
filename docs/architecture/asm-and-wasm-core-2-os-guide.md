@@ -1,6 +1,6 @@
 # Assembly (`Assembleur`) & W3C WebAssembly Core 2.0 — Same-Codebase Modern OS Architecture in Aphrody
 
-> Canonical engineering and didactic reference grounded in live upstream specifications ([W3C WebAssembly Core](https://www.w3.org/TR/wasm-core-2/), [Wasm 2.0 Snapshot](https://www.w3.org/TR/2025/CRD-wasm-core-2-20250616/), [WebAssembly.org](https://webassembly.org/), [WASI.dev](https://wasi.dev/), [Component Model WIT](https://component-model.bytecodealliance.org/design/wit.html), [Wikipédia — Assembleur](https://fr.wikipedia.org/wiki/Assembleur)) and verified directly against [`crates/os_session/src/wasm_hal.rs`](../../crates/os_session/src/wasm_hal.rs), [`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts), and [`tooling/bun/cross-build.ts`](../../tooling/bun/cross-build.ts).
+> Canonical engineering and didactic reference grounded in live upstream specifications ([W3C WebAssembly Core](https://www.w3.org/TR/wasm-core-2/), [Wasm 2.0 Snapshot](https://www.w3.org/TR/2025/CRD-wasm-core-2-20250616/), [WebAssembly.org](https://webassembly.org/), [WASI.dev](https://wasi.dev/), [Component Model WIT](https://component-model.bytecodealliance.org/design/wit.html), [Wikipédia — Assembleur](https://fr.wikipedia.org/wiki/Assembleur)) and verified directly against [`crates/aphrody_session/src/wasm_hal.rs`](../../crates/aphrody_session/src/wasm_hal.rs), [`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts), and [`tooling/bun/cross-build.ts`](../../tooling/bun/cross-build.ts).
 
 ---
 
@@ -55,7 +55,7 @@ Example machine encoding cited by [Wikipédia — Assembleur](https://fr.wikiped
 
 ### 1.4 Calling Conventions (ABI Matrix)
 
-Encoded directly in [`CallingConvention`](../../crates/os_session/src/wasm_hal.rs):
+Encoded directly in [`CallingConvention`](../../crates/aphrody_session/src/wasm_hal.rs):
 
 | Calling Convention | Integer / Ptr Arg Registers | Float / Vector Arg Registers | Return Registers | Stack Alignment & ABI Notes |
 | :--- | :--- | :--- | :--- | :--- |
@@ -68,7 +68,7 @@ Encoded directly in [`CallingConvention`](../../crates/os_session/src/wasm_hal.r
 
 Rust embeds LLVM's inline assembler via `core::arch::asm!`, compiling `.rs` files directly without an external `.s` build step (`cc`/`nasm`), while external `.s` + `clang -c` / `nasm` remains useful for stand-alone boot trampolines before Rust's stack/runtime is initialized.
 
-Critical correctness rules enforced in [`crates/os_session/src/wasm_hal.rs`](../../crates/os_session/src/wasm_hal.rs):
+Critical correctness rules enforced in [`crates/aphrody_session/src/wasm_hal.rs`](../../crates/aphrody_session/src/wasm_hal.rs):
 1. **Accurate register clobbers & options**: `spin_wait_hint()` passes `options(nomem, nostack, preserves_flags)` for `pause` (`x86_64`) and `yield` (`aarch64`).
 2. **Never mark non-deterministic hardware counters `pure` or `readonly`**: `read_timestamp_ticks()` omits `pure` on `rdtsc` (`out("eax") lo, out("edx") hi`) and `mrs {ticks}, cntvct_el0`, preventing LLVM from hoisting or deduplicating consecutive timer reads.
 3. **Explicit `// SAFETY:` contracts**: required by workspace lints and `cargo clippy -- -D warnings`.
@@ -87,7 +87,7 @@ Unlike native CPUs that jump to arbitrary memory addresses (`jmp *%rax`), WebAss
 
 ### 2.2 Value Types & Binary Type Opcodes (Core 2.0 §5.3 & §A.7)
 
-Implemented in [`WasmValueType`](../../crates/os_session/src/wasm_hal.rs):
+Implemented in [`WasmValueType`](../../crates/aphrody_session/src/wasm_hal.rs):
 
 | Value Type | Category | Binary Byte (`s7` negative) | Width / Semantics |
 | :--- | :--- | :--- | :--- |
@@ -148,7 +148,7 @@ Verified live on Aphrody's own browser Wasm bundle (`llvm-objdump -s --section=t
 Aphrody compiles a **single `#![no_std]`-clean Rust logic & HAL core** across bare-metal/native OS hosts, Browser Full-Wasm WebGPU desktops, and capability-sandboxed WASI Component Model services:
 
 ```text
-                  Single Rust Core (crates/os_session/src/wasm_hal.rs + compositor + session)
+                  Single Rust Core (crates/aphrody_session/src/wasm_hal.rs + compositor + session)
                                              │
             ┌────────────────────────────────┼────────────────────────────────┐
             ▼                                ▼                                ▼
@@ -161,9 +161,9 @@ Aphrody compiles a **single `#![no_std]`-clean Rust logic & HAL core** across ba
   • Vulkan / DX12 / Metal        • WebGPU -> WebGL2 + ARIA DOM
 ```
 
-### 3.1 Single HAL Core (`crates/os_session/src/wasm_hal.rs`)
+### 3.1 Single HAL Core (`crates/aphrody_session/src/wasm_hal.rs`)
 
-Re-exported cleanly from [`crates/os_session/src/os_session.rs`](../../crates/os_session/src/os_session.rs) with zero OS-syscall dependencies:
+Re-exported cleanly from [`crates/aphrody_session/src/aphrody_session.rs`](../../crates/aphrody_session/src/aphrody_session.rs) with zero OS-syscall dependencies:
 - **`IsaProfile` & `CallingConvention`**: compile-time introspection of ISA (`X86_64`, `Aarch64`, `Wasm32`, `Wasm32Simd128`, `Wasm32WasiP2`), pointer bits (`64` vs `32`), active SIMD register width (`0`, `128`, `256`, `512`), ABI (`SystemV`/`Win64`/`Aapcs64`/`WasmStack`), and page size (`4 KiB`, `16 KiB`, `64 KiB`).
 - **Unified Low-Level Primitives**:
   - `spin_wait_hint()`: `asm!("pause")` on `x86_64`, `asm!("yield")` on `aarch64`, `core::hint::spin_loop()` on `wasm32`.
@@ -185,17 +185,17 @@ Re-exported cleanly from [`crates/os_session/src/os_session.rs`](../../crates/os
 
 ### 3.3 Aphrody Runtime, Compositor & WebGPU Integration
 
-1. **Browser Cohort Architecture ([`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts), [`crates/os_desktop/examples/web_os.rs`](../../crates/os_desktop/examples/web_os.rs), [`crates/gpui_web`](../../crates/gpui_web/src/gpui_web.rs))**:
+1. **Browser Cohort Architecture ([`tooling/bun/web-build.ts`](../../tooling/bun/web-build.ts), [`crates/aphrody_desktop/examples/web_os.rs`](../../crates/aphrody_desktop/examples/web_os.rs), [`crates/gpui_web`](../../crates/gpui_web/src/gpui_web.rs))**:
    - Compiles `wasm32-unknown-unknown` with `[profile.web]` (`opt-level = "z"`, `lto = "thin"`, `strip = true`, `panic = "abort"` in root [`Cargo.toml`](../../Cargo.toml)) and `RUSTC_WRAPPER=""` to avoid Windows `web-sys` argv overflow.
    - Emits separated deployment cohorts in `target/web-dist/`:
      - `baseline`: universal Core 2.0 Wasm (`+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types,+multivalue`), zero `SharedArrayBuffer` / COOP-COEP requirement.
      - `simd-baseline`: adds `-C target-feature=+simd128`, selected dynamically in JS via `WebAssembly.validate(WASM_CORE2_SIMD_PROBE_BYTES)`.
      - `multithreaded` (opt-in `--coi`): adds `+atomics,+bulk-memory,+mutable-globals` gated on `crossOriginIsolated`.
    - Optimizes via Binaryen `wasm-opt v133 -Oz --enable-bulk-memory --enable-bulk-memory-opt --enable-nontrapping-float-to-int --enable-sign-ext --enable-reference-types --enable-multivalue` and pins `wasm-bindgen 0.2.129` against [`Cargo.lock`](../../Cargo.lock).
-2. **GPU & Compositor Pipeline ([`crates/os_session/src/compositor.rs`](../../crates/os_session/src/compositor.rs), [`crates/gpui_wgpu`](../../crates/gpui_wgpu/src/wgpu_context.rs), [`crates/wgpu_cli`](../../crates/wgpu_cli/src/main.rs))**:
-   - `os_session` computes Taffy tiling/layer-shell layouts identically on native and Wasm (`compositor.rs` has zero platform syscalls).
+2. **GPU & Compositor Pipeline ([`crates/aphrody_session/src/compositor.rs`](../../crates/aphrody_session/src/compositor.rs), [`crates/gpui_wgpu`](../../crates/gpui_wgpu/src/wgpu_context.rs), [`crates/aphrody_cli`](../../crates/aphrody_cli/src/main.rs))**:
+   - `aphrody_session` computes Taffy tiling/layer-shell layouts identically on native and Wasm (`compositor.rs` has zero platform syscalls).
    - `gpui_web::WebPlatform` pairs `WebBackendPreference` with `gpui_wgpu::WgpuContext` (preferring browser WebGPU `navigator.gpu` and falling back to WebGL2 cleanly).
-   - `wgpu_cli` (`gpui-wgpu`) validates and transpiles `.wgsl` compute/render shaders via `naga` across Vulkan, DX12, Metal, and OpenGL ES.
+   - `aphrody_cli` (`gpui-wgpu`) validates and transpiles `.wgsl` compute/render shaders via `naga` across Vulkan, DX12, Metal, and OpenGL ES.
 3. **Server / Extension WASI 0.2 Host ([`crates/extension_host/src/wasm_host.rs`](../../crates/extension_host/src/wasm_host.rs), [WASI Releases](https://wasi.dev/releases))**:
    - Uses `wasmtime 48.0.7` + `wasmtime-wasi` (`p2`) to execute `wasm32-wasip2` components built from WIT contracts, ready to adopt WASI 0.3 (`async func`, `stream<T>`, `future<T>`) cleanly without breaking WASI 0.2 components.
 
@@ -205,32 +205,32 @@ Re-exported cleanly from [`crates/os_session/src/os_session.rs`](../../crates/os
 
 All commands below were executed and verified directly inside `C:\src\aphrody` (hosted tooling: `rustc 1.98.1`, `clang 23.1.5`, `LLD 23.1.5`, `llvm-objdump`, `wasm-bindgen 0.2.129`, `wasm-opt 133`, `wat2wasm 1.0.42`, `NASM 3.02`, `Bun 1.4.5`).
 
-### 4.1 Native + Wasm Cross-Verification (`os_session`)
+### 4.1 Native + Wasm Cross-Verification (`aphrody_session`)
 
 ```powershell
 # 1. Host unit tests (covers native asm! ticks, SIMD/scalar bit-identity, and Wasm Core 2.0 codec)
-cargo test -j 4 -p os_session
+cargo test -j 4 -p aphrody_session
 
 # 2. Zero-warning Clippy gate on native host
-cargo clippy -j 4 -p os_session --all-targets -- -D warnings
+cargo clippy -j 4 -p aphrody_session --all-targets -- -D warnings
 
 # 3. Zero-warning Clippy across Core 2.0 baseline, +simd128, and WASI Preview 2 targets
 $env:RUSTC_WRAPPER=""
-cargo clippy -j 4 -p os_session --target wasm32-unknown-unknown -- -D warnings
+cargo clippy -j 4 -p aphrody_session --target wasm32-unknown-unknown -- -D warnings
 $env:CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-feature=+simd128"
-cargo clippy -j 4 -p os_session --target wasm32-unknown-unknown -- -D warnings
+cargo clippy -j 4 -p aphrody_session --target wasm32-unknown-unknown -- -D warnings
 Remove-Item Env:\CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS
-cargo clippy -j 4 -p os_session --target wasm32-wasip2 -- -D warnings
+cargo clippy -j 4 -p aphrody_session --target wasm32-wasip2 -- -D warnings
 
 # 4. Unified cross-build matrix checks (wasm32-unknown-unknown, wasm32-wasip2, Linux glibc 2.28 via cargo-zigbuild)
-bun run cross:check -- --target wasm32-unknown-unknown --package os_session
-bun run cross:check -- --target wasm32-wasip2 --package os_session
-bun run cross:check -- --target x86_64-unknown-linux-gnu.2.28 --package os_session
+bun run cross:check -- --target wasm32-unknown-unknown --package aphrody_session
+bun run cross:check -- --target wasm32-wasip2 --package aphrody_session
+bun run cross:check -- --target x86_64-unknown-linux-gnu.2.28 --package aphrody_session
 ```
 
 ### 4.2 Runnable Core 2.0 `.wat` & Binary Verification in Bun
 
-The 35-byte module generated by `os_session::wasm_hal::encode_wasm_core2_noop_module()` matches the canonical Core 2.0 `.wat` module `(module (func (export "noop") nop))`, and the 31-byte `WASM_CORE2_SIMD_PROBE_BYTES` matches `tooling/bun/web-build.ts`:
+The 35-byte module generated by `aphrody_session::wasm_hal::encode_wasm_core2_noop_module()` matches the canonical Core 2.0 `.wat` module `(module (func (export "noop") nop))`, and the 31-byte `WASM_CORE2_SIMD_PROBE_BYTES` matches `tooling/bun/web-build.ts`:
 
 ```powershell
 @'
