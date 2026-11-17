@@ -17,7 +17,7 @@ Manually test your changes; report results, mention platforms tested, and includ
 ## Self-review
 
 - [ ] I've reviewed my diff for quality, security, reliability, and performance.
-- [ ] Diff follows [`.rules`](https://github.com/aphrody-dev/aphrody/blob/main/.rules) (no `mod.rs`, no `.unwrap()` on fallible calls, Clippy clean, `README.md` guard respected).
+- [ ] Diff follows [`AGENTS.md`](https://github.com/aphrody-dev/aphrody/blob/main/AGENTS.md) (no `mod.rs`, no `.unwrap()` on fallible calls, Clippy clean, `README.md` guard respected).
 - [ ] UI changes follow [`docs/src/development/ui-checklist.md`](https://github.com/aphrody-dev/aphrody/blob/main/docs/src/development/ui-checklist.md).
 - [ ] Tests cover the new or changed behavior.
 
