@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> Remove this line to confirm you've reviewed this PR before submitting.
+
 # Aphrody — GPUI OS (`aphrody`)
 
 Modular, local-first, ultra-fast Rust **GPU UI Framework**, **Code Engine**, **Native Shell (TSX/Rust)**, **WGPU Toolkit**, **Application Starter Pack**, and **Aphrody Studio** — with **100% ecosystem compatibility with Zed**.
