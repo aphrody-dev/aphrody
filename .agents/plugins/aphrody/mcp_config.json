@@ -7,6 +7,10 @@
     "docker-brain": {
       "command": "bun",
       "args": ["--no-install", "--no-env-file", "${PLUGIN_ROOT}/mcp/docker-mcp.ts"]
+    },
+    "vercel-brain": {
+      "command": "bun",
+      "args": ["--no-install", "--no-env-file", "${PLUGIN_ROOT}/mcp/vercel-mcp.ts"]
     }
   }
 }

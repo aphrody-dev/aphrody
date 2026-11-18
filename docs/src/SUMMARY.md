@@ -229,6 +229,7 @@
   - [Windows](./development/windows.md)
   - [FreeBSD](./development/freebsd.md)
   - [Docker & Containers](./development/docker.md)
+  - [Vercel & Cloud Deployment](./development/vercel.md)
   - [Using Debuggers](./development/debuggers.md)
   - [Performance](./performance.md)
   - [UI/UX Checklist](./development/ui-checklist.md)
