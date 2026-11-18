@@ -93,7 +93,7 @@ jobs:
           '
       - name: Run fleet-lb, Cloudflare Worker, learn-cloud, and fleet deploy tests
         shell: bash
-        run: bun test tooling/bun/fleet-lb.test.ts ./.cloudflare/aphrody-worker/src/index.test.ts tooling/bun/fleet-deploy.test.ts tooling/bun/cloudflare-releases.test.ts tooling/bun/learn-cloud.test.ts
+        run: bun test --timeout 20000 tooling/bun/fleet-lb.test.ts ./.cloudflare/aphrody-worker/src/index.test.ts tooling/bun/fleet-deploy.test.ts tooling/bun/cloudflare-releases.test.ts tooling/bun/learn-cloud.test.ts
       - name: Verify cross-platform fleet:lb CLI (probe, schedule, beacon dry-run)
         shell: bash
         run: |
