@@ -12,6 +12,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { buildCanonicalDesignTokens, contrastRatioHex } from "./google-design-sync.ts";
+import { buildAllMaquettes, captureMaquetteScreenshots, MAQUETTE_DEFINITIONS } from "./design-maquettes.ts";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 export const DESIGN_DOCS_DIR = join(repoRoot, "docs/design");
@@ -95,17 +96,94 @@ const CURATED_SVGS: Array<{ id: string; title: string; viewBox: string; body: st
     viewBox: "0 0 24 24",
     body: `<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
   },
+  {
+    id: "aphrody-monogram-neural",
+    title: "Aphrody Neural Expressive Monogram",
+    viewBox: "0 0 96 96",
+    body: `<defs><linearGradient id="aphTile" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#004B75"/><stop offset="100%" stop-color="#135B82"/></linearGradient></defs><rect width="96" height="96" rx="22" fill="url(#aphTile)"/><path d="M48 18 76 74H63.5L57.8 62H38.2L32.5 74H20L48 18Zm0 19-6.6 15.5h13.2L48 37Z" fill="#FFFFFF"/><path d="M56.5 18 42.5 47H54L39.5 76" fill="none" stroke="#FFB300" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+  {
+    id: "aphrody-monogram-mono",
+    title: "Aphrody Monochrome Monogram",
+    viewBox: "0 0 96 96",
+    body: `<rect x="4" y="4" width="88" height="88" rx="20" fill="none" stroke="currentColor" stroke-width="5"/><path d="M48 20 73 72H61.5L56.5 61H39.5L34.5 72H23L48 20Zm0 18-5.5 14h11L48 38Z" fill="currentColor"/>`,
+  },
+  {
+    id: "aphrody-mobile-adaptive-fg",
+    title: "Aphrody Mobile Adaptive Icon Foreground (66dp Safe Zone)",
+    viewBox: "0 0 108 108",
+    body: `<path d="M54 24 79 77H67.5L62.5 66H45.5L40.5 77H29L54 24Zm0 17-5.8 14.5h11.6L54 41Z" fill="#FFFFFF"/><path d="M61 25 48 51h10L45 77" fill="none" stroke="#FFB300" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+  {
+    id: "aphrody-mobile-adaptive-bg",
+    title: "Aphrody Mobile Adaptive Icon Background",
+    viewBox: "0 0 108 108",
+    body: `<defs><radialGradient id="mobBg" cx="50%" cy="35%" r="65%"><stop offset="0%" stop-color="#135B82"/><stop offset="100%" stop-color="#0B0E14"/></radialGradient></defs><rect width="108" height="108" fill="url(#mobBg)"/>`,
+  },
+  {
+    id: "aphrody-os-compositor",
+    title: "Aphrody COSMIC Epoch Compositor Tiling Glyph",
+    viewBox: "0 0 24 24",
+    body: `<rect x="2.5" y="3" width="19" height="18" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 3v18M12 12h9.5" stroke="currentColor" stroke-width="1.75"/>`,
+  },
+  {
+    id: "aphrody-ide-studio",
+    title: "Aphrody Studio IDE Multi-Pane Glyph",
+    viewBox: "0 0 24 24",
+    body: `<rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M8.5 3v18M12 10l2.5 2-2.5 2M15.5 14h2.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+  {
+    id: "aphrody-webgpu-prism",
+    title: "WebGPU & WGSL Compute Prism",
+    viewBox: "0 0 24 24",
+    body: `<polygon points="12,2.5 20.5,7.5 20.5,16.5 12,21.5 3.5,16.5 3.5,7.5" fill="none" stroke="currentColor" stroke-width="1.75"/><polygon points="12,5 18.5,16.2 5.5,16.2" fill="none" stroke="currentColor" stroke-width="1.5"/>`,
+  },
+  {
+    id: "aphrody-wasm-cube",
+    title: "WebAssembly Core 2.0 & WASI P2 Cube",
+    viewBox: "0 0 24 24",
+    body: `<path d="M4 7v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2.5a3.5 3.5 0 0 1-7 0H6a2 2 0 0 0-2 2Z" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M7.5 12.5 9 16l1.5-3.5L12 16l1.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+  {
+    id: "aphrody-vpn-shield",
+    title: "Aphrody Sovereign WireGuard VPN Shield",
+    viewBox: "0 0 24 24",
+    body: `<path d="M12 2.5 19.5 5.8v5.5c0 4.8-3.2 8.7-7.5 10.2-4.3-1.5-7.5-5.4-7.5-10.2V5.8L12 2.5Z" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="m9 12 2.2 2.2L15.5 10" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+  {
+    id: "aphrody-ai-agent-orbit",
+    title: "Multi-Agent MCP / ACP / A2A Control Orbit",
+    viewBox: "0 0 24 24",
+    body: `<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.75"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" fill="none" stroke="currentColor" stroke-width="1.5"/>`,
+  },
+  {
+    id: "aphrody-figma-tokens",
+    title: "W3C DTCG & Figma Variable Token Grid",
+    viewBox: "0 0 24 24",
+    body: `<circle cx="8" cy="7" r="3" fill="none" stroke="currentColor" stroke-width="1.75"/><rect x="13" y="4" width="6" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.75"/><rect x="5" y="13" width="6" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.75"/><circle cx="16" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.75"/>`,
+  },
+  {
+    id: "aphrody-store-22targets",
+    title: "Aphrody 22-Target Store Distribution",
+    viewBox: "0 0 24 24",
+    body: `<path d="M4 9h16l-1.2 10.5a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 9Z" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M8.5 9V6.5a3.5 3.5 0 0 1 7 0V9" fill="none" stroke="currentColor" stroke-width="1.75"/>`,
+  },
 ];
 
 function normalizeSvgMarkup(raw: string, fallbackTitle: string): { clean: string; viewBox: string } {
   let s = raw.replace(/\r?\n/g, " ").replace(/\s+/g, " ").replace(/>\s+</g, "><").trim();
+  s = s.replace(/&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-fA-F]+;)/g, "&amp;");
   const vbMatch = s.match(/viewBox=["']([^"']+)["']/i);
   const viewBox = vbMatch?.[1] ?? "0 0 24 24";
   if (!/role=["']/i.test(s)) {
     s = s.replace(/^<svg\b/i, '<svg role="img"');
   }
+  if (s.includes("currentColor") && !/style=["'][^"']*color:/i.test(s)) {
+    s = s.replace(/^<svg\b/i, '<svg style="color:#8FD0FF"');
+  }
   if (!/<title>/i.test(s)) {
-    s = s.replace(/(<svg[^>]*>)/i, `$1<title>${fallbackTitle}</title>`);
+    const safeTitle = fallbackTitle.replace(/&(?!amp;)/g, "&amp;");
+    s = s.replace(/(<svg[^>]*>)/i, `$1<title>${safeTitle}</title>`);
   }
   if (!/xmlns=/i.test(s)) {
     s = s.replace(/^<svg\b/i, '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -175,8 +253,20 @@ export interface DesignSystemManifest {
   guidelines: GuidelineMdxSpec[];
   kits: {
     figma: { path: string; sha256: string; collectionCount: number; componentCount: number };
+    figmaCodeConnect: { path: string; sha256: string; mappingCount: number };
     stitch: { path: string; sha256: string; screenCount: number; preserveDataStitchId: boolean };
   };
+  maquettes: Array<{
+    id: string;
+    file: string;
+    path: string;
+    stitchId: string;
+    surface: string;
+    deviceType: string;
+    title: string;
+    defaultTheme: string;
+    bytes: number;
+  }>;
   components: GpuiAndEguiComponentContract[];
 }
 
@@ -190,10 +280,11 @@ export function validateDesignManifest(doc: unknown): { ok: boolean; errors: str
   if (m.sourceOfTruth !== "https://design.google/") errors.push("Invalid sourceOfTruth");
   if ((m.wcagContrastDarkPrimary ?? 0) < 4.5) errors.push("Dark primary WCAG contrast < 4.5");
   if ((m.wcagContrastLightPrimary ?? 0) < 4.5) errors.push("Light primary WCAG contrast < 4.5");
-  if (!Array.isArray(m.svgs) || m.svgs.length < 8) errors.push("Expected >= 8 optimized SVGs");
+  if (!Array.isArray(m.svgs) || m.svgs.length < 20) errors.push("Expected >= 20 optimized SVGs");
   if (!Array.isArray(m.guidelines) || m.guidelines.length < 6) errors.push("Expected 6 MDX guidelines");
   if (!Array.isArray(m.components) || m.components.length < 8) errors.push("Expected >= 8 dual GPUI/egui component contracts");
-  if (!m.kits?.figma?.path || !m.kits?.stitch?.path) errors.push("Missing Figma or Stitch kit reference");
+  if (!Array.isArray(m.maquettes) || m.maquettes.length < 12) errors.push("Expected 12 cross-platform HTML5 maquettes");
+  if (!m.kits?.figma?.path || !m.kits?.stitch?.path || !m.kits?.figmaCodeConnect?.path) errors.push("Missing Figma, Code Connect, or Stitch kit reference");
   return { ok: errors.length === 0, errors };
 }
 `;
@@ -203,6 +294,8 @@ function buildStylesheetCss(): string {
   const tokens = buildCanonicalDesignTokens();
   const d = tokens.sys.color.dark;
   const l = tokens.sys.color.light;
+  const n = tokens.sys.color.neural_obsidian ?? d;
+  const o = tokens.sys.color.oled_pitch ?? d;
   const spFast = sampleDampedSpringLinearCss(
     tokens.sys.motion.springs.spatial_fast.stiffness,
     tokens.sys.motion.springs.spatial_fast.damping_ratio,
@@ -227,10 +320,33 @@ function buildStylesheetCss(): string {
   return `/* Authoritative Material 3 Expressive + Neural Expressive Stylesheet (https://design.google/?home) */
 /* Generated by tooling/bun/design-docs-pack.ts — 100% Baseline & WCAG 2.2 AA compliant */
 
+@font-face {
+  font-family: "Google Sans Code";
+  src: local("Google Sans Code"), url("../../assets/fonts/google-sans-code/GoogleSansCode-Variable.ttf") format("truetype");
+  font-weight: 300 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: local("JetBrains Mono"), url("../../assets/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: local("IBM Plex Sans"), url("../../assets/fonts/ibm-plex-sans/IBMPlexSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root, [data-theme="dark"] {
-  --md-ref-typeface-brand: ${tokens.ref.typeface.brand};
-  --md-ref-typeface-plain: ${tokens.ref.typeface.plain};
-  --md-ref-typeface-mono: ${tokens.ref.typeface.mono};
+  --md-ref-typeface-brand: "Google Sans Flex", "Google Sans", "IBM Plex Sans", system-ui, sans-serif;
+  --md-ref-typeface-plain: "Google Sans Flex", "IBM Plex Sans", "Google Sans Text", system-ui, sans-serif;
+  --md-ref-typeface-mono: "Google Sans Code", "JetBrains Mono", "Lilex", monospace;
+  --md-sys-brand-bolt: #FFB300;
+  --md-sys-neural-indigo: #111B3A;
 
   /* Google Sans Flex 6 Variable Axes */
   --md-ref-font-axes-display: "opsz" 48, "wght" 500, "wdth" 100, "GRAD" 0, "slnt" 0, "ROND" 40;
@@ -242,7 +358,7 @@ ${emitPaletteVars(d)}
   --md-sys-neural-obsidian: #0B0E14;
   --md-sys-neural-rail: #13161F;
   --md-sys-neural-popover: #1C202B;
-  --md-sys-neural-glow: radial-gradient(circle at 50% 42%, rgba(59, 130, 246, 0.20) 0%, rgba(99, 102, 241, 0.08) 38%, rgba(11, 14, 20, 0) 72%);
+  --md-sys-neural-glow: radial-gradient(circle at 50% 36%, rgba(59, 130, 246, 0.22) 0%, rgba(17, 27, 58, 0.35) 38%, rgba(11, 14, 20, 0) 74%);
 
   /* Shape Scale */
   --md-sys-shape-corner-xs: ${tokens.sys.shape.extra_small_px}px;
@@ -265,12 +381,28 @@ ${emitPaletteVars(d)}
   --md-sys-touch-target-min: ${tokens.sys.density.touch_target_min_px}px;
 }
 
+[data-theme="neural"] {
+${emitPaletteVars(n)}
+  --md-sys-neural-obsidian: #0B0E14;
+  --md-sys-neural-rail: #13161F;
+  --md-sys-neural-popover: #1C202B;
+  --md-sys-neural-glow: radial-gradient(circle at 50% 34%, rgba(59, 130, 246, 0.24) 0%, rgba(17, 27, 58, 0.42) 40%, rgba(11, 14, 20, 0) 74%);
+}
+
+[data-theme="oled"] {
+${emitPaletteVars(o)}
+  --md-sys-neural-obsidian: #000000;
+  --md-sys-neural-rail: #0A0E14;
+  --md-sys-neural-popover: #121720;
+  --md-sys-neural-glow: radial-gradient(circle at 50% 34%, rgba(143, 208, 255, 0.14) 0%, rgba(0, 0, 0, 0) 68%);
+}
+
 [data-theme="light"] {
 ${emitPaletteVars(l)}
-  --md-sys-neural-obsidian: #F4F7FC;
-  --md-sys-neural-rail: #EBF0F8;
+  --md-sys-neural-obsidian: #F7F9FF;
+  --md-sys-neural-rail: #EEF3FA;
   --md-sys-neural-popover: #FFFFFF;
-  --md-sys-neural-glow: radial-gradient(circle at 50% 42%, rgba(0, 99, 153, 0.10) 0%, rgba(91, 88, 145, 0.05) 40%, rgba(244, 247, 252, 0) 72%);
+  --md-sys-neural-glow: radial-gradient(circle at 50% 36%, rgba(0, 99, 153, 0.10) 0%, rgba(91, 88, 145, 0.05) 40%, rgba(247, 249, 255, 0) 74%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -280,15 +412,127 @@ ${emitPaletteVars(l)}
   }
 }
 
+* { box-sizing: border-box; }
 .gd-tabular { font-variant-numeric: tabular-nums; }
 .gd-pill-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: var(--md-sys-touch-target-min);
+  padding: 0 20px;
   border-radius: var(--md-sys-shape-corner-full);
+  font-family: var(--md-ref-typeface-plain);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
   transition: border-radius var(--md-sys-motion-spring-spatial-fast), transform var(--md-sys-motion-spring-spatial-fast), background-color var(--md-sys-motion-spring-effects-default);
 }
 .gd-pill-button:active {
   border-radius: var(--md-sys-shape-corner-md);
   transform: scale(0.98);
+}
+
+/* Maquette Showcase & Cross-Platform Layout Primitives */
+.mq-body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--md-ref-typeface-plain);
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
+  line-height: 1.5;
+}
+.mq-skip-link { position: absolute; left: -9999px; }
+.mq-skip-link:focus { left: 16px; top: 16px; z-index: 99; padding: 8px 14px; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-radius: 8px; }
+.mq-topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 20px;
+  background: var(--md-sys-neural-rail);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+.mq-topbar-left, .mq-topbar-right, .mq-top-nav, .mq-theme-switcher { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mq-brand-lockup { display: inline-flex; align-items: center; gap: 10px; color: var(--md-sys-color-on-surface); text-decoration: none; font-weight: 700; }
+.mq-nav-link {
+  min-height: 36px; display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 9999px;
+  color: var(--md-sys-color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 500;
+}
+.mq-nav-link[aria-current="page"] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.mq-theme-btn {
+  min-height: 36px; padding: 6px 12px; border-radius: 9999px; border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.mq-theme-btn[aria-pressed="true"] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: var(--md-sys-color-primary); }
+.mq-main { flex: 1; max-width: 1320px; width: 100%; margin: 0 auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.mq-footer {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 14px 20px;
+  border-top: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface-container-low);
+  font-size: 12px; color: var(--md-sys-color-on-surface-variant);
+}
+.mq-footer a { color: var(--md-sys-color-primary); }
+.mq-hero { padding: 28px; border-radius: var(--md-sys-shape-corner-xl); background: var(--md-sys-color-surface-container-low); border: 1px solid var(--md-sys-color-outline-variant); }
+.mq-neural-aura { background-image: var(--md-sys-neural-glow); }
+.mq-centered { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.mq-display-hero { font-family: var(--md-ref-typeface-brand); font-variation-settings: var(--md-ref-font-axes-display); font-size: clamp(28px, 4vw, 48px); line-height: 1.15; margin: 12px 0; }
+.mq-display-title { font-family: var(--md-ref-typeface-brand); font-variation-settings: var(--md-ref-font-axes-display); font-size: clamp(22px, 2.8vw, 32px); line-height: 1.25; margin: 10px 0; }
+.mq-lead { color: var(--md-sys-color-on-surface-variant); max-width: 720px; margin: 0 0 16px; }
+.mq-pill-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); font-size: 12px; font-weight: 600; }
+.mq-badge, .mq-meta-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 9999px; background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); font-size: 11px; font-weight: 600; }
+.mq-badge-ok { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.mq-badge-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.mq-cta-group, .mq-chip-row, .mq-flow-strip { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mq-btn-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.mq-btn-secondary { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); border-color: var(--md-sys-color-outline-variant); }
+.mq-chip { min-height: 36px; display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 9999px; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); font-size: 12px; font-weight: 600; cursor: pointer; }
+.mq-chip-active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: var(--md-sys-color-primary); }
+.mq-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.mq-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.mq-grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.mq-card { padding: 20px; border-radius: var(--md-sys-shape-corner-lg); background: var(--md-sys-color-surface-container); border: 1px solid var(--md-sys-color-outline-variant); display: flex; flex-direction: column; gap: 10px; }
+.mq-card-focus { border-color: var(--md-sys-color-primary); }
+.mq-card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.mq-card h2, .mq-card h3 { margin: 0; font-size: 17px; }
+.mq-card h2 a { color: var(--md-sys-color-on-surface); text-decoration: none; }
+.mq-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; width: 100%; margin-top: 12px; }
+.mq-kpi-card { padding: 14px; border-radius: var(--md-sys-shape-corner-md); background: var(--md-sys-color-surface-container-high); display: flex; flex-direction: column; gap: 4px; }
+.mq-kpi-label, .mq-kpi-meta, .mq-meta-line { font-size: 12px; color: var(--md-sys-color-on-surface-variant); overflow-wrap: anywhere; }
+.mq-meta-line code { font-family: var(--md-ref-typeface-mono); overflow-wrap: anywhere; word-break: break-word; }
+[data-theme="light"] .mq-card img[src*="../svg/"], [data-theme="light"] .mq-os-dock img[src*="../svg/"], [data-theme="light"] .mq-icon-rail img[src*="../svg/"] { filter: brightness(0.45) contrast(1.4); }
+[data-theme="light"] img[src*="aphrody-monogram-neural.svg"] { filter: none !important; }
+.mq-kpi-value { font-size: 24px; color: var(--md-sys-color-primary); }
+.mq-code-block { margin: 0; padding: 14px; border-radius: var(--md-sys-shape-corner-md); background: var(--md-sys-color-surface-container-lowest); border: 1px solid var(--md-sys-color-outline-variant); font-family: var(--md-ref-typeface-mono); font-size: 12.5px; overflow-x: auto; color: var(--md-sys-color-on-surface); }
+.mq-shell-3col { display: grid; grid-template-columns: 240px minmax(0, 1fr) 280px; gap: 16px; }
+.mq-ide-frame { display: grid; grid-template-columns: 52px minmax(0, 1fr) 300px; gap: 14px; }
+.mq-icon-rail { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 14px 6px; border-radius: var(--md-sys-shape-corner-lg); background: var(--md-sys-color-surface-container-low); border: 1px solid var(--md-sys-color-outline-variant); }
+.mq-sidebar { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: var(--md-sys-shape-corner-lg); background: var(--md-sys-color-surface-container-low); border: 1px solid var(--md-sys-color-outline-variant); }
+.mq-side-item { padding: 10px 12px; border-radius: var(--md-sys-shape-corner-md); font-size: 13px; color: var(--md-sys-color-on-surface-variant); text-decoration: none; }
+.mq-side-active { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-weight: 600; }
+.mq-omnibar-pill { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 9999px; background: var(--md-sys-neural-popover); border: 1px solid var(--md-sys-color-primary); font-size: 13px; }
+.mq-popover-card { padding: 14px; border-radius: var(--md-sys-shape-corner-lg-inc); background: var(--md-sys-neural-popover); border: 1px solid var(--md-sys-color-outline-variant); display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.mq-grounding-stack { padding: 16px; border-radius: var(--md-sys-shape-corner-xl); background: var(--md-sys-color-surface-container-low); border: 1px solid var(--md-sys-color-outline-variant); display: flex; flex-direction: column; gap: 10px; }
+.mq-ground-item { padding: 12px; border-radius: var(--md-sys-shape-corner-lg); background: var(--md-sys-color-surface-container); }
+.mq-thinking-aura { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; border: 1px solid var(--md-sys-color-tertiary); background: var(--md-sys-color-surface-container-high); font-size: 12px; }
+.mq-os-panel { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-radius: 9999px; background: var(--md-sys-color-surface-container-high); font-size: 13px; }
+.mq-os-dock { align-self: center; display: flex; align-items: center; gap: 14px; padding: 10px 18px; border-radius: var(--md-sys-shape-corner-xl); background: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant); }
+.mq-tab-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.mq-tab { padding: 6px 12px; border-radius: 8px; background: var(--md-sys-color-surface-container-low); font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
+.mq-tab-active { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-weight: 600; }
+.mq-shader-stage { display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: var(--md-sys-shape-corner-md); background: var(--md-sys-color-surface-container-lowest); border: 1px solid var(--md-sys-color-outline-variant); }
+.mq-flow-node { padding: 8px 12px; border-radius: 10px; background: var(--md-sys-color-surface-container-high); font-family: var(--md-ref-typeface-mono); font-size: 12px; }
+.mq-axis-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 12px; }
+.mq-device-showcase { display: flex; justify-content: center; }
+.mq-phone-frame { width: min(390px, 100%); min-height: 620px; border-radius: 28px; border: 2px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+.mq-phone-notch { text-align: center; padding: 10px; font-size: 12px; font-weight: 600; background: var(--md-sys-color-surface-container-low); }
+.mq-phone-content { padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.mq-bottom-nav { min-height: 64px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 8px 12px; background: var(--md-sys-color-surface-container-low); border-top: 1px solid var(--md-sys-color-outline-variant); }
+.mq-bottom-tab { min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-size: 12px; font-weight: 600; color: var(--md-sys-color-on-surface-variant); text-decoration: none; }
+.mq-bottom-active { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+@media (max-width: 840px) {
+  .mq-shell-3col, .mq-ide-frame { grid-template-columns: 1fr; }
 }
 `;
 }
@@ -399,70 +643,204 @@ stitch:
 
 function buildFigmaKitJson(): object {
   const tokens = buildCanonicalDesignTokens();
+  const refPalette = Object.fromEntries(
+    Object.entries(tokens.ref.palette).map(([k, hex]) => [
+      k,
+      { $type: "color", $value: hex, $extensions: { "com.figma.scopes": ["ALL_SCOPES"] } },
+    ]),
+  );
+  const channelColors = {
+    "channel-lts": { $type: "color", $value: "#BAE6FD" },
+    "channel-stable": { $type: "color", $value: "#ECF4FF" },
+    "channel-preview": { $type: "color", $value: "#E9D5FF" },
+    "channel-canary": { $type: "color", $value: "#FBCFE8" },
+    "channel-nightly": { $type: "color", $value: "#FDE08A" },
+    "channel-dev": { $type: "color", $value: "#99F6E4" },
+    "brand-bolt": { $type: "color", $value: "#FFB300" },
+    "neural-indigo": { $type: "color", $value: "#111B3A" },
+  };
   const colorVariables: Record<string, object> = {};
   for (const [role, darkHex] of Object.entries(tokens.sys.color.dark)) {
     const lightHex = (tokens.sys.color.light as unknown as Record<string, string>)[role] ?? darkHex;
-    colorVariables[role.replaceAll("_", "-")] = {
+    const neuralHex = (tokens.sys.color.neural_obsidian as unknown as Record<string, string> | undefined)?.[role] ?? darkHex;
+    const oledHex = (tokens.sys.color.oled_pitch as unknown as Record<string, string> | undefined)?.[role] ?? darkHex;
+    const cssName = role.replaceAll("_", "-");
+    colorVariables[cssName] = {
       $type: "color",
-      $value: darkHex,
+      $value: neuralHex,
       $extensions: {
         "com.figma.modes": {
-          Dark: darkHex,
-          Light: lightHex,
+          "Neural Obsidian": neuralHex,
+          "M3 Dark": darkHex,
+          "M3 Light": lightHex,
+          "OLED Pitch": oledHex,
         },
         "com.figma.scopes": ["ALL_SCOPES"],
+        "com.figma.codeSyntax": {
+          WEB: `var(--md-sys-color-${cssName})`,
+          RUST_GPUI: `tokens.hsla(mode, "${role}")`,
+          ANDROID: `MaterialTheme.colorScheme.${role}`,
+          iOS: `AphrodyTheme.color("${role}")`,
+        },
       },
     };
   }
+  const responsiveVariables = {
+    columns: {
+      $type: "number",
+      $value: 12,
+      $extensions: { "com.figma.modes": { Mobile_390: 4, Tablet_834: 8, Desktop_1440: 12, Ultrawide_1920: 16 } },
+    },
+    "canvas-margin": {
+      $type: "dimension",
+      $value: "24px",
+      $extensions: { "com.figma.modes": { Mobile_390: "16px", Tablet_834: "20px", Desktop_1440: "24px", Ultrawide_1920: "32px" } },
+    },
+    gutter: {
+      $type: "dimension",
+      $value: "16px",
+      $extensions: { "com.figma.modes": { Mobile_390: "12px", Tablet_834: "16px", Desktop_1440: "16px", Ultrawide_1920: "24px" } },
+    },
+    "rail-width": {
+      $type: "dimension",
+      $value: "56px",
+      $extensions: { "com.figma.modes": { Mobile_390: "0px", Tablet_834: "80px", Desktop_1440: "260px", Ultrawide_1920: "280px" } },
+    },
+    "touch-target-min": {
+      $type: "dimension",
+      $value: "44px",
+      $extensions: { "com.figma.modes": { Mobile_390: "48px", Tablet_834: "44px", Desktop_1440: "44px", Ultrawide_1920: "44px" } },
+    },
+  };
   return {
     $schema: "https://tr.designtokens.org/format/",
     name: "Aphrody · Google Design Material 3 Expressive + Neural Figma Kit",
-    version: "2.0.0",
+    version: "3.0.0",
     sourceUrl: "https://design.google/?home",
     collections: {
-      "Sys/Color": colorVariables,
-      "Sys/Shape": Object.fromEntries(
-        Object.entries(tokens.sys.shape).map(([k, px]) => [
-          k,
-          { $type: "dimension", $value: `${px}px` },
-        ]),
-      ),
-      "Sys/Typography": Object.fromEntries(
-        Object.entries(tokens.sys.typescale).map(([k, spec]) => [
-          k,
-          {
-            $type: "typography",
-            $value: {
-              fontFamily: spec.font === "brand" ? "Google Sans Flex" : "Google Sans Text",
-              fontSize: `${spec.size_sp}px`,
-              lineHeight: `${spec.line_height_sp}px`,
-              fontWeight: spec.weight,
+      "01_Ref/Palette": { ...refPalette, ...channelColors },
+      "02_Sys/Color": colorVariables,
+      "03_Sys/Typography": {
+        ...Object.fromEntries(
+          Object.entries(tokens.sys.typescale).map(([k, spec]) => [
+            k,
+            {
+              $type: "typography",
+              $value: {
+                fontFamily: spec.font === "brand" ? "Google Sans Flex" : "Google Sans Text",
+                fontSize: `${spec.size_sp}px`,
+                lineHeight: `${spec.line_height_sp}px`,
+                fontWeight: spec.weight,
+              },
             },
-          },
-        ]),
-      ),
-      "Sys/MotionSprings": tokens.sys.motion.springs,
+          ]),
+        ),
+        axes: tokens.ref.variable_axes,
+      },
+      "04_Sys/Layout_Responsive": responsiveVariables,
+      "05_Sys/Shape_Elevation": {
+        shape: Object.fromEntries(
+          Object.entries(tokens.sys.shape).map(([k, px]) => [k, { $type: "dimension", $value: `${px}px` }]),
+        ),
+        elevationLevels: ["surface_container_lowest", "surface_container_low", "surface_container", "surface_container_high", "surface_container_highest", "neural_aura_glow"],
+      },
+      "06_Sys/Motion_Springs": tokens.sys.motion.springs,
     },
     componentSets: [
       { id: "ExpressiveAppShell", variants: ["ExpandedRail", "CollapsedRail", "MobileSheet"], autoLayout: "HORIZONTAL", radiusToken: "large_px" },
-      { id: "NeuralOmnibar", variants: ["Idle", "Focused", "AttachmentMenuOpen"], autoLayout: "HORIZONTAL", radiusToken: "full_px" },
-      { id: "CascadingPopoverMenu", variants: ["RootMenu", "SubMenu"], autoLayout: "VERTICAL", radiusToken: "large_increased_px" },
-      { id: "GroundingCardStack", variants: ["Collapsed3", "ExpandedAll"], autoLayout: "VERTICAL", radiusToken: "extra_large_px" },
+      { id: "DesktopNavRail", variants: ["Collapsed56", "Expanded260", "Floating"], autoLayout: "VERTICAL", radiusToken: "large_px" },
+      { id: "MobileBottomNavBar", variants: ["Neural", "Dark", "Light", "OLED"], autoLayout: "HORIZONTAL", radiusToken: "none_px" },
+      { id: "SegmentedStudioBar", variants: ["2Up", "4Up", "Scrollable"], autoLayout: "HORIZONTAL", radiusToken: "full_px" },
+      { id: "NeuralOmnibar", variants: ["Idle", "Focused", "AttachmentMenuOpen", "VoiceActive"], autoLayout: "HORIZONTAL", radiusToken: "full_px" },
+      { id: "CascadingPopoverMenu", variants: ["RootMenu", "SubMenu", "WithBadges"], autoLayout: "VERTICAL", radiusToken: "large_increased_px" },
+      { id: "GroundingCardStack", variants: ["Collapsed3", "ExpandedAll", "CompactMobile"], autoLayout: "VERTICAL", radiusToken: "extra_large_px" },
+      { id: "ThinkingAuraBadge", variants: ["Thinking", "Grounded", "Complete"], autoLayout: "HORIZONTAL", radiusToken: "full_px" },
       { id: "ExpressivePillButton", variants: ["Primary", "Secondary", "Outline", "Ghost", "Destructive"], autoLayout: "HORIZONTAL", radiusToken: "full_px" },
+      { id: "IdeEditorTabStrip", variants: ["Active", "Modified", "SplitPane"], autoLayout: "HORIZONTAL", radiusToken: "small_px" },
+      { id: "DiffReviewHunkCard", variants: ["Added", "Modified", "Approved", "MobileSwipe"], autoLayout: "VERTICAL", radiusToken: "medium_px" },
+      { id: "TerminalSheetDrawer", variants: ["Peek", "Half", "Expanded"], autoLayout: "VERTICAL", radiusToken: "extra_large_px" },
+      { id: "CosmicTopPanel", variants: ["Compact", "Default", "FloatingPill"], autoLayout: "HORIZONTAL", radiusToken: "full_px" },
+      { id: "CosmicDockBar", variants: ["BottomFloating", "LeftPinned", "AutoHide"], autoLayout: "HORIZONTAL", radiusToken: "extra_large_px" },
       { id: "FigCraftCanvasNode", variants: ["Frame", "Component", "TokenBound"], autoLayout: "VERTICAL", radiusToken: "medium_px" },
       { id: "CraftAnythingDisasmTable", variants: ["X64", "A64", "Wasm"], autoLayout: "VERTICAL", radiusToken: "medium_px" },
       { id: "UnrealBevyViewportHud", variants: ["LitPbrSolari", "NaniteMeshlets", "WorldNormals"], autoLayout: "HORIZONTAL", radiusToken: "large_px" },
+      { id: "HeroPlaygroundBanner", variants: ["Desktop1440", "Mobile390", "WebGpuActive"], autoLayout: "VERTICAL", radiusToken: "extra_large_px" },
+      { id: "ReleaseChannelMatrixCard", variants: ["LTS", "Stable", "Preview", "Canary", "Nightly", "Dev"], autoLayout: "VERTICAL", radiusToken: "large_px" },
+      { id: "VpnShieldQuickTile", variants: ["Disconnected", "Connecting", "ProtectedWG", "MobileOLED"], autoLayout: "HORIZONTAL", radiusToken: "large_px" },
     ],
   };
 }
 
-function buildStitchKitJson(): object {
+function buildFigmaCodeConnectJson(): object {
+  const kit = buildFigmaKitJson() as { componentSets: Array<{ id: string }> };
+  const map: Record<string, { gpui: string; nsh: string; egui: string; web: string; mobile: string }> = {
+    ExpressiveAppShell: { gpui: "aphrody_ui::cosmic_shell::render_nav_rail", nsh: "<AppShell />", egui: "egui::SidePanel", web: ".mq-shell-3col", mobile: "nsh-platform-ios::NavigationStack" },
+    DesktopNavRail: { gpui: "aphrody_ui::cosmic_shell::NavRail", nsh: "<NavRail />", egui: "egui::SidePanel::left", web: ".mq-icon-rail", mobile: "Compact -> MobileBottomNavBar" },
+    MobileBottomNavBar: { gpui: "aphrody_ui::google_design_components::MobileBottomNavBar", nsh: "<BottomTabs />", egui: "egui::TopBottomPanel::bottom", web: ".mq-bottom-nav", mobile: "examples/nsh/mobile-companion" },
+    SegmentedStudioBar: { gpui: "aphrody_ui::google_design_components::SegmentedStudioBar", nsh: "<SegmentedBar />", egui: "egui::SelectableLabel", web: ".mq-chip-row", mobile: "<SegmentedBar density='compact' />" },
+    NeuralOmnibar: { gpui: "aphrody_ui::google_design_components::ExpressiveOmnibar", nsh: "<NeuralOmnibar />", egui: "egui::TextEdit::singleline", web: ".mq-omnibar-pill", mobile: "examples/nsh/mobile-companion" },
+    CascadingPopoverMenu: { gpui: "aphrody_ui::google_design_components::CascadingPopoverCard", nsh: "<CascadingPopover />", egui: "egui::menu", web: ".mq-popover-card", mobile: "<Sheet detent='medium' />" },
+    GroundingCardStack: { gpui: "aphrody_ui::google_design_components::GroundingSourceCard", nsh: "<GroundingCard />", egui: "egui::Frame::group", web: ".mq-grounding-stack", mobile: "<ScrollView horizontal />" },
+    ThinkingAuraBadge: { gpui: "aphrody_ui::google_design_components::ThinkingAuraBadge", nsh: "<ThinkingAuraBadge />", egui: "egui::Spinner", web: ".mq-thinking-aura", mobile: "<ThinkingAuraBadge compact />" },
+    ExpressivePillButton: { gpui: "aphrody_ui::starter_pack::StarterButton", nsh: "<PillButton />", egui: "egui::Button", web: ".gd-pill-button", mobile: "min-height: 44px touch target" },
+    IdeEditorTabStrip: { gpui: "workspace::Pane", nsh: "<TabStrip />", egui: "egui::TopBottomPanel::top", web: ".mq-tab-strip", mobile: "<Picker />" },
+    DiffReviewHunkCard: { gpui: "editor::DiffView", nsh: "<DiffView />", egui: "egui_gpui::CodeSurface", web: ".mq-code-block", mobile: "examples/nsh/mobile-companion" },
+    TerminalSheetDrawer: { gpui: "terminal_view::TerminalView", nsh: "<Sheet />", egui: "egui::Window", web: ".mq-popover-card", mobile: "<BottomSheet snapPoints={[0.35, 0.85]} />" },
+    CosmicTopPanel: { gpui: "aphrody_desktop::panel", nsh: "<TopPanel />", egui: "egui::TopBottomPanel::top", web: ".mq-os-panel", mobile: "SafeArea Top Bar" },
+    CosmicDockBar: { gpui: "aphrody_desktop::dock", nsh: "<DockBar />", egui: "egui::TopBottomPanel::bottom", web: ".mq-os-dock", mobile: "MobileBottomNavBar" },
+    FigCraftCanvasNode: { gpui: "aphrody_craft::render_gpui_studio_panel", nsh: "<FigCraftGoogleScreen />", egui: "egui_gpui::EguiGpuiHost", web: "[data-stitch-id='stitch-figcraft-root']", mobile: "ViewerOnly" },
+    CraftAnythingDisasmTable: { gpui: "aphrody_craft::CraftStudioSession", nsh: "<CraftDisasmGrid />", egui: "egui::Grid", web: ".mq-code-block", mobile: "SummaryKPIs" },
+    UnrealBevyViewportHud: { gpui: "bevy_gpui::render_viewport_rgba8", nsh: "<ViewportCanvas />", egui: "bevy_gpui::render_bevy_egui_inspector", web: ".mq-shader-stage", mobile: "WebGPU Pocket Preview" },
+    HeroPlaygroundBanner: { gpui: "aphrody_desktop::examples::web_os", nsh: "<HeroBanner />", egui: "egui::CentralPanel", web: ".mq-hero.mq-neural-aura", mobile: ".mq-hero compact" },
+    ReleaseChannelMatrixCard: { gpui: "aphrody_ui::google_design_components::RoadmapHorizonCard", nsh: "<ChannelCard />", egui: "egui::Frame::group", web: ".mq-card", mobile: "Stacked Card" },
+    VpnShieldQuickTile: { gpui: "aphrody_vpn::VpnStatusTile", nsh: "<VpnQuickTile />", egui: "egui::ToggleValue", web: ".mq-omnibar-pill", mobile: "examples/nsh/mobile-companion" },
+  };
+  return {
+    version: "3.0.0",
+    figmaFileHint: "Aphrody Labs Design System v3.0",
+    sourceOfTruth: "https://design.google/",
+    mappings: kit.componentSets.map((cs) => ({
+      figmaComponentSet: cs.id,
+      ...(map[cs.id] ?? {
+        gpui: "aphrody_ui::starter_pack",
+        nsh: "<View />",
+        egui: "egui::Frame",
+        web: ".mq-card",
+        mobile: "examples/nsh/mobile-companion",
+      }),
+    })),
+  };
+}
+
+function buildStitchKitJson(maquettes: Array<{
+  id: string;
+  file: string;
+  path: string;
+  stitchId: string;
+  surface: string;
+  deviceType: string;
+  title: string;
+  defaultTheme: string;
+  bytes: number;
+}>): object {
   return {
     name: "Aphrody · Google Stitch & Multi-Studio Design Kit",
-    version: "2.0.0",
+    version: "3.0.0",
     sourceUrl: "https://stitch.withgoogle.com/",
     designMdRef: "../DESIGN.md",
     preserveDataStitchId: true,
+    upstreamProjects: [
+      {
+        projectId: "7027971799774493367",
+        title: "Aphrody merged app",
+        designSystems: ["assets/1fce14953fc44e5ba3ce49e4903d8771", "assets/3e02f3e0e21a4659b041a81802caa30d"],
+      },
+      {
+        projectId: "15555120843463058326",
+        title: "Aphrody sites (aphrody.com, aphrody.app) - M3",
+        designSystems: ["assets/17150568052080874355"],
+      },
+    ],
     screens: [
       {
         id: "stitch-screen-figcraft-google",
@@ -501,6 +879,7 @@ function buildStitchKitJson(): object {
         slots: ["stitch-agy-rail", "stitch-agy-kpis", "stitch-agy-timeline", "stitch-agy-inspector"],
       },
     ],
+    maquettes,
   };
 }
 
@@ -794,7 +1173,13 @@ export function buildDesignDocsPackage(outDir = DESIGN_DOCS_DIR) {
   const figmaJson = JSON.stringify(figmaObj, null, 2) + "\n";
   writeFileSync(join(outDir, "kits/figma-design-kit.json"), figmaJson, "utf8");
 
-  const stitchObj = buildStitchKitJson() as { screens: unknown[]; preserveDataStitchId: boolean };
+  const codeConnectObj = buildFigmaCodeConnectJson() as { mappings: unknown[] };
+  const codeConnectJson = JSON.stringify(codeConnectObj, null, 2) + "\n";
+  writeFileSync(join(outDir, "kits/figma-code-connect.json"), codeConnectJson, "utf8");
+
+  const { entries: maquetteEntries } = buildAllMaquettes(outDir, repoRoot);
+
+  const stitchObj = buildStitchKitJson(maquetteEntries) as { screens: unknown[]; preserveDataStitchId: boolean };
   const stitchJson = JSON.stringify(stitchObj, null, 2) + "\n";
   writeFileSync(join(outDir, "kits/stitch-design-kit.json"), stitchJson, "utf8");
 
@@ -842,6 +1227,11 @@ export function buildDesignDocsPackage(outDir = DESIGN_DOCS_DIR) {
         collectionCount: Object.keys(figmaObj.collections).length,
         componentCount: figmaObj.componentSets.length,
       },
+      figmaCodeConnect: {
+        path: "./kits/figma-code-connect.json",
+        sha256: sha256Hex(codeConnectJson),
+        mappingCount: codeConnectObj.mappings.length,
+      },
       stitch: {
         path: "./kits/stitch-design-kit.json",
         sha256: sha256Hex(stitchJson),
@@ -849,6 +1239,7 @@ export function buildDesignDocsPackage(outDir = DESIGN_DOCS_DIR) {
         preserveDataStitchId: stitchObj.preserveDataStitchId,
       },
     },
+    maquettes: maquetteEntries,
     components: COMPONENT_CONTRACTS,
   };
 
@@ -858,6 +1249,12 @@ export function buildDesignDocsPackage(outDir = DESIGN_DOCS_DIR) {
 
 if (import.meta.main) {
   const cmd = Bun.argv[2] ?? "build";
+  if (cmd === "capture") {
+    const captureRes = await captureMaquetteScreenshots(repoRoot);
+    console.log(JSON.stringify(captureRes, null, 2));
+    if (!captureRes.ok) process.exit(1);
+    process.exit(0);
+  }
   const manifest =
     cmd === "build"
       ? buildDesignDocsPackage()
@@ -871,6 +1268,7 @@ if (import.meta.main) {
         svgs: manifest.svgs.length,
         referenceCaptures: manifest.referenceCaptures.length,
         guidelines: manifest.guidelines.length,
+        maquettes: manifest.maquettes?.length ?? MAQUETTE_DEFINITIONS.length,
         components: manifest.components.length,
         errors: check.errors,
       },

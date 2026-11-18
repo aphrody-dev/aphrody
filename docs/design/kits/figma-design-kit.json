@@ -1,190 +1,588 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
   "name": "Aphrody · Google Design Material 3 Expressive + Neural Figma Kit",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "sourceUrl": "https://design.google/?home",
   "collections": {
-    "Sys/Color": {
-      "background": {
+    "01_Ref/Palette": {
+      "primary0": {
         "$type": "color",
-        "$value": "#0E141B",
+        "$value": "#000000",
         "$extensions": {
-          "com.figma.modes": {
-            "Dark": "#0E141B",
-            "Light": "#F7F9FF"
-          },
           "com.figma.scopes": [
             "ALL_SCOPES"
           ]
+        }
+      },
+      "primary10": {
+        "$type": "color",
+        "$value": "#001D32",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary20": {
+        "$type": "color",
+        "$value": "#003352",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary30": {
+        "$type": "color",
+        "$value": "#004B75",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary40": {
+        "$type": "color",
+        "$value": "#006399",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary80": {
+        "$type": "color",
+        "$value": "#8FD0FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary90": {
+        "$type": "color",
+        "$value": "#CEE5FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "primary100": {
+        "$type": "color",
+        "$value": "#FFFFFF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "secondary30": {
+        "$type": "color",
+        "$value": "#34485F",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "secondary40": {
+        "$type": "color",
+        "$value": "#4B6078",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "secondary80": {
+        "$type": "color",
+        "$value": "#B4C9E5",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "secondary90": {
+        "$type": "color",
+        "$value": "#D2E4FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "tertiary30": {
+        "$type": "color",
+        "$value": "#434077",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "tertiary40": {
+        "$type": "color",
+        "$value": "#5B5891",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "tertiary80": {
+        "$type": "color",
+        "$value": "#C6C2FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "tertiary90": {
+        "$type": "color",
+        "$value": "#E2DFFF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "neutral6": {
+        "$type": "color",
+        "$value": "#0E141B",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "neutral10": {
+        "$type": "color",
+        "$value": "#161C24",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "neutral90": {
+        "$type": "color",
+        "$value": "#D9E1EC",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "neutral98": {
+        "$type": "color",
+        "$value": "#F7F9FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "neutral100": {
+        "$type": "color",
+        "$value": "#FFFFFF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "error30": {
+        "$type": "color",
+        "$value": "#93000A",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "error40": {
+        "$type": "color",
+        "$value": "#BA1A1A",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "error80": {
+        "$type": "color",
+        "$value": "#FFB4AB",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "error90": {
+        "$type": "color",
+        "$value": "#FFDAD6",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "bolt10": {
+        "$type": "color",
+        "$value": "#3A2500",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "bolt50": {
+        "$type": "color",
+        "$value": "#FFB300",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "neural_indigo": {
+        "$type": "color",
+        "$value": "#111B3A",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "channel-lts": {
+        "$type": "color",
+        "$value": "#BAE6FD"
+      },
+      "channel-stable": {
+        "$type": "color",
+        "$value": "#ECF4FF"
+      },
+      "channel-preview": {
+        "$type": "color",
+        "$value": "#E9D5FF"
+      },
+      "channel-canary": {
+        "$type": "color",
+        "$value": "#FBCFE8"
+      },
+      "channel-nightly": {
+        "$type": "color",
+        "$value": "#FDE08A"
+      },
+      "channel-dev": {
+        "$type": "color",
+        "$value": "#99F6E4"
+      },
+      "brand-bolt": {
+        "$type": "color",
+        "$value": "#FFB300"
+      },
+      "neural-indigo": {
+        "$type": "color",
+        "$value": "#111B3A"
+      }
+    },
+    "02_Sys/Color": {
+      "background": {
+        "$type": "color",
+        "$value": "#0B0E14",
+        "$extensions": {
+          "com.figma.modes": {
+            "Neural Obsidian": "#0B0E14",
+            "M3 Dark": "#0E141B",
+            "M3 Light": "#F7F9FF",
+            "OLED Pitch": "#000000"
+          },
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-background)",
+            "RUST_GPUI": "tokens.hsla(mode, \"background\")",
+            "ANDROID": "MaterialTheme.colorScheme.background",
+            "iOS": "AphrodyTheme.color(\"background\")"
+          }
         }
       },
       "on-background": {
         "$type": "color",
-        "$value": "#E0E6F0",
+        "$value": "#E4EAF4",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#E0E6F0",
-            "Light": "#161C24"
+            "Neural Obsidian": "#E4EAF4",
+            "M3 Dark": "#E0E6F0",
+            "M3 Light": "#161C24",
+            "OLED Pitch": "#EDF2FA"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-background)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_background\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_background",
+            "iOS": "AphrodyTheme.color(\"on_background\")"
+          }
         }
       },
       "surface": {
         "$type": "color",
-        "$value": "#0E141B",
+        "$value": "#0B0E14",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#0E141B",
-            "Light": "#F7F9FF"
+            "Neural Obsidian": "#0B0E14",
+            "M3 Dark": "#0E141B",
+            "M3 Light": "#F7F9FF",
+            "OLED Pitch": "#000000"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface",
+            "iOS": "AphrodyTheme.color(\"surface\")"
+          }
         }
       },
       "surface-dim": {
         "$type": "color",
-        "$value": "#0B1016",
+        "$value": "#07090E",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#0B1016",
-            "Light": "#D5DBE4"
+            "Neural Obsidian": "#07090E",
+            "M3 Dark": "#0B1016",
+            "M3 Light": "#D5DBE4",
+            "OLED Pitch": "#000000"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-dim)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_dim\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_dim",
+            "iOS": "AphrodyTheme.color(\"surface_dim\")"
+          }
         }
       },
       "surface-bright": {
         "$type": "color",
-        "$value": "#343B44",
+        "$value": "#2B3140",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#343B44",
-            "Light": "#FFFFFF"
+            "Neural Obsidian": "#2B3140",
+            "M3 Dark": "#343B44",
+            "M3 Light": "#FFFFFF",
+            "OLED Pitch": "#222834"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-bright)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_bright\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_bright",
+            "iOS": "AphrodyTheme.color(\"surface_bright\")"
+          }
         }
       },
       "surface-container-lowest": {
         "$type": "color",
-        "$value": "#080D13",
+        "$value": "#06080C",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#080D13",
-            "Light": "#FFFFFF"
+            "Neural Obsidian": "#06080C",
+            "M3 Dark": "#080D13",
+            "M3 Light": "#FFFFFF",
+            "OLED Pitch": "#000000"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-container-lowest)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_container_lowest\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_container_lowest",
+            "iOS": "AphrodyTheme.color(\"surface_container_lowest\")"
+          }
         }
       },
       "surface-container-low": {
         "$type": "color",
-        "$value": "#161D25",
+        "$value": "#13161F",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#161D25",
-            "Light": "#EEF3FA"
+            "Neural Obsidian": "#13161F",
+            "M3 Dark": "#161D25",
+            "M3 Light": "#EEF3FA",
+            "OLED Pitch": "#0A0E14"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-container-low)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_container_low\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_container_low",
+            "iOS": "AphrodyTheme.color(\"surface_container_low\")"
+          }
         }
       },
       "surface-container": {
         "$type": "color",
-        "$value": "#1B222B",
+        "$value": "#181C26",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#1B222B",
-            "Light": "#E7EDF6"
+            "Neural Obsidian": "#181C26",
+            "M3 Dark": "#1B222B",
+            "M3 Light": "#E7EDF6",
+            "OLED Pitch": "#121720"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_container",
+            "iOS": "AphrodyTheme.color(\"surface_container\")"
+          }
         }
       },
       "surface-container-high": {
         "$type": "color",
-        "$value": "#252C36",
+        "$value": "#1C202B",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#252C36",
-            "Light": "#E0E7F1"
+            "Neural Obsidian": "#1C202B",
+            "M3 Dark": "#252C36",
+            "M3 Light": "#E0E7F1",
+            "OLED Pitch": "#1B222E"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-container-high)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_container_high\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_container_high",
+            "iOS": "AphrodyTheme.color(\"surface_container_high\")"
+          }
         }
       },
       "surface-container-highest": {
         "$type": "color",
-        "$value": "#303843",
+        "$value": "#262C3A",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#303843",
-            "Light": "#D9E1EC"
+            "Neural Obsidian": "#262C3A",
+            "M3 Dark": "#303843",
+            "M3 Light": "#D9E1EC",
+            "OLED Pitch": "#252E3D"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-surface-container-highest)",
+            "RUST_GPUI": "tokens.hsla(mode, \"surface_container_highest\")",
+            "ANDROID": "MaterialTheme.colorScheme.surface_container_highest",
+            "iOS": "AphrodyTheme.color(\"surface_container_highest\")"
+          }
         }
       },
       "on-surface": {
         "$type": "color",
-        "$value": "#E0E6F0",
+        "$value": "#E4EAF4",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#E0E6F0",
-            "Light": "#161C24"
+            "Neural Obsidian": "#E4EAF4",
+            "M3 Dark": "#E0E6F0",
+            "M3 Light": "#161C24",
+            "OLED Pitch": "#EDF2FA"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-surface)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_surface\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_surface",
+            "iOS": "AphrodyTheme.color(\"on_surface\")"
+          }
         }
       },
       "on-surface-variant": {
         "$type": "color",
-        "$value": "#C0CAD7",
+        "$value": "#BAC4D6",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#C0CAD7",
-            "Light": "#3D4754"
+            "Neural Obsidian": "#BAC4D6",
+            "M3 Dark": "#C0CAD7",
+            "M3 Light": "#3D4754",
+            "OLED Pitch": "#C2CCDC"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-surface-variant)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_surface_variant\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_surface_variant",
+            "iOS": "AphrodyTheme.color(\"on_surface_variant\")"
+          }
         }
       },
       "outline": {
         "$type": "color",
-        "$value": "#8A94A2",
+        "$value": "#8792A6",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#8A94A2",
-            "Light": "#6E7886"
+            "Neural Obsidian": "#8792A6",
+            "M3 Dark": "#8A94A2",
+            "M3 Light": "#6E7886",
+            "OLED Pitch": "#8C96A8"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-outline)",
+            "RUST_GPUI": "tokens.hsla(mode, \"outline\")",
+            "ANDROID": "MaterialTheme.colorScheme.outline",
+            "iOS": "AphrodyTheme.color(\"outline\")"
+          }
         }
       },
       "outline-variant": {
         "$type": "color",
-        "$value": "#404956",
+        "$value": "#384152",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#404956",
-            "Light": "#BEC7D4"
+            "Neural Obsidian": "#384152",
+            "M3 Dark": "#404956",
+            "M3 Light": "#BEC7D4",
+            "OLED Pitch": "#2B3545"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-outline-variant)",
+            "RUST_GPUI": "tokens.hsla(mode, \"outline_variant\")",
+            "ANDROID": "MaterialTheme.colorScheme.outline_variant",
+            "iOS": "AphrodyTheme.color(\"outline_variant\")"
+          }
         }
       },
       "primary": {
@@ -192,12 +590,20 @@
         "$value": "#8FD0FF",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#8FD0FF",
-            "Light": "#006399"
+            "Neural Obsidian": "#8FD0FF",
+            "M3 Dark": "#8FD0FF",
+            "M3 Light": "#006399",
+            "OLED Pitch": "#8FD0FF"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-primary)",
+            "RUST_GPUI": "tokens.hsla(mode, \"primary\")",
+            "ANDROID": "MaterialTheme.colorScheme.primary",
+            "iOS": "AphrodyTheme.color(\"primary\")"
+          }
         }
       },
       "on-primary": {
@@ -205,12 +611,20 @@
         "$value": "#003352",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#003352",
-            "Light": "#FFFFFF"
+            "Neural Obsidian": "#003352",
+            "M3 Dark": "#003352",
+            "M3 Light": "#FFFFFF",
+            "OLED Pitch": "#003352"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-primary)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_primary\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_primary",
+            "iOS": "AphrodyTheme.color(\"on_primary\")"
+          }
         }
       },
       "primary-container": {
@@ -218,12 +632,20 @@
         "$value": "#004B75",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#004B75",
-            "Light": "#CEE5FF"
+            "Neural Obsidian": "#004B75",
+            "M3 Dark": "#004B75",
+            "M3 Light": "#CEE5FF",
+            "OLED Pitch": "#004B75"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-primary-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"primary_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.primary_container",
+            "iOS": "AphrodyTheme.color(\"primary_container\")"
+          }
         }
       },
       "on-primary-container": {
@@ -231,12 +653,20 @@
         "$value": "#CEE5FF",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#CEE5FF",
-            "Light": "#004972"
+            "Neural Obsidian": "#CEE5FF",
+            "M3 Dark": "#CEE5FF",
+            "M3 Light": "#004972",
+            "OLED Pitch": "#CEE5FF"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-primary-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_primary_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_primary_container",
+            "iOS": "AphrodyTheme.color(\"on_primary_container\")"
+          }
         }
       },
       "secondary": {
@@ -244,12 +674,20 @@
         "$value": "#B4C9E5",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#B4C9E5",
-            "Light": "#4B6078"
+            "Neural Obsidian": "#B4C9E5",
+            "M3 Dark": "#B4C9E5",
+            "M3 Light": "#4B6078",
+            "OLED Pitch": "#B4C9E5"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-secondary)",
+            "RUST_GPUI": "tokens.hsla(mode, \"secondary\")",
+            "ANDROID": "MaterialTheme.colorScheme.secondary",
+            "iOS": "AphrodyTheme.color(\"secondary\")"
+          }
         }
       },
       "on-secondary": {
@@ -257,12 +695,20 @@
         "$value": "#1D3248",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#1D3248",
-            "Light": "#FFFFFF"
+            "Neural Obsidian": "#1D3248",
+            "M3 Dark": "#1D3248",
+            "M3 Light": "#FFFFFF",
+            "OLED Pitch": "#1D3248"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-secondary)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_secondary\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_secondary",
+            "iOS": "AphrodyTheme.color(\"on_secondary\")"
+          }
         }
       },
       "secondary-container": {
@@ -270,12 +716,20 @@
         "$value": "#34485F",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#34485F",
-            "Light": "#D2E4FF"
+            "Neural Obsidian": "#34485F",
+            "M3 Dark": "#34485F",
+            "M3 Light": "#D2E4FF",
+            "OLED Pitch": "#34485F"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-secondary-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"secondary_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.secondary_container",
+            "iOS": "AphrodyTheme.color(\"secondary_container\")"
+          }
         }
       },
       "on-secondary-container": {
@@ -283,12 +737,20 @@
         "$value": "#D2E4FF",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#D2E4FF",
-            "Light": "#34485F"
+            "Neural Obsidian": "#D2E4FF",
+            "M3 Dark": "#D2E4FF",
+            "M3 Light": "#34485F",
+            "OLED Pitch": "#D2E4FF"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-secondary-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_secondary_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_secondary_container",
+            "iOS": "AphrodyTheme.color(\"on_secondary_container\")"
+          }
         }
       },
       "tertiary": {
@@ -296,12 +758,20 @@
         "$value": "#C6C2FF",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#C6C2FF",
-            "Light": "#5B5891"
+            "Neural Obsidian": "#C6C2FF",
+            "M3 Dark": "#C6C2FF",
+            "M3 Light": "#5B5891",
+            "OLED Pitch": "#C6C2FF"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-tertiary)",
+            "RUST_GPUI": "tokens.hsla(mode, \"tertiary\")",
+            "ANDROID": "MaterialTheme.colorScheme.tertiary",
+            "iOS": "AphrodyTheme.color(\"tertiary\")"
+          }
         }
       },
       "on-tertiary": {
@@ -309,12 +779,20 @@
         "$value": "#2C295F",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#2C295F",
-            "Light": "#FFFFFF"
+            "Neural Obsidian": "#2C295F",
+            "M3 Dark": "#2C295F",
+            "M3 Light": "#FFFFFF",
+            "OLED Pitch": "#2C295F"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-tertiary)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_tertiary\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_tertiary",
+            "iOS": "AphrodyTheme.color(\"on_tertiary\")"
+          }
         }
       },
       "tertiary-container": {
@@ -322,12 +800,20 @@
         "$value": "#434077",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#434077",
-            "Light": "#E2DFFF"
+            "Neural Obsidian": "#434077",
+            "M3 Dark": "#434077",
+            "M3 Light": "#E2DFFF",
+            "OLED Pitch": "#434077"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-tertiary-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"tertiary_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.tertiary_container",
+            "iOS": "AphrodyTheme.color(\"tertiary_container\")"
+          }
         }
       },
       "on-tertiary-container": {
@@ -335,12 +821,20 @@
         "$value": "#E2DFFF",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#E2DFFF",
-            "Light": "#434077"
+            "Neural Obsidian": "#E2DFFF",
+            "M3 Dark": "#E2DFFF",
+            "M3 Light": "#434077",
+            "OLED Pitch": "#E2DFFF"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-tertiary-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_tertiary_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_tertiary_container",
+            "iOS": "AphrodyTheme.color(\"on_tertiary_container\")"
+          }
         }
       },
       "error": {
@@ -348,12 +842,20 @@
         "$value": "#FFB4AB",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#FFB4AB",
-            "Light": "#BA1A1A"
+            "Neural Obsidian": "#FFB4AB",
+            "M3 Dark": "#FFB4AB",
+            "M3 Light": "#BA1A1A",
+            "OLED Pitch": "#FFB4AB"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-error)",
+            "RUST_GPUI": "tokens.hsla(mode, \"error\")",
+            "ANDROID": "MaterialTheme.colorScheme.error",
+            "iOS": "AphrodyTheme.color(\"error\")"
+          }
         }
       },
       "on-error": {
@@ -361,12 +863,20 @@
         "$value": "#690005",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#690005",
-            "Light": "#FFFFFF"
+            "Neural Obsidian": "#690005",
+            "M3 Dark": "#690005",
+            "M3 Light": "#FFFFFF",
+            "OLED Pitch": "#690005"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-error)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_error\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_error",
+            "iOS": "AphrodyTheme.color(\"on_error\")"
+          }
         }
       },
       "error-container": {
@@ -374,12 +884,20 @@
         "$value": "#93000A",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#93000A",
-            "Light": "#FFDAD6"
+            "Neural Obsidian": "#93000A",
+            "M3 Dark": "#93000A",
+            "M3 Light": "#FFDAD6",
+            "OLED Pitch": "#93000A"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-error-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"error_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.error_container",
+            "iOS": "AphrodyTheme.color(\"error_container\")"
+          }
         }
       },
       "on-error-container": {
@@ -387,50 +905,24 @@
         "$value": "#FFDAD6",
         "$extensions": {
           "com.figma.modes": {
-            "Dark": "#FFDAD6",
-            "Light": "#93000A"
+            "Neural Obsidian": "#FFDAD6",
+            "M3 Dark": "#FFDAD6",
+            "M3 Light": "#93000A",
+            "OLED Pitch": "#FFDAD6"
           },
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ]
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--md-sys-color-on-error-container)",
+            "RUST_GPUI": "tokens.hsla(mode, \"on_error_container\")",
+            "ANDROID": "MaterialTheme.colorScheme.on_error_container",
+            "iOS": "AphrodyTheme.color(\"on_error_container\")"
+          }
         }
       }
     },
-    "Sys/Shape": {
-      "none_px": {
-        "$type": "dimension",
-        "$value": "0px"
-      },
-      "extra_small_px": {
-        "$type": "dimension",
-        "$value": "4px"
-      },
-      "small_px": {
-        "$type": "dimension",
-        "$value": "8px"
-      },
-      "medium_px": {
-        "$type": "dimension",
-        "$value": "12px"
-      },
-      "large_px": {
-        "$type": "dimension",
-        "$value": "16px"
-      },
-      "large_increased_px": {
-        "$type": "dimension",
-        "$value": "20px"
-      },
-      "extra_large_px": {
-        "$type": "dimension",
-        "$value": "28px"
-      },
-      "full_px": {
-        "$type": "dimension",
-        "$value": "9999px"
-      }
-    },
-    "Sys/Typography": {
+    "03_Sys/Typography": {
       "display_large": {
         "$type": "typography",
         "$value": {
@@ -565,9 +1057,159 @@
           "lineHeight": "16px",
           "fontWeight": 600
         }
+      },
+      "axes": {
+        "opsz": {
+          "tag": "opsz",
+          "name": "Optical Size",
+          "min": 6,
+          "default_value": 14,
+          "max": 144
+        },
+        "wght": {
+          "tag": "wght",
+          "name": "Weight",
+          "min": 100,
+          "default_value": 400,
+          "max": 1000
+        },
+        "wdth": {
+          "tag": "wdth",
+          "name": "Width",
+          "min": 25,
+          "default_value": 100,
+          "max": 151
+        },
+        "GRAD": {
+          "tag": "GRAD",
+          "name": "Grade",
+          "min": -50,
+          "default_value": 0,
+          "max": 200
+        },
+        "slnt": {
+          "tag": "slnt",
+          "name": "Slant",
+          "min": -10,
+          "default_value": 0,
+          "max": 0
+        },
+        "ROND": {
+          "tag": "ROND",
+          "name": "Roundness",
+          "min": 0,
+          "default_value": 0,
+          "max": 100
+        }
       }
     },
-    "Sys/MotionSprings": {
+    "04_Sys/Layout_Responsive": {
+      "columns": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.modes": {
+            "Mobile_390": 4,
+            "Tablet_834": 8,
+            "Desktop_1440": 12,
+            "Ultrawide_1920": 16
+          }
+        }
+      },
+      "canvas-margin": {
+        "$type": "dimension",
+        "$value": "24px",
+        "$extensions": {
+          "com.figma.modes": {
+            "Mobile_390": "16px",
+            "Tablet_834": "20px",
+            "Desktop_1440": "24px",
+            "Ultrawide_1920": "32px"
+          }
+        }
+      },
+      "gutter": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$extensions": {
+          "com.figma.modes": {
+            "Mobile_390": "12px",
+            "Tablet_834": "16px",
+            "Desktop_1440": "16px",
+            "Ultrawide_1920": "24px"
+          }
+        }
+      },
+      "rail-width": {
+        "$type": "dimension",
+        "$value": "56px",
+        "$extensions": {
+          "com.figma.modes": {
+            "Mobile_390": "0px",
+            "Tablet_834": "80px",
+            "Desktop_1440": "260px",
+            "Ultrawide_1920": "280px"
+          }
+        }
+      },
+      "touch-target-min": {
+        "$type": "dimension",
+        "$value": "44px",
+        "$extensions": {
+          "com.figma.modes": {
+            "Mobile_390": "48px",
+            "Tablet_834": "44px",
+            "Desktop_1440": "44px",
+            "Ultrawide_1920": "44px"
+          }
+        }
+      }
+    },
+    "05_Sys/Shape_Elevation": {
+      "shape": {
+        "none_px": {
+          "$type": "dimension",
+          "$value": "0px"
+        },
+        "extra_small_px": {
+          "$type": "dimension",
+          "$value": "4px"
+        },
+        "small_px": {
+          "$type": "dimension",
+          "$value": "8px"
+        },
+        "medium_px": {
+          "$type": "dimension",
+          "$value": "12px"
+        },
+        "large_px": {
+          "$type": "dimension",
+          "$value": "16px"
+        },
+        "large_increased_px": {
+          "$type": "dimension",
+          "$value": "20px"
+        },
+        "extra_large_px": {
+          "$type": "dimension",
+          "$value": "28px"
+        },
+        "full_px": {
+          "$type": "dimension",
+          "$value": "9999px"
+        }
+      },
+      "elevationLevels": [
+        "surface_container_lowest",
+        "surface_container_low",
+        "surface_container",
+        "surface_container_high",
+        "surface_container_highest",
+        "neural_aura_glow"
+      ]
+    },
+    "06_Sys/Motion_Springs": {
       "spatial_fast": {
         "stiffness": 1400,
         "damping_ratio": 0.9
@@ -606,11 +1248,43 @@
       "radiusToken": "large_px"
     },
     {
+      "id": "DesktopNavRail",
+      "variants": [
+        "Collapsed56",
+        "Expanded260",
+        "Floating"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "large_px"
+    },
+    {
+      "id": "MobileBottomNavBar",
+      "variants": [
+        "Neural",
+        "Dark",
+        "Light",
+        "OLED"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "none_px"
+    },
+    {
+      "id": "SegmentedStudioBar",
+      "variants": [
+        "2Up",
+        "4Up",
+        "Scrollable"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "full_px"
+    },
+    {
       "id": "NeuralOmnibar",
       "variants": [
         "Idle",
         "Focused",
-        "AttachmentMenuOpen"
+        "AttachmentMenuOpen",
+        "VoiceActive"
       ],
       "autoLayout": "HORIZONTAL",
       "radiusToken": "full_px"
@@ -619,7 +1293,8 @@
       "id": "CascadingPopoverMenu",
       "variants": [
         "RootMenu",
-        "SubMenu"
+        "SubMenu",
+        "WithBadges"
       ],
       "autoLayout": "VERTICAL",
       "radiusToken": "large_increased_px"
@@ -628,10 +1303,21 @@
       "id": "GroundingCardStack",
       "variants": [
         "Collapsed3",
-        "ExpandedAll"
+        "ExpandedAll",
+        "CompactMobile"
       ],
       "autoLayout": "VERTICAL",
       "radiusToken": "extra_large_px"
+    },
+    {
+      "id": "ThinkingAuraBadge",
+      "variants": [
+        "Thinking",
+        "Grounded",
+        "Complete"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "full_px"
     },
     {
       "id": "ExpressivePillButton",
@@ -644,6 +1330,57 @@
       ],
       "autoLayout": "HORIZONTAL",
       "radiusToken": "full_px"
+    },
+    {
+      "id": "IdeEditorTabStrip",
+      "variants": [
+        "Active",
+        "Modified",
+        "SplitPane"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "small_px"
+    },
+    {
+      "id": "DiffReviewHunkCard",
+      "variants": [
+        "Added",
+        "Modified",
+        "Approved",
+        "MobileSwipe"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "medium_px"
+    },
+    {
+      "id": "TerminalSheetDrawer",
+      "variants": [
+        "Peek",
+        "Half",
+        "Expanded"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "extra_large_px"
+    },
+    {
+      "id": "CosmicTopPanel",
+      "variants": [
+        "Compact",
+        "Default",
+        "FloatingPill"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "full_px"
+    },
+    {
+      "id": "CosmicDockBar",
+      "variants": [
+        "BottomFloating",
+        "LeftPinned",
+        "AutoHide"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "extra_large_px"
     },
     {
       "id": "FigCraftCanvasNode",
@@ -671,6 +1408,40 @@
         "LitPbrSolari",
         "NaniteMeshlets",
         "WorldNormals"
+      ],
+      "autoLayout": "HORIZONTAL",
+      "radiusToken": "large_px"
+    },
+    {
+      "id": "HeroPlaygroundBanner",
+      "variants": [
+        "Desktop1440",
+        "Mobile390",
+        "WebGpuActive"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "extra_large_px"
+    },
+    {
+      "id": "ReleaseChannelMatrixCard",
+      "variants": [
+        "LTS",
+        "Stable",
+        "Preview",
+        "Canary",
+        "Nightly",
+        "Dev"
+      ],
+      "autoLayout": "VERTICAL",
+      "radiusToken": "large_px"
+    },
+    {
+      "id": "VpnShieldQuickTile",
+      "variants": [
+        "Disconnected",
+        "Connecting",
+        "ProtectedWG",
+        "MobileOLED"
       ],
       "autoLayout": "HORIZONTAL",
       "radiusToken": "large_px"

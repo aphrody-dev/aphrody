@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="neural">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobile (iOS 390px &amp; Android 412px): Companion Home &amp; Agent — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="mobile">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">MOBILE / MOBILE</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" >Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" >Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" aria-current="page">Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">Mobile (iOS 390px &amp; Android 412px): Companion Home &amp; Agent</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-mobile-home" data-design-source="https://design.google/">
+    
+      <div class="mq-device-showcase">
+        <section class="mq-phone-frame" aria-label="iOS 390px Companion Maquette" data-stitch-id="stitch-mobile-status">
+          <div class="mq-phone-notch">9:41 &middot; iOS Metal 120Hz</div>
+          <div class="mq-phone-content" data-stitch-id="stitch-mobile-cards">
+            <div class="mq-card">
+              <div class="mq-card-header"><strong>Aphrody Companion</strong><span class="mq-badge">WG Connected</span></div>
+              <p>fr1 XFS Build: <code>cargo check -p aphrody_nsh</code> green in 4.2s</p>
+            </div>
+            <div class="mq-card">
+              <strong>Pending Agent Hunks (2)</strong>
+              <p>Tap to review Tree-sitter Rust &amp; WGSL diff on go.</p>
+            </div>
+            <div class="mq-omnibar-pill"><span>+</span><span>Ask mobile agent or dispatch fr1 job...</span></div>
+          </div>
+          <nav class="mq-bottom-nav" aria-label="Mobile Navigation" data-stitch-id="stitch-mobile-bottom-nav">
+            <a class="mq-bottom-tab mq-bottom-active" href="./10-mobile-companion-home.html">Agent</a>
+            <a class="mq-bottom-tab" href="./11-mobile-code-diff-review.html">Diffs</a>
+            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Fleet</a>
+            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Craft</a>
+          </nav>
+        </section>
+      </div>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

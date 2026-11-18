@@ -123,6 +123,8 @@ export interface GoogleDesignTokenDocument {
     color: {
       light: ColorPaletteRoleSet;
       dark: ColorPaletteRoleSet;
+      neural_obsidian?: ColorPaletteRoleSet;
+      oled_pitch?: ColorPaletteRoleSet;
     };
     motion: {
       springs: Record<string, SpringToken>;
@@ -187,6 +189,9 @@ export function buildCanonicalDesignTokens(
         error40: "#BA1A1A",
         error80: "#FFB4AB",
         error90: "#FFDAD6",
+        bolt10: "#3A2500",
+        bolt50: "#FFB300",
+        neural_indigo: "#111B3A",
       },
       typeface: {
         brand: "Google Sans Flex, Google Sans, Inter, system-ui, sans-serif",
@@ -252,6 +257,70 @@ export function buildCanonicalDesignTokens(
           on_surface_variant: "#C0CAD7",
           outline: "#8A94A2",
           outline_variant: "#404956",
+          primary: "#8FD0FF",
+          on_primary: "#003352",
+          primary_container: "#004B75",
+          on_primary_container: "#CEE5FF",
+          secondary: "#B4C9E5",
+          on_secondary: "#1D3248",
+          secondary_container: "#34485F",
+          on_secondary_container: "#D2E4FF",
+          tertiary: "#C6C2FF",
+          on_tertiary: "#2C295F",
+          tertiary_container: "#434077",
+          on_tertiary_container: "#E2DFFF",
+          error: "#FFB4AB",
+          on_error: "#690005",
+          error_container: "#93000A",
+          on_error_container: "#FFDAD6",
+        },
+        neural_obsidian: {
+          background: "#0B0E14",
+          on_background: "#E4EAF4",
+          surface: "#0B0E14",
+          surface_dim: "#07090E",
+          surface_bright: "#2B3140",
+          surface_container_lowest: "#06080C",
+          surface_container_low: "#13161F",
+          surface_container: "#181C26",
+          surface_container_high: "#1C202B",
+          surface_container_highest: "#262C3A",
+          on_surface: "#E4EAF4",
+          on_surface_variant: "#BAC4D6",
+          outline: "#8792A6",
+          outline_variant: "#384152",
+          primary: "#8FD0FF",
+          on_primary: "#003352",
+          primary_container: "#004B75",
+          on_primary_container: "#CEE5FF",
+          secondary: "#B4C9E5",
+          on_secondary: "#1D3248",
+          secondary_container: "#34485F",
+          on_secondary_container: "#D2E4FF",
+          tertiary: "#C6C2FF",
+          on_tertiary: "#2C295F",
+          tertiary_container: "#434077",
+          on_tertiary_container: "#E2DFFF",
+          error: "#FFB4AB",
+          on_error: "#690005",
+          error_container: "#93000A",
+          on_error_container: "#FFDAD6",
+        },
+        oled_pitch: {
+          background: "#000000",
+          on_background: "#EDF2FA",
+          surface: "#000000",
+          surface_dim: "#000000",
+          surface_bright: "#222834",
+          surface_container_lowest: "#000000",
+          surface_container_low: "#0A0E14",
+          surface_container: "#121720",
+          surface_container_high: "#1B222E",
+          surface_container_highest: "#252E3D",
+          on_surface: "#EDF2FA",
+          on_surface_variant: "#C2CCDC",
+          outline: "#8C96A8",
+          outline_variant: "#2B3545",
           primary: "#8FD0FF",
           on_primary: "#003352",
           primary_container: "#004B75",
@@ -494,6 +563,12 @@ export function serializeDesignTokensToml(doc: GoogleDesignTokenDocument): strin
     ...serializeKvTable("[ref.typeface]", doc.ref.typeface),
     ...serializeKvTable("[sys.color.light]", doc.sys.color.light as unknown as Record<string, string>),
     ...serializeKvTable("[sys.color.dark]", doc.sys.color.dark as unknown as Record<string, string>),
+    ...(doc.sys.color.neural_obsidian
+      ? serializeKvTable("[sys.color.neural_obsidian]", doc.sys.color.neural_obsidian as unknown as Record<string, string>)
+      : []),
+    ...(doc.sys.color.oled_pitch
+      ? serializeKvTable("[sys.color.oled_pitch]", doc.sys.color.oled_pitch as unknown as Record<string, string>)
+      : []),
     ...serializeKvTable("[sys.shape]", doc.sys.shape),
     ...serializeKvTable("[sys.state]", doc.sys.state),
     ...serializeKvTable("[sys.density]", doc.sys.density),
@@ -976,6 +1051,12 @@ export function auditDesignCompliance(root = repoRoot): DesignAuditReport {
     }
     wcagFailures.push(...checkPaletteWcagAa("light", parsed.sys.color.light));
     wcagFailures.push(...checkPaletteWcagAa("dark", parsed.sys.color.dark));
+    if (parsed.sys.color.neural_obsidian) {
+      wcagFailures.push(...checkPaletteWcagAa("neural_obsidian", parsed.sys.color.neural_obsidian));
+    }
+    if (parsed.sys.color.oled_pitch) {
+      wcagFailures.push(...checkPaletteWcagAa("oled_pitch", parsed.sys.color.oled_pitch));
+    }
   }
 
   const snapshotPath = join(root, "assets/os/design_google_sitemap_snapshot.toml");

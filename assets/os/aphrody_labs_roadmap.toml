@@ -1,0 +1,176 @@
+# Authoritative Aphrody Labs Ecosystem Vision, Domains & Multi-Horizon Roadmap (2026-Q4 -> 2027-Q4)
+# Anchored to product.toml, DESIGN.md, and assets/os/google_design_tokens.toml.
+schema_version = 1
+organization = "Aphrody Labs"
+design_source_of_truth = "https://design.google/"
+stitch_url = "https://stitch.withgoogle.com/"
+primary_monorepo = "aphrody-dev/aphrody"
+
+[vision]
+thesis = "Local-first GPU-native OS, code engine, and AI workspace where Code is a Design Material"
+tagline = "120 FPS GPUI + WGPU v30 + WebAssembly Core 2.0 AOT + Sovereign AI OS"
+principles = [
+  "One token graph across Rust GPUI, NSH TSX, egui 0.37, Bevy 0.20, Web, iOS, and Android",
+  "100% Zed ecosystem compatibility with modular zero-bloat crate boundaries",
+  "WebAssembly Core 2.0 & WASI Preview 2 AOT first, native Speed without Chromium electron overhead",
+  "$0 Vercel sovereign distribution via Cloudflare Workers/R2 + XFS bare-metal fleet (fr1/fr2/prd)",
+  "Accessible AI-native control plane across MCP, ACP, A2A, and AccessKit UI trees",
+]
+
+[[domains]]
+id = "aphrody"
+org = "aphrody-dev"
+repo = "aphrody-dev/aphrody"
+category = "Core OS, Studio IDE & UI Framework"
+surfaces = ["Desktop", "Web", "iOS", "Android", "Headless MCP"]
+owner_paths = ["crates/zed", "crates/aphrody_desktop", "crates/aphrody_ui", "crates/gpui"]
+summary = "Unified GPU-native Studio IDE, COSMIC Epoch desktop shell, ArtCraft 17-app suite, NSH framework, and 22-target packager."
+
+[[domains]]
+id = "ai-os"
+org = "aphrody-dev"
+repo = "aphrody-dev/ai-os"
+category = "Multi-Agent Control Plane"
+surfaces = ["Desktop", "Cloudflare Edge", "CLI"]
+owner_paths = ["crates/aphrody_pilot"]
+summary = "Relay, MCP, ACP, A2A, and AccessKit semantic OS pilotage unifying native UI automation and headless Tree-sitter tooling."
+
+[[domains]]
+id = "ay"
+org = "aphrody-dev"
+repo = "aphrody-dev/ay"
+category = "Fleet & Machine Automation"
+surfaces = ["CLI", "SSH Fleet"]
+owner_paths = ["tooling/bun/fleet-sync.ts"]
+summary = "SSH fleet orchestration, WireGuard LAN/mesh automation, and bare-metal builder provisioning across fr1, fr2, and prd."
+
+[[domains]]
+id = "anu"
+org = "aphrody-dev"
+repo = "aphrody-dev/anu"
+category = "Pure-Rust System Userspace"
+surfaces = ["Linux", "WASI"]
+owner_paths = ["crates/aphrody_session", "crates/aphrody_installer"]
+summary = "Pure-Rust POSIX/GNU coreutils, rubash shell, Btrfs/LUKS2 installer, and sovereign Linux userspace."
+
+[[domains]]
+id = "bun"
+org = "aphrody-labs"
+repo = "aphrody-labs/bun"
+category = "TypeScript & Systems Runtime"
+surfaces = ["Desktop", "Web", "CLI"]
+owner_paths = ["vendor/bun", "tooling/bun"]
+summary = "High-speed JS/TS/TSX/Zig/Rust runtime with native NGINX, Mullvad VPN, SQLite, Video, and NSH bundler pipelines."
+
+[[domains]]
+id = "browser"
+org = "aphrody-labs"
+repo = "aphrody-labs/browser"
+category = "GPUI Chromium & WebGPU Engine"
+surfaces = ["Desktop", "Web"]
+owner_paths = ["crates/aphrody_browser"]
+summary = "Native Chromium //ui/views shell in GPUI with Servo/Blitz escalation, WebGPU OS host, and per-tab WireGuard routing."
+
+[[domains]]
+id = "open"
+org = "aphrody-labs"
+repo = "aphrody-labs/open"
+category = "Browser CDP, TUI & Tunnel"
+surfaces = ["Desktop", "CLI", "Extension"]
+owner_paths = ["crates/aphrody_pilot/src/browser.rs"]
+summary = "Live CDP browser control, OpenTUI terminal UI, encrypted tunnels, and AI model router."
+
+[[domains]]
+id = "auto"
+org = "aphrody-labs"
+repo = "aphrody-labs/auto"
+category = "Autonomous Workflows & Productivity"
+surfaces = ["Website", "Desktop", "Mobile"]
+owner_paths = ["tooling/bun/prod-standards-starterpack.ts", ".cloudflare"]
+summary = "Automated CI/CD release orchestration, document/grid/deck suites, and Cloudflare edge distribution."
+
+[[domains]]
+id = "nie"
+org = "aphrody-labs"
+repo = "aphrody-labs/nie"
+category = "3D Engine & Gaming Runtime"
+surfaces = ["Desktop", "WebGPU", "Linux"]
+owner_paths = ["crates/bevy_gpui", "crates/aphrody_craft"]
+summary = "Bevy 0.20 + Unreal Engine 5.8 Nanite meshlets, Solari GI, MaterialX -> Naga v30 WGSL shaders, and Steam runtime."
+
+[[domains]]
+id = "shenron"
+org = "aphrody-labs"
+repo = "aphrody-labs/shenron"
+category = "Multimodal AI & Voice Surfaces"
+surfaces = ["Desktop", "Mobile", "Web"]
+owner_paths = ["crates/aphrody_ui/src/google_design_components.rs"]
+summary = "Neural Expressive voice/multimodal assistant surfaces, thinking aura indicators, and grounded citation cards."
+
+[[horizons]]
+id = "H0"
+window = "2026-Q4"
+status = "completed"
+title = "Unified Rust Engine, Upstream Zed Merge & Material 3 Foundation"
+surfaces = ["Project", "Desktop", "Website"]
+milestones = [
+  "Upstream zed-industries/zed merge with zero package-conformity warnings and 0 license gaps",
+  "WGPU v30 + Naga v30 + WebAssembly Core 2.0 / WASI Preview 2 AOT pipeline",
+  "Storytold 82-repo unification (craft-libs, craft-anything, egui_gpui, bevy_gpui UE5.8)",
+  "Pure-Rust https://design.google/ mirror (crates/aphrody_design) and 22-target aphrody_store",
+]
+exit_kpis = [
+  "100% WCAG 2.2 AA contrast >= 4.5:1 across Material Light & Dark",
+  "Lighthouse 100/100/100/100 on all 5 standalone Wasm/WebGPU starter templates",
+]
+
+[[horizons]]
+id = "H1"
+window = "2027-Q1"
+status = "active"
+title = "Figma DTCG v3, Google Stitch Studio GA, 4-Mode Themes & Edge Portal"
+surfaces = ["Project", "Website", "Desktop"]
+milestones = [
+  "4-mode token system (Neural Obsidian, Material Dark, Material Light, OLED Pitch)",
+  "Bundled Google Sans Code + JetBrains Mono + 6-axis Google Sans Flex variable typography",
+  "W3C DTCG v3 Figma Variables + Code Connect JSON & 12-screen Google Stitch maquette suite",
+  "Fumadocs v16 + Twoslash + llms.txt portal and upgraded Cloudflare R2 download portal",
+]
+exit_kpis = [
+  "20 Figma Auto-Layout component sets synced with Rust/NSH/Web Code Connect",
+  "12 HTML5/CSS maquettes verified headless via CDP at Desktop (1440px) & Mobile (390px)",
+]
+
+[[horizons]]
+id = "H2"
+window = "2027-Q2"
+status = "planned"
+title = "Aphrody Mobile Companion GA (iOS Metal & Android Vulkan / NSH)"
+surfaces = ["Mobile", "Project", "Website"]
+milestones = [
+  "iOS gpui_ios Metal + NativeShell.xcframework release pipeline and TestFlight / App Store target",
+  "Android nsh-platform-android Vulkan/JNI .aar release pipeline and Play Store / APK target",
+  "Mobile Companion App: remote fr1 build monitor, Tree-sitter diff review, Agent omnibar, WireGuard toggle",
+  "Ed25519 NshTrust OTA signed bundle signing & rollout across mobile clients",
+]
+exit_kpis = [
+  "44x44pt minimum touch targets and Compact (<600px) / Medium (600..839px) M3 adaptive breakpoints",
+  "120Hz ProMotion & LTPO OLED Pitch power profile under <2% idle frame budget",
+]
+
+[[horizons]]
+id = "H3"
+window = "2027-Q3..Q4"
+status = "planned"
+title = "Sovereign Aphrody AI OS 1.0 & Collaborative 3D/Spatial Studio"
+surfaces = ["Project", "Desktop", "Mobile", "Website"]
+milestones = [
+  "Bootable Sovereign Linux ISO via aphrody_installer (Btrfs/LUKS2 + COSMIC Epoch DE switcher)",
+  "Hardware-accelerated Wayland Smithay compositor + multi-monitor Pop-Shell stacking",
+  "Local NPU/GPU voice & vision pilotage integrated with aphrody_pilot AccessKit trees",
+  "Real-time collaborative Unreal/Bevy 5.8 + FigCraft multiplayer canvas via CRDT sync",
+]
+exit_kpis = [
+  "End-to-end 120 FPS desktop compositing across AMD/NVIDIA/Intel/Apple Silicon/WebGPU",
+  "Zero-cloud offline mode for IDE, AI routing, docs (llms.txt), and Creative Craft suite",
+]

@@ -40,8 +40,8 @@ pub use google_design::{
     SpringSpec, StateLayerOpacities, WindowSizeClass,
 };
 pub use google_design_components::{
-    CascadingPopoverCard, ExpressiveOmnibar, GroundingSourceCard, PopoverMenuItem,
-    SegmentedStudioBar, ThinkingAuraBadge,
+    CascadingPopoverCard, ExpressiveOmnibar, GroundingSourceCard, MobileBottomNavBar,
+    MobileNavTab, PopoverMenuItem, RoadmapHorizonCard, SegmentedStudioBar, ThinkingAuraBadge,
 };
 pub use starter_pack::{
     AgentSlotMeta, BUNDLED_SUBMODULE_PARITY_TOML, CoreWebVitalsBudgetSpec, MonorepoAuditSummary,

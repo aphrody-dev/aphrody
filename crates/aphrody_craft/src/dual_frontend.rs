@@ -360,6 +360,8 @@ fn unreachable_tokens_fallback() -> aphrody_ui::GoogleDesignTokens {
                 color: aphrody_ui::google_design::ColorPaletteMap {
                     light: Default::default(),
                     dark: Default::default(),
+                    neural_obsidian: Default::default(),
+                    oled_pitch: Default::default(),
                 },
                 motion: aphrody_ui::google_design::MotionTokens {
                     springs: Default::default(),

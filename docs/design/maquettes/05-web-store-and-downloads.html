@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="neural">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>releases.aphrody.com &amp; Store — 22-Target Distribution Portal — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="website">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">WEBSITE / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" aria-current="page">Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" >Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">releases.aphrody.com &amp; Store — 22-Target Distribution Portal</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-web-store" data-design-source="https://design.google/">
+    
+      <section class="mq-hero" data-stitch-id="stitch-store-hero">
+        <div class="mq-pill-eyebrow">Zero-Egress Cloudflare R2 &bull; Sigstore Cosign &amp; SHA-256 Attested</div>
+        <h1 class="mq-display-title">Download Aphrody Across Desktop &amp; Mobile</h1>
+        <div class="mq-chip-row">
+          <span class="mq-chip mq-chip-active">Stable</span>
+          <span class="mq-chip">Preview</span>
+          <span class="mq-chip">Canary</span>
+          <span class="mq-chip">Nightly</span>
+          <span class="mq-chip">LTS</span>
+          <span class="mq-chip">Dev</span>
+        </div>
+      </section>
+      <section class="mq-grid-3" data-stitch-id="stitch-store-platforms">
+        <article class="mq-card"><h2>Windows &amp; Linux</h2><p>Aphrody-Setup-x64.exe &middot; winget, msstore, scoop, choco, deb, rpm, flatpak, nix, arch AUR, AppImage</p></article>
+        <article class="mq-card"><h2>macOS Apple Silicon</h2><p>Aphrody-arm64.dmg &middot; Metal 120Hz GPUI + Homebrew cask &amp; notarized .app bundle</p></article>
+        <article class="mq-card"><h2>iOS &amp; Android Mobile</h2><p>App Store / TestFlight (.xcframework) &middot; Play Store / Signed APK (Vulkan NSH .aar)</p></article>
+      </section>
+      <section class="mq-card" data-stitch-id="stitch-store-targets">
+        <h2>Awesome GPUI &amp; Extension Catalog (1,590 Zed Extensions)</h2>
+        <pre class="mq-code-block"><code>$Env:APHRODY_CHANNEL = "stable"
+irm https://releases.aphrody.com/install.ps1 | iex
+gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
+      </section>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

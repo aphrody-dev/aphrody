@@ -109,6 +109,71 @@ impl Default for GoogleSansFlexAxes {
 }
 
 impl GoogleSansFlexAxes {
+    /// Expressive display hero headline preset matching Neural Expressive home canvas.
+    #[must_use]
+    pub fn display_hero() -> Self {
+        Self {
+            opsz: 48.0,
+            wght: 500.0,
+            wdth: 100.0,
+            grad: 0.0,
+            slnt: 0.0,
+            rond: 40.0,
+        }
+    }
+
+    /// Section headline preset for cards, panels, and docs titles.
+    #[must_use]
+    pub fn section_headline() -> Self {
+        Self {
+            opsz: 28.0,
+            wght: 500.0,
+            wdth: 100.0,
+            grad: 0.0,
+            slnt: 0.0,
+            rond: 25.0,
+        }
+    }
+
+    /// Interactive control preset with subtle roundness for pills and action chips.
+    #[must_use]
+    pub fn ui_control() -> Self {
+        Self {
+            opsz: 14.0,
+            wght: 500.0,
+            wdth: 100.0,
+            grad: 0.0,
+            slnt: 0.0,
+            rond: 20.0,
+        }
+    }
+
+    /// Compact mobile & high-density telemetry preset.
+    #[must_use]
+    pub fn compact_mobile() -> Self {
+        Self {
+            opsz: 12.0,
+            wght: 500.0,
+            wdth: 95.0,
+            grad: 10.0,
+            slnt: 0.0,
+            rond: 16.0,
+        }
+    }
+
+    /// Tabular label preset for counters, store metadata, and roadmaps.
+    #[must_use]
+    pub fn tabular_label() -> Self {
+        Self {
+            opsz: 11.0,
+            wght: 600.0,
+            wdth: 100.0,
+            grad: 25.0,
+            slnt: 0.0,
+            rond: 0.0,
+        }
+    }
+
     #[must_use]
     pub fn css_font_variation_settings(&self) -> String {
         format!(
@@ -168,10 +233,14 @@ pub struct MotionTokens {
     pub springs: BTreeMap<String, SpringSpec>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ColorPaletteMap {
     pub light: BTreeMap<String, String>,
     pub dark: BTreeMap<String, String>,
+    #[serde(default)]
+    pub neural_obsidian: BTreeMap<String, String>,
+    #[serde(default)]
+    pub oled_pitch: BTreeMap<String, String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -213,6 +282,29 @@ impl GoogleDesignTokens {
         match mode {
             AppearanceMode::Light => &self.sys.color.light,
             AppearanceMode::Dark => &self.sys.color.dark,
+        }
+    }
+
+    /// Resolves one of the 4 named Aphrody surface modes (`light`, `dark`, `neural_obsidian`, `oled_pitch`).
+    #[must_use]
+    pub fn palette_by_name(&self, name: &str) -> &BTreeMap<String, String> {
+        match name {
+            "light" | "material_light" => &self.sys.color.light,
+            "neural_obsidian" | "neural-obsidian" | "neural" => {
+                if self.sys.color.neural_obsidian.is_empty() {
+                    &self.sys.color.dark
+                } else {
+                    &self.sys.color.neural_obsidian
+                }
+            }
+            "oled_pitch" | "oled-pitch" | "oled" => {
+                if self.sys.color.oled_pitch.is_empty() {
+                    &self.sys.color.dark
+                } else {
+                    &self.sys.color.oled_pitch
+                }
+            }
+            _ => &self.sys.color.dark,
         }
     }
 
@@ -355,6 +447,10 @@ mod tests {
         assert!(tokens.to_css_custom_properties(AppearanceMode::Dark).contains("--md-sys-color-primary:"));
         assert!(tokens.to_wgsl_theme_struct(AppearanceMode::Dark).contains("struct GoogleDesignTheme"));
         assert!(GoogleSansFlexAxes::default().css_font_variation_settings().contains("\"opsz\" 14.0"));
+        assert_eq!(GoogleSansFlexAxes::display_hero().rond, 40.0);
+        assert_eq!(GoogleSansFlexAxes::compact_mobile().wdth, 95.0);
+        assert!(!tokens.palette_by_name("neural_obsidian").is_empty());
+        assert!(!tokens.palette_by_name("oled_pitch").is_empty());
         assert!(GoogleDesignTokens::bundled_design_md().is_ok());
         Ok(())
     }

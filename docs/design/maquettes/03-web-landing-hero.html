@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="neural">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aphrody.com — Website Landing &amp; Live WebGPU Playground — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="website">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">WEBSITE / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" aria-current="page">Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" >Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">aphrody.com — Website Landing &amp; Live WebGPU Playground</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-web-landing" data-design-source="https://design.google/">
+    
+      <section class="mq-hero mq-neural-aura mq-centered" data-stitch-id="stitch-web-hero-cta">
+        <span class="mq-pill-eyebrow"><img src="../svg/gemini-neural-spark.svg" width="16" height="16" alt="" /> GPUI 120 FPS &bull; WGPU v30 &bull; 100% Zed Compatible</span>
+        <h1 class="mq-display-hero">Build GPU-Native Software Across Every Surface</h1>
+        <p class="mq-lead">One declarative Rust + NSH TSX codebase compiled to Desktop, iOS Metal, Android Vulkan, and zero-overhead Wasm + WebGPU &mdash; served from Cloudflare Workers at $0 Vercel cost.</p>
+        <div class="mq-cta-group">
+          <a class="gd-pill-button mq-btn-primary" href="./05-web-store-and-downloads.html">Download Aphrody Studio</a>
+          <a class="gd-pill-button mq-btn-secondary" href="./04-web-docs-llms-portal.html">Read Docs &amp; llms.txt</a>
+        </div>
+      </section>
+      <section class="mq-grid-2" data-stitch-id="stitch-web-gpu-preview">
+        <div class="mq-card">
+          <div class="mq-card-header"><h2>Live Wasm Core 2.0 + WebGPU Canvas</h2><span class="mq-badge">64px Rounded Preview</span></div>
+          <div class="mq-shader-stage">
+            <img src="../svg/aphrody-webgpu-prism.svg" width="56" height="56" alt="WebGPU Compute Prism" />
+            <div>
+              <strong>WGSL Naga v30 Pipeline</strong>
+              <p>Frame Budget &le; 8.3ms (120Hz) &middot; Wasm Critical &le; 96 KB Brotli &middot; Offline IndexedDB Shader Cache</p>
+            </div>
+          </div>
+        </div>
+        <div class="mq-card" data-stitch-id="stitch-web-parity">
+          <h2>Production Web Vitals &amp; Agent Readiness</h2>
+          <div class="mq-kpi-row">
+            <article class="mq-kpi-card"><span class="mq-kpi-label">LCP Budget</span><strong class="mq-kpi-value gd-tabular">&le; 1.8s</strong></article>
+            <article class="mq-kpi-card"><span class="mq-kpi-label">INP Latency</span><strong class="mq-kpi-value gd-tabular">&le; 60ms</strong></article>
+            <article class="mq-kpi-card"><span class="mq-kpi-label">CLS Score</span><strong class="mq-kpi-value gd-tabular">0.00</strong></article>
+          </div>
+        </div>
+      </section>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

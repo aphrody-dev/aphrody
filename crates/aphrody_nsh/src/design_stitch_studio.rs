@@ -18,7 +18,10 @@ use aphrody_design::http_mirror::{
 };
 use aphrody_design::modern_web_guidance::{WebGuidanceFinding, audit_html_source};
 use aphrody_design::screen_capture::capture_stitch_screen_png;
-use aphrody_design::stitch_client::{StitchClient, StitchScreen, stitch_screen_to_nsh_tsx};
+use aphrody_design::stitch_client::{
+    StitchClient, StitchMaquetteSpec, StitchScreen, bundled_maquette_catalog,
+    stitch_screen_to_nsh_tsx,
+};
 use aphrody_design::web_standards::{LighthouseAuditReport, audit_html_standards};
 use gpui_ui::ActiveTheme as _;
 use gpui_ui::gpui::{
@@ -87,6 +90,7 @@ pub struct DesignStitchStudioItem {
     lint_report: DesignMdLintReport,
     axes: GoogleSansFlexAxes,
     active_screen: Option<StitchScreen>,
+    maquette_catalog: Vec<StitchMaquetteSpec>,
     guidance_findings: Vec<WebGuidanceFinding>,
     lighthouse_report: Option<LighthouseAuditReport>,
     parity_matrix: Option<SubmoduleParityMatrix>,
@@ -122,6 +126,7 @@ impl DesignStitchStudioItem {
         let active_screen = client
             .synthesize_screen("Aphrody Native Stitch Studio", "DESKTOP", &design_md, false)
             .ok();
+        let maquette_catalog = bundled_maquette_catalog();
         let guidance_findings = active_screen
             .as_ref()
             .map_or_else(Vec::new, |s| audit_html_source("stitch.html", &s.html_code));
@@ -159,6 +164,7 @@ impl DesignStitchStudioItem {
             lint_report,
             axes: GoogleSansFlexAxes::default(),
             active_screen,
+            maquette_catalog,
             guidance_findings,
             lighthouse_report,
             parity_matrix,
@@ -437,6 +443,8 @@ impl Render for DesignStitchStudioItem {
                         color: aphrody_ui::google_design::ColorPaletteMap {
                             light: Default::default(),
                             dark: Default::default(),
+                            neural_obsidian: Default::default(),
+                            oled_pitch: Default::default(),
                         },
                         motion: aphrody_ui::google_design::MotionTokens {
                             springs: Default::default(),
@@ -564,10 +572,11 @@ impl Render for DesignStitchStudioItem {
                         .bg(colors.editor_background)
                         .child(
                             Label::new(format!(
-                                "CSS tokens lines: {} | Tailwind v4 lines: {} | Stitch NSH TSX bytes: {} | Sitemap routes: {} | Parity stacks: {} | Starter primitives: {}",
+                                "CSS tokens lines: {} | Tailwind v4 lines: {} | Stitch NSH TSX bytes: {} | Maquettes: {} (Web/Desktop/Mobile) | Sitemap routes: {} | Parity stacks: {} | Starter primitives: {}",
                                 css_vars.lines().count(),
                                 tailwind_css.lines().count(),
                                 tsx_preview.len(),
+                                self.maquette_catalog.len(),
                                 self.sitemap.len(),
                                 framework_count,
                                 StarterPackCatalog::primitives().len()

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>docs.aphrody.com — Fumadocs v16, Twoslash &amp; llms.txt Portal — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="website">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">WEBSITE / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" aria-current="page">Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" >Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">docs.aphrody.com — Fumadocs v16, Twoslash &amp; llms.txt Portal</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-web-docs" data-design-source="https://design.google/">
+    
+      <div class="mq-shell-3col">
+        <aside class="mq-sidebar" aria-label="Documentation Navigation" data-stitch-id="stitch-docs-sidebar">
+          <h2>Docs Modules</h2>
+          <a class="mq-side-item mq-side-active" href="#getting-started">1. Google Design Tokens</a>
+          <a class="mq-side-item" href="#gpui">2. GPUI Elements &amp; Springs</a>
+          <a class="mq-side-item" href="#nsh">3. NSH TSX &amp; Mobile Embed</a>
+          <a class="mq-side-item" href="#wgpu">4. WGPU v30 &amp; Wasm LTO</a>
+          <a class="mq-side-item" href="#skills">5. /.well-known/agent-skills</a>
+        </aside>
+        <section class="mq-card" data-stitch-id="stitch-docs-reader">
+          <div class="mq-card-header"><h1>Google Design &amp; Spring Physics API</h1><span class="mq-badge">Accept: text/markdown</span></div>
+          <p>Documentation pages serve hydrated Fumadocs MDX + Twoslash to browsers and lossless Markdown mirrors to AI agents via Cloudflare Edge content negotiation.</p>
+          <pre class="mq-code-block"><code>use aphrody_ui::google_design::{GoogleDesignTokens, GoogleSansFlexAxes};
+let tokens = GoogleDesignTokens::bundled()?;
+let spring = tokens.spring("spatial_fast"); // k=1400, zeta=0.90</code></pre>
+        </section>
+        <aside class="mq-card" aria-label="Agent Feeds" data-stitch-id="stitch-docs-agent-panel">
+          <h2>AI Discovery Endpoints</h2>
+          <ul class="mq-list">
+            <li><code>/llms.txt</code> (v2 index)</li>
+            <li><code>/docs/wgpu/llms.txt</code></li>
+            <li><code>/openapi.json</code> (Scalar 3.1)</li>
+            <li><code>/.well-known/agent-skills/index.json</code></li>
+          </ul>
+        </aside>
+      </div>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

@@ -62,6 +62,7 @@
     "design:sync": "bun tooling/bun/google-design-sync.ts sync",
     "design:audit": "bun tooling/bun/google-design-sync.ts audit",
     "design:pack": "bun tooling/bun/design-docs-pack.ts build",
+    "design:capture": "bun tooling/bun/design-docs-pack.ts capture",
     "storytold:sync": "bun tooling/bun/storytold-unify.ts sync",
     "storytold:audit": "bun tooling/bun/storytold-unify.ts audit",
     "agy:studio": "bun tooling/bun/agy-session-studio.ts",

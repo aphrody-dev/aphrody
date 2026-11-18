@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="neural">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desktop: aphrody-os COSMIC Compositor &amp; Dual Craft Studio — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="desktop">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">DESKTOP / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" >Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" aria-current="page">Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">Desktop: aphrody-os COSMIC Compositor &amp; Dual Craft Studio</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-desktop-cosmic-os" data-design-source="https://design.google/">
+    
+      <section class="mq-os-panel" data-stitch-id="stitch-os-toppanel">
+        <span>Workspaces: [1 IDE] [2 Studio] [3 Browser]</span>
+        <strong class="gd-tabular">10:42 &middot; GPU 120Hz</strong>
+        <span>WireGuard: FR-PAR-01 &bull; Battery 98%</span>
+      </section>
+      <section class="mq-grid-2" data-stitch-id="stitch-os-stage">
+        <article class="mq-card">
+          <div class="mq-card-header"><h2>FigCraft Google Design (GPUI Native)</h2><span class="mq-badge">0.42ms/frame</span></div>
+          <p>Vector canvas, Figma DTCG Variables inspector, and live NSH signal bindings over shared <code>wgpu v30</code> device.</p>
+          <img src="../svg/parity-split-compare.svg" width="32" height="32" alt="GPUI vs egui parity" />
+        </article>
+        <article class="mq-card">
+          <div class="mq-card-header"><h2>Unreal Engine 5.8 &times; Bevy Solari Viewport</h2><span class="mq-badge">WGPU SM 6.7</span></div>
+          <p>Nanite virtualized meshlets, Solari GI diffuse probes, and MaterialX compiled to WGSL via Naga v30.</p>
+          <img src="../svg/bevy-unreal-solari.svg" width="32" height="32" alt="Bevy Solari Viewport" />
+        </article>
+      </section>
+      <nav class="mq-os-dock" aria-label="COSMIC Application Dock" data-stitch-id="stitch-os-dock">
+        <img src="../svg/aphrody-monogram-neural.svg" width="36" height="36" alt="Launcher" />
+        <img src="../svg/aphrody-ide-studio.svg" width="32" height="32" alt="Aphrody IDE" />
+        <img src="../svg/figcraft-stitch-frame.svg" width="32" height="32" alt="FigCraft" />
+        <img src="../svg/craft-anything-hex.svg" width="32" height="32" alt="Craft Anything" />
+        <img src="../svg/aphrody-vpn-shield.svg" width="32" height="32" alt="Mullvad VPN" />
+      </nav>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

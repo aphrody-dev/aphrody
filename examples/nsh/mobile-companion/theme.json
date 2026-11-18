@@ -1,0 +1,83 @@
+{
+  "sourceOfTruth": "https://design.google/",
+  "system": "Material 3 Neural Expressive",
+  "typography": {
+    "sans": "Google Sans Flex",
+    "mono": "Google Sans Code"
+  },
+  "radii": {
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 28,
+    "full": 9999
+  },
+  "neural": {
+    "background": "#0B0E14",
+    "foreground": "#E4EAF4",
+    "card": "#181C26",
+    "cardForeground": "#E4EAF4",
+    "popover": "#1C202B",
+    "popoverForeground": "#E4EAF4",
+    "primary": "#8FD0FF",
+    "primaryForeground": "#003352",
+    "secondary": "#34485F",
+    "secondaryForeground": "#D2E4FF",
+    "muted": "#13161F",
+    "mutedForeground": "#BAC4D6",
+    "accent": "#434077",
+    "accentForeground": "#E2DFFF",
+    "border": "#384152"
+  },
+  "dark": {
+    "background": "#0E141B",
+    "foreground": "#E0E6F0",
+    "card": "#1B222B",
+    "cardForeground": "#E0E6F0",
+    "popover": "#252C36",
+    "popoverForeground": "#E0E6F0",
+    "primary": "#8FD0FF",
+    "primaryForeground": "#003352",
+    "secondary": "#34485F",
+    "secondaryForeground": "#D2E4FF",
+    "muted": "#161D25",
+    "mutedForeground": "#C0CAD7",
+    "accent": "#434077",
+    "accentForeground": "#E2DFFF",
+    "border": "#404956"
+  },
+  "light": {
+    "background": "#F7F9FF",
+    "foreground": "#161C24",
+    "card": "#E7EDF6",
+    "cardForeground": "#161C24",
+    "popover": "#FFFFFF",
+    "popoverForeground": "#161C24",
+    "primary": "#006399",
+    "primaryForeground": "#FFFFFF",
+    "secondary": "#D2E4FF",
+    "secondaryForeground": "#34485F",
+    "muted": "#EEF3FA",
+    "mutedForeground": "#3D4754",
+    "accent": "#E2DFFF",
+    "accentForeground": "#434077",
+    "border": "#BEC7D4"
+  },
+  "oled": {
+    "background": "#000000",
+    "foreground": "#EDF2FA",
+    "card": "#121720",
+    "cardForeground": "#EDF2FA",
+    "popover": "#1B222E",
+    "popoverForeground": "#EDF2FA",
+    "primary": "#8FD0FF",
+    "primaryForeground": "#003352",
+    "secondary": "#34485F",
+    "secondaryForeground": "#D2E4FF",
+    "muted": "#0A0E14",
+    "mutedForeground": "#C2CCDC",
+    "accent": "#434077",
+    "accentForeground": "#E2DFFF",
+    "border": "#2B3545"
+  }
+}

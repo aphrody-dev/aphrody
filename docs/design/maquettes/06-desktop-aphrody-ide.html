@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desktop: Aphrody Studio IDE (`crates/zed` + Stitch Dock) — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="desktop">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">DESKTOP / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" >Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" aria-current="page">Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">Desktop: Aphrody Studio IDE (`crates/zed` + Stitch Dock)</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-desktop-ide" data-design-source="https://design.google/">
+    
+      <div class="mq-ide-frame">
+        <aside class="mq-icon-rail" aria-label="IDE Activity Rail" data-stitch-id="stitch-ide-rail">
+          <img src="../svg/aphrody-monogram-neural.svg" width="26" height="26" alt="Aphrody" />
+          <img src="../svg/aphrody-ide-studio.svg" width="22" height="22" alt="Explorer" />
+          <img src="../svg/figcraft-stitch-frame.svg" width="22" height="22" alt="Stitch Studio" />
+          <img src="../svg/aphrody-ai-agent-orbit.svg" width="22" height="22" alt="Agent" />
+        </aside>
+        <section class="mq-card" data-stitch-id="stitch-ide-editor">
+          <div class="mq-tab-strip"><span class="mq-tab mq-tab-active">google_design.rs</span><span class="mq-tab">stitch_client.rs</span><span class="mq-tab">App.tsx</span></div>
+          <pre class="mq-code-block"><code>pub fn capture_screen(doc: &amp;DesignMdDocument, id: &amp;str) -&gt; anyhow::Result&lt;()&gt; {
+    let screen = StitchClient::default().synthesize_screen(id, "DESKTOP", doc, false)?;
+    capture_stitch_screen_png(doc, &amp;screen, 1440, 900, Path::new("target/design-maquettes/out.png"))
+}</code></pre>
+        </section>
+        <aside class="mq-card" aria-label="Stitch Inspector" data-stitch-id="stitch-ide-stitch-dock">
+          <h2>Stitch &amp; Figma Inspector</h2>
+          <p>Source: <code>DESIGN.md</code></p>
+          <p>WCAG Contrast: <strong class="gd-tabular">7.92:1</strong></p>
+          <p>Spring: <code>spatial_fast (1400, 0.9)</code></p>
+          <a class="gd-pill-button mq-btn-primary" href="./07-desktop-aphrody-os-cosmic.html">Open in aphrody-os</a>
+        </aside>
+      </div>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

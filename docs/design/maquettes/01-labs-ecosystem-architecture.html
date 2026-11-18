@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="neural">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aphrody Labs 10-Domain Ecosystem Architecture — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="labs">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">LABS / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" aria-current="page">Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" >Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" >Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">Aphrody Labs 10-Domain Ecosystem Architecture</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-labs-architecture" data-design-source="https://design.google/">
+    
+      <section class="mq-hero mq-neural-aura" data-stitch-id="stitch-labs-arch-hero">
+        <div class="mq-pill-eyebrow">Aphrody Labs Architecture &middot; 1,169 Consolidated Repositories</div>
+        <h1 class="mq-display-title">Code Is a Design Material Across One Sovereign Stack</h1>
+        <p class="mq-lead">Unified GPUI 120 FPS compositor, WGPU v30 + Naga shaders, Wasm Core 2.0 / WASI P2 AOT, Bun 1.4.5, and Google Material 3 Neural Expressive design tokens across Desktop, Web, iOS, and Android.</p>
+        <div class="mq-kpi-row">
+          <article class="mq-kpi-card"><span class="mq-kpi-label">Active Domains</span><strong class="mq-kpi-value gd-tabular">10</strong><span class="mq-kpi-meta">aphrody-dev + aphrody-labs</span></article>
+          <article class="mq-kpi-card"><span class="mq-kpi-label">Figma Modes</span><strong class="mq-kpi-value gd-tabular">4</strong><span class="mq-kpi-meta">Neural, Dark, Light, OLED</span></article>
+          <article class="mq-kpi-card"><span class="mq-kpi-label">Lighthouse Target</span><strong class="mq-kpi-value gd-tabular">400/400</strong><span class="mq-kpi-meta">CWV + A11y + SEO</span></article>
+          <article class="mq-kpi-card"><span class="mq-kpi-label">Store Targets</span><strong class="mq-kpi-value gd-tabular">22</strong><span class="mq-kpi-meta">Desktop, Mobile &amp; OCI</span></article>
+        </div>
+      </section>
+      <section class="mq-grid-2" data-stitch-id="stitch-labs-domains-grid">
+        <div class="mq-card">
+          <h2>Core Rust &amp; OS Pillars (aphrody-dev)</h2>
+          <ul class="mq-list">
+            <li><strong>aphrody</strong> &mdash; Zed-compatible Studio IDE, GPUI, NSH, ArtCraft 17 apps, 22-target Store</li>
+            <li><strong>ai-os</strong> &mdash; MCP, ACP, A2A &amp; AccessKit semantic OS pilot daemon</li>
+            <li><strong>ay</strong> &mdash; SSH fleet orchestration &amp; WireGuard mesh (fr1 / fr2 / prd)</li>
+            <li><strong>anu</strong> &mdash; Pure-Rust POSIX coreutils, rubash shell &amp; Btrfs installer</li>
+          </ul>
+        </div>
+        <div class="mq-card">
+          <h2>Runtime, Web, 3D &amp; AI Pillars (aphrody-labs)</h2>
+          <ul class="mq-list">
+            <li><strong>bun</strong> &mdash; JS/TS/TSX/Zig runtime, NGINX, Mullvad VPN, Video &amp; NSH bundler</li>
+            <li><strong>browser &amp; open</strong> &mdash; Chromium Views GPUI shell, CDP, OpenTUI &amp; WebGPU OS</li>
+            <li><strong>nie</strong> &mdash; Bevy 0.20 + Unreal 5.8 Nanite meshlets, Solari GI &amp; MaterialX</li>
+            <li><strong>auto &amp; shenron</strong> &mdash; Zero-Vercel Cloudflare edge + multimodal voice UI</li>
+          </ul>
+        </div>
+      </section>
+      <section class="mq-card" data-stitch-id="stitch-labs-token-flow">
+        <h2>Single Source of Truth Pipeline</h2>
+        <div class="mq-flow-strip">
+          <span class="mq-flow-node">product.toml + google_design_tokens.toml</span>
+          <span class="mq-flow-arrow" aria-hidden="true">&rarr;</span>
+          <span class="mq-flow-node">DESIGN.md + W3C DTCG Figma Variables</span>
+          <span class="mq-flow-arrow" aria-hidden="true">&rarr;</span>
+          <span class="mq-flow-node">Google Stitch Screen Synthesis</span>
+          <span class="mq-flow-arrow" aria-hidden="true">&rarr;</span>
+          <span class="mq-flow-node">GPUI / NSH / Web / iOS / Android</span>
+        </div>
+      </section>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>

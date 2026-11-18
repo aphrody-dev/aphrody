@@ -59,8 +59,20 @@ export interface DesignSystemManifest {
   guidelines: GuidelineMdxSpec[];
   kits: {
     figma: { path: string; sha256: string; collectionCount: number; componentCount: number };
+    figmaCodeConnect: { path: string; sha256: string; mappingCount: number };
     stitch: { path: string; sha256: string; screenCount: number; preserveDataStitchId: boolean };
   };
+  maquettes: Array<{
+    id: string;
+    file: string;
+    path: string;
+    stitchId: string;
+    surface: string;
+    deviceType: string;
+    title: string;
+    defaultTheme: string;
+    bytes: number;
+  }>;
   components: GpuiAndEguiComponentContract[];
 }
 
@@ -74,9 +86,10 @@ export function validateDesignManifest(doc: unknown): { ok: boolean; errors: str
   if (m.sourceOfTruth !== "https://design.google/") errors.push("Invalid sourceOfTruth");
   if ((m.wcagContrastDarkPrimary ?? 0) < 4.5) errors.push("Dark primary WCAG contrast < 4.5");
   if ((m.wcagContrastLightPrimary ?? 0) < 4.5) errors.push("Light primary WCAG contrast < 4.5");
-  if (!Array.isArray(m.svgs) || m.svgs.length < 8) errors.push("Expected >= 8 optimized SVGs");
+  if (!Array.isArray(m.svgs) || m.svgs.length < 20) errors.push("Expected >= 20 optimized SVGs");
   if (!Array.isArray(m.guidelines) || m.guidelines.length < 6) errors.push("Expected 6 MDX guidelines");
   if (!Array.isArray(m.components) || m.components.length < 8) errors.push("Expected >= 8 dual GPUI/egui component contracts");
-  if (!m.kits?.figma?.path || !m.kits?.stitch?.path) errors.push("Missing Figma or Stitch kit reference");
+  if (!Array.isArray(m.maquettes) || m.maquettes.length < 12) errors.push("Expected 12 cross-platform HTML5 maquettes");
+  if (!m.kits?.figma?.path || !m.kits?.stitch?.path || !m.kits?.figmaCodeConnect?.path) errors.push("Missing Figma, Code Connect, or Stitch kit reference");
   return { ok: errors.length === 0, errors };
 }

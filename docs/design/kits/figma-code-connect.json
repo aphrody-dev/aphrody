@@ -1,0 +1,167 @@
+{
+  "version": "3.0.0",
+  "figmaFileHint": "Aphrody Labs Design System v3.0",
+  "sourceOfTruth": "https://design.google/",
+  "mappings": [
+    {
+      "figmaComponentSet": "ExpressiveAppShell",
+      "gpui": "aphrody_ui::cosmic_shell::render_nav_rail",
+      "nsh": "<AppShell />",
+      "egui": "egui::SidePanel",
+      "web": ".mq-shell-3col",
+      "mobile": "nsh-platform-ios::NavigationStack"
+    },
+    {
+      "figmaComponentSet": "DesktopNavRail",
+      "gpui": "aphrody_ui::cosmic_shell::NavRail",
+      "nsh": "<NavRail />",
+      "egui": "egui::SidePanel::left",
+      "web": ".mq-icon-rail",
+      "mobile": "Compact -> MobileBottomNavBar"
+    },
+    {
+      "figmaComponentSet": "MobileBottomNavBar",
+      "gpui": "aphrody_ui::google_design_components::MobileBottomNavBar",
+      "nsh": "<BottomTabs />",
+      "egui": "egui::TopBottomPanel::bottom",
+      "web": ".mq-bottom-nav",
+      "mobile": "examples/nsh/mobile-companion"
+    },
+    {
+      "figmaComponentSet": "SegmentedStudioBar",
+      "gpui": "aphrody_ui::google_design_components::SegmentedStudioBar",
+      "nsh": "<SegmentedBar />",
+      "egui": "egui::SelectableLabel",
+      "web": ".mq-chip-row",
+      "mobile": "<SegmentedBar density='compact' />"
+    },
+    {
+      "figmaComponentSet": "NeuralOmnibar",
+      "gpui": "aphrody_ui::google_design_components::ExpressiveOmnibar",
+      "nsh": "<NeuralOmnibar />",
+      "egui": "egui::TextEdit::singleline",
+      "web": ".mq-omnibar-pill",
+      "mobile": "examples/nsh/mobile-companion"
+    },
+    {
+      "figmaComponentSet": "CascadingPopoverMenu",
+      "gpui": "aphrody_ui::google_design_components::CascadingPopoverCard",
+      "nsh": "<CascadingPopover />",
+      "egui": "egui::menu",
+      "web": ".mq-popover-card",
+      "mobile": "<Sheet detent='medium' />"
+    },
+    {
+      "figmaComponentSet": "GroundingCardStack",
+      "gpui": "aphrody_ui::google_design_components::GroundingSourceCard",
+      "nsh": "<GroundingCard />",
+      "egui": "egui::Frame::group",
+      "web": ".mq-grounding-stack",
+      "mobile": "<ScrollView horizontal />"
+    },
+    {
+      "figmaComponentSet": "ThinkingAuraBadge",
+      "gpui": "aphrody_ui::google_design_components::ThinkingAuraBadge",
+      "nsh": "<ThinkingAuraBadge />",
+      "egui": "egui::Spinner",
+      "web": ".mq-thinking-aura",
+      "mobile": "<ThinkingAuraBadge compact />"
+    },
+    {
+      "figmaComponentSet": "ExpressivePillButton",
+      "gpui": "aphrody_ui::starter_pack::StarterButton",
+      "nsh": "<PillButton />",
+      "egui": "egui::Button",
+      "web": ".gd-pill-button",
+      "mobile": "min-height: 44px touch target"
+    },
+    {
+      "figmaComponentSet": "IdeEditorTabStrip",
+      "gpui": "workspace::Pane",
+      "nsh": "<TabStrip />",
+      "egui": "egui::TopBottomPanel::top",
+      "web": ".mq-tab-strip",
+      "mobile": "<Picker />"
+    },
+    {
+      "figmaComponentSet": "DiffReviewHunkCard",
+      "gpui": "editor::DiffView",
+      "nsh": "<DiffView />",
+      "egui": "egui_gpui::CodeSurface",
+      "web": ".mq-code-block",
+      "mobile": "examples/nsh/mobile-companion"
+    },
+    {
+      "figmaComponentSet": "TerminalSheetDrawer",
+      "gpui": "terminal_view::TerminalView",
+      "nsh": "<Sheet />",
+      "egui": "egui::Window",
+      "web": ".mq-popover-card",
+      "mobile": "<BottomSheet snapPoints={[0.35, 0.85]} />"
+    },
+    {
+      "figmaComponentSet": "CosmicTopPanel",
+      "gpui": "aphrody_desktop::panel",
+      "nsh": "<TopPanel />",
+      "egui": "egui::TopBottomPanel::top",
+      "web": ".mq-os-panel",
+      "mobile": "SafeArea Top Bar"
+    },
+    {
+      "figmaComponentSet": "CosmicDockBar",
+      "gpui": "aphrody_desktop::dock",
+      "nsh": "<DockBar />",
+      "egui": "egui::TopBottomPanel::bottom",
+      "web": ".mq-os-dock",
+      "mobile": "MobileBottomNavBar"
+    },
+    {
+      "figmaComponentSet": "FigCraftCanvasNode",
+      "gpui": "aphrody_craft::render_gpui_studio_panel",
+      "nsh": "<FigCraftGoogleScreen />",
+      "egui": "egui_gpui::EguiGpuiHost",
+      "web": "[data-stitch-id='stitch-figcraft-root']",
+      "mobile": "ViewerOnly"
+    },
+    {
+      "figmaComponentSet": "CraftAnythingDisasmTable",
+      "gpui": "aphrody_craft::CraftStudioSession",
+      "nsh": "<CraftDisasmGrid />",
+      "egui": "egui::Grid",
+      "web": ".mq-code-block",
+      "mobile": "SummaryKPIs"
+    },
+    {
+      "figmaComponentSet": "UnrealBevyViewportHud",
+      "gpui": "bevy_gpui::render_viewport_rgba8",
+      "nsh": "<ViewportCanvas />",
+      "egui": "bevy_gpui::render_bevy_egui_inspector",
+      "web": ".mq-shader-stage",
+      "mobile": "WebGPU Pocket Preview"
+    },
+    {
+      "figmaComponentSet": "HeroPlaygroundBanner",
+      "gpui": "aphrody_desktop::examples::web_os",
+      "nsh": "<HeroBanner />",
+      "egui": "egui::CentralPanel",
+      "web": ".mq-hero.mq-neural-aura",
+      "mobile": ".mq-hero compact"
+    },
+    {
+      "figmaComponentSet": "ReleaseChannelMatrixCard",
+      "gpui": "aphrody_ui::google_design_components::RoadmapHorizonCard",
+      "nsh": "<ChannelCard />",
+      "egui": "egui::Frame::group",
+      "web": ".mq-card",
+      "mobile": "Stacked Card"
+    },
+    {
+      "figmaComponentSet": "VpnShieldQuickTile",
+      "gpui": "aphrody_vpn::VpnStatusTile",
+      "nsh": "<VpnQuickTile />",
+      "egui": "egui::ToggleValue",
+      "web": ".mq-omnibar-pill",
+      "mobile": "examples/nsh/mobile-companion"
+    }
+  ]
+}

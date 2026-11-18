@@ -1,0 +1,6 @@
+{
+  "name": "Aphrody Mobile Companion",
+  "id": "dev.aphrody.mobile-companion",
+  "version": "1.0.0",
+  "entry": "App.tsx"
+}

@@ -227,6 +227,51 @@ mount(<StitchGeneratedView />);
     )
 }
 
+/// Metadata descriptor for one of the 12 canonical cross-platform Stitch maquettes.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StitchMaquetteSpec {
+    pub id: String,
+    pub stitch_id: String,
+    pub surface: String,
+    pub device_type: String,
+    pub title: String,
+    pub relative_html_path: String,
+    pub gpui_surface: String,
+}
+
+/// Returns all 12 canonical Aphrody Labs, Website, Desktop, and Mobile maquette specifications.
+#[must_use]
+pub fn bundled_maquette_catalog() -> Vec<StitchMaquetteSpec> {
+    let entries = [
+        ("01-labs-ecosystem-architecture", "stitch-labs-architecture", "labs", "DESKTOP", "Aphrody Labs 10-Domain Ecosystem Architecture", "docs/design/maquettes/01-labs-ecosystem-architecture.html", "aphrody_nsh::StudioMode::GoogleDesignMirror"),
+        ("02-labs-roadmap-2026-2027", "stitch-labs-roadmap", "labs", "DESKTOP", "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)", "docs/design/maquettes/02-labs-roadmap-2026-2027.html", "aphrody_ui::RoadmapHorizonCard"),
+        ("03-web-landing-hero", "stitch-web-landing", "website", "DESKTOP", "aphrody.com — Website Landing & Live WebGPU Playground", "docs/design/maquettes/03-web-landing-hero.html", "aphrody_desktop::examples::web_os"),
+        ("04-web-docs-llms-portal", "stitch-web-docs", "website", "DESKTOP", "docs.aphrody.com — Fumadocs v16, Twoslash & llms.txt Portal", "docs/design/maquettes/04-web-docs-llms-portal.html", "aphrody_nsh::StudioMode::GpuiStarterPack"),
+        ("05-web-store-and-downloads", "stitch-web-store", "website", "DESKTOP", "releases.aphrody.com & Store — 22-Target Distribution Portal", "docs/design/maquettes/05-web-store-and-downloads.html", "aphrody_store::AwesomeGpuiCatalog"),
+        ("06-desktop-aphrody-ide", "stitch-desktop-ide", "desktop", "DESKTOP", "Desktop: Aphrody Studio IDE", "docs/design/maquettes/06-desktop-aphrody-ide.html", "crates/zed + aphrody_nsh::DesignStitchStudioItem"),
+        ("07-desktop-aphrody-os-cosmic", "stitch-desktop-cosmic-os", "desktop", "DESKTOP", "Desktop: aphrody-os COSMIC Compositor & Dual Craft Studio", "docs/design/maquettes/07-desktop-aphrody-os-cosmic.html", "aphrody_desktop::OsDesktopShell"),
+        ("08-desktop-agy-neural-session", "stitch-desktop-neural-agy", "desktop", "DESKTOP", "Desktop: Neural Expressive Home & Grounding Stack", "docs/design/maquettes/08-desktop-agy-neural-session.html", "aphrody_ui::google_design_components"),
+        ("09-desktop-browser-vpn-shield", "stitch-desktop-browser-vpn", "desktop", "DESKTOP", "Desktop: Aphrody Browser + Per-Tab Mullvad WireGuard VPN", "docs/design/maquettes/09-desktop-browser-vpn-shield.html", "aphrody_browser::ChromiumBrowserView"),
+        ("10-mobile-companion-home", "stitch-mobile-home", "mobile", "MOBILE", "Mobile: Companion Home & Agent", "docs/design/maquettes/10-mobile-companion-home.html", "gpui_ios + nsh-platform-android"),
+        ("11-mobile-code-diff-review", "stitch-mobile-diff", "mobile", "MOBILE", "Mobile: Code Diff Review & Bottom Sheet", "docs/design/maquettes/11-mobile-code-diff-review.html", "nsh_base::DiffView"),
+        ("12-mobile-pocket-craft-vpn", "stitch-mobile-craft-oled", "mobile", "TABLET", "Mobile / Tablet OLED Pitch: Pocket Craft & VPN", "docs/design/maquettes/12-mobile-pocket-craft-vpn.html", "nsh-platform-ios + nsh-platform-android"),
+    ];
+    entries
+        .into_iter()
+        .map(|(id, stitch_id, surface, device_type, title, relative_html_path, gpui_surface)| {
+            StitchMaquetteSpec {
+                id: id.to_owned(),
+                stitch_id: stitch_id.to_owned(),
+                surface: surface.to_owned(),
+                device_type: device_type.to_owned(),
+                title: title.to_owned(),
+                relative_html_path: relative_html_path.to_owned(),
+                gpui_surface: gpui_surface.to_owned(),
+            }
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -236,17 +281,26 @@ mod tests {
     fn synthesizes_screen_and_emits_nsh_tsx_with_stitch_ids() -> Result<()> {
         let design_md = load_bundled_root_design_md()?;
         let client = StitchClient::new("https://stitch.withgoogle.com", None);
-        let screen = client.synthesize_screen(
-            "WebGPU Shader Studio",
-            "DESKTOP",
-            &design_md,
-            false,
-        )?;
-        assert!(screen.html_code.contains("data-stitch-id="));
-        assert!(screen.html_code.contains("https://design.google/"));
-        let tsx = stitch_screen_to_nsh_tsx(&screen);
-        assert!(tsx.contains(&screen.stitch_id));
+        for device in ["DESKTOP", "MOBILE", "TABLET"] {
+            let screen = client.synthesize_screen(
+                &format!("WebGPU Shader Studio {device}"),
+                device,
+                &design_md,
+                false,
+            )?;
+            assert!(screen.html_code.contains("data-stitch-id="));
+            assert!(screen.html_code.contains("https://design.google/"));
+            let tsx = stitch_screen_to_nsh_tsx(&screen);
+            assert!(tsx.contains(&screen.stitch_id));
+            assert!(tsx.contains(device));
+        }
         assert!(!StitchClient::stitch_sitemap_routes().is_empty());
+        let maquettes = bundled_maquette_catalog();
+        assert_eq!(maquettes.len(), 12);
+        assert!(maquettes.iter().any(|m| m.surface == "labs"));
+        assert!(maquettes.iter().any(|m| m.surface == "website"));
+        assert!(maquettes.iter().any(|m| m.surface == "desktop"));
+        assert!(maquettes.iter().any(|m| m.surface == "mobile"));
         Ok(())
     }
 }

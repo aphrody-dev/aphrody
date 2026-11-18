@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="neural">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desktop: Neural Expressive Home &amp; Grounding Stack — Aphrody Design System</title>
+  <link rel="stylesheet" href="../stylesheet.css" />
+</head>
+<body class="mq-body" data-surface="desktop">
+  <a class="mq-skip-link" href="#mq-main">Skip to main maquette canvas</a>
+  <header class="mq-topbar" role="banner">
+  <div class="mq-topbar-left">
+    <a class="mq-brand-lockup" href="./index.html" aria-label="Aphrody Labs Design System Home">
+      <img src="../svg/aphrody-monogram-neural.svg" width="28" height="28" alt="Aphrody Monogram" />
+      <span class="mq-brand-name">Aphrody</span>
+      <span class="mq-badge">DESKTOP / DESKTOP</span>
+    </a>
+    <nav class="mq-top-nav" aria-label="Primary Surface Switcher">
+      <a class="mq-nav-link" href="./index.html" >System Index</a><a class="mq-nav-link" href="./01-labs-ecosystem-architecture.html" >Aphrody Labs</a><a class="mq-nav-link" href="./03-web-landing-hero.html" >Website</a><a class="mq-nav-link" href="./06-desktop-aphrody-ide.html" aria-current="page">Desktop</a><a class="mq-nav-link" href="./10-mobile-companion-home.html" >Mobile</a>
+    </nav>
+  </div>
+  <div class="mq-topbar-right">
+    <div class="mq-theme-switcher" role="group" aria-label="Theme Appearance Mode">
+      <button type="button" class="mq-theme-btn" data-set-theme="neural">Neural</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="dark">Dark</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="light">Light</button>
+      <button type="button" class="mq-theme-btn" data-set-theme="oled">OLED</button>
+    </div>
+    <span class="mq-meta-pill">Desktop: Neural Expressive Home &amp; Grounding Stack</span>
+  </div>
+</header>
+  <main id="mq-main" class="mq-main" data-stitch-id="stitch-desktop-neural-agy" data-design-source="https://design.google/">
+    
+      <div class="mq-shell-3col">
+        <aside class="mq-sidebar" aria-label="Sessions Sidebar" data-stitch-id="stitch-neural-rail">
+          <a class="gd-pill-button mq-btn-primary" href="#new-session">+ New Session</a>
+          <div class="mq-side-item mq-side-active">Aphrody Labs Architecture IA</div>
+          <div class="mq-side-item">Figma &amp; Stitch DTCG Kit</div>
+          <div class="mq-side-item">fr1 Kernel 7.3 Build Fleet</div>
+          <div class="mq-side-item">Mobile Metal / Vulkan Audit</div>
+        </aside>
+        <section class="mq-card mq-neural-aura mq-centered" data-stitch-id="stitch-neural-omnibar">
+          <div class="mq-thinking-aura"><img src="../svg/gemini-neural-spark.svg" width="16" height="16" alt="" /> Thinking Deeply &middot; Carbon High</div>
+          <h1 class="mq-display-title">Where should we start?</h1>
+          <div class="mq-omnibar-pill">
+            <span class="mq-plus-btn" aria-label="Attachment Menu">+</span>
+            <span>Ask Aphrody Agent, inspect a FigCraft frame, or run gpui-wgpu...</span>
+            <span class="mq-badge">Ctrl+K</span>
+          </div>
+          <div class="mq-popover-card" aria-label="Cascading Attachment Popover">
+            <strong>More Tools &amp; Uploads (20px Radius)</strong>
+            <span>Upload files &bull; Import code &bull; Notebooks &bull; Stitch Canvas</span>
+          </div>
+        </section>
+        <aside class="mq-grounding-stack" aria-label="Grounded Sources" data-stitch-id="stitch-neural-grounding">
+          <h2>Grounded Context (28px Stack)</h2>
+          <article class="mq-ground-item"><span class="mq-badge">design.google</span><h3>Code is a Design Material</h3><p>Semantic 3-tier tokens shared across runtime code &amp; Figma.</p></article>
+          <article class="mq-ground-item"><span class="mq-badge">fonts.google</span><h3>Google Sans Flex (6 Axes)</h3><p>opsz, wght, wdth, GRAD, slnt, ROND across display &amp; controls.</p></article>
+          <article class="mq-ground-item"><span class="mq-badge">stitch.withgoogle.com</span><h3>Stitch data-stitch-id Preservation</h3><p>Zero-drift DOM/GPUI slot binding for automated regeneration.</p></article>
+        </aside>
+      </div>
+  </main>
+  <footer class="mq-footer" role="contentinfo">
+    <span>Aphrody Labs Design System v3.0 &middot; Source: <a href="https://design.google/">design.google</a> &amp; <a href="https://stitch.withgoogle.com/">Google Stitch</a></span>
+    <span class="gd-tabular">WCAG 2.2 AA &ge; 4.5:1 &middot; Google Sans Flex + Google Sans Code + JetBrains Mono</span>
+  </footer>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const syncButtons = () => {
+        const active = root.getAttribute("data-theme") || "neural";
+        document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-theme") === active ? "true" : "false");
+        });
+      };
+      document.querySelectorAll("[data-set-theme]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const next = btn.getAttribute("data-set-theme");
+          if (next) {
+            root.setAttribute("data-theme", next);
+            syncButtons();
+          }
+        });
+      });
+      syncButtons();
+      
+    })();
+  </script>
+</body>
+</html>
