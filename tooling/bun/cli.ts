@@ -35,6 +35,11 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   { domain: "workspace", action: "agent-desktop", scriptRel: "tooling/bun/agent-desktop-audit.ts", defaultArgs: [], summary: "Verify aphrody_pilot zero-mod.rs & 58-tool MCP parity" },
   { domain: "workspace", action: "gpui-vs-dioxus", scriptRel: "tooling/bun/gpui-vs-dioxus-audit.ts", defaultArgs: ["all"], summary: "Audit 9-submodule GPUI/Wgpu/Taffy/AccessKit parity matrix" },
   { domain: "workspace", action: "crate-skill", scriptRel: "tooling/bun/crate-to-skill.ts", defaultArgs: ["--help"], summary: "Generate portable Agent Skill bundle from a workspace crate" },
+  { domain: "workspace", action: "slim", scriptRel: "tooling/bun/disk-slim.ts", defaultArgs: ["apply"], summary: "Reclaim multi-GB target/* caches and compact bloated submodule packs" },
+  { domain: "workspace", action: "r2-manifest", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["manifest"], summary: "Generate content-addressed assets/os/r2_assets_manifest.toml" },
+  { domain: "workspace", action: "r2-push", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["push"], summary: "Upload content-addressed monorepo assets to R2 aphrody-assets" },
+  { domain: "workspace", action: "r2-hydrate", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["hydrate"], summary: "Hydrate offloaded R2 assets on demand into target/r2-cache" },
+  { domain: "workspace", action: "r2-prune", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["prune-local"], summary: "Remove offloaded non-boot media assets from local checkout" },
 
   // 2. Google Design System & Stitch Studio (`https://design.google/`)
   { domain: "design", action: "sync", scriptRel: "tooling/bun/google-design-sync.ts", defaultArgs: ["sync"], summary: "Synchronize 3-tier Material 3 Expressive tokens, sitemap, and root DESIGN.md" },
@@ -65,12 +70,17 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   { domain: "ingest", action: "wasm-bindgen", scriptRel: "tooling/bun/wasm-bindgen-ingest.ts", defaultArgs: ["all"], summary: "Ingest wasm-bindgen org digests, llms.txt, and skill" },
   { domain: "ingest", action: "emscripten", scriptRel: "tooling/bun/emscripten-crawl.ts", defaultArgs: ["all"], summary: "Crawl Emscripten docs & 12 repos into llms.txt and skill" },
   { domain: "ingest", action: "webassembly", scriptRel: "tooling/bun/webassembly-org-ingest.ts", defaultArgs: ["all"], summary: "Ingest top 100 WebAssembly org repositories" },
+  { domain: "ingest", action: "sync-status", scriptRel: "tooling/bun/upstream-sync.ts", defaultArgs: ["status"], summary: "Inspect Zed, NSH, GPUI-Kit, WGPU, and Bun upstream sync status" },
+  { domain: "ingest", action: "sync-all", scriptRel: "tooling/bun/upstream-sync.ts", defaultArgs: ["sync", "--target", "all"], summary: "Sync and auto-resolve Zed, NSH, and GPUI-Kit upstreams" },
+  { domain: "ingest", action: "sync-resolve", scriptRel: "tooling/bun/upstream-sync.ts", defaultArgs: ["resolve"], summary: "Auto-resolve active Zed merge conflicts preserving Aphrody brand & subcommands" },
 
   // 7. Remote Build Fleet (`fr1`) & Rust Toolchain Optimization
   { domain: "fleet", action: "sync", scriptRel: "tooling/bun/fleet-sync.ts", defaultArgs: ["sync", "--host", "fr1"], summary: "Delta-sync workspace to remote Linux builder fr1" },
   { domain: "fleet", action: "verify", scriptRel: "tooling/bun/fleet-sync.ts", defaultArgs: ["verify", "--host", "fr1"], summary: "Run remote Linux verification on fr1" },
   { domain: "fleet", action: "host-audit", scriptRel: "tooling/bun/ci-host-optimize.ts", defaultArgs: ["audit", "--host", "fr1"], summary: "Audit Ubuntu/Kernel/XFS/sccache/build.slice on fr1" },
   { domain: "fleet", action: "toolchain", scriptRel: "tooling/bun/toolchain-audit.ts", defaultArgs: ["doctor"], summary: "Audit Rust profiles, linkers, sccache, and Cargo.lock duplicates" },
+  { domain: "fleet", action: "edge-audit", scriptRel: "tooling/bun/cloudflare-deploy.ts", defaultArgs: ["audit"], summary: "Audit unified .cloudflare/aphrody-worker config and R2 bindings" },
+  { domain: "fleet", action: "edge-deploy", scriptRel: "tooling/bun/cloudflare-deploy.ts", defaultArgs: ["deploy"], summary: "Deploy unified aphrody-worker and R2 release scripts" },
 ];
 
 export interface CheckStepResult {
@@ -96,7 +106,7 @@ export function runConsolidatedChecks(root = repoRoot): { ok: boolean; steps: Ch
     { id: "design:audit", args: ["tooling/bun/google-design-sync.ts", "audit"] },
     { id: "design:pack-verify", args: ["tooling/bun/design-docs-pack.ts", "build"] },
     { id: "storytold:audit", args: ["tooling/bun/storytold-unify.ts", "audit"] },
-    { id: "workspace:agy-audit", args: ["tooling/bun/agy-config-audit.ts"] },
+    { id: "workspace:agy-audit", args: ["tooling/bun/agy-config-audit.ts", "--repo-only"] },
     { id: "workspace:i18n", args: ["tooling/bun/w3c-i18n.ts", "check"] },
   ];
 

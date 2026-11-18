@@ -7,8 +7,8 @@ use gpui::{ClickEvent, FontWeight, Hsla, Role, hsla};
 use serde::{Deserialize, Serialize};
 use ui::prelude::*;
 
-use crate::cosmic_theme::{AppearanceMode, contrast_ratio};
-use crate::google_design::GoogleDesignTokens;
+use crate::cosmic_theme::{AppearanceMode, OsTheme, contrast_ratio};
+use crate::google_design::{GoogleDesignTokens, ShapeScale};
 
 /// Embedded submodule parity & CWV matrix (`assets/os/submodule_parity_matrix.toml`).
 pub const BUNDLED_SUBMODULE_PARITY_TOML: &str =
@@ -169,6 +169,39 @@ impl ShadcnGpuiTheme {
             radius_md_px: tokens.sys.shape.medium_px,
             radius_lg_px: tokens.sys.shape.large_px,
             radius_xl_px: tokens.sys.shape.extra_large_px,
+        }
+    }
+
+    /// Maps the active desktop theme (`themes.json` entry and mode) onto the same semantic roles,
+    /// so components follow theme switches instead of the bundled Google Design palette.
+    #[must_use]
+    pub fn from_os_theme(theme: &OsTheme, shape: &ShapeScale) -> Self {
+        let colors = &theme.colors;
+        Self {
+            mode: theme.mode,
+            background: colors.surface,
+            foreground: colors.on_surface,
+            card: colors.surface_container_low,
+            card_foreground: colors.on_surface,
+            popover: colors.surface_container_high,
+            popover_foreground: colors.on_surface,
+            primary: colors.primary,
+            primary_foreground: colors.on_primary,
+            secondary: colors.secondary_container,
+            secondary_foreground: colors.on_secondary_container,
+            muted: colors.surface_container,
+            muted_foreground: colors.on_surface_variant,
+            accent: colors.primary_container,
+            accent_foreground: colors.on_primary_container,
+            destructive: colors.error,
+            destructive_foreground: colors.on_error,
+            border: colors.outline_variant,
+            input: colors.outline_variant,
+            ring: colors.primary,
+            radius_sm_px: shape.small_px,
+            radius_md_px: shape.medium_px,
+            radius_lg_px: shape.large_px,
+            radius_xl_px: shape.extra_large_px,
         }
     }
 
@@ -352,6 +385,7 @@ impl RenderOnce for StarterButton {
             StarterSize::Icon => (36.0_f32, 8.0_f32),
         };
 
+        let focus_ring = self.theme.ring;
         let mut base = div()
             .id(self.id)
             .h(rems_from_px(height_px))
@@ -363,8 +397,15 @@ impl RenderOnce for StarterButton {
             .flex()
             .items_center()
             .justify_center()
+            .role(Role::Button)
+            .aria_label(self.label.clone())
             .when(self.disabled, |el| el.opacity(0.45))
-            .when(!self.disabled, |el| el.cursor_pointer())
+            .when(!self.disabled, |el| {
+                el.cursor_pointer()
+                    .focusable()
+                    .tab_stop(true)
+                    .focus_visible(move |style| style.border_2().border_color(focus_ring))
+            })
             .child(
                 div()
                     .text_color(fg)
@@ -671,6 +712,23 @@ mod tests {
         }
         assert_eq!(StarterButton::agent_meta().slot, "button");
         assert!(StarterPackCatalog::primitives().len() >= 16);
+        Ok(())
+    }
+
+    #[test]
+    fn every_bundled_desktop_theme_maps_to_wcag_aa_starter_roles() -> Result<()> {
+        let shape = GoogleDesignTokens::bundled()?.sys.shape;
+        let catalog = crate::cosmic_theme::OsThemeCatalog::bundled()?;
+        for id in catalog.ids() {
+            for mode in [AppearanceMode::Light, AppearanceMode::Dark] {
+                let os_theme = catalog
+                    .resolve(&id, Some(mode))
+                    .with_context(|| format!("theme {id} missing {mode:?}"))?;
+                ShadcnGpuiTheme::from_os_theme(&os_theme, &shape)
+                    .verify_wcag_aa()
+                    .with_context(|| format!("theme {id}"))?;
+            }
+        }
         Ok(())
     }
 

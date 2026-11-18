@@ -7,7 +7,7 @@ spec_url = "https://m3.material.io/"
 fonts_url = "https://fonts.google.com/"
 stitch_url = "https://stitch.withgoogle.com/"
 sans_flex_family = "Google Sans Flex"
-synced_at = "2026-11-18T09:23:17.619Z"
+synced_at = "2026-11-18T12:23:58.092Z"
 seed_hex = "#135B82"
 variant = "expressive"
 principles = ["Code is a design material: interactive software bridges intent and visual craft", "Google Sans Flex optical size, weight, width, grade, slant, and roundness tune hierarchy", "Strict 3-tier design tokens (reference -> system -> component) exported via DESIGN.md", "Physics-based spring motion separated cleanly into spatial vs effects springs", "WCAG 2.2 AA contrast >= 4.5:1 across all surface and action foregrounds"]
@@ -41,6 +41,34 @@ error90 = "#FFDAD6"
 bolt10 = "#3A2500"
 bolt50 = "#FFB300"
 neural_indigo = "#111B3A"
+glimmer_void = "#000000"
+glimmer_surface = "#12110C"
+glimmer_container = "#32302A"
+glimmer_gold = "#FAE366"
+glimmer_mint = "#C3ECD0"
+glimmer_lime = "#BFF28D"
+glimmer_coral = "#FFDAD3"
+gemini_blue = "#4285F4"
+gemini_violet = "#9B72CB"
+gemini_rose = "#D96570"
+gemini_peach = "#FFDCC1"
+youtube_red = "#FF0033"
+youtube_magenta = "#FF2C9C"
+youtube_pink = "#FF8099"
+youtube_dark = "#0F0F0F"
+googlebook_blue = "#4285F4"
+googlebook_red = "#EA4335"
+googlebook_yellow = "#FBBC05"
+googlebook_green = "#34A853"
+googlebook_cyan = "#25F4EE"
+googlebook_magenta = "#FE2C55"
+quire_folio_light = "#FBF8FF"
+quire_folio_dark = "#121318"
+quire_rim_1 = "#7E8CFF"
+quire_rim_2 = "#C58BFF"
+quire_rim_3 = "#FF7A9C"
+quire_rim_4 = "#FFB38A"
+quire_rim_5 = "#8FD6FF"
 
 [ref.typeface]
 brand = "Google Sans Flex, Google Sans, Inter, system-ui, sans-serif"
@@ -276,6 +304,26 @@ damping_ratio = 1.00
 stiffness = 800.0
 damping_ratio = 1.00
 
+[sys.motion.springs.quire_unfold]
+stiffness = 380.0
+damping_ratio = 0.80
+
+[sys.motion.springs.quire_settle]
+stiffness = 700.0
+damping_ratio = 0.90
+
+[sys.motion.springs.quire_expand]
+stiffness = 300.0
+damping_ratio = 0.85
+
+[sys.motion.springs.quire_fold]
+stiffness = 900.0
+damping_ratio = 1.00
+
+[sys.motion.springs.quire_tick]
+stiffness = 1400.0
+damping_ratio = 0.70
+
 [sys.typescale.display_large]
 font = "brand"
 size_sp = 57
@@ -418,3 +466,35 @@ backdrop_color_role = "surface_dim"
 accent_color_role = "primary"
 secondary_accent_color_role = "tertiary"
 shape = "large_px"
+
+[comp.glimmer_hud]
+container_color_hex = "#12110C"
+elevated_container_hex = "#32302A"
+min_visual_angle_deg = 0.6
+shape = "large_increased_px"
+anti_halation = 1
+
+[comp.gemini_spectrum]
+stop_start_hex = "#4285F4"
+stop_mid_hex = "#9B72CB"
+stop_end_hex = "#D96570"
+spark_radius_px = 12
+
+[comp.youtube_scrubber]
+brand_red_hex = "#FF0033"
+gradient_magenta_hex = "#FF2C9C"
+gradient_angle_deg = 45
+track_height_px = 6
+
+[comp.googlebook_glowbar]
+height_px = 36
+g_key_radius_px = 9999
+rambler_pill_radius_px = 20
+
+[comp.quire_glass_note]
+blur_dp = 34
+tint_opacity = 0.8
+economy_paper_opacity = 0.96
+rim_width_dp = 1.5
+card_radius_px = 28
+pill_radius_px = 9999

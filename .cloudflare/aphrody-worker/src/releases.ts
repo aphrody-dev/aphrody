@@ -1,18 +1,6 @@
-export interface R2ObjectLike {
-  body: ReadableStream | string | Uint8Array;
-  httpEtag?: string;
-  writeHttpMetadata?: (headers: Headers) => void;
-}
+import { MONOGRAM_SVG, type WorkerEnv } from "./types.ts";
 
-export interface R2BucketLike {
-  get(key: string): Promise<R2ObjectLike | null>;
-}
-
-export interface Env {
-  RELEASES_BUCKET: R2BucketLike;
-}
-
-const VALID_CHANNELS = new Set(["lts", "stable", "preview", "canary", "nightly", "dev"]);
+export const VALID_CHANNELS = new Set(["lts", "stable", "preview", "canary", "nightly", "dev"]);
 
 export function detectPlatform(userAgent: string): {
   label: string;
@@ -53,13 +41,27 @@ export function renderDownloadPortal(request: Request): Response {
   const channel = VALID_CHANNELS.has(rawChannel) ? rawChannel : "stable";
   const detected = detectPlatform(request.headers.get("User-Agent") ?? "");
   const assetUrl = `/assets/${channel}/latest/${detected.asset}`;
+  const title = `Download Aphrody (${channel}) — GPU-Native Studio`;
+  const desc = `Download Aphrody (${channel}) for Windows, macOS, Linux, iOS, and Android via zero-egress Cloudflare R2 with Sigstore provenance.`;
 
   const html = `<!DOCTYPE html>
 <html lang="en" dir="ltr" data-theme="neural">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Download Aphrody (${channel}) — GPU-Native Studio</title>
+  <title>${title}</title>
+  <meta name="description" content="${desc}" />
+  <link rel="canonical" href="https://releases.aphrody.com/" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="https://aphrody.com/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Aphrody Releases" />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${desc}" />
+  <meta property="og:url" content="https://releases.aphrody.com/" />
+  <meta property="og:image" content="https://aphrody.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <style>
     :root {
       color-scheme: dark light;
@@ -158,7 +160,7 @@ export function renderDownloadPortal(request: Request): Response {
   <main>
     <header>
       <div class="brand">
-        <svg role="img" width="32" height="32" viewBox="0 0 96 96" aria-label="Aphrody Monogram"><title>Aphrody</title><rect width="96" height="96" rx="22" fill="#004B75"/><path d="M48 18 76 74H63.5L57.8 62H38.2L32.5 74H20L48 18Zm0 19-6.6 15.5h13.2L48 37Z" fill="#FFFFFF"/><path d="M56.5 18 42.5 47H54L39.5 76" fill="none" stroke="#FFB300" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${MONOGRAM_SVG.replace('width="96" height="96"', 'width="32" height="32"')}
         <span>Aphrody Releases</span>
       </div>
       <span class="pill">Zero-Egress Cloudflare R2 &bull; Sigstore Provenance &bull; Channel: ${channel}</span>
@@ -181,113 +183,101 @@ export function renderDownloadPortal(request: Request): Response {
   </main>
 </body>
 </html>`;
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff" } });
 }
 
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    const path = url.pathname;
+export async function handleReleasesRequest(request: Request, env: WorkerEnv): Promise<Response> {
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const bucket = env.RELEASES_BUCKET;
 
-    if (path === "/healthz" || path === "/api/health") {
-      return Response.json(
-        {
-          ok: true,
-          service: "aphrody-releases",
-          channels: [...VALID_CHANNELS],
-          r2_bucket: "aphrody-releases",
-        },
-        { headers: { "Cache-Control": "no-store" } },
-      );
-    }
-    if (path === "/api/channels") {
-      return Response.json(
-        {
-          channels: [...VALID_CHANNELS],
-          latest_endpoint: "/api/releases/{channel}/latest",
-        },
-        { headers: { "Cache-Control": "public, max-age=60" } },
-      );
-    }
-    if (path === "/api/design") {
-      return Response.json(
-        {
-          source_of_truth: "https://design.google/",
-          system: "Material 3 Expressive + Neural Obsidian",
-          modes: ["neural", "dark", "light", "oled"],
-          channels: [...VALID_CHANNELS],
-          mobile: {
-            ios: "gpui_ios + NativeShell.xcframework",
-            android: "nsh-platform-android Vulkan .aar",
-          },
-          store_targets: 22,
-        },
-        { headers: { "Cache-Control": "public, max-age=300" } },
-      );
-    }
-    if (path === "/" || path === "/download" || path === "/download/") {
-      return renderDownloadPortal(request);
-    }
-    if (path === "/install.sh") {
-      const obj = await env.RELEASES_BUCKET.get("scripts/install.sh");
-      return obj
-        ? new Response(obj.body, {
-            headers: {
-              "Content-Type": "text/x-shellscript; charset=utf-8",
-              "Cache-Control": "public, max-age=300",
-            },
-          })
-        : new Response("Installer unavailable — run deploy to populate scripts/install.sh\n", {
-            status: 404,
-          });
-    }
-    if (path === "/install.ps1") {
-      const obj = await env.RELEASES_BUCKET.get("scripts/install.ps1");
-      return obj
-        ? new Response(obj.body, {
-            headers: {
-              "Content-Type": "text/plain; charset=utf-8",
-              "Cache-Control": "public, max-age=300",
-            },
-          })
-        : new Response("Installer unavailable — run deploy to populate scripts/install.ps1\n", {
-            status: 404,
-          });
-    }
+  if (path === "/icon.svg" || path === "/favicon.svg") {
+    return new Response(MONOGRAM_SVG, {
+      headers: {
+        "Content-Type": "image/svg+xml; charset=utf-8",
+        "Cache-Control": "public, max-age=86400",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
+  if (path === "/favicon.ico") return Response.redirect("https://aphrody.com/favicon.ico", 301);
+  if (path === "/apple-touch-icon.png") return Response.redirect("https://aphrody.com/apple-touch-icon.png", 301);
+  if (path === "/robots.txt") {
+    return new Response("User-agent: *\nAllow: /\n", {
+      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600" },
+    });
+  }
+  if (path === "/api/channels") {
+    return Response.json(
+      { channels: [...VALID_CHANNELS], latest_endpoint: "/api/releases/{channel}/latest" },
+      { headers: { "Cache-Control": "public, max-age=60" } },
+    );
+  }
+  if (path === "/api/design") {
+    return Response.json(
+      {
+        source_of_truth: "https://design.google/",
+        system: "Material 3 Expressive + Neural Obsidian",
+        modes: ["neural", "dark", "light", "oled"],
+        channels: [...VALID_CHANNELS],
+        mobile: { ios: "gpui_ios + NativeShell.xcframework", android: "nsh-platform-android Vulkan .aar" },
+        store_targets: 22,
+      },
+      { headers: { "Cache-Control": "public, max-age=300" } },
+    );
+  }
+  if (path === "/" || path === "/download" || path === "/download/") {
+    return renderDownloadPortal(request);
+  }
+  if (path === "/install.sh") {
+    const obj = await bucket?.get("scripts/install.sh");
+    return obj
+      ? new Response(obj.body, {
+          headers: { "Content-Type": "text/x-shellscript; charset=utf-8", "Cache-Control": "public, max-age=300" },
+        })
+      : new Response("Installer unavailable - run deploy to populate scripts/install.sh\n", { status: 404 });
+  }
+  if (path === "/install.ps1") {
+    const obj = await bucket?.get("scripts/install.ps1");
+    return obj
+      ? new Response(obj.body, {
+          headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=300" },
+        })
+      : new Response("Installer unavailable - run deploy to populate scripts/install.ps1\n", { status: 404 });
+  }
 
-    const assetMatch = /^\/releases\/([^/]+)\/([^/]+)\/asset$/.exec(path);
-    if (assetMatch) {
-      const [, rawChannel, version] = assetMatch;
-      const channel = rawChannel.toLowerCase();
-      if (!VALID_CHANNELS.has(channel)) return new Response("Invalid channel", { status: 400 });
-      const os = url.searchParams.get("os") ?? "windows";
-      const arch = url.searchParams.get("arch") ?? "x86_64";
-      const obj = await env.RELEASES_BUCKET.get(`manifests/${channel}/${version}/${os}-${arch}.json`);
-      return obj
-        ? new Response(obj.body, { headers: { "Content-Type": "application/json; charset=utf-8" } })
-        : new Response("Manifest not found", { status: 404 });
-    }
+  const assetMatch = /^\/releases\/([^/]+)\/([^/]+)\/asset$/.exec(path);
+  if (assetMatch) {
+    const [, rawChannel, version] = assetMatch;
+    const channel = rawChannel.toLowerCase();
+    if (!VALID_CHANNELS.has(channel)) return new Response("Invalid channel", { status: 400 });
+    const os = url.searchParams.get("os") ?? "windows";
+    const arch = url.searchParams.get("arch") ?? "x86_64";
+    const obj = await bucket?.get(`manifests/${channel}/${version}/${os}-${arch}.json`);
+    return obj
+      ? new Response(obj.body, { headers: { "Content-Type": "application/json; charset=utf-8" } })
+      : new Response("Manifest not found", { status: 404 });
+  }
 
-    const latestMatch = /^\/api\/releases\/([^/]+)\/latest$/.exec(path);
-    if (latestMatch) {
-      const channel = latestMatch[1].toLowerCase();
-      if (!VALID_CHANNELS.has(channel)) return new Response("Invalid channel", { status: 400 });
-      const obj = await env.RELEASES_BUCKET.get(`channels/${channel}/latest.json`);
-      return obj
-        ? new Response(obj.body, { headers: { "Content-Type": "application/json; charset=utf-8" } })
-        : new Response("Channel manifest not found", { status: 404 });
-    }
+  const latestMatch = /^\/api\/releases\/([^/]+)\/latest$/.exec(path);
+  if (latestMatch) {
+    const channel = latestMatch[1].toLowerCase();
+    if (!VALID_CHANNELS.has(channel)) return new Response("Invalid channel", { status: 400 });
+    const obj = await bucket?.get(`channels/${channel}/latest.json`);
+    return obj
+      ? new Response(obj.body, { headers: { "Content-Type": "application/json; charset=utf-8" } })
+      : new Response("Channel manifest not found", { status: 404 });
+  }
 
-    if (path.startsWith("/assets/")) {
-      const key = path.slice("/assets/".length);
-      const obj = await env.RELEASES_BUCKET.get(key);
-      if (!obj) return new Response("Asset not found", { status: 404 });
-      const headers = new Headers({ "Cache-Control": "public, max-age=31536000, immutable" });
-      obj.writeHttpMetadata?.(headers);
-      if (obj.httpEtag) headers.set("etag", obj.httpEtag);
-      return new Response(obj.body, { headers });
-    }
+  if (path.startsWith("/assets/")) {
+    const key = path.slice("/assets/".length);
+    const obj = await bucket?.get(key);
+    if (!obj) return new Response("Asset not found", { status: 404 });
+    const headers = new Headers({ "Cache-Control": "public, max-age=31536000, immutable" });
+    obj.writeHttpMetadata?.(headers);
+    if (obj.httpEtag) headers.set("etag", obj.httpEtag);
+    return new Response(request.method === "HEAD" ? null : obj.body, { headers });
+  }
 
-    return new Response("Not Found", { status: 404 });
-  },
-};
+  return new Response("Not Found", { status: 404 });
+}

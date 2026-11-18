@@ -154,7 +154,12 @@ impl Render for HelloWorld {
                                             .hover(|style| style.opacity(0.5))
                                     })),
                             )
-                            .child(img("image/black-cat-typing.gif").size_12()),
+                            .when(
+                                std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                                    .join("examples/image/black-cat-typing.gif")
+                                    .is_file(),
+                                |this| this.child(img("image/black-cat-typing.gif").size_12()),
+                            ),
                     ),
             )
     }

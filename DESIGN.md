@@ -93,6 +93,19 @@ Derived from [*Google Sans: Evolving Google's Typeface*](https://design.google/l
 - **UI Display & Controls**: `Google Sans Flex` with continuous axes `opsz` (6..144), `wght` (100..1000), `wdth` (25..151), `GRAD` (-50..200), `slnt` (-10..0), and `ROND` (0..100).
 - **Code & Terminal Buffers**: `JetBrains Mono` / `Roboto Mono` / `.AphrodyMono` for unambiguous code legibility where proportional sans stops.
 
+## Mirrored References (native GPUI)
+
+Each reference resolves to tokens in `assets/os/google_design_tokens.toml` and a `RenderOnce` component in `crates/aphrody_ui/src/google_design_components.rs`:
+
+| Reference | Tokens | GPUI component |
+| --- | --- | --- |
+| [Transparent Screens](https://design.google/library/transparent-screens) | `ref.palette.glimmer_*`, `comp.glimmer_hud` | `TransparentHudCard` |
+| [Gemini visual design](https://design.google/library/gemini-ai-visual-design) | `ref.palette.gemini_*`, `comp.gemini_spectrum` | `GeminiSpectrumCard` |
+| [YouTube new red](https://design.google/library/youtube-new-red-color) | `ref.palette.youtube_*`, `comp.youtube_scrubber` | `YoutubeGradientScrubber` |
+| [Googlebook](https://googlebook.google/) | `ref.palette.googlebook_*`, `comp.googlebook_glowbar` | `GlowbarShellCard` |
+| [OpenBook](https://openbook.page/) / [Quire](https://github.com/Mhsbrian/OpenBook) | `ref.palette.quire_*`, `sys.motion.springs.quire_*`, `comp.quire_glass_note` | `QuireGlassNote` |
+| [Angular Material](https://material.angular.dev/components/categories), [Flutter Material](https://docs.flutter.dev/ui/widgets/material), [Compose Material](https://developer.android.com/jetpack/androidx/releases/compose-material), [Figma M3 kit](https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833) | `sys.color.*`, `sys.shape.*` | `MaterialComponentMatrix` |
+
 ```yaml
 stitch:
   preserve_data_stitch_id: true

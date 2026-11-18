@@ -31,7 +31,7 @@ flowchart TD
 | `bun` | `aphrody-labs/bun` | Runtime, Bundler, NSH | [`tooling/bun/design-docs-pack.ts`](../../tooling/bun/design-docs-pack.ts) |
 | `browser` | `aphrody-labs/browser` | GPUI Chromium + WebGPU | [`crates/aphrody_browser`](../../crates/aphrody_browser/Cargo.toml) |
 | `open` | `aphrody-labs/open` | CDP, TUI, Tunnel | [`crates/aphrody_pilot/src/browser.rs`](../../crates/aphrody_pilot/src/browser.rs) |
-| `auto` | `aphrody-labs/auto` | CI/CD & Cloudflare Edge | [`.cloudflare/aphrody-releases/src/worker.ts`](../../.cloudflare/aphrody-releases/src/worker.ts) |
+| `auto` | `aphrody-labs/auto` | CI/CD & Cloudflare Edge | [`.cloudflare/aphrody-worker/src/index.ts`](../../.cloudflare/aphrody-worker/src/index.ts) |
 | `nie` | `aphrody-labs/nie` | Bevy 0.20 + Unreal 5.8 | [`crates/bevy_gpui`](../../crates/bevy_gpui/Cargo.toml) |
 | `shenron` | `aphrody-labs/shenron` | Multimodal Voice & AI UI | [`crates/aphrody_ui/src/google_design_components.rs`](../../crates/aphrody_ui/src/google_design_components.rs) |
 

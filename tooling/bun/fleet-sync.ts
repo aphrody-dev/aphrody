@@ -535,7 +535,7 @@ async function runEndToEndDeploy(
         runChecked([...wrangler, "r2", "object", "put", key, "--file", file, "--content-type", ct, "--remote"], repoRoot);
       }
     }
-    return { cloudflareWorker: "aphrody-releases", channel, version, dryRun, ok: true };
+    return { cloudflareWorker: "aphrody-worker", channel, version, dryRun, ok: true };
   })();
 
   const [edgeOut, cfOut] = await Promise.all([pushEdgePromise, cfPromise]);

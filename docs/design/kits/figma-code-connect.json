@@ -1,6 +1,43 @@
 {
   "version": "3.0.0",
   "figmaFileHint": "Aphrody Labs Design System v3.0",
+  "material3Kit": {
+    "fileKey": "vEr6T5SQaJfMpLxjMUfD55",
+    "nodeId": "11:1833",
+    "url": "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833"
+  },
+  "referenceMirrors": [
+    {
+      "id": "TransparentHudCard",
+      "gpui": "aphrody_ui::google_design_mirror::TransparentHudCard",
+      "sourceUrl": "https://design.google/library/transparent-screens"
+    },
+    {
+      "id": "GeminiSpectrumCard",
+      "gpui": "aphrody_ui::google_design_mirror::GeminiSpectrumCard",
+      "sourceUrl": "https://design.google/library/gemini-ai-visual-design"
+    },
+    {
+      "id": "YoutubeGradientScrubber",
+      "gpui": "aphrody_ui::google_design_mirror::YoutubeGradientScrubber",
+      "sourceUrl": "https://design.google/library/youtube-new-red-color"
+    },
+    {
+      "id": "GlowbarShellCard",
+      "gpui": "aphrody_ui::google_design_mirror::GlowbarShellCard",
+      "sourceUrl": "https://googlebook.google/"
+    },
+    {
+      "id": "QuireGlassNote",
+      "gpui": "aphrody_ui::google_design_mirror::QuireGlassNote",
+      "sourceUrl": "https://github.com/Mhsbrian/OpenBook"
+    },
+    {
+      "id": "MaterialComponentMatrix",
+      "gpui": "aphrody_ui::google_design_mirror::MaterialComponentMatrix",
+      "sourceUrl": "https://docs.flutter.dev/ui/widgets/material"
+    }
+  ],
   "sourceOfTruth": "https://design.google/",
   "mappings": [
     {

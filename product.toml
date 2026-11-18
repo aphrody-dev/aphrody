@@ -70,6 +70,8 @@ upstream_modern_web_guidance = "https://github.com/GoogleChrome/modern-web-guida
 upstream_design_md = "https://github.com/google-labs-code/design.md.git"
 upstream_stitch_sdk = "https://github.com/google-labs-code/stitch-sdk.git"
 upstream_stitch_skills = "https://github.com/google-labs-code/stitch-skills.git"
+upstream_agent_browser = "https://github.com/aphrody-labs/agent-browser.git"
+upstream_agent_desktop = "https://github.com/aphrody-labs/agent-desktop.git"
 submodule_bun = "https://github.com/aphrody-labs/bun"
 
 [features]

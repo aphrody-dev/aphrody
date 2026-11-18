@@ -192,6 +192,34 @@ export function buildCanonicalDesignTokens(
         bolt10: "#3A2500",
         bolt50: "#FFB300",
         neural_indigo: "#111B3A",
+        glimmer_void: "#000000",
+        glimmer_surface: "#12110C",
+        glimmer_container: "#32302A",
+        glimmer_gold: "#FAE366",
+        glimmer_mint: "#C3ECD0",
+        glimmer_lime: "#BFF28D",
+        glimmer_coral: "#FFDAD3",
+        gemini_blue: "#4285F4",
+        gemini_violet: "#9B72CB",
+        gemini_rose: "#D96570",
+        gemini_peach: "#FFDCC1",
+        youtube_red: "#FF0033",
+        youtube_magenta: "#FF2C9C",
+        youtube_pink: "#FF8099",
+        youtube_dark: "#0F0F0F",
+        googlebook_blue: "#4285F4",
+        googlebook_red: "#EA4335",
+        googlebook_yellow: "#FBBC05",
+        googlebook_green: "#34A853",
+        googlebook_cyan: "#25F4EE",
+        googlebook_magenta: "#FE2C55",
+        quire_folio_light: "#FBF8FF",
+        quire_folio_dark: "#121318",
+        quire_rim_1: "#7E8CFF",
+        quire_rim_2: "#C58BFF",
+        quire_rim_3: "#FF7A9C",
+        quire_rim_4: "#FFB38A",
+        quire_rim_5: "#8FD6FF",
       },
       typeface: {
         brand: "Google Sans Flex, Google Sans, Inter, system-ui, sans-serif",
@@ -347,6 +375,11 @@ export function buildCanonicalDesignTokens(
           effects_fast: { stiffness: 3800.0, damping_ratio: 1.0 },
           effects_default: { stiffness: 1600.0, damping_ratio: 1.0 },
           effects_slow: { stiffness: 800.0, damping_ratio: 1.0 },
+          quire_unfold: { stiffness: 380.0, damping_ratio: 0.8 },
+          quire_settle: { stiffness: 700.0, damping_ratio: 0.9 },
+          quire_expand: { stiffness: 300.0, damping_ratio: 0.85 },
+          quire_fold: { stiffness: 900.0, damping_ratio: 1.0 },
+          quire_tick: { stiffness: 1400.0, damping_ratio: 0.7 },
         },
       },
       shape: {
@@ -530,6 +563,38 @@ export function buildCanonicalDesignTokens(
         secondary_accent_color_role: "tertiary",
         shape: "large_px",
       },
+      glimmer_hud: {
+        container_color_hex: "#12110C",
+        elevated_container_hex: "#32302A",
+        min_visual_angle_deg: 0.6,
+        shape: "large_increased_px",
+        anti_halation: 1,
+      },
+      gemini_spectrum: {
+        stop_start_hex: "#4285F4",
+        stop_mid_hex: "#9B72CB",
+        stop_end_hex: "#D96570",
+        spark_radius_px: 12,
+      },
+      youtube_scrubber: {
+        brand_red_hex: "#FF0033",
+        gradient_magenta_hex: "#FF2C9C",
+        gradient_angle_deg: 45,
+        track_height_px: 6,
+      },
+      googlebook_glowbar: {
+        height_px: 36,
+        g_key_radius_px: 9999,
+        rambler_pill_radius_px: 20,
+      },
+      quire_glass_note: {
+        blur_dp: 34,
+        tint_opacity: 0.8,
+        economy_paper_opacity: 0.96,
+        rim_width_dp: 1.5,
+        card_radius_px: 28,
+        pill_radius_px: 9999,
+      },
     },
   };
 }
@@ -695,6 +760,90 @@ const DEFAULT_ARTICLES: DesignArticleSnapshot[] = [
     summary:
       "Guides Aphrody's dual typography strategy: Google Sans Flex (6 variable axes opsz/wght/wdth/GRAD/slnt/ROND) for brand display and UI chrome paired with dedicated monospace fonts (JetBrains Mono / Zed Mono) for code buffers.",
   },
+  {
+    url: "https://design.google/library/transparent-screens",
+    title: "Designing for Transparent Screens",
+    description:
+      "How Google designed the Glimmer language for additive, see-through displays where black renders as transparent.",
+    headings: [
+      "Black is transparent",
+      "Dark containers over bright worlds",
+      "Glanceable type at a minimum visual angle",
+      "Avoiding halation",
+    ],
+    summary:
+      "Maps to TransparentHudCard and the xr-glimmer theme: black void as transparency, #12110C / #32302A containers, warm gold/mint/lime accents, Google Sans Flex glanceable preset (opsz 10, wght 600, GRAD 20).",
+  },
+  {
+    url: "https://design.google/library/gemini-ai-visual-design",
+    title: "Gemini's Visual Design",
+    description:
+      "The gradient, shape, and motion language that expresses Gemini as a responsive AI collaborator.",
+    headings: ["Gradients as energy", "Shapes that breathe", "Motion that thinks"],
+    summary:
+      "Maps to GeminiSpectrumCard: blue #4285F4 to violet #9B72CB to rose #D96570 spectrum resolved from ref.palette, thinking state expressed with an effects spring, never with color alone.",
+  },
+  {
+    url: "https://design.google/library/youtube-new-red-color",
+    title: "YouTube's New Red",
+    description:
+      "Why YouTube shifted its red toward magenta and introduced a gradient across the progress bar and key surfaces.",
+    headings: ["A brighter red", "Red to magenta", "The progress bar gradient"],
+    summary:
+      "Maps to YoutubeGradientScrubber: #FF0033 to #FF2C9C gradient on the played range, neutral buffered range, controlled value with keyboard-accessible seek steps.",
+  },
+  {
+    url: "https://googlebook.google/",
+    title: "Googlebook",
+    description: "Googlebook laptop product surface with the four-color glow bar and Gemini-forward shell.",
+    headings: ["Glow bar", "Gemini built in", "Material 3 Expressive shell"],
+    summary:
+      "Maps to GlowbarShellCard: four Google brand stops (blue, red, yellow, green) as a hairline glow bar above a launcher shell, theme roles for every text surface.",
+  },
+  {
+    url: "https://openbook.page/",
+    title: "OpenBook",
+    description: "OpenBook agent-first notebook shell built on the Quire glass design language.",
+    headings: ["Quire glass notes", "Undo every step", "Destructive-only consent"],
+    summary:
+      "Maps to QuireGlassNote: blurred glass surface (34dp, 80% tint) with a conic rim, per-step Undo, consent card only for destructive operations, quiet line naming the agent, intake source, and Esc.",
+  },
+  {
+    url: "https://github.com/Mhsbrian/OpenBook",
+    title: "OpenBook (Mhsbrian/OpenBook) Quire design document",
+    description: "Source of the Quire specification: glass, paper/ink economy mode, rim gradient, and spring table.",
+    headings: ["Glass", "Paper and ink", "Rim", "Springs", "Consent"],
+    summary:
+      "Spring table quire_unfold 380/0.8, quire_settle 700/0.9, quire_expand 300/0.85, quire_fold 900/1.0, quire_tick 1400/0.7 and economy fallback paper opacity 0.96 are tokenized under sys.motion.springs and comp.quire_glass_note.",
+  },
+  {
+    url: "https://material.angular.dev/components/categories",
+    title: "Angular Material component categories",
+    description: "Angular Material components grouped by Form controls, Navigation, Layout, Buttons and indicators, Popups and modals, Data table.",
+    headings: ["Form Controls", "Navigation", "Layout", "Buttons & Indicators", "Popups & Modals", "Data table"],
+    summary: "One column of MaterialComponentMatrix: each category maps to the equivalent native GPUI component.",
+  },
+  {
+    url: "https://docs.flutter.dev/ui/widgets/material",
+    title: "Flutter Material Components widgets",
+    description: "Flutter widgets implementing Material 3: Actions, Communication, Containment, Navigation, Selection, Text inputs.",
+    headings: ["Actions", "Communication", "Containment", "Navigation", "Selection", "Text inputs"],
+    summary: "Defines the six Material 3 categories used as rows of MaterialComponentMatrix.",
+  },
+  {
+    url: "https://developer.android.com/jetpack/androidx/releases/compose-material?hl=fr",
+    title: "Compose Material releases",
+    description: "Jetpack Compose Material and Material 3 release notes and component availability.",
+    headings: ["Compose Material", "Material 3", "Expressive components"],
+    summary: "One column of MaterialComponentMatrix with Compose composables per Material 3 category.",
+  },
+  {
+    url: "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
+    title: "Material 3 Design Kit (Community)",
+    description: "Official Material 3 Figma kit, file key vEr6T5SQaJfMpLxjMUfD55, node 11:1833; local archive docs/design/Material 3 Design Kit (Community).zip.",
+    headings: ["Styles", "Components", "Variables"],
+    summary: "Figma column of MaterialComponentMatrix and figmaFileHint for Code Connect mappings in docs/design.",
+  },
 ];
 
 export function renderDesignMdFromTokens(doc: GoogleDesignTokenDocument): string {
@@ -795,6 +944,19 @@ Derived from [*Google Sans: Evolving Google's Typeface*](https://design.google/l
 - **UI Display & Controls**: \`Google Sans Flex\` with continuous axes \`opsz\` (6..144), \`wght\` (100..1000), \`wdth\` (25..151), \`GRAD\` (-50..200), \`slnt\` (-10..0), and \`ROND\` (0..100).
 - **Code & Terminal Buffers**: \`JetBrains Mono\` / \`Roboto Mono\` / \`.AphrodyMono\` for unambiguous code legibility where proportional sans stops.
 
+## Mirrored References (native GPUI)
+
+Each reference resolves to tokens in \`assets/os/google_design_tokens.toml\` and a \`RenderOnce\` component in \`crates/aphrody_ui/src/google_design_components.rs\`:
+
+| Reference | Tokens | GPUI component |
+| --- | --- | --- |
+| [Transparent Screens](https://design.google/library/transparent-screens) | \`ref.palette.glimmer_*\`, \`comp.glimmer_hud\` | \`TransparentHudCard\` |
+| [Gemini visual design](https://design.google/library/gemini-ai-visual-design) | \`ref.palette.gemini_*\`, \`comp.gemini_spectrum\` | \`GeminiSpectrumCard\` |
+| [YouTube new red](https://design.google/library/youtube-new-red-color) | \`ref.palette.youtube_*\`, \`comp.youtube_scrubber\` | \`YoutubeGradientScrubber\` |
+| [Googlebook](https://googlebook.google/) | \`ref.palette.googlebook_*\`, \`comp.googlebook_glowbar\` | \`GlowbarShellCard\` |
+| [OpenBook](https://openbook.page/) / [Quire](https://github.com/Mhsbrian/OpenBook) | \`ref.palette.quire_*\`, \`sys.motion.springs.quire_*\`, \`comp.quire_glass_note\` | \`QuireGlassNote\` |
+| [Angular Material](https://material.angular.dev/components/categories), [Flutter Material](https://docs.flutter.dev/ui/widgets/material), [Compose Material](https://developer.android.com/jetpack/androidx/releases/compose-material), [Figma M3 kit](https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833) | \`sys.color.*\`, \`sys.shape.*\` | \`MaterialComponentMatrix\` |
+
 \`\`\`yaml
 stitch:
   preserve_data_stitch_id: true
@@ -859,51 +1021,39 @@ export async function syncGoogleDesignTokens(
   designMdPath = DEFAULT_DESIGN_MD_PATH,
 ): Promise<{ path: string; reachable: boolean; source: string; sitemapCount: number }> {
   let reachable = false;
-  let urls: Array<{ loc: string; lastmod: string; priority: string }> = [
-    {
-      loc: "https://design.google/library/code-is-a-design-material",
-      lastmod: "2026-01-01",
-      priority: "0.9",
-    },
-    {
-      loc: "https://design.google/library/google-sans-flex-font",
-      lastmod: "2026-01-01",
-      priority: "0.9",
-    },
-  ];
+  let urls: Array<{ loc: string; lastmod: string; priority: string }> = DEFAULT_ARTICLES.filter((article) =>
+    article.url.startsWith("https://design.google/"),
+  ).map((article) => ({ loc: article.url, lastmod: "2026-01-01", priority: "0.9" }));
   const articles: DesignArticleSnapshot[] = [...DEFAULT_ARTICLES];
+  const headers = { "User-Agent": "Aphrody-Design-Sync/1.0" };
 
   if (!offline) {
     try {
-      const [rootRes, sitemapRes, codeRes, fontRes] = await Promise.all([
-        fetch(DESIGN_SOURCE_URL, { headers: { "User-Agent": "Aphrody-Design-Sync/1.0" } }),
-        fetch("https://design.google/sitemap.xml", {
-          headers: { "User-Agent": "Aphrody-Design-Sync/1.0" },
-        }),
-        fetch(DEFAULT_ARTICLES[0].url, { headers: { "User-Agent": "Aphrody-Design-Sync/1.0" } }),
-        fetch(DEFAULT_ARTICLES[1].url, { headers: { "User-Agent": "Aphrody-Design-Sync/1.0" } }),
+      const [rootRes, sitemapRes] = await Promise.all([
+        fetch(DESIGN_SOURCE_URL, { headers, signal: AbortSignal.timeout(15_000) }),
+        fetch("https://design.google/sitemap.xml", { headers, signal: AbortSignal.timeout(15_000) }),
       ]);
       reachable = rootRes.ok;
       if (sitemapRes.ok) {
         const parsed = parseSitemapXmlUrls(await sitemapRes.text());
         if (parsed.length > 0) urls = parsed;
       }
-      if (codeRes.ok) {
-        articles[0] = extractHtmlSummary(
-          DEFAULT_ARTICLES[0].url,
-          await codeRes.text(),
-          DEFAULT_ARTICLES[0],
-        );
-      }
-      if (fontRes.ok) {
-        articles[1] = extractHtmlSummary(
-          DEFAULT_ARTICLES[1].url,
-          await fontRes.text(),
-          DEFAULT_ARTICLES[1],
-        );
-      }
     } catch {
       reachable = false;
+    }
+    // Figma requires a session and returns an app shell; its curated entry is kept as authored.
+    const fetchable = DEFAULT_ARTICLES.map((article, articleIx) => ({ article, articleIx })).filter(
+      ({ article }) => !article.url.startsWith("https://www.figma.com/"),
+    );
+    const settled = await Promise.allSettled(
+      fetchable.map(async ({ article, articleIx }) => {
+        const response = await fetch(article.url, { headers, signal: AbortSignal.timeout(15_000) });
+        if (!response.ok) throw new Error(`${article.url} -> HTTP ${response.status}`);
+        return { articleIx, snapshot: extractHtmlSummary(article.url, await response.text(), article) };
+      }),
+    );
+    for (const result of settled) {
+      if (result.status === "fulfilled") articles[result.value.articleIx] = result.value.snapshot;
     }
   }
 
@@ -943,6 +1093,36 @@ export async function syncGoogleDesignTokens(
         url: "https://github.com/google-labs-code/stitch-skills",
         license: "Apache-2.0",
         role: "Stitch MCP workflows (data-stitch-id tracking, DESIGN.md synthesis, TSX extraction)",
+      },
+      {
+        repo: "Mhsbrian/OpenBook",
+        url: "https://github.com/Mhsbrian/OpenBook",
+        license: "See upstream repository",
+        role: "Quire glass design document mirrored as QuireGlassNote, quire_* springs and comp.quire_glass_note",
+      },
+      {
+        repo: "angular/components",
+        url: "https://github.com/angular/components",
+        license: "MIT",
+        role: "Angular Material component categories mapped in MaterialComponentMatrix",
+      },
+      {
+        repo: "flutter/flutter",
+        url: "https://github.com/flutter/flutter",
+        license: "BSD-3-Clause",
+        role: "Flutter Material 3 widget categories mapped in MaterialComponentMatrix",
+      },
+      {
+        repo: "androidx/androidx (compose-material3)",
+        url: "https://developer.android.com/jetpack/androidx/releases/compose-material3",
+        license: "Apache-2.0",
+        role: "Jetpack Compose Material 3 composables mapped in MaterialComponentMatrix",
+      },
+      {
+        repo: "Figma Material 3 Design Kit (Community)",
+        url: "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
+        license: "CC BY 4.0",
+        role: "Figma variables and component sets referenced by docs/design figma kit and Code Connect mappings",
       },
     ],
     stitch_routes: [

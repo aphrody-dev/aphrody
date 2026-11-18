@@ -257,6 +257,258 @@
           ]
         }
       },
+      "glimmer_void": {
+        "$type": "color",
+        "$value": "#000000",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "glimmer_surface": {
+        "$type": "color",
+        "$value": "#12110C",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "glimmer_container": {
+        "$type": "color",
+        "$value": "#32302A",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "glimmer_gold": {
+        "$type": "color",
+        "$value": "#FAE366",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "glimmer_mint": {
+        "$type": "color",
+        "$value": "#C3ECD0",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "glimmer_lime": {
+        "$type": "color",
+        "$value": "#BFF28D",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "glimmer_coral": {
+        "$type": "color",
+        "$value": "#FFDAD3",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "gemini_blue": {
+        "$type": "color",
+        "$value": "#4285F4",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "gemini_violet": {
+        "$type": "color",
+        "$value": "#9B72CB",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "gemini_rose": {
+        "$type": "color",
+        "$value": "#D96570",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "gemini_peach": {
+        "$type": "color",
+        "$value": "#FFDCC1",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "youtube_red": {
+        "$type": "color",
+        "$value": "#FF0033",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "youtube_magenta": {
+        "$type": "color",
+        "$value": "#FF2C9C",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "youtube_pink": {
+        "$type": "color",
+        "$value": "#FF8099",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "youtube_dark": {
+        "$type": "color",
+        "$value": "#0F0F0F",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "googlebook_blue": {
+        "$type": "color",
+        "$value": "#4285F4",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "googlebook_red": {
+        "$type": "color",
+        "$value": "#EA4335",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "googlebook_yellow": {
+        "$type": "color",
+        "$value": "#FBBC05",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "googlebook_green": {
+        "$type": "color",
+        "$value": "#34A853",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "googlebook_cyan": {
+        "$type": "color",
+        "$value": "#25F4EE",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "googlebook_magenta": {
+        "$type": "color",
+        "$value": "#FE2C55",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_folio_light": {
+        "$type": "color",
+        "$value": "#FBF8FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_folio_dark": {
+        "$type": "color",
+        "$value": "#121318",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_rim_1": {
+        "$type": "color",
+        "$value": "#7E8CFF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_rim_2": {
+        "$type": "color",
+        "$value": "#C58BFF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_rim_3": {
+        "$type": "color",
+        "$value": "#FF7A9C",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_rim_4": {
+        "$type": "color",
+        "$value": "#FFB38A",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "quire_rim_5": {
+        "$type": "color",
+        "$value": "#8FD6FF",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
       "channel-lts": {
         "$type": "color",
         "$value": "#BAE6FD"
@@ -1233,6 +1485,26 @@
       "effects_slow": {
         "stiffness": 800,
         "damping_ratio": 1
+      },
+      "quire_unfold": {
+        "stiffness": 380,
+        "damping_ratio": 0.8
+      },
+      "quire_settle": {
+        "stiffness": 700,
+        "damping_ratio": 0.9
+      },
+      "quire_expand": {
+        "stiffness": 300,
+        "damping_ratio": 0.85
+      },
+      "quire_fold": {
+        "stiffness": 900,
+        "damping_ratio": 1
+      },
+      "quire_tick": {
+        "stiffness": 1400,
+        "damping_ratio": 0.7
       }
     }
   },
@@ -1445,6 +1717,78 @@
       ],
       "autoLayout": "HORIZONTAL",
       "radiusToken": "large_px"
+    }
+  ],
+  "material3Kit": {
+    "name": "Material 3 Design Kit (Community)",
+    "fileKey": "vEr6T5SQaJfMpLxjMUfD55",
+    "nodeId": "11:1833",
+    "url": "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
+    "localArchive": "docs/design/Material 3 Design Kit (Community).zip",
+    "r2Manifest": "assets/os/r2_assets_manifest.toml",
+    "license": "CC BY 4.0"
+  },
+  "referenceMirrors": [
+    {
+      "id": "TransparentHudCard",
+      "sourceUrl": "https://design.google/library/transparent-screens",
+      "gpui": "aphrody_ui::google_design_mirror::TransparentHudCard",
+      "tokens": [
+        "ref.palette.glimmer_*",
+        "comp.glimmer_hud"
+      ],
+      "theme": "xr-glimmer"
+    },
+    {
+      "id": "GeminiSpectrumCard",
+      "sourceUrl": "https://design.google/library/gemini-ai-visual-design",
+      "gpui": "aphrody_ui::google_design_mirror::GeminiSpectrumCard",
+      "tokens": [
+        "ref.palette.gemini_*",
+        "comp.gemini_spectrum"
+      ],
+      "theme": "gemini-ai"
+    },
+    {
+      "id": "YoutubeGradientScrubber",
+      "sourceUrl": "https://design.google/library/youtube-new-red-color",
+      "gpui": "aphrody_ui::google_design_mirror::YoutubeGradientScrubber",
+      "tokens": [
+        "ref.palette.youtube_*",
+        "comp.youtube_scrubber"
+      ],
+      "theme": "youtube-red"
+    },
+    {
+      "id": "GlowbarShellCard",
+      "sourceUrl": "https://googlebook.google/",
+      "gpui": "aphrody_ui::google_design_mirror::GlowbarShellCard",
+      "tokens": [
+        "ref.palette.googlebook_*",
+        "comp.googlebook_glowbar"
+      ],
+      "theme": "google-expressive"
+    },
+    {
+      "id": "QuireGlassNote",
+      "sourceUrl": "https://github.com/Mhsbrian/OpenBook",
+      "gpui": "aphrody_ui::google_design_mirror::QuireGlassNote",
+      "tokens": [
+        "ref.palette.quire_*",
+        "sys.motion.springs.quire_*",
+        "comp.quire_glass_note"
+      ],
+      "theme": "openbook-quire"
+    },
+    {
+      "id": "MaterialComponentMatrix",
+      "sourceUrl": "https://docs.flutter.dev/ui/widgets/material",
+      "gpui": "aphrody_ui::google_design_mirror::MaterialComponentMatrix",
+      "tokens": [
+        "sys.color.*",
+        "sys.shape.*"
+      ],
+      "theme": "m3"
     }
   ]
 }

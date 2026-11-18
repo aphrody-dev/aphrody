@@ -5,7 +5,7 @@ import { parseGitmodules } from "./submodules.ts";
 import { checkRepoHygiene } from "./repo-hygiene.ts";
 import { worktreePaths } from "./worktree.ts";
 import { CROSS_MATRIX } from "./cross-build.ts";
-import releaseWorker, { detectPlatform, renderDownloadPortal } from "../../.cloudflare/aphrody-releases/src/worker.ts";
+import releaseWorker, { detectPlatform, renderDownloadPortal } from "../../.cloudflare/aphrody-worker/src/index.ts";
 
 const repoRoot = resolve(import.meta.dir, "../..");
 

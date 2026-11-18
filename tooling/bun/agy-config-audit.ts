@@ -139,12 +139,12 @@ function resolveAgyBin(home: string): string {
   return Bun.which("agy") ?? "agy";
 }
 
-export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAuditReport {
+export function auditLiveEnvironment(repoRoot: string, home = homedir(), repoOnly = false): AgyAuditReport {
   const geminiRoot = join(home, ".gemini");
   const checks: AgyCheckResult[] = [];
   const agyBin = resolveAgyBin(home);
   const settingsPath = join(geminiRoot, "antigravity-cli", "settings.json");
-  const hasWorkstationGemini = existsSync(settingsPath);
+  const hasWorkstationGemini = !repoOnly && existsSync(settingsPath);
 
   if (hasWorkstationGemini) {
     const verRes = Bun.spawnSync([agyBin, "--version"], { stdout: "pipe", stderr: "pipe", stdin: "ignore" });
@@ -334,7 +334,7 @@ export function auditLiveEnvironment(repoRoot: string, home = homedir()): AgyAud
 
 if (import.meta.main) {
   const repoRoot = resolve(import.meta.dir, "..", "..");
-  const report = auditLiveEnvironment(repoRoot);
+  const report = auditLiveEnvironment(repoRoot, homedir(), Bun.argv.includes("--repo-only"));
   if (Bun.argv.includes("--json")) {
     console.log(JSON.stringify(report, null, 2));
   } else {

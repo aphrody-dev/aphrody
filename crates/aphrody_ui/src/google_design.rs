@@ -174,6 +174,33 @@ impl GoogleSansFlexAxes {
         }
     }
 
+    /// Glanceable preset for additive transparent displays (`design.google/library/transparent-screens`):
+    /// positive grade and weight keep strokes legible over bright backgrounds without halation.
+    #[must_use]
+    pub fn xr_glimmer_glanceable() -> Self {
+        Self {
+            opsz: 10.0,
+            wght: 600.0,
+            wdth: 104.0,
+            grad: 20.0,
+            slnt: 0.0,
+            rond: 15.0,
+        }
+    }
+
+    /// Long-form reading preset for OpenBook Quire notes on glass or paper.
+    #[must_use]
+    pub fn quire_ink_body() -> Self {
+        Self {
+            opsz: 16.0,
+            wght: 420.0,
+            wdth: 100.0,
+            grad: 0.0,
+            slnt: 0.0,
+            rond: 8.0,
+        }
+    }
+
     #[must_use]
     pub fn css_font_variation_settings(&self) -> String {
         format!(
@@ -269,12 +296,33 @@ pub struct GoogleDesignTokens {
     #[serde(rename = "ref")]
     pub reference: RefTokens,
     pub sys: SysTokens,
+    #[serde(default)]
+    pub comp: BTreeMap<String, toml::Table>,
 }
 
 impl GoogleDesignTokens {
     pub fn bundled() -> Result<Self> {
         toml::from_str(BUNDLED_GOOGLE_DESIGN_TOKENS_TOML)
             .context("parsing bundled google_design_tokens.toml")
+    }
+
+    /// Resolves a `ref.palette` entry; brand reference colors live only in the token manifest.
+    #[must_use]
+    pub fn reference_hsla(&self, key: &str) -> Option<Hsla> {
+        self.reference
+            .palette
+            .get(key)
+            .and_then(|hex| theme::try_parse_color(hex.trim()).ok())
+    }
+
+    /// Reads a numeric `comp.<component>.<key>` token (integers are widened to `f32`).
+    #[must_use]
+    pub fn comp_number(&self, component: &str, key: &str) -> Option<f32> {
+        match self.comp.get(component)?.get(key)? {
+            toml::Value::Float(value) => Some(*value as f32),
+            toml::Value::Integer(value) => Some(*value as f32),
+            _ => None,
+        }
     }
 
     #[must_use]
@@ -401,6 +449,87 @@ impl GoogleDesignTokens {
     }
 }
 
+/// Brand reference colors and component metrics for the mirrored design.google references
+/// (Glimmer, Gemini, YouTube, Googlebook, OpenBook Quire), resolved once from `ref.palette` and `comp.*`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[non_exhaustive]
+pub struct MirrorAccentPalette {
+    pub glimmer_void: Hsla,
+    pub glimmer_surface: Hsla,
+    pub glimmer_container: Hsla,
+    pub glimmer_gold: Hsla,
+    pub glimmer_mint: Hsla,
+    pub glimmer_lime: Hsla,
+    pub gemini_spectrum: [Hsla; 3],
+    pub youtube_red: Hsla,
+    pub youtube_magenta: Hsla,
+    pub youtube_gradient_angle_deg: f32,
+    pub youtube_track_height_px: f32,
+    pub googlebook_glow: [Hsla; 4],
+    pub quire_rim: [Hsla; 5],
+    pub quire_folio_light: Hsla,
+    pub quire_folio_dark: Hsla,
+    pub quire_tint_opacity: f32,
+    pub quire_economy_paper_opacity: f32,
+    pub quire_rim_width_px: f32,
+    pub quire_card_radius_px: f32,
+}
+
+impl MirrorAccentPalette {
+    pub fn bundled() -> Result<Self> {
+        Self::from_tokens(&GoogleDesignTokens::bundled()?)
+    }
+
+    pub fn from_tokens(tokens: &GoogleDesignTokens) -> Result<Self> {
+        let color = |key: &str| {
+            tokens
+                .reference_hsla(key)
+                .with_context(|| format!("ref.palette.{key} missing or unparsable"))
+        };
+        let number = |component: &str, key: &str| {
+            tokens
+                .comp_number(component, key)
+                .with_context(|| format!("comp.{component}.{key} missing"))
+        };
+        Ok(Self {
+            glimmer_void: color("glimmer_void")?,
+            glimmer_surface: color("glimmer_surface")?,
+            glimmer_container: color("glimmer_container")?,
+            glimmer_gold: color("glimmer_gold")?,
+            glimmer_mint: color("glimmer_mint")?,
+            glimmer_lime: color("glimmer_lime")?,
+            gemini_spectrum: [
+                color("gemini_blue")?,
+                color("gemini_violet")?,
+                color("gemini_rose")?,
+            ],
+            youtube_red: color("youtube_red")?,
+            youtube_magenta: color("youtube_magenta")?,
+            youtube_gradient_angle_deg: number("youtube_scrubber", "gradient_angle_deg")?,
+            youtube_track_height_px: number("youtube_scrubber", "track_height_px")?,
+            googlebook_glow: [
+                color("googlebook_blue")?,
+                color("googlebook_red")?,
+                color("googlebook_yellow")?,
+                color("googlebook_green")?,
+            ],
+            quire_rim: [
+                color("quire_rim_1")?,
+                color("quire_rim_2")?,
+                color("quire_rim_3")?,
+                color("quire_rim_4")?,
+                color("quire_rim_5")?,
+            ],
+            quire_folio_light: color("quire_folio_light")?,
+            quire_folio_dark: color("quire_folio_dark")?,
+            quire_tint_opacity: number("quire_glass_note", "tint_opacity")?,
+            quire_economy_paper_opacity: number("quire_glass_note", "economy_paper_opacity")?,
+            quire_rim_width_px: number("quire_glass_note", "rim_width_dp")?,
+            quire_card_radius_px: number("quire_glass_note", "card_radius_px")?,
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -452,6 +581,40 @@ mod tests {
         assert!(!tokens.palette_by_name("neural_obsidian").is_empty());
         assert!(!tokens.palette_by_name("oled_pitch").is_empty());
         assert!(GoogleDesignTokens::bundled_design_md().is_ok());
+        Ok(())
+    }
+
+    #[test]
+    fn mirrored_reference_tokens_resolve_and_stay_legible() -> Result<()> {
+        let tokens = GoogleDesignTokens::bundled()?;
+        let accents = MirrorAccentPalette::from_tokens(&tokens)?;
+
+        for name in ["quire_unfold", "quire_settle", "quire_expand", "quire_fold", "quire_tick"] {
+            let spring = tokens
+                .spring(name)
+                .with_context(|| format!("{name} spring missing"))?;
+            assert!((spring.sample_position(3.0) - 1.0).abs() < 1e-2, "{name} does not settle");
+        }
+
+        for (foreground, background) in [
+            (accents.glimmer_gold, accents.glimmer_surface),
+            (accents.glimmer_mint, accents.glimmer_surface),
+            (accents.glimmer_gold, accents.glimmer_container),
+        ] {
+            let ratio = contrast_ratio(foreground, background);
+            assert!(ratio >= 4.5, "glimmer contrast {ratio:.2} < 4.5");
+        }
+
+        assert_eq!(accents.glimmer_void.l, 0.0);
+        assert_eq!(accents.youtube_gradient_angle_deg, 45.0);
+        assert!(accents.quire_economy_paper_opacity > accents.quire_tint_opacity);
+        assert_eq!(GoogleSansFlexAxes::xr_glimmer_glanceable().grad, 20.0);
+        assert!(
+            GoogleSansFlexAxes::quire_ink_body()
+                .css_font_variation_settings()
+                .contains("\"opsz\" 16.0")
+        );
+        assert!(tokens.comp_number("missing_component", "height_px").is_none());
         Ok(())
     }
 }

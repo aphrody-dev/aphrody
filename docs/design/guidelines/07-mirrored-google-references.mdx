@@ -1,0 +1,19 @@
+---
+title: "Mirrored Google References & Material 3 Matrix"
+source: "https://design.google/library/transparent-screens"
+---
+
+# Mirrored Google References & Material 3 Matrix
+
+Each reference is a value-like GPUI element in `aphrody_ui::google_design_mirror`. Brand colors resolve through `MirrorAccentPalette` (`ref.palette`, `comp.*`), never through literals at call sites. Owners keep the state and receive requested changes through callbacks.
+
+| Reference | GPUI element | Theme | Behavior contract |
+| --- | --- | --- | --- |
+| [Transparent Screens](https://design.google/library/transparent-screens) | `TransparentHudCard` | `xr-glimmer` | Read-only; status carries a text label, not only a dot |
+| [Gemini visual design](https://design.google/library/gemini-ai-visual-design) | `GeminiSpectrumCard` | `gemini-ai` | Thinking state is written out |
+| [YouTube new red](https://design.google/library/youtube-new-red-color) | `YoutubeGradientScrubber` | `youtube-red` | Slider role; arrows ±5 s, Home/End, ±10 s buttons; `on_seek` reports the target |
+| [Googlebook](https://googlebook.google/) | `GlowbarShellCard` | `google-expressive` | Entries keyed by domain id; `on_select` reports the id |
+| [OpenBook Quire](https://github.com/Mhsbrian/OpenBook) | `QuireGlassNote` | `openbook-quire` | Per-step Undo; consent card only for deletion (`Delete "Old drafts"?`, Keep it / Delete); Esc stops the agent when `on_dismiss` is set |
+| [Angular](https://material.angular.dev/components/categories) · [Flutter](https://docs.flutter.dev/ui/widgets/material) · [Compose](https://developer.android.com/jetpack/androidx/releases/compose-material) · [Figma M3 kit](https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833) | `MaterialComponentMatrix` | `m3` | Read-only six-row matrix |
+
+The Figma kit archive is versioned as `docs/design/Material 3 Design Kit (Community).zip`; `figma-kit.json` exposes it under `material3Kit`.

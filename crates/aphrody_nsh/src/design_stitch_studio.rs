@@ -25,16 +25,17 @@ use aphrody_design::stitch_client::{
 use aphrody_design::web_standards::{LighthouseAuditReport, audit_html_standards};
 use gpui_ui::ActiveTheme as _;
 use gpui_ui::gpui::{
-    self, App, AppContext as _, Context, EventEmitter, FocusHandle, Focusable, IntoElement,
-    ParentElement, Render, SharedString, StatefulInteractiveElement as _, Styled, Window, actions,
-    div,
+    self, AnyElement, App, AppContext as _, Context, EventEmitter, FocusHandle, Focusable,
+    IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement as _, Styled,
+    Window, actions, div,
 };
 use gpui_ui::ui::{
     FluentBuilder as _, Icon, IconName, InteractiveElement as _, Label, LabelCommon as _, h_flex,
     v_flex,
 };
 use aphrody_ui::AppearanceMode;
-use aphrody_ui::google_design::GoogleSansFlexAxes;
+use aphrody_ui::google_design::{GoogleSansFlexAxes, MirrorAccentPalette};
+use aphrody_ui::google_design_mirror::{ReferenceGallery, ReferenceGalleryState};
 use aphrody_ui::starter_pack::{
     ShadcnGpuiTheme, StarterBadge, StarterButton, StarterCard, StarterKpiCard,
     StarterPackCatalog, StarterSize, StarterVariant, SubmoduleParityMatrix,
@@ -98,6 +99,8 @@ pub struct DesignStitchStudioItem {
     status_message: SharedString,
     last_capture: Option<PathBuf>,
     is_busy: bool,
+    gallery: ReferenceGalleryState,
+    gallery_accents: Option<MirrorAccentPalette>,
 }
 
 impl DesignStitchStudioItem {
@@ -172,6 +175,14 @@ impl DesignStitchStudioItem {
             status_message,
             last_capture: None,
             is_busy: false,
+            gallery: ReferenceGalleryState::default(),
+            gallery_accents: match MirrorAccentPalette::bundled() {
+                Ok(accents) => Some(accents),
+                Err(err) => {
+                    log::warn!("Mirrored reference tokens unavailable: {err:#}");
+                    None
+                }
+            },
         }
     }
 
@@ -192,23 +203,23 @@ impl DesignStitchStudioItem {
             let result = bg
                 .spawn(async move {
                     let sitemap = mirror_design_google_sitemap(cache_dir.as_deref(), true)?;
-                    let a1 = fetch_or_fallback_article(
-                        "https://design.google/library/code-is-a-design-material",
-                        cache_dir.as_deref(),
-                        true,
-                    )?;
-                    let a2 = fetch_or_fallback_article(
-                        "https://design.google/library/google-sans-flex-font",
-                        cache_dir.as_deref(),
-                        true,
-                    )?;
-                    let live_count = [a1.live_fetched, a2.live_fetched]
-                        .into_iter()
-                        .filter(|x| *x)
-                        .count();
+                    // Figma serves an authenticated app shell, so its curated snapshot entry is kept.
+                    let mut articles = Vec::new();
+                    for curated in DesignSitemapSnapshot::bundled()?.featured_articles {
+                        if curated.url.starts_with("https://www.figma.com/") {
+                            articles.push(curated);
+                        } else {
+                            articles.push(fetch_or_fallback_article(
+                                &curated.url,
+                                cache_dir.as_deref(),
+                                true,
+                            )?);
+                        }
+                    }
+                    let live_count = articles.iter().filter(|article| article.live_fetched).count();
                     anyhow::Ok(LiveMirrorPayload {
                         sitemap,
-                        articles: vec![a1, a2],
+                        articles,
                         live_count,
                     })
                 })
@@ -386,6 +397,26 @@ fn sitemap_len(snapshot: &Option<DesignSitemapSnapshot>) -> usize {
     snapshot.as_ref().map_or(0, |s| s.total_urls)
 }
 
+impl DesignStitchStudioItem {
+    fn render_reference_gallery(
+        &self,
+        theme: &ShadcnGpuiTheme,
+        cx: &mut Context<Self>,
+    ) -> Option<AnyElement> {
+        let accents = self.gallery_accents?;
+        Some(
+            ReferenceGallery::new("studio-reference-gallery", &self.gallery, theme, &accents)
+                .thinking(self.is_busy)
+                .on_change(cx.listener(|this, change, _, cx| {
+                    if this.gallery.apply(change) {
+                        cx.notify();
+                    }
+                }))
+                .into_any_element(),
+        )
+    }
+}
+
 impl Focusable for DesignStitchStudioItem {
     fn focus_handle(&self, _cx: &App) -> FocusHandle {
         self.focus_handle.clone()
@@ -396,7 +427,6 @@ impl EventEmitter<ItemEvent> for DesignStitchStudioItem {}
 
 impl Render for DesignStitchStudioItem {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let colors = cx.theme().colors();
         let mode_title = match self.mode {
             StudioMode::GoogleDesignMirror => "Google Design Live Mirror (design.google)",
             StudioMode::StitchStudio => "Google Stitch & DESIGN.md Studio",
@@ -469,6 +499,7 @@ impl Render for DesignStitchStudioItem {
                             focus_ring_px: 2.0,
                         },
                     },
+                    comp: Default::default(),
                 },
                 AppearanceMode::Dark,
             )
@@ -477,10 +508,17 @@ impl Render for DesignStitchStudioItem {
             .parity_matrix
             .as_ref()
             .map_or(0, |matrix| matrix.frameworks.len());
+        let reference_gallery = if self.mode == StudioMode::GoogleDesignMirror {
+            self.render_reference_gallery(&starter_theme, cx)
+        } else {
+            None
+        };
+        let colors = cx.theme().colors();
 
         v_flex()
             .id("google-design-stitch-studio")
             .size_full()
+            .overflow_y_scroll()
             .p_4()
             .gap_3()
             .bg(colors.editor_background)
@@ -562,6 +600,7 @@ impl Render for DesignStitchStudioItem {
                             )
                     })),
             )
+            .children(reference_gallery)
             .when(!tsx_preview.is_empty(), |col| {
                 col.child(
                     div()

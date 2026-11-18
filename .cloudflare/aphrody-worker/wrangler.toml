@@ -1,0 +1,52 @@
+name = "aphrody-worker"
+main = "src/index.ts"
+compatibility_date = "2026-11-18"
+workers_dev = false
+preview_urls = false
+
+[limits]
+cpu_ms = 50
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 0.1
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.05
+
+[[routes]]
+pattern = "releases.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[routes]]
+pattern = "downloads.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[routes]]
+pattern = "aphrody.com/download*"
+zone_name = "aphrody.com"
+
+[[routes]]
+pattern = "docs.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[routes]]
+pattern = "aphrody.com/github"
+zone_name = "aphrody.com"
+
+[[r2_buckets]]
+binding = "RELEASES_BUCKET"
+bucket_name = "aphrody-releases"
+
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "aphrody-assets"
+
+[[queues.producers]]
+binding = "EVENTS"
+queue = "github-events"

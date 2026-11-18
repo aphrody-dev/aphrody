@@ -10,7 +10,7 @@ on:
         required: false
         default: all
         type: choice
-        options: [all, gpui-kit, nsh, bun, zed, wgpu, store]
+        options: [all, gpui-kit, nsh, bun, zed, wgpu, store, agent-browser, agent-desktop]
 
 permissions:
   contents: write
@@ -18,161 +18,55 @@ permissions:
   issues: write
 
 jobs:
-  sync-bun-gpui-kit-nsh:
-    if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || contains('gpui-kit nsh bun store', github.event.inputs.target)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          submodules: recursive
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: oven-sh/setup-bun@v2
-      - name: Read upstream config via Bun
-        id: cfg
-        run: |
-          bun -e '
-            import { readFileSync } from "node:fs";
-            const pm = Bun.TOML.parse(readFileSync("product.toml", "utf8")) as any;
-            for (const l of [
-              `plugin_name=${pm.plugin.name}`,
-              `default_branch=${pm.git.default_branch}`,
-              `upstream_gpui_kit=${pm.git.upstream_gpui_kit}`,
-              `upstream_nsh=${pm.git.upstream_nsh}`,
-            ]) console.log(l);
-          ' >> "$GITHUB_OUTPUT"
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Sync vendor/bun submodule
-        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'bun'
-        run: |
-          git submodule update --remote --merge vendor/bun || true
-      - name: Sync gpui-kit skills & docs into unified plugin
-        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'gpui-kit'
-        run: |
-          PLUGIN=".agents/plugins/${{ steps.cfg.outputs.plugin_name }}"
-          rm -rf /tmp/gpui-kit
-          git clone --depth=1 "${{ steps.cfg.outputs.upstream_gpui_kit }}" /tmp/gpui-kit
-          mkdir -p "$PLUGIN/skills" "$PLUGIN/docs/gpui-kit"
-          cp -r /tmp/gpui-kit/skills/. "$PLUGIN/skills/"
-          cp -r /tmp/gpui-kit/docs/. "$PLUGIN/docs/gpui-kit/"
-          rm -rf /tmp/gpui-kit
-      - name: Sync NSH docs & references
-        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'nsh'
-        run: |
-          PLUGIN=".agents/plugins/${{ steps.cfg.outputs.plugin_name }}"
-          rm -rf /tmp/nsh
-          git clone --depth=1 "${{ steps.cfg.outputs.upstream_nsh }}" /tmp/nsh
-          mkdir -p docs/nsh "$PLUGIN/docs/nsh"
-          cp -r /tmp/nsh/docs/. docs/nsh/
-          cp -r /tmp/nsh/docs/. "$PLUGIN/docs/nsh/"
-          rm -rf /tmp/nsh
-      - name: Sync awesome-gpui, extensions, and winget-pkgs catalogs
-        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'store'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun tooling/bun/awesome-gpui-store.ts sync-all
-      - name: Create or update upstream-sync PR if changed
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes from bun/gpui-kit/nsh upstreams."
-            exit 0
-          fi
-          BRANCH="sync/upstreams-auto"
-          git checkout -B "$BRANCH"
-          git add -A
-          git commit -m "chore(sync): update bun, gpui-kit, and nsh upstreams"
-          git push --force origin "$BRANCH"
-          if ! gh pr list --repo "${{ github.repository }}" --head "$BRANCH" --state open --json number --jq '.[0].number' | grep -q .; then
-            gh pr create \
-              --repo "${{ github.repository }}" \
-              --head "$BRANCH" \
-              --base "${{ steps.cfg.outputs.default_branch }}" \
-              --title "chore(sync): sync upstream bun / gpui-kit / nsh" \
-              --body "Automated upstream sync PR configured via product.toml.\n\nRelease Notes:\n\n- N/A" \
-              --label "upstream-sync,auto-merge,gpui-kit,nsh"
-          fi
-
-  sync-zed-and-wgpu-digest:
-    if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'zed' || github.event.inputs.target == 'wgpu'
+  sync-consolidated-upstreams:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 500
+          submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: oven-sh/setup-bun@v2
-      - name: Read upstream config via Bun
-        id: cfg
-        run: |
-          bun -e '
-            import { readFileSync } from "node:fs";
-            const pm = Bun.TOML.parse(readFileSync("product.toml", "utf8")) as any;
-            const wgpuSlug = pm.git.upstream_wgpu.replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "");
-            for (const l of [
-              `default_branch=${pm.git.default_branch}`,
-              `upstream_zed=${pm.git.upstream_zed}`,
-              `upstream_zed_branch=${pm.git.upstream_zed_branch}`,
-              `upstream_wgpu_slug=${wgpuSlug}`,
-            ]) console.log(l);
-          ' >> "$GITHUB_OUTPUT"
       - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Check vendored WGPU against upstream
-        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'wgpu'
+      - name: Run consolidated upstream sync & deterministic conflict resolver
+        id: sync
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          WGPU_REPO="${{ steps.cfg.outputs.upstream_wgpu_slug }}"
-          LOCAL_VER=$(grep -m1 '^version = ' vendor/wgpu/Cargo.toml | cut -d'"' -f2 || echo "unknown")
-          LATEST_TAG=$(gh api "repos/${WGPU_REPO}/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unknown")
-          TRUNK_SHA=$(gh api "repos/${WGPU_REPO}/commits/trunk" --jq '.sha[0:12]' 2>/dev/null || echo "unknown")
-          echo "vendor/wgpu version=$LOCAL_VER, upstream ($WGPU_REPO) latest release=$LATEST_TAG, trunk=$TRUNK_SHA"
-      - name: Attempt clean zed-industries/zed sync PR or open conflict report
-        if: github.event.inputs.target == '' || github.event.inputs.target == 'all' || github.event.inputs.target == 'zed'
+          TARGET="${{ github.event.inputs.target || 'all' }}"
+          if [ "$TARGET" = "store" ]; then
+            bun tooling/bun/awesome-gpui-store.ts sync-all
+            exit 0
+          fi
+          if [ "$TARGET" = "wgpu" ]; then
+            bun tooling/bun/upstream-sync.ts status --json
+            exit 0
+          fi
+          bun tooling/bun/upstream-sync.ts sync --target "$TARGET"
+      - name: Verify repo hygiene and workflow integrity
+        run: bun tooling/bun/repo-hygiene.ts
+      - name: Open or update automated upstream-sync PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ZED_URL="${{ steps.cfg.outputs.upstream_zed }}"
-          ZED_BRANCH="${{ steps.cfg.outputs.upstream_zed_branch }}"
-          WGPU_REPO="${{ steps.cfg.outputs.upstream_wgpu_slug }}"
-          BASE="${{ steps.cfg.outputs.default_branch }}"
-          git remote add zed-upstream "$ZED_URL" || true
-          git fetch zed-upstream "$ZED_BRANCH" --depth=500
-          BRANCH="sync/zed-upstream"
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Already synchronized with all upstreams."
+            exit 0
+          fi
+          BRANCH="sync/upstreams-auto"
           git checkout -B "$BRANCH"
-          if git merge --no-commit --no-ff "zed-upstream/${ZED_BRANCH}"; then
-            if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "chore(sync): merge clean commits from $ZED_URL"
-              git push --force origin "$BRANCH"
-              if ! gh pr list --repo "${{ github.repository }}" --head "$BRANCH" --state open --json number --jq '.[0].number' | grep -q .; then
-                gh pr create \
-                  --repo "${{ github.repository }}" \
-                  --head "$BRANCH" \
-                  --base "$BASE" \
-                  --title "chore(sync): merge upstream updates" \
-                  --body "Clean merge from $ZED_URL ($ZED_BRANCH).\n\nRelease Notes:\n\n- N/A" \
-                  --label "upstream-sync,zed,auto-merge"
-              fi
-            else
-              echo "Already up to date with $ZED_URL ($ZED_BRANCH)."
-            fi
-          else
-            git merge --abort || true
-            ZED_HEAD=$(git rev-parse --short "zed-upstream/${ZED_BRANCH}")
-            WGPU_TAG=$(gh api "repos/${WGPU_REPO}/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unknown")
-            BODY="Upstream sync requires manual conflict resolution or selective cherry-pick ($ZED_URL HEAD: \`$ZED_HEAD\`, latest $WGPU_REPO release: \`$WGPU_TAG\`)."
-            EXISTING=$(gh issue list --repo "${{ github.repository }}" --label "upstream-sync" --state open --json number --jq '.[0].number' || true)
-            if [ -n "$EXISTING" ]; then
-              if ! gh issue view "$EXISTING" --repo "${{ github.repository }}" --json comments --jq '.comments[].body' | grep -Fq "$ZED_HEAD"; then
-                gh issue comment "$EXISTING" --repo "${{ github.repository }}" --body "$BODY"
-              fi
-            else
-              gh issue create --repo "${{ github.repository }}" --title "chore(sync): review upstream zed ($ZED_HEAD) & wgpu ($WGPU_TAG)" --body "$BODY" --label "upstream-sync,zed,wgpu"
-            fi
+          git add -A
+          git commit -m "chore(sync): consolidated sync zed, nsh, gpui-kit, and bun"
+          git push --force origin "$BRANCH"
+          if ! gh pr list --repo "${{ github.repository }}" --head "$BRANCH" --state open --json number --jq '.[0].number' | grep -q .; then
+            gh pr create \
+              --repo "${{ github.repository }}" \
+              --head "$BRANCH" \
+              --base main \
+              --title "chore(sync): consolidated upstream sync (zed / nsh / gpui-kit / bun)" \
+              --body "Automated consolidated sync and conflict resolution via tooling/bun/upstream-sync.ts.\n\nRelease Notes:\n\n- N/A" \
+              --label "upstream-sync,auto-merge,zed,gpui-kit,nsh"
           fi

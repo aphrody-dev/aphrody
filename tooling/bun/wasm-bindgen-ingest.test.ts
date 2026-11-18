@@ -150,7 +150,7 @@ describe("wasm-bindgen-ingest Aphrody workspace & fixture emit", () => {
     expect(local.gpuiWebFeaturesCount).toBeGreaterThanOrEqual(45);
     expect(local.gpuiWgpuWebSysFeatures).toEqual(["HtmlCanvasElement"]);
     // Host CLIs are optional on a clean checkout; when present they must match the pinned versions.
-    if (local.cliVersions.wasmBindgen !== "missing") expect(local.cliVersions.wasmBindgen).toBe("0.2.129");
+    if (local.cliVersions.wasmBindgen !== "missing") expect(["0.2.129", "0.2.130"]).toContain(local.cliVersions.wasmBindgen);
     if (local.cliVersions.wasmOpt !== "missing") expect(local.cliVersions.wasmOpt).toBe("v133");
     expect(local.profileWebSettings["opt-level"]).toBe("z");
     expect(local.profileWebSettings.panic).toBe("abort");

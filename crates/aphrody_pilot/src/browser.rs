@@ -1,4 +1,4 @@
-//! Headless Browser Automation & CDP Engine absorbed from `vercel-labs/agent-browser`.
+//! Headless Browser Automation & CDP Engine absorbed from `aphrody-labs/agent-browser`.
 //!
 //! Provides SSRF/non-public IP policy checks, multi-OS Chrome/Chromium/Edge/Brave binary
 //! discovery, CDP HTTP discovery (`/json/version`, `/json/list`), asynchronous WebSocket CDP

@@ -386,6 +386,7 @@ fn unreachable_tokens_fallback() -> aphrody_ui::GoogleDesignTokens {
                     focus_ring_px: 2.0,
                 },
             },
+            comp: Default::default(),
         })
 }
 

@@ -165,6 +165,10 @@ pub struct GitSection {
     pub upstream_stitch_sdk: String,
     #[serde(default)]
     pub upstream_stitch_skills: String,
+    #[serde(default)]
+    pub upstream_agent_browser: String,
+    #[serde(default)]
+    pub upstream_agent_desktop: String,
     pub submodule_bun: String,
 }
 

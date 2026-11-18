@@ -12,7 +12,8 @@
   "referenceCaptures": [
     {
       "id": "gemini-home",
-      "path": "./gemini-home.png",
+      "path": "https://assets.aphrody.app/v1/design-reference/7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2.png",
       "bytes": 631827,
       "sha256": "7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2",
       "surfaceFamily": "gemini-neural-home",
@@ -25,7 +26,8 @@
     },
     {
       "id": "gemini-opions",
-      "path": "./gemini-opions.png",
+      "path": "https://assets.aphrody.app/v1/design-reference/b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0.png",
       "bytes": 560591,
       "sha256": "b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0",
       "surfaceFamily": "gemini-cascading-menu",
@@ -36,7 +38,8 @@
     },
     {
       "id": "google-ai-mode",
-      "path": "./google-ai-mode.png",
+      "path": "https://assets.aphrody.app/v1/design-reference/b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9.png",
       "bytes": 121621,
       "sha256": "b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9",
       "surfaceFamily": "google-ai-mode",
@@ -48,7 +51,8 @@
     },
     {
       "id": "google-in-chrome",
-      "path": "./google-in-chrome.png",
+      "path": "https://assets.aphrody.app/v1/design-reference/5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75.png",
       "bytes": 61310,
       "sha256": "5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75",
       "surfaceFamily": "chrome-omnibar",
@@ -60,7 +64,8 @@
     },
     {
       "id": "win11-chrome157",
-      "path": "./win11-chrome157.png",
+      "path": "https://assets.aphrody.app/v1/design-reference/648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa.png",
       "bytes": 631406,
       "sha256": "648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa",
       "surfaceFamily": "chrome-157-grounding",
@@ -355,18 +360,26 @@
       "sourceUrl": "https://design.google/?home",
       "bytes": 950,
       "sha256": "0e00145845151a266d9d5178781916e74780d781c823d8c37569baf6b3db2916"
+    },
+    {
+      "id": "07-mirrored-google-references",
+      "title": "Mirrored Google References & Material 3 Matrix",
+      "path": "./guidelines/07-mirrored-google-references.mdx",
+      "sourceUrl": "https://design.google/library/transparent-screens",
+      "bytes": 1971,
+      "sha256": "95168e68495ff6f40f0ebf08643092e71fab21cd9419e88c5c83e24151c3134b"
     }
   ],
   "kits": {
     "figma": {
       "path": "./kits/figma-design-kit.json",
-      "sha256": "d021286a113b86a5ab407bec2e7db6bc3e0720d28f950a80a4880316118097ec",
+      "sha256": "879a687d85fc3d313190afe7b7d7d485b2aa18b1e9bf548651959ceec3846034",
       "collectionCount": 6,
       "componentCount": 20
     },
     "figmaCodeConnect": {
       "path": "./kits/figma-code-connect.json",
-      "sha256": "b6ed36d7a59d0807985c17eb60b1de64a4990482eec0c872c7080ab4c77b457f",
+      "sha256": "af269525f2efa21429c4d6d81ad24606a0d99f7518483dadd2437759dba20f03",
       "mappingCount": 20
     },
     "stitch": {
@@ -511,6 +524,42 @@
     }
   ],
   "components": [
+    {
+      "id": "youtube-gradient-scrubber",
+      "category": "data_display",
+      "gpuiSymbol": "aphrody_ui::google_design_mirror::YoutubeGradientScrubber",
+      "eguiEquivalentSymbol": "egui::Slider",
+      "nshElement": "MediaScrubber",
+      "stitchSlotId": "stitch-media-scrubber",
+      "tokensConsumed": [
+        "--md-ref-palette-youtube-red",
+        "--md-ref-palette-youtube-magenta",
+        "--md-sys-color-surface-container"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "disabled"
+      ]
+    },
+    {
+      "id": "quire-glass-note",
+      "category": "overlay",
+      "gpuiSymbol": "aphrody_ui::google_design_mirror::QuireGlassNote",
+      "eguiEquivalentSymbol": "egui::Window",
+      "nshElement": "QuireNote",
+      "stitchSlotId": "stitch-quire-note",
+      "tokensConsumed": [
+        "--md-ref-palette-quire-folio-light",
+        "--md-ref-palette-quire-folio-dark",
+        "--md-sys-color-error"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "disabled"
+      ]
+    },
     {
       "id": "expressive-app-shell",
       "category": "shell",

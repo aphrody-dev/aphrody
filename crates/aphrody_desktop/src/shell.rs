@@ -27,6 +27,7 @@ use crate::applets::{BrandLauncherApplet, SystemTelemetryApplet, WorkspaceApplet
 use crate::apps::cosmic_settings::{
     CosmicSettingsCallbacks, SettingsPage, render_cosmic_settings_window,
 };
+use crate::apps::design_gallery::{DesignGalleryState, render_design_gallery_window};
 use crate::apps::edit::{CosmicEditState, render_cosmic_edit_window};
 use crate::apps::installer::render_installer_window;
 use crate::apps::store::render_cosmic_store_window;
@@ -98,6 +99,7 @@ pub struct OsDesktopShell {
     pub store_category: Option<aphrody_store::StoreCategory>,
     pub installer_catalog: aphrody_installer::InstallerProfileCatalog,
     pub selected_de_id: String,
+    pub design_gallery: DesignGalleryState,
     pub launcher_folder: LauncherFolder,
     pub launcher_open: bool,
     pub launcher_query: String,
@@ -288,6 +290,7 @@ impl OsDesktopShell {
             store_category: None,
             installer_catalog,
             selected_de_id: "aphrody-gpui".to_owned(),
+            design_gallery: DesignGalleryState::bundled(),
             launcher_folder: LauncherFolder::default(),
             launcher_open: false,
             launcher_query: String::new(),
@@ -949,6 +952,20 @@ impl OsDesktopShell {
                         entity_store.update(cx, |s, cx| {
                             s.store_category = cat;
                             cx.notify();
+                        });
+                    }),
+                )
+            }
+            WindowKind::Design => {
+                let entity_design = cx.entity();
+                render_design_gallery_window(
+                    &self.theme,
+                    &self.design_gallery,
+                    Box::new(move |change, cx| {
+                        entity_design.update(cx, |s, cx| {
+                            if s.design_gallery.apply(change) {
+                                cx.notify();
+                            }
                         });
                     }),
                 )

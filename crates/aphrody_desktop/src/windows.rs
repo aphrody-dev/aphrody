@@ -27,10 +27,11 @@ pub enum WindowKind {
     Edit,
     Store,
     Installer,
+    Design,
 }
 
 impl WindowKind {
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 9] = [
         Self::Studio,
         Self::Files,
         Self::Settings,
@@ -39,6 +40,7 @@ impl WindowKind {
         Self::Edit,
         Self::Store,
         Self::Installer,
+        Self::Design,
     ];
 
     #[must_use]
@@ -52,6 +54,7 @@ impl WindowKind {
             Self::Edit => "cosmic-edit",
             Self::Store => "cosmic-store",
             Self::Installer => "aphrody-installer",
+            Self::Design => "design-gallery",
         }
     }
 
@@ -66,6 +69,7 @@ impl WindowKind {
             Self::Edit => "COSMIC Edit",
             Self::Store => "COSMIC Store",
             Self::Installer => "OS Installer & DE Switcher",
+            Self::Design => "Design Gallery",
         }
     }
 
@@ -80,6 +84,7 @@ impl WindowKind {
             Self::Edit => IconName::FileCode,
             Self::Store => IconName::Download,
             Self::Installer => IconName::Code,
+            Self::Design => IconName::Sparkle,
         }
     }
 }

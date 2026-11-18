@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import worker, { detectPlatform, renderDownloadPortal } from "../../.cloudflare/aphrody-releases/src/worker.ts";
+import worker, { detectPlatform, renderDownloadPortal } from "../../.cloudflare/aphrody-worker/src/index.ts";
 
-describe("aphrody-releases Cloudflare Worker portal", () => {
+describe("aphrody-worker consolidated Cloudflare portal", () => {
   const mockEnv = {
     RELEASES_BUCKET: {
       async get() {

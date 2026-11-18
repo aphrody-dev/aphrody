@@ -768,8 +768,67 @@ function buildFigmaKitJson(): object {
       { id: "ReleaseChannelMatrixCard", variants: ["LTS", "Stable", "Preview", "Canary", "Nightly", "Dev"], autoLayout: "VERTICAL", radiusToken: "large_px" },
       { id: "VpnShieldQuickTile", variants: ["Disconnected", "Connecting", "ProtectedWG", "MobileOLED"], autoLayout: "HORIZONTAL", radiusToken: "large_px" },
     ],
+    material3Kit: MATERIAL3_FIGMA_KIT,
+    referenceMirrors: REFERENCE_MIRRORS,
   };
 }
+
+/** Official Material 3 Design Kit (Community); indexed in assets/os/r2_assets_manifest.toml and served via R2. */
+const MATERIAL3_FIGMA_KIT = {
+  name: "Material 3 Design Kit (Community)",
+  fileKey: "vEr6T5SQaJfMpLxjMUfD55",
+  nodeId: "11:1833",
+  url: "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
+  localArchive: "docs/design/Material 3 Design Kit (Community).zip",
+  r2Manifest: "assets/os/r2_assets_manifest.toml",
+  license: "CC BY 4.0",
+} as const;
+
+/** design.google library and Material ecosystem references mirrored as native GPUI components. */
+const REFERENCE_MIRRORS = [
+  {
+    id: "TransparentHudCard",
+    sourceUrl: "https://design.google/library/transparent-screens",
+    gpui: "aphrody_ui::google_design_mirror::TransparentHudCard",
+    tokens: ["ref.palette.glimmer_*", "comp.glimmer_hud"],
+    theme: "xr-glimmer",
+  },
+  {
+    id: "GeminiSpectrumCard",
+    sourceUrl: "https://design.google/library/gemini-ai-visual-design",
+    gpui: "aphrody_ui::google_design_mirror::GeminiSpectrumCard",
+    tokens: ["ref.palette.gemini_*", "comp.gemini_spectrum"],
+    theme: "gemini-ai",
+  },
+  {
+    id: "YoutubeGradientScrubber",
+    sourceUrl: "https://design.google/library/youtube-new-red-color",
+    gpui: "aphrody_ui::google_design_mirror::YoutubeGradientScrubber",
+    tokens: ["ref.palette.youtube_*", "comp.youtube_scrubber"],
+    theme: "youtube-red",
+  },
+  {
+    id: "GlowbarShellCard",
+    sourceUrl: "https://googlebook.google/",
+    gpui: "aphrody_ui::google_design_mirror::GlowbarShellCard",
+    tokens: ["ref.palette.googlebook_*", "comp.googlebook_glowbar"],
+    theme: "google-expressive",
+  },
+  {
+    id: "QuireGlassNote",
+    sourceUrl: "https://github.com/Mhsbrian/OpenBook",
+    gpui: "aphrody_ui::google_design_mirror::QuireGlassNote",
+    tokens: ["ref.palette.quire_*", "sys.motion.springs.quire_*", "comp.quire_glass_note"],
+    theme: "openbook-quire",
+  },
+  {
+    id: "MaterialComponentMatrix",
+    sourceUrl: "https://docs.flutter.dev/ui/widgets/material",
+    gpui: "aphrody_ui::google_design_mirror::MaterialComponentMatrix",
+    tokens: ["sys.color.*", "sys.shape.*"],
+    theme: "m3",
+  },
+] as const;
 
 function buildFigmaCodeConnectJson(): object {
   const kit = buildFigmaKitJson() as { componentSets: Array<{ id: string }> };
@@ -798,6 +857,8 @@ function buildFigmaCodeConnectJson(): object {
   return {
     version: "3.0.0",
     figmaFileHint: "Aphrody Labs Design System v3.0",
+    material3Kit: { fileKey: MATERIAL3_FIGMA_KIT.fileKey, nodeId: MATERIAL3_FIGMA_KIT.nodeId, url: MATERIAL3_FIGMA_KIT.url },
+    referenceMirrors: REFERENCE_MIRRORS.map((mirror) => ({ id: mirror.id, gpui: mirror.gpui, sourceUrl: mirror.sourceUrl })),
     sourceOfTruth: "https://design.google/",
     mappings: kit.componentSets.map((cs) => ({
       figmaComponentSet: cs.id,
@@ -988,9 +1049,54 @@ source: "https://design.google/?home"
 | \`unreal-bevy-viewport\` | \`bevy_gpui::render_viewport_rgba8\` | \`bevy_gpui::render_bevy_egui_inspector\` | \`<Shader>\` / \`<Canvas>\` |
 `,
   },
+  {
+    id: "07-mirrored-google-references",
+    title: "Mirrored Google References & Material 3 Matrix",
+    sourceUrl: "https://design.google/library/transparent-screens",
+    content: `---
+title: "Mirrored Google References & Material 3 Matrix"
+source: "https://design.google/library/transparent-screens"
+---
+
+# Mirrored Google References & Material 3 Matrix
+
+Each reference is a value-like GPUI element in \`aphrody_ui::google_design_mirror\`. Brand colors resolve through \`MirrorAccentPalette\` (\`ref.palette\`, \`comp.*\`), never through literals at call sites. Owners keep the state and receive requested changes through callbacks.
+
+| Reference | GPUI element | Theme | Behavior contract |
+| --- | --- | --- | --- |
+| [Transparent Screens](https://design.google/library/transparent-screens) | \`TransparentHudCard\` | \`xr-glimmer\` | Read-only; status carries a text label, not only a dot |
+| [Gemini visual design](https://design.google/library/gemini-ai-visual-design) | \`GeminiSpectrumCard\` | \`gemini-ai\` | Thinking state is written out |
+| [YouTube new red](https://design.google/library/youtube-new-red-color) | \`YoutubeGradientScrubber\` | \`youtube-red\` | Slider role; arrows ±5 s, Home/End, ±10 s buttons; \`on_seek\` reports the target |
+| [Googlebook](https://googlebook.google/) | \`GlowbarShellCard\` | \`google-expressive\` | Entries keyed by domain id; \`on_select\` reports the id |
+| [OpenBook Quire](https://github.com/Mhsbrian/OpenBook) | \`QuireGlassNote\` | \`openbook-quire\` | Per-step Undo; consent card only for deletion (\`Delete "Old drafts"?\`, Keep it / Delete); Esc stops the agent when \`on_dismiss\` is set |
+| [Angular](https://material.angular.dev/components/categories) · [Flutter](https://docs.flutter.dev/ui/widgets/material) · [Compose](https://developer.android.com/jetpack/androidx/releases/compose-material) · [Figma M3 kit](https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833) | \`MaterialComponentMatrix\` | \`m3\` | Read-only six-row matrix |
+
+The Figma kit archive is versioned as \`docs/design/Material 3 Design Kit (Community).zip\`; \`figma-kit.json\` exposes it under \`material3Kit\`.
+`,
+  },
 ];
 
 const COMPONENT_CONTRACTS = [
+  {
+    id: "youtube-gradient-scrubber",
+    category: "data_display",
+    gpuiSymbol: "aphrody_ui::google_design_mirror::YoutubeGradientScrubber",
+    eguiEquivalentSymbol: "egui::Slider",
+    nshElement: "MediaScrubber",
+    stitchSlotId: "stitch-media-scrubber",
+    tokensConsumed: ["--md-ref-palette-youtube-red", "--md-ref-palette-youtube-magenta", "--md-sys-color-surface-container"],
+    states: ["default", "focused", "disabled"],
+  },
+  {
+    id: "quire-glass-note",
+    category: "overlay",
+    gpuiSymbol: "aphrody_ui::google_design_mirror::QuireGlassNote",
+    eguiEquivalentSymbol: "egui::Window",
+    nshElement: "QuireNote",
+    stitchSlotId: "stitch-quire-note",
+    tokensConsumed: ["--md-ref-palette-quire-folio-light", "--md-ref-palette-quire-folio-dark", "--md-sys-color-error"],
+    states: ["default", "focused", "disabled"],
+  },
   {
     id: "expressive-app-shell",
     category: "shell",
@@ -1147,20 +1253,60 @@ export function buildDesignDocsPackage(outDir = DESIGN_DOCS_DIR) {
     { file: "win11-chrome157.png", family: "chrome-157-grounding", patterns: ["24px source grounding card stack", "64x64 rounded media thumb", "Modern Web Guidance 1.0"] },
   ];
 
+  const r2ByPath = new Map<string, { sha256: string; bytes: number; public_url: string; r2_key: string }>();
+  const r2ManifestPath = join(repoRoot, "assets/os/r2_assets_manifest.toml");
+  if (existsSync(r2ManifestPath)) {
+    const parsedR2 = Bun.TOML.parse(readFileSync(r2ManifestPath, "utf8")) as {
+      assets?: Array<{ logical_path: string; sha256: string; bytes: number; public_url: string; r2_key: string }>;
+    };
+    for (const item of parsedR2.assets ?? []) {
+      r2ByPath.set(item.logical_path, item);
+    }
+  }
+
   const referenceCaptures = refSpecs
-    .filter((r) => existsSync(join(outDir, r.file)))
     .map((r) => {
       const full = join(outDir, r.file);
-      const bytes = readFileSync(full);
-      return {
-        id: r.file.replace(/\.png$/, ""),
-        path: `./${r.file}`,
-        bytes: statSync(full).size,
-        sha256: sha256Hex(bytes),
-        surfaceFamily: r.family,
-        keyPatterns: r.patterns,
-      };
-    });
+      const cached = join(repoRoot, "target/r2-cache/docs/design", r.file);
+      const r2Entry = r2ByPath.get(`docs/design/${r.file}`);
+      if (existsSync(full)) {
+        const bytes = readFileSync(full);
+        return {
+          id: r.file.replace(/\.png$/, ""),
+          path: `./${r.file}`,
+          r2Url: r2Entry?.public_url,
+          bytes: statSync(full).size,
+          sha256: sha256Hex(bytes),
+          surfaceFamily: r.family,
+          keyPatterns: r.patterns,
+        };
+      }
+      if (existsSync(cached)) {
+        const bytes = readFileSync(cached);
+        return {
+          id: r.file.replace(/\.png$/, ""),
+          path: r2Entry?.public_url ?? `./${r.file}`,
+          r2Url: r2Entry?.public_url,
+          bytes: statSync(cached).size,
+          sha256: sha256Hex(bytes),
+          surfaceFamily: r.family,
+          keyPatterns: r.patterns,
+        };
+      }
+      if (r2Entry) {
+        return {
+          id: r.file.replace(/\.png$/, ""),
+          path: r2Entry.public_url,
+          r2Url: r2Entry.public_url,
+          bytes: r2Entry.bytes,
+          sha256: r2Entry.sha256,
+          surfaceFamily: r.family,
+          keyPatterns: r.patterns,
+        };
+      }
+      return null;
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
 
   // Stylesheet, DESIGN.md, Schema, Kits, MDX Guidelines
   writeFileSync(join(outDir, "schema.ts"), buildSchemaTsSource(), "utf8");

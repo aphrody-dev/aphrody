@@ -70,11 +70,7 @@ export function readProductUrls(root = repoRoot): {
 export function auditCloudflareRepoConfig(root = repoRoot, runDryRun = false): CloudflareAuditReport {
   const urls = readProductUrls(root);
   const errors: string[] = [];
-  const workerDirs = [
-    ".cloudflare/aphrody-releases",
-    ".cloudflare/docs-proxy",
-    ".cloudflare/open-source-website-assets",
-  ];
+  const workerDirs = [".cloudflare/aphrody-worker"];
   const workers: WorkerManifestAudit[] = [];
 
   for (const rel of workerDirs) {
@@ -95,6 +91,11 @@ export function auditCloudflareRepoConfig(root = repoRoot, runDryRun = false): C
     const hasLegacyZedDomain = /\bzed\.dev\b|zed-open-source-website-assets/.test(raw);
     if (hasLegacyZedDomain) {
       errors.push(`${rel}/wrangler.toml still references legacy zed.dev / zed-open-source-website-assets`);
+    }
+    for (const expectedBucket of ["aphrody-releases", "aphrody-assets"]) {
+      if (!bucketNames.includes(expectedBucket)) {
+        errors.push(`${rel}/wrangler.toml missing consolidated R2 bucket binding: ${expectedBucket}`);
+      }
     }
 
     let dryRunOk: boolean | undefined;
@@ -118,6 +119,17 @@ export function auditCloudflareRepoConfig(root = repoRoot, runDryRun = false): C
       hasLegacyZedDomain,
       dryRunOk,
     });
+  }
+
+  for (const legacyDir of [
+    ".cloudflare/aphrody-releases",
+    ".cloudflare/docs-proxy",
+    ".cloudflare/open-source-website-assets",
+    ".cloudflare/aphrody-github",
+  ]) {
+    if (existsSync(join(root, legacyDir))) {
+      errors.push(`Legacy isolated worker directory still present: ${legacyDir}`);
+    }
   }
 
   const installSh = join(root, "script", "aphrody-install.sh");
@@ -252,11 +264,9 @@ function publishInstallScripts(dryRun: boolean): { uploaded: string[]; dryRun: b
   return { uploaded, dryRun };
 }
 
-function deployWorkers(dryRun: boolean, allWorkers: boolean): Array<{ worker: string; exitCode: number }> {
+function deployWorkers(dryRun: boolean, _allWorkers: boolean): Array<{ worker: string; exitCode: number }> {
   const wrangler = resolveWranglerCmd();
-  const dirs = allWorkers
-    ? [".cloudflare/aphrody-releases", ".cloudflare/docs-proxy", ".cloudflare/open-source-website-assets"]
-    : [".cloudflare/aphrody-releases"];
+  const dirs = [".cloudflare/aphrody-worker"];
   const results: Array<{ worker: string; exitCode: number }> = [];
   for (const rel of dirs) {
     const args = dryRun

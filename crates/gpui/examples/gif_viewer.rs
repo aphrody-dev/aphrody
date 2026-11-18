@@ -33,8 +33,17 @@ fn run_example() {
         if !example_support::load_fonts(cx) {
             return;
         }
-        let gif_path =
+        let local_gif =
             PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/image/black-cat-typing.gif");
+        let cached_gif = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../target/r2-cache/crates/gpui/examples/image/black-cat-typing.gif");
+        let gif_path = if local_gif.is_file() {
+            local_gif
+        } else if cached_gif.is_file() {
+            cached_gif
+        } else {
+            PathBuf::from("https://assets.aphrody.app/v1/gpui-examples/black-cat-typing.gif")
+        };
 
         cx.open_window(
             WindowOptions {

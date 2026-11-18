@@ -10,11 +10,7 @@ describe("cloudflare & multi-vps fleet orchestration", () => {
     expect(audit.errors).toEqual([]);
     expect(audit.installScriptsPresent).toBe(true);
     expect(audit.releaseDomain).toBe("releases.aphrody.com");
-    expect(audit.workers.map((w) => w.name)).toEqual([
-      "aphrody-releases",
-      "docs-proxy",
-      "open-source-website-assets",
-    ]);
+    expect(audit.workers.map((w) => w.name)).toEqual(["aphrody-worker"]);
     for (const worker of audit.workers) {
       expect(worker.hasLegacyZedDomain).toBe(false);
     }

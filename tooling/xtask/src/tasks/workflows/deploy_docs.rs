@@ -135,7 +135,7 @@ fn docs_deploy_steps(job: Job, project_name: &StepOutput) -> Job {
         .add_with(("accountId", vars::CLOUDFLARE_ACCOUNT_ID))
         .add_with((
             "command",
-            "r2 object put -f script/install.sh zed-open-source-website-assets/install.sh",
+            "r2 object put -f script/aphrody-install.sh aphrody-assets/scripts/install.sh",
         ))
     }
 
@@ -147,7 +147,7 @@ fn docs_deploy_steps(job: Job, project_name: &StepOutput) -> Job {
         ) // v3
         .add_with(("apiToken", vars::CLOUDFLARE_API_TOKEN))
         .add_with(("accountId", vars::CLOUDFLARE_ACCOUNT_ID))
-        .add_with(("command", "deploy .cloudflare/docs-proxy/src/worker.js"))
+        .add_with(("command", "deploy --config .cloudflare/aphrody-worker/wrangler.toml"))
     }
 
     fn upload_wrangler_logs() -> UploadArtifactStep {

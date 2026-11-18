@@ -51,7 +51,7 @@ C:\src\aphrody (clean `main`) ──▶ C:\src\worktrees\aphrody-<id> (bot/<id>)
 1. **In-App Auto-Updater ([`crates/auto_update/src/auto_update.rs`](../../crates/auto_update/src/auto_update.rs))**:
    - Replaces legacy `github.com/zed-industries/zed/commits/...` URLs with `brand::REPOSITORY_URL`, uses `brand::APP_SLUG` temp prefixes (`aphrody-auto-update`), derives brand asset names (`Aphrody.dmg`, `aphrody.tar.gz`, `Aphrody-Setup.exe`) from `brand::APP_NAME`/`brand::APP_SLUG`, and performs streaming **SHA-256 verification** (`sha2::Sha256`) on `ReleaseAsset { sha256 }` before invoking OS installers.
    - CLI tools integrate `axoupdater` (`0.10.3`) against the same GitHub/R2 JSON feed; every release asset carries Sigstore provenance verifiable via `gh attestation verify <artifact> --owner aphrody-dev`.
-2. **Cloudflare R2 Zero-Egress Portal ([`.cloudflare/aphrody-releases/`](../../.cloudflare/aphrody-releases/src/worker.ts))**:
+2. **Cloudflare R2 Zero-Egress Portal ([`.cloudflare/aphrody-worker/`](../../.cloudflare/aphrody-worker/src/releases.ts))**:
    - Routes `releases.aphrody.com/*` and `aphrody.com/download*`:
      - `GET /download`: UA-aware HTML portal selecting Windows x64/ARM64, macOS Apple Silicon/Intel, Linux x86_64/aarch64 installers + channel selector (`stable`, `lts`, `preview`, `canary`, `nightly`) + SHA-256/Attestation copy commands.
      - `GET /api/releases/:channel/latest` & `GET /releases/:channel/:version/asset`: Drop-in JSON feed served from R2 `manifests/`.

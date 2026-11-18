@@ -8,6 +8,7 @@ pub mod cosmic_shell;
 pub mod cosmic_theme;
 pub mod google_design;
 pub mod google_design_components;
+pub mod google_design_mirror;
 pub mod i18n;
 pub mod immediate;
 pub mod reactive;
@@ -36,12 +37,18 @@ pub use reactive::{
     slider_control, toggle_control,
 };
 pub use google_design::{
-    BUNDLED_GOOGLE_DESIGN_TOKENS_TOML, GoogleDesignTokens, GoogleSansFlexAxes, ShapeScale,
-    SpringSpec, StateLayerOpacities, WindowSizeClass,
+    BUNDLED_GOOGLE_DESIGN_TOKENS_TOML, GoogleDesignTokens, GoogleSansFlexAxes, MirrorAccentPalette,
+    ShapeScale, SpringSpec, StateLayerOpacities, WindowSizeClass,
 };
 pub use google_design_components::{
     CascadingPopoverCard, ExpressiveOmnibar, GroundingSourceCard, MobileBottomNavBar,
     MobileNavTab, PopoverMenuItem, RoadmapHorizonCard, SegmentedStudioBar, ThinkingAuraBadge,
+};
+pub use google_design_mirror::{
+    GeminiSpectrumCard, GlowbarEntry, GlowbarShellCard, MATERIAL_COMPONENT_MAPPINGS,
+    MaterialComponentMapping, MaterialComponentMatrix, QuireGlassNote, QuireStep,
+    ReferenceGallery, ReferenceGalleryChange, ReferenceGalleryState, TransparentHudCard,
+    YoutubeGradientScrubber, format_media_timestamp, seek_target_secs,
 };
 pub use starter_pack::{
     AgentSlotMeta, BUNDLED_SUBMODULE_PARITY_TOML, CoreWebVitalsBudgetSpec, MonorepoAuditSummary,
