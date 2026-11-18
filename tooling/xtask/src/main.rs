@@ -30,7 +30,7 @@ enum CliCommand {
     /// Consolidated Google Design, Storytold 82-repo, egui/Bevy parity & NSH session studio workflows.
     #[command(subcommand)]
     Studio(tasks::studio::StudioCommand),
-    /// Runs the Linux Bubblewrap sandboxing NixOS VM tests.
+    /// Runs the sandbox_linux NixOS VM tests.
     SandboxTests(tasks::sandbox_tests::SandboxTestsArgs),
     /// Runs the Windows WSL Bubblewrap sandbox behavior tests.
     WslSandboxTests(tasks::wsl_sandbox_tests::WslSandboxTestsArgs),
