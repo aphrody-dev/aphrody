@@ -826,6 +826,7 @@ export async function probeLocalHost(manifest: FleetClusterManifest): Promise<No
     const targets = Bun.spawnSync(["rustup", "target", "list", "--installed"], {
       stdout: "pipe",
       stderr: "pipe",
+      timeout: 3000,
     });
     if (targets.exitCode === 0 && new TextDecoder().decode(targets.stdout).includes("wasm32")) {
       capabilities.add("wasm");

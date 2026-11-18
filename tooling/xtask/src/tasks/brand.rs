@@ -1039,6 +1039,8 @@ mod tests {
                 upstream_design_md: "https://github.com/google-labs-code/design-md.git".into(),
                 upstream_stitch_sdk: "https://github.com/google-labs-code/stitch-sdk.git".into(),
                 upstream_stitch_skills: "https://github.com/google-labs-code/stitch-skills.git".into(),
+                upstream_agent_browser: "https://github.com/vercel-labs/agent-browser.git".into(),
+                upstream_agent_desktop: "https://github.com/aphrody-dev/agent-desktop.git".into(),
                 submodule_bun: "https://github.com/aphrody-labs/bun".into(),
             },
             features: FeaturesSection {
