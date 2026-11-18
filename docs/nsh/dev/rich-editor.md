@@ -166,7 +166,9 @@ Rust uses `RichEditor::on_content_size_change`, whose listener receives
 `RichEditorEvent::ContentSizeChange { content_size }`.
 
 Input (`controller.rs`): as the code `Editor`, an invisible native input at the caret (the sink) takes typed text
-and input methods. Typed text goes to plugins' `handle_text_input` (input rules), else is inserted with the stored
+and input methods. A node selection of a block atom has no caret: the sink is at the node's box, where a platform
+that scrolls a field into view as it focuses it (a browser) finds it, and scrolling the selection into view
+(`scroll_into_view`) brings the node in whole, as ProseMirror scrolls a node selection's DOM node. Typed text goes to plugins' `handle_text_input` (input rules), else is inserted with the stored
 marks (origin `Input`). While an input method composes, its text shows in the line at the caret with the block's
 typography, and the document waits; the commit is one transaction tagged with the composition's id (`composition`
 meta, which the history groups). `RichEditorEvent::CompositionChange(bool)` (Rust
@@ -181,12 +183,24 @@ goal x, the document's ends). An Escape none of them takes collapses a selection
 in a terminal, it blurs the editor, so the focus can leave it (Escape stays bound for the plugins' own, a
 suggestion's).
 Presses: a node view's `handle_event`, the plugins' click hooks (`handle_click_on` per ancestor, then
-`handle_click`, double and triple likewise), then a caret (Shift extends), a word, the textblock or a node selection;
+`handle_click`, double and triple likewise), then a caret (Shift extends), a word, the textblock or a node selection (a press inside an inline node view's box
+selects its node without Shift or Mod: `inline_view_at`, after prosemirror-view's `selectClickedLeaf`; an inline
+view's box is the frame the text engine placed it at, `TextGeo::widths`, which fixes the positions around it, the
+text between two fixed points scaled to the room it has);
 a drag extends through `create_selection_between`, and past the viewport's top or bottom it scrolls the view on a timer (the code `Editor`'s `AutoScroll` and `edge_speed`) and extends again at each step. Paste: HTML through `transform_pasted_html` and the
 `clipboard_parser` (else the schema's), read by `DomParser::parse_from_clipboard`: HTML an editor copied carries
 `data-pm-slice` and comes back as the copied slice (its open depths, its whitespace, wrapped in its context again),
 other HTML is fitted to the selection (`parse_with_context`); else text through `transform_pasted_text`,
-`clipboard_text_parser` (else `slice_from_text`); then `transform_pasted`, `handle_paste`, else a replace of the selection (origin `Paste`). Files
+`clipboard_text_parser` (else `slice_from_text`); then `transform_pasted`, `handle_paste`, else a replace of the selection (origin `Paste`).
+A JS plugin's paste hooks (`RichEditorPlugin.transformPasted` / `handlePaste`; `PluginSpec::__js_hooks` hands them
+to the view) cannot run in the paste event, where JS is not running: when a plugin has one, pastes queue
+(`Rv::pastes`) and one task (`drain_pastes`) takes them in order through the same steps, awaiting each JS hook
+(`Callback::call_async`). After each await it checks the state: a document or selection changed meanwhile means the
+content was made for another place, so the paste starts over from the current state (dropped after three tries);
+Rust hooks so always see the current state. Typing never waits; a paste waits a JS turn.
+`EditorSession::paste_html` / `paste_text` (JS `pasteHTML` / `pasteText`, ProseMirror's) take the same steps
+(`parse_paste`, `paste_transaction`, shared with the view) without the JS hooks: they are what a `handlePaste` calls
+to go on with content it cleaned up, and a JS hook could only answer a turn later.
 (images with their bytes, `file:` URLs from a file manager) go to the app as `onPasteFiles` and insert nothing,
 as Tiptap's file handler leaves them to its `onPaste`. Files dropped on the desktops are the host's `onFileDrop`
 (a component's host takes a view's file drop events, `ComponentHostProps`): the root listens only when the app
@@ -215,7 +229,8 @@ are the session's selection, which the view may not have rendered yet, grown by 
 while handles show, so the menu leaves them free to take a finger. Paste is the sink's own (its `onPaste`, with
 HTML and files); Cut, Copy and Select All come back as `EventKind::EditAction` and run as the keys' commands do.
 
-The bubble menu (`bubbleMenu`, a slot): an empty box over the selection's lines (`Rv::selection_box`), inside the
+The bubble menu (`bubbleMenu`, a slot): an empty box over the selection's lines, or its node's box for a node
+selection (`Rv::selection_box`; a block atom has no text or caret to go by), inside the
 content box so it scrolls with the text, anchors an `overlay()` holding the app's content (`bubbleMenuPlacement`,
 `bubbleMenuOffset`); the overlay flips and stays on screen as the core's overlays do. Whether it shows is the app's:
 it passes the slot while it wants the menu.

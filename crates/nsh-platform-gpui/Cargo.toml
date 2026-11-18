@@ -3,7 +3,6 @@ name = "nsh-platform-gpui"
 description = "GPUI backend (macOS, Windows, Linux): nsh apps drawn by GPUI, embeddable in GPUI and GPUI Kit apps."
 version.workspace = true
 edition.workspace = true
-publish.workspace = true
 license.workspace = true
 homepage.workspace = true
 readme.workspace = true
@@ -74,8 +73,8 @@ log.workspace = true
 nsh-core.workspace = true
 nsh-engine.workspace = true
 nsh-base.workspace = true
-gpui = { workspace = true, features = ["font-kit", "wayland", "x11"] }
-gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }
+gpui.workspace = true
+gpui_platform.workspace = true
 image = { workspace = true, features = ["gif", "webp", "jpeg", "bmp", "ico", "tiff"] }
 rustc-hash.workspace = true
 tiny-skia.workspace = true
@@ -127,7 +126,7 @@ objc2-foundation.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 raw-window-handle.workspace = true
-windows-sys = { workspace = true, features = ["Win32_System_Com", "Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging"] }
+windows-sys.workspace = true
 
 # Tests in windows of GPUI's test platform (feature `shot`) compile
 # their apps.

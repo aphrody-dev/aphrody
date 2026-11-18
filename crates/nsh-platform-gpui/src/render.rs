@@ -39,8 +39,8 @@ use std::rc::Rc;
 
 use gpui::{
     App, Bounds, ContentMask, Corners, Edges, Element, ElementId, GlobalElementId, Hitbox,
-    HitboxBehavior, Hsla, InspectorElementId, LayoutId, PaintQuad, Pixels, Point, Window, point,
-    px, size,
+    HitboxBehavior, Hsla, InspectorElementId, LayoutId, PaintQuad, Pixels, Point,
+    Window, point, px, size,
 };
 use nsh_core::{Color, Points};
 
@@ -462,11 +462,8 @@ impl<'a> DrawCx<'a> {
             return;
         }
         let c = self.color(color);
-        let mut builder = gpui::PathBuilder::fill().with_style(gpui::PathStyle::Fill(
-            gpui::FillOptions {
-                fill_rule: gpui::FillRule::EvenOdd,
-            },
-        ));
+        let mut builder = gpui::PathBuilder::fill()
+            .with_style(gpui::PathStyle::Fill(gpui::FillOptions::even_odd()));
         let mut any = false;
         for contour in contours {
             if contour.len() < 3 {

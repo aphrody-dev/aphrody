@@ -31,6 +31,8 @@ pub use ui::{self, prelude as ui_prelude};
 pub use ui_input::{self, InputField};
 pub use ui_macros;
 
+#[cfg(feature = "kit")]
+pub mod kit;
 #[cfg(feature = "nsh")]
 pub mod nsh;
 

@@ -13,6 +13,7 @@ mod component;
 mod dev;
 mod dev_port;
 mod entry;
+mod extensions;
 mod init;
 mod logger;
 mod native_features;
@@ -208,48 +209,19 @@ enum Command {
         #[arg(long)]
         foreground: bool,
     },
-    /// Type check an app using Bun's native multi-core TypeScript checker (`bun check --no-script`);
-    /// an app with Rust crates (`nsh.json` `"rust"`): `cargo check` them first, and a
+    /// Type check an app with TypeScript's native compiler (TypeScript 7,
+    /// downloaded once from the npm registry; no Node needed); an app with
+    /// Rust crates (`nsh.json` `"rust"`): `cargo check` them first, and a
     /// Rust app (`"root"`) without a `tsconfig.json` only that.
     Check {
         /// The entry module, or the app's directory (default: the current one),
         /// whose `App.tsx` is the entry.
         #[arg(default_value = ".")]
         entry: PathBuf,
-        /// Custom `bun` executable path (defaults to `NSH_BUN` or `bun` on PATH).
-        #[arg(long, visible_alias = "tsc", env = "NSH_BUN")]
-        bun: Option<PathBuf>,
-        /// Further arguments for `bun check` (after `--`).
-        #[arg(last = true)]
-        args: Vec<String>,
-    },
-    /// Format an app's TypeScript/TSX, JSON, and Markdown files (and sort imports + Tailwind classes) via `bun fmt`.
-    Fmt {
-        /// Directory or file to format (default: current directory).
-        #[arg(default_value = ".")]
-        path: PathBuf,
-        /// Check formatting without writing changes.
-        #[arg(long)]
-        check: bool,
-        /// Custom `bun` executable path (defaults to `NSH_BUN` or `bun` on PATH).
-        #[arg(long, env = "NSH_BUN")]
-        bun: Option<PathBuf>,
-        /// Further arguments for `bun fmt` (after `--`).
-        #[arg(last = true)]
-        args: Vec<String>,
-    },
-    /// Lint an app's TypeScript/TSX files via Bun's built-in linter (`bun lint`).
-    Lint {
-        /// Directory or file to lint (default: current directory).
-        #[arg(default_value = ".")]
-        path: PathBuf,
-        /// Apply safe auto-fixes (`bun lint --fix`).
-        #[arg(long)]
-        fix: bool,
-        /// Custom `bun` executable path (defaults to `NSH_BUN` or `bun` on PATH).
-        #[arg(long, env = "NSH_BUN")]
-        bun: Option<PathBuf>,
-        /// Further arguments for `bun lint` (after `--`).
+        /// The `tsc` to run instead of the pinned TypeScript 7.
+        #[arg(long, env = "NSH_TSC")]
+        tsc: Option<PathBuf>,
+        /// Further arguments for `tsc` (after `--`).
         #[arg(last = true)]
         args: Vec<String>,
     },
@@ -364,6 +336,27 @@ enum Command {
         #[arg(value_enum)]
         channel: Option<self_update::Channel>,
     },
+    /// Add a third-party extension to the app in this directory: a Rust
+    /// crate with components, modules and classes for its Rust and TSX
+    /// code, from crates.io (`nsh add acme-ui[@1.2]`), Git (`nsh add
+    /// https://github.com/acme/ui`) or a directory (`nsh add --path
+    /// ../ui`). Listed in `nsh.json` `"extensions"`, the version or commit
+    /// it resolved to pinned in `nsh.lock`.
+    Add {
+        /// A crate name (with `@<version>`), `github:<owner>/<repo>` (with
+        /// `@<tag>`) or a Git repository URL.
+        #[arg(required_unless_present = "path", conflicts_with = "path")]
+        source: Option<String>,
+        /// A local directory with the extension.
+        #[arg(long)]
+        path: Option<String>,
+        /// The tag to take from Git (default: the default branch).
+        #[arg(long, conflicts_with_all = ["rev", "path"])]
+        tag: Option<String>,
+        /// The commit or branch to take from Git.
+        #[arg(long, conflicts_with = "path")]
+        rev: Option<String>,
+    },
     /// Add, remove or list the runtimes installed beside this nsh: those
     /// of other platforms than this machine's (`android`, `ios`, `web`,
     /// `gpui`, `tui`), which a command that needs one also adds itself.
@@ -389,9 +382,12 @@ enum Command {
         /// The secret key (`nsh keygen`'s `.secret`) of the app's `updater.publicKey`.
         #[arg(long)]
         key: Option<PathBuf>,
-        /// A text file with what changed.
+        /// A text file with what changed; `<tag>=<file>` for another
+        /// language, a BCP 47 tag such as `en`, `zh-TW` or `ja`, written
+        /// beside the manifest as `notes.<tag>.md` (repeatable; the
+        /// untagged one is needed with tagged ones).
         #[arg(long)]
-        notes: Option<PathBuf>,
+        notes: Vec<String>,
         /// Where iOS or Android users get it: `ios=<url>`, `android=<url>` (repeatable).
         #[arg(long = "link")]
         links: Vec<String>,
@@ -650,11 +646,10 @@ impl Command {
             | Command::Publish { entry, .. } => Some(entry),
             Command::Package(args) => Some(&mut args.entry),
             Command::Init { .. }
-            | Command::Fmt { .. }
-            | Command::Lint { .. }
             | Command::Keygen { .. }
             | Command::Update { .. }
             | Command::Component { .. }
+            | Command::Add { .. }
             | Command::UpdateManifest { .. }
             | Command::Certify { .. }
             | Command::Verify { .. }
@@ -918,19 +913,7 @@ fn dispatch(command: Command) -> anyhow::Result<()> {
             release,
             split,
         } => build::build(&entry, &out, release, split),
-        Command::Check { entry, bun, args } => check::check(&entry, bun.as_deref(), &args),
-        Command::Fmt {
-            path,
-            check: check_only,
-            bun,
-            args,
-        } => check::fmt(&path, check_only, bun.as_deref(), &args),
-        Command::Lint {
-            path,
-            fix,
-            bun,
-            args,
-        } => check::lint(&path, fix, bun.as_deref(), &args),
+        Command::Check { entry, tsc, args } => check::check(&entry, tsc.as_deref(), &args),
         Command::Test {
             path,
             entry,
@@ -1084,6 +1067,15 @@ fn dispatch(command: Command) -> anyhow::Result<()> {
         }
         Command::Keygen { name } => sign::keygen(&name),
         Command::Update { channel } => self_update::update(channel),
+        Command::Add {
+            source,
+            path,
+            tag,
+            rev,
+        } => extensions::add(
+            &std::env::current_dir()?,
+            extensions::Source::parse(source, path, tag, rev)?,
+        ),
         Command::Component { action } => match action {
             ComponentAction::List => component::list(),
             ComponentAction::Add { names } => component::add_named(&names),
@@ -1104,7 +1096,7 @@ fn dispatch(command: Command) -> anyhow::Result<()> {
             package: package.as_deref(),
             entry: &entry,
             key: key.as_deref(),
-            notes: notes.as_deref(),
+            notes: &notes,
             links: &links,
             base_url: base_url.as_deref(),
             out: &out,

@@ -513,7 +513,7 @@ fn bundled_fonts_leave_the_host_running() {
         "#,
                 &[(
                     "fonts/Pacifico-Regular.ttf",
-                    include_bytes!("../../../../examples/gallery/fonts/Pacifico-Regular.ttf"),
+                    include_bytes!("../../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf"),
                 )],
             );
             let deadline = Instant::now() + STARTUP_TIMEOUT;

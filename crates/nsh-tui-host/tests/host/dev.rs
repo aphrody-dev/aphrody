@@ -75,7 +75,7 @@ fn apps_read_bundled_fonts_from_the_dev_server() {
     std::fs::create_dir_all(&fonts).unwrap();
     std::fs::write(
         fonts.join("Pacifico-Regular.ttf"),
-        include_bytes!("../../../../examples/gallery/fonts/Pacifico-Regular.ttf"),
+        include_bytes!("../../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf"),
     )
     .unwrap();
     let server = DevServer::start(

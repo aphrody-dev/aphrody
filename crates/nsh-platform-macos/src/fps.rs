@@ -32,7 +32,7 @@
 //! removed with it.
 //!
 //! While it shows it also logs one `nsh::fps` line a second, in the shape
-//! of the Linux backend's (`examples/gallery/tools/perf.py` reads both):
+//! of the Linux backend's (`examples/nsh/gallery/tools/perf.py` reads both):
 //!
 //! `fps 120/120 frame 1.21/1.10/2.40/3.90 gap 8.33/8.33/8.40/16.70 over 0%
 //! tick 0.40/… drain 0.30/… canvas 0.20/… commits 20 js 0.30/… core 0.50/…

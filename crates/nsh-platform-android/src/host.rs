@@ -6,7 +6,7 @@ use std::{
     collections::VecDeque,
     sync::{
         Arc, Mutex,
-        atomic::{AtomicU64, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
     },
     time::Instant,
 };
@@ -64,11 +64,14 @@ pub(crate) struct Host {
     granted: Mutex<Option<nsh_engine::Capabilities>>,
     /// The VM limits of loaded apps (`NshView.setLimits`).
     limits: Mutex<nsh_engine::Limits>,
+    /// Whether scroll views make their content's native views only near
+    /// their viewport (`NshView.setContentCulling`, on by default).
+    content_culling: AtomicBool,
     /// The embedding app's runtime for apps loaded from now on.
     runtime: Mutex<Option<tokio::runtime::Handle>>,
     /// Where loaded apps keep their data, each in a directory named by its
-    /// id ([`EngineConfig::data_dir`]): `nsh` in the files directory.
-    pub(crate) data_dir: Option<std::path::PathBuf>,
+    /// id ([`EngineConfig::support_dir`]): `nsh` in the files directory.
+    pub(crate) support_dir: Option<std::path::PathBuf>,
     /// The directory loaded apps keep their storage in, overriding their own
     /// (`NshView.setStorageDirectory`); `None`: theirs.
     storage: Mutex<Option<std::path::PathBuf>>,
@@ -147,6 +150,15 @@ impl Host {
         *self.limits.lock().expect("limits") = limits;
     }
 
+    /// Turns content culling on or off for the running app and the apps
+    /// loaded from now on.
+    pub(crate) fn set_content_culling(&self, enabled: bool) {
+        self.content_culling.store(enabled, Ordering::Relaxed);
+        if let Some(control) = self.control() {
+            control.set_content_culling(enabled);
+        }
+    }
+
     /// The embedding app's theme overrides (`None`: the app's own theme):
     /// sent to the running app at once, and to every app loaded later
     /// before its first frame.
@@ -222,7 +234,7 @@ impl Host {
             app,
             viewport,
             trace: self.trace,
-            content_culling: true,
+            content_culling: self.content_culling.load(Ordering::Relaxed),
             network: Some(crate::net::network()),
             websocket: None,
             refuse_connections: None,
@@ -234,7 +246,8 @@ impl Host {
             limits: *self.limits.lock().expect("limits"),
             ui_sets: crate::ui_sets(),
             runtime: self.runtime.lock().expect("runtime").clone(),
-            data_dir: self.data_dir.clone(),
+            support_dir: self.support_dir.clone(),
+            data_dir: None,
             cache,
             storage: self.storage.lock().expect("storage").as_ref().map(|dir| {
                 nsh_engine::FileStorage::open(dir) as Arc<dyn nsh_engine::StorageBackend>
@@ -664,7 +677,7 @@ extern "system" fn Java_com_longbridge_nsh_Native_create(
     view: JObject<'_>,
     density: jfloat,
     trace: jboolean,
-    data_dir: JString<'_>,
+    support_dir: JString<'_>,
     cache_dir: JString<'_>,
 ) -> jlong {
     #[cfg(feature = "websocket")]
@@ -672,8 +685,8 @@ extern "system" fn Java_com_longbridge_nsh_Native_create(
     let Ok(view) = env.new_global_ref(view) else {
         return 0;
     };
-    let data_dir = env
-        .get_string(&data_dir)
+    let support_dir = env
+        .get_string(&support_dir)
         .ok()
         .map(|dir| std::path::PathBuf::from(String::from(dir)));
     let cache_dir = (!cache_dir.is_null())
@@ -710,8 +723,9 @@ extern "system" fn Java_com_longbridge_nsh_Native_create(
         epoch: Instant::now(),
         granted: Mutex::new(None),
         limits: Mutex::new(nsh_engine::Limits::default()),
+        content_culling: AtomicBool::new(true),
         runtime: Mutex::new(None),
-        data_dir,
+        support_dir,
         storage: Mutex::new(None),
         access: Mutex::new(Arc::default()),
         host_tokens: Mutex::new(None),
@@ -800,6 +814,20 @@ extern "system" fn Java_com_longbridge_nsh_Native_setStandaloneLimits(
     // SAFETY: Java passes its live handle.
     let host = unsafe { host(handle) };
     host.set_limits(nsh_engine::Limits::standalone());
+}
+
+/// Whether scroll views make the native views of their content only near
+/// their viewport (the default), or all of it (`NshView.setContentCulling`).
+#[unsafe(no_mangle)]
+extern "system" fn Java_com_longbridge_nsh_Native_setContentCulling(
+    _: JNIEnv<'_>,
+    _: JClass<'_>,
+    handle: jlong,
+    enabled: jboolean,
+) {
+    // SAFETY: Java passes its live handle.
+    let host = unsafe { host(handle) };
+    host.set_content_culling(enabled != 0);
 }
 
 /// The directory the storage of the apps loaded next is kept in (null: each
@@ -1333,10 +1361,12 @@ extern "system" fn Java_com_longbridge_nsh_Native_environment(
     environment.pixel_ratio = v[9];
     environment.screen_reader = v[10] != 0.0;
     environment.os = nsh_engine::Os::Android;
-    // Android's backend holds text only on the clipboard.
-    environment.clipboard_images = false;
     environment.notifications = true;
     environment.audio = true;
+    // A chooser over `ACTION_SEND` (`Share.java`).
+    environment.share = true;
+    // A Custom Tab, ended by the callback link (`AuthSession.java`).
+    environment.auth_session = true;
     environment.os_version = (v[11] as u16, 0);
     environment.idiom = match v[12] as u8 {
         1 => Idiom::Pad,
@@ -1955,6 +1985,9 @@ extern "system" fn Java_com_longbridge_nsh_Native_eventMap(
                 "positionMs" => "positionMs",
                 "truncated" => "truncated",
                 "buffering" => "buffering",
+                "action" => "action",
+                "target" => "target",
+                "value" => "value",
                 _ => continue,
             };
             if let Some(v) = read(&mut env, i) {

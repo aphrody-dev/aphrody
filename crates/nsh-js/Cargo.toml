@@ -3,7 +3,6 @@ name = "nsh-js"
 description = "QuickJS host: runtime setup, host APIs, op decoding and bytecode."
 version.workspace = true
 edition.workspace = true
-publish.workspace = true
 rust-version.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -56,5 +55,5 @@ brotli.workspace = true
 flate2.workspace = true
 zstd.workspace = true
 # The typed API check reads the crate's public API.
-syn = { workspace = true, features = ["full", "parsing", "visit"] }
+syn = { workspace = true, features = ["visit"] }
 nsh-base = { workspace = true, features = ["editor", "highlight", "plot", "rich-editor", "term"] }

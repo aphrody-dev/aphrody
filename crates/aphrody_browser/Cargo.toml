@@ -19,6 +19,8 @@ gpui-views = ["dep:gpui", "dep:aphrody_ui", "dep:ui"]
 vpn-daemon = ["dep:aphrody_vpn"]
 
 [dependencies]
+anyhow.workspace = true
+aphrody_pilot.workspace = true
 aphrody_ui = { workspace = true, optional = true }
 aphrody_vpn = { workspace = true, optional = true }
 browser-browse.workspace = true
@@ -28,5 +30,6 @@ browser-views.workspace = true
 browser-vpn.workspace = true
 gpui = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
 ui = { workspace = true, optional = true }
 url.workspace = true

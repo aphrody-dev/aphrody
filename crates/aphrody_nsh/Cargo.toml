@@ -27,7 +27,7 @@ aphrody_craft = { workspace = true, features = ["studio"], optional = true }
 editor.workspace = true
 file_icons.workspace = true
 aphrody_design = { workspace = true, optional = true }
-gpui_ui = { workspace = true, features = ["nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }
+gpui_ui = { workspace = true, features = ["kit", "nsh-dev", "nsh-shader", "nsh-math", "nsh-tui"] }
 language.workspace = true
 log.workspace = true
 aphrody_ui.workspace = true

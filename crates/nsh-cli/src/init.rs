@@ -142,28 +142,12 @@ pub(crate) fn init(
         text.replace("__SPECIFIER__", &specifier)
             .replace("__APP_NAME__", &name)
     };
-    let bun_package_json = serde_json::to_string_pretty(&serde_json::json!({
-        "name": slug,
-        "private": true,
-        "type": "module",
-        "scripts": {
-            "dev": "nsh dev",
-            "build": "nsh build",
-            "check": "bun check --no-script",
-            "fmt": "bun fmt",
-            "lint": "bun lint",
-            "test": "nsh test"
-        },
-        "dependencies": {},
-        "devDependencies": {}
-    }))? + "\n";
     let mut files = vec![(".gitignore", GITIGNORE.to_owned())];
     match template {
         Template::Ts => files.extend([
             ("App.tsx", APP.to_owned()),
             ("App.test.tsx", APP_TEST.to_owned()),
             ("tsconfig.json", nsh_bundler::TSCONFIG.to_owned()),
-            ("package.json", bun_package_json),
         ]),
         Template::Rust => {
             config["rust"] = ".".into();
@@ -195,7 +179,6 @@ pub(crate) fn init(
                     include_str!("templates/mixed/App.test.tsx").to_owned(),
                 ),
                 ("tsconfig.json", nsh_bundler::TSCONFIG.to_owned()),
-                ("package.json", bun_package_json),
                 (
                     "Cargo.toml",
                     manifest(&rust_package_name(&name), nsh_source.as_deref(), false),

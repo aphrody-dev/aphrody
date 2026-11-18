@@ -16,7 +16,7 @@ doctest = false
 [features]
 default = ["codecs", "storytold-suite", "wasm-inspect", "native-inspect"]
 full = ["codecs", "storytold-suite", "wasm-inspect", "native-inspect", "studio"]
-figcraft = []
+figcraft = ["dep:aphrody_design", "dep:aphrody_ui"]
 craft-anything = []
 unreal-bevy = []
 studio = [
@@ -28,6 +28,7 @@ studio = [
     "dep:bevy_gpui",
     "dep:egui_gpui",
     "dep:gpui",
+    "dep:gpui-kit",
     "dep:ui",
     "dep:web-time",
 ]
@@ -164,6 +165,7 @@ craft-zip = { workspace = true, optional = true }
 dirs.workspace = true
 egui_gpui = { workspace = true, optional = true }
 gpui = { workspace = true, optional = true }
+gpui-kit = { workspace = true, optional = true }
 image = { workspace = true, optional = true }
 log.workspace = true
 object = { workspace = true, optional = true }

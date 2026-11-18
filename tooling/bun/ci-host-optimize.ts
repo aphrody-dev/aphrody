@@ -451,7 +451,7 @@ export function analyzeProbe(probe: HostProbeReport, zedBaseline = inspectZedBas
       title: "Kernel sysctl tuning diverges from Kernel 7.3 io_uring & metadata-cache profile",
       current: `io_uring_disabled=${probe.sysctl["kernel.io_uring_disabled"] ?? "unset"}, vfs_cache_pressure=${probe.sysctl["vm.vfs_cache_pressure"] ?? "unset"}`,
       target:
-        "Apply /etc/sysctl.d/96-aphrody-ci-kernel73.conf (io_uring=0, vfs_cache_pressure=50, dirty_bytes=1G, compaction_proactiveness=20)",
+        "Apply /etc/sysctl.d/94-aphrody-ci-kernel73.conf (io_uring=0, vfs_cache_pressure=50, dirty_bytes=1G, compaction_proactiveness=20; leaves 95-fleet-tune.conf authoritative)",
       rationale:
         "Keeps XFS/ext4 dentry/inode caches resident across multi-crate rustc/Cargo dependency scans while capping dirty writeback stalls.",
     });
@@ -624,7 +624,9 @@ if [ -x "${remoteHome}/.local/bin/bun" ] && { [ -L "${remoteHome}/.local/bin/wra
   fi
 fi
 
-cat <<'EOF' > /etc/sysctl.d/96-aphrody-ci-kernel73.conf
+# Written before 95-fleet-tune.conf so host-specific swap/dirty ratios stay authoritative.
+rm -f /etc/sysctl.d/96-aphrody-ci-kernel73.conf
+cat <<'EOF' > /etc/sysctl.d/94-aphrody-ci-kernel73.conf
 ${plan.sysctlDropin}EOF
 sysctl --system >/dev/null || true
 

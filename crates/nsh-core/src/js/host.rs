@@ -768,7 +768,7 @@ pub const EVENTS: &[(EventKind, u32, &str, &str)] = &[
         EventKind::Wheel,
         on::ALL,
         "(e: WheelEvent) => void",
-        "A mouse wheel or touchpad scrolled over the view (or a view inside it); desktops and the web. The nearest listener hears it. A listener nearer than any scroll view under the pointer takes the wheel: nothing scrolls or zooms natively (a canvas zooms on `e.modifiers.ctrl` and pans otherwise); a scroll view listening, or a view around one, only observes it.",
+        "A mouse wheel or touchpad scrolled over the view (or a view inside it); desktops and the web. The nearest listener hears it. A listener nearer than any scroll view under the pointer takes the wheel: nothing scrolls or zooms natively (a canvas zooms on `e.modifiers.control` and pans otherwise); a scroll view listening, or a view around one, only observes it.",
     ),
     (
         EventKind::Pinch,
@@ -1069,6 +1069,12 @@ pub const EVENTS: &[(EventKind, u32, &str, &str)] = &[
         "Escape or the Android back button, while this is the top overlay listening to it (it takes the key from the overlays below, the pages and `BackHandler`). Closing is the app's.",
     ),
     (
+        EventKind::DetentChange,
+        on::MODAL,
+        "(e: { detent: SheetDetent }) => void",
+        "The user moved an iOS sheet to another of its `detents` (dragging it, its grabber, a scroll at its edge, a screen reader): set `detent` to it to keep the app's value in step.",
+    ),
+    (
         EventKind::Position,
         on::OVERLAY,
         "(e: OverlayPosition) => void",
@@ -1098,6 +1104,8 @@ pub const INTERNAL_EVENTS: &[EventKind] = &[
     EventKind::Pick,
     EventKind::OpenUrl,
     EventKind::ScreenColor,
+    EventKind::Share,
+    EventKind::AuthSession,
     EventKind::CanvasImage,
     EventKind::FileRequest,
     EventKind::Speech,

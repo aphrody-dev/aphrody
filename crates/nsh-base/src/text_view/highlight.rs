@@ -459,7 +459,7 @@ mod syntect_highlighter {
         fn bench_highlight() {
             let root = concat!(env!("CARGO_MANIFEST_DIR"), "/../../");
             for (language, path) in [
-                ("tsx", "examples/gallery/demos/Chat.tsx"),
+                ("tsx", "examples/nsh/gallery/demos/Chat.tsx"),
                 ("rust", "crates/nsh-base/src/text_view/view.rs"),
                 ("python", ".github/ci/paths.py"),
             ] {

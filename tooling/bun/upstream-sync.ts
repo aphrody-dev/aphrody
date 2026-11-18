@@ -265,13 +265,8 @@ export function resolveActiveZedMergeConflicts(root = repoRoot): ConflictResolut
  * `crates/sum_tree`, and `[workspace.dependencies]` without `gpui-fast` splits.
  */
 export function normalizeGpuiKitManifest(rawToml: string, crateDirName: string): string {
-  let out = rawToml
+  const lines = rawToml
     .replace(/^publish\s*=\s*true\s*$/m, "publish.workspace = true")
-    .replace(/^version\s*=\s*"[^"]+"\s*$/m, (m) => m)
-    .replace(/^gpui-fast\s*=.*$/gm, "gpui-fast = []")
-    .replace(/^gpui-fast-platform\s*=.*$/gm, "")
-    .replace(/^gpui-fast-web\s*=.*$/gm, "")
-    .replace(/\[dependencies\]\r?\n/, `[dependencies]\n`)
     .replace(/\bsum-tree\.workspace\s*=\s*true\b/g, "sum_tree.workspace = true")
     .replace(/\bropey\.workspace\s*=\s*true\b/g, "ropey_kit.workspace = true")
     .replace(/\bmarkdown\.workspace\s*=\s*true\b/g, "markdown-rs.workspace = true")
@@ -281,7 +276,38 @@ export function normalizeGpuiKitManifest(rawToml: string, crateDirName: string):
     .replace(/,\s*"gpui-fast[^"]*"/g, "")
     .replace(/"gpui-fast[^"]*",\s*/g, "")
     .replace(/,\s*"dep:gpui-fast[^"]*"/g, "")
-    .replace(/"dep:gpui-fast[^"]*",\s*/g, "");
+    .replace(/"dep:gpui-fast[^"]*",\s*/g, "")
+    .split(/\r?\n/);
+
+  const filtered: string[] = [];
+  let section = "";
+  let sawLog = false;
+  for (const line of lines) {
+    const secMatch = line.match(/^\s*\[([^\]]+)\]\s*$/);
+    if (secMatch) {
+      section = secMatch[1];
+      sawLog = false;
+      filtered.push(line);
+      continue;
+    }
+    const inDeps = section.includes("dependencies");
+    if (inDeps && /^\s*gpui-fast(?:-[a-z0-9-]+)?\b/.test(line)) {
+      continue;
+    }
+    if (!inDeps && /^\s*gpui-fast\s*=/.test(line)) {
+      filtered.push("gpui-fast = []");
+      continue;
+    }
+    if (!inDeps && /^\s*gpui-fast-(?:platform|web)\s*=/.test(line)) {
+      continue;
+    }
+    if (inDeps && /^\s*log\.workspace\s*=\s*true\s*$/.test(line)) {
+      if (sawLog) continue;
+      sawLog = true;
+    }
+    filtered.push(line);
+  }
+  let out = filtered.join("\n");
 
   // Ensure workspace lint inheritance is active for package_conformity
   if (!/\[lints\]\s*\r?\nworkspace\s*=\s*true/.test(out)) {
@@ -291,29 +317,59 @@ export function normalizeGpuiKitManifest(rawToml: string, crateDirName: string):
   // Convert bare registry/git dep specs inside gpui-kit crates to `.workspace = true` where root Cargo.toml provides them
   const workspaceConvertedDeps = [
     "aho-corasick",
+    "ashpd",
+    "async-channel",
+    "block2",
+    "core-graphics",
+    "core-text",
+    "cpal",
+    "criterion",
     "data-url",
+    "enum-iterator",
     "futures",
-    "html5ever",
+    "indoc",
     "instant",
     "itertools",
     "jiff",
+    "libc",
     "markdown",
     "markup5ever_rcdom",
     "num-traits",
+    "objc2",
+    "objc2-app-kit",
+    "objc2-av-foundation",
+    "objc2-avf-audio",
+    "objc2-core-foundation",
+    "objc2-foundation",
+    "objc2-io-kit",
+    "objc2-speech",
+    "once_cell",
+    "paste",
     "regex",
+    "resvg",
     "rust_decimal",
     "rust-embed",
     "proc-macro2",
     "proc-macro-crate",
     "quote",
+    "similar",
     "syn",
     "syntect",
+    "sys-locale",
     "two-face",
     "serde_repr",
     "semver",
     "smol",
     "sysinfo",
     "tracing",
+    "tree-sitter",
+    "tree-sitter-[a-z0-9-]+",
+    "unicode-bidi",
+    "unicode-linebreak",
+    "unicode-segmentation",
+    "unicode-width",
+    "uuid",
+    "wayland-client",
     "web-time",
     "wasm-bindgen",
     "wasm-bindgen-futures",
@@ -322,11 +378,11 @@ export function normalizeGpuiKitManifest(rawToml: string, crateDirName: string):
   ];
 
   for (const dep of workspaceConvertedDeps) {
-    const bareRe = new RegExp(`^${dep}\\s*=\\s*(?:"[^"]+"|\\{[^\\n]*\\})\\s*$`, "gm");
-    out = out.replace(bareRe, (line) => {
+    const bareRe = new RegExp(`^(${dep})\\s*=\\s*(?:"[^"]+"|\\{[\\s\\S]*?\\})\\s*$`, "gm");
+    out = out.replace(bareRe, (line, key) => {
       if (line.includes("workspace")) return line;
-      if (line.includes("optional = true")) return `${dep} = { workspace = true, optional = true }`;
-      return `${dep}.workspace = true`;
+      if (line.includes("optional = true")) return `${key} = { workspace = true, optional = true }`;
+      return `${key}.workspace = true`;
     });
   }
 
@@ -534,6 +590,7 @@ export function syncNshFromClone(root: string, cloneDir: string, dryRun = false)
         .replace(/wry\s*=\s*\{\s*package\s*=\s*"lb-wry"[^}]*\}/g, "wry = { workspace = true, optional = true }")
         .replace(/\bmarkdown\.workspace\s*=\s*true\b/g, "markdown-rs.workspace = true")
         .replace(/^(\s*)(nsh-[a-z0-9-]+)\s*=\s*\{\s*path\s*=\s*"(?:\.\.\/)+[^"]+"\s*(?:,\s*default-features\s*=\s*(?:true|false))?\s*\}\s*$/gm, "$1$2.workspace = true")
+        .replace(/^(\s*)(nsh-[a-z0-9-]+)\s*=\s*\{\s*path\s*=\s*"\."(\s*,[^}]+)\}\s*$/gm, "$1$2 = { workspace = true$3}")
         .replace(/^publish\s*=\s*false\s*$/m, "publish.workspace = true");
       if (oldCargo && oldCargo.includes("publish.workspace = true")) {
         toml = toml.replace(/^publish\s*=\s*false\s*$/m, "publish.workspace = true");

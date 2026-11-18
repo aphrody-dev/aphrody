@@ -112,6 +112,12 @@ members = [
     "crates/go_to_line",
     "crates/google_ai",
     "crates/gpui",
+    "crates/gpui-base",
+    "crates/gpui-component",
+    "crates/gpui-component-macros",
+    "crates/gpui-fps",
+    "crates/gpui-kit",
+    "crates/gpui-kit-assets",
     "crates/gpui_apple",
     "crates/gpui_ios",
     "crates/gpui_linux",
@@ -376,7 +382,7 @@ default-members = [
 ]
 
 [workspace.package]
-version = "0.5.0"
+version = "0.6.0"
 edition = "2024"
 rust-version = "1.97"
 license = "Apache-2.0"
@@ -482,6 +488,12 @@ go_to_line = { path = "crates/go_to_line" }
 google_ai = { path = "crates/google_ai" }
 aphrody_design = { path = "crates/aphrody_design" }
 gpui = { path = "crates/gpui", default-features = false }
+gpui-base = { version = "0.10.0", path = "crates/gpui-base" }
+gpui-component = { version = "0.10.0", path = "crates/gpui-component" }
+gpui-component-macros = { version = "0.10.0", path = "crates/gpui-component-macros" }
+gpui-fps = { version = "0.10.0", path = "crates/gpui-fps" }
+gpui-kit = { version = "0.10.0", path = "crates/gpui-kit" }
+gpui-kit-assets = { version = "0.10.0", path = "crates/gpui-kit-assets" }
 gpui_apple = { path = "crates/gpui_apple" }
 gpui_ios = { path = "crates/gpui_ios" }
 gpui_linux = { path = "crates/gpui_linux", default-features = false }
@@ -545,24 +557,24 @@ multi_buffer = { path = "crates/multi_buffer" }
 net = { path = "crates/net" }
 node_runtime = { path = "crates/node_runtime" }
 notifications = { path = "crates/notifications" }
-nsh-base = { version = "0.5.0", path = "crates/nsh-base", default-features = false }
-nsh-bundler = { version = "0.5.0", path = "crates/nsh-bundler", default-features = false }
-nsh-core = { version = "0.5.0", path = "crates/nsh-core" }
-nsh-dev = { version = "0.5.0", path = "crates/nsh-dev" }
-nsh-engine = { version = "0.5.0", path = "crates/nsh-engine", default-features = false }
-nsh-i18n = { version = "0.5.0", path = "crates/nsh-i18n" }
-nsh-js = { version = "0.5.0", path = "crates/nsh-js", default-features = false }
-nsh-macros = { version = "0.5.0", path = "crates/nsh-macros" }
-nsh-package = { version = "0.5.0", path = "crates/nsh-package" }
-nsh-platform-apple = { version = "0.5.0", path = "crates/nsh-platform-apple" }
-nsh-platform-gpui = { version = "0.5.0", path = "crates/nsh-platform-gpui", default-features = false }
-nsh-platform-ios = { version = "0.5.0", path = "crates/nsh-platform-ios", default-features = false }
-nsh-platform-linux = { version = "0.5.0", path = "crates/nsh-platform-linux", default-features = false }
-nsh-platform-macos = { version = "0.5.0", path = "crates/nsh-platform-macos", default-features = false }
-nsh-platform-tui = { version = "0.5.0", path = "crates/nsh-platform-tui", default-features = false }
-nsh-platform-windows = { version = "0.5.0", path = "crates/nsh-platform-windows", default-features = false }
-nsh-testing = { version = "0.5.0", path = "crates/nsh-testing", default-features = false }
-nsh-updater = { version = "0.5.0", path = "crates/nsh-updater" }
+nsh-base = { version = "0.6.0", path = "crates/nsh-base", default-features = false }
+nsh-bundler = { version = "0.6.0", path = "crates/nsh-bundler", default-features = false }
+nsh-core = { version = "0.6.0", path = "crates/nsh-core" }
+nsh-dev = { version = "0.6.0", path = "crates/nsh-dev" }
+nsh-engine = { version = "0.6.0", path = "crates/nsh-engine", default-features = false }
+nsh-i18n = { version = "0.6.0", path = "crates/nsh-i18n" }
+nsh-js = { version = "0.6.0", path = "crates/nsh-js", default-features = false }
+nsh-macros = { version = "0.6.0", path = "crates/nsh-macros" }
+nsh-package = { version = "0.6.0", path = "crates/nsh-package" }
+nsh-platform-apple = { version = "0.6.0", path = "crates/nsh-platform-apple" }
+nsh-platform-gpui = { version = "0.6.0", path = "crates/nsh-platform-gpui", default-features = false }
+nsh-platform-ios = { version = "0.6.0", path = "crates/nsh-platform-ios", default-features = false }
+nsh-platform-linux = { version = "0.6.0", path = "crates/nsh-platform-linux", default-features = false }
+nsh-platform-macos = { version = "0.6.0", path = "crates/nsh-platform-macos", default-features = false }
+nsh-platform-tui = { version = "0.6.0", path = "crates/nsh-platform-tui", default-features = false }
+nsh-platform-windows = { version = "0.6.0", path = "crates/nsh-platform-windows", default-features = false }
+nsh-testing = { version = "0.6.0", path = "crates/nsh-testing", default-features = false }
+nsh-updater = { version = "0.6.0", path = "crates/nsh-updater" }
 aphrody_nsh = { path = "crates/aphrody_nsh" }
 aphrody_browser = { path = "crates/aphrody_browser" }
 oauth_callback_server = { path = "crates/oauth_callback_server" }
@@ -908,6 +920,7 @@ livekit = { version = "0.7.32", features = ["tokio", "rustls-tls-native-roots"] 
 log = { version = "0.4", default-features = false, features = ["std"] }
 lru = "0.16"
 lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "82d7fc66ebdfabcfeb26ba16bbed9f3d26211fc3" }
+lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }
 mach2 = "0.6"
 markup5ever_rcdom = "0.39"
 merman = { version = "=0.9.3", default-features = false }
@@ -1490,7 +1503,7 @@ httpdate = "1"
 imagesize = "0.15"
 jni = "0.21"
 jni-verifier = { package = "jni", version = "0.22" }
-markdown-rs = { package = "markdown", version = "1.0.0" }
+markdown-rs = { package = "markdown", version = "1.0.0", features = ["serde"] }
 md-5 = "0.10"
 naga = { path = "vendor/wgpu/naga", default-features = false, features = ["wgsl-in"] }
 notify = "9.0.0-rc.4"
@@ -1563,6 +1576,41 @@ tiny-skia-path = "0.11"
 trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d884a89351f3b8856d12894cccee261d" }
 vscode_theme = "0.2.0"
 waker-fn = "1.2.0"
+
+# Consolidated GPUI-Kit & NSH 0.6.0 shared workspace dependencies (enforced by xtask package-conformity)
+data-url = "0.3"
+enum-iterator = "2.1.0"
+instant = { version = "0.1", features = ["wasm-bindgen"] }
+jiff = { version = "1.0", features = ["js"] }
+num-traits = "0.2"
+objc2-authentication-services = { version = "0.3.2", default-features = false, features = ["std", "block2", "ASWebAuthenticationSession"] }
+objc2-av-foundation = { version = "0.3", default-features = false, features = ["std", "AVCaptureDevice", "AVMediaFormat"] }
+objc2-avf-audio = { version = "0.3", default-features = false, features = ["std", "AVAudioBuffer", "AVAudioFormat", "AVAudioTypes"] }
+objc2-speech = { version = "0.3", default-features = false, features = ["std", "block2", "objc2-avf-audio", "SFSpeechRecognitionMetadata", "SFSpeechRecognitionRequest", "SFSpeechRecognitionResult", "SFSpeechRecognitionTask", "SFSpeechRecognizer", "SFTranscription"] }
+once_cell = "1.19.0"
+paste = "1"
+proc-macro-crate = "3.5"
+ropey_kit = { package = "ropey", version = "=2.0.0-beta.1", features = ["metric_chars", "metric_lines_lf", "metric_utf16"] }
+rust_decimal = "1.37.0"
+serde_repr = "0.1"
+wayland-client = "0.31"
+tree-sitter-astro-next = "0.1.1"
+tree-sitter-c-sharp = "0.23.1"
+tree-sitter-cmake = "0.7.1"
+tree-sitter-graphql = "0.1.0"
+tree-sitter-java = "0.23.5"
+tree-sitter-javascript = "0.23.1"
+tree-sitter-kotlin-sg = "0.4.0"
+tree-sitter-lua = "0.4.1"
+tree-sitter-make = "1.1.1"
+tree-sitter-php = "0.24.2"
+tree-sitter-proto = "0.2.0"
+tree-sitter-scala = "0.23.4"
+tree-sitter-sequel = "0.3.8"
+tree-sitter-svelte-next = "0.1.1"
+tree-sitter-swift = "0.7.0"
+tree-sitter-toml-ng = "0.7.0"
+tree-sitter-zig = "1.1.2"
 
 [workspace.dependencies.windows]
 version = "0.62"

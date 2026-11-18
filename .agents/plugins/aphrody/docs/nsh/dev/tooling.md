@@ -46,13 +46,32 @@
   QuickJS-NG's is declared), every event has a type or is internal, and every imported name has one home.
 - To check the declarations themselves, run `nsh check -- --skipLibCheck false` in an app.
 
-### `nsh check`, `nsh fmt`, and `nsh lint` (Bun-native)
+### `nsh check`
 
-The bundler strips types without checking them (Oxc). In `aphrody`, TypeScript checking, formatting, and linting are unified directly on **Bun** (`vendor/bun/docs/`), eliminating npm tarball downloads, Node.js, Prettier, and ESLint:
+The bundler strips types without checking them (Oxc), and no Rust type checker for TypeScript exists: checking means
+running TypeScript itself. The options were:
 
-- `nsh check` (`crates/nsh-cli/src/check.rs`) writes `.nsh/types` and `.nsh/tsconfig.json`, then runs `bun check --no-script -p <app dir>` across all CPU cores using Bun's built-in TypeScript 7 checker and built-in `lib.*.d.ts` declarations (`vendor/bun/docs/runtime/check.mdx`). Arguments after `--` pass through to `bun check`, and `--bun <path>` / `NSH_BUN` override the `bun` executable. An app with Rust crates (`nsh.json` `"rust"`) runs `cargo check --all-targets` on each crate first (`check::cargo_check`); a pure Rust app (`"root"`) runs `bun check` only if a `tsconfig.json` is present for its `.test.tsx` suite.
-- `nsh fmt` runs `bun fmt` (`--check` in CI), formatting TS/TSX/JSON/Markdown and automatically sorting imports and Tailwind CSS classes (`vendor/bun/docs/format/index.mdx`).
-- `nsh lint` runs `bun lint` (`--fix`), applying Bun's built-in TypeScript/JSX lint rules with zero npm packages (`vendor/bun/docs/lint/index.mdx`).
+- **Bundle the JS compiler** (`typescript.js`, ~9 MB) and run it in QuickJS: QuickJS is 10–50× slower than V8 at this
+  workload (tens of seconds for a small app) and the compiler needs a host for files and `lib.*.d.ts`; no.
+- **Require Node** (`npx tsc`, `bunx tsc`): what apps did before; the only Node dependency of the toolchain.
+- **Run TypeScript's native compiler**: TypeScript 7 (July 2026) is the Go port, shipped on npm as one executable per
+  platform (`@typescript/typescript-<os>-<arch>`, `package/lib/tsc` with its `lib.*.d.ts` next to it) behind the
+  `typescript` package's optional dependencies. It needs no Node and checks the same as TypeScript 6.
+
+`nsh check` does the last (`crates/nsh-cli/src/check.rs`): it writes `.nsh/types` as every command does, then runs
+`tsc -p <app dir> --noEmit` (arguments after `--` are passed on). The compiler is a pinned release (`TYPESCRIPT`),
+downloaded from the npm registry's tarball URL the first time (ureq, no npm client), checked against the
+`dist.integrity` (SHA-512) recorded in the source for each host it supports (macOS, Linux and Windows, arm64 and x64; on Windows the compiler is
+`package/lib/tsc.exe`), unpacked into NSH's cache (`NSH_CACHE`, else `~/Library/Caches/nsh` / `$XDG_CACHE_HOME/nsh` /
+`%LOCALAPPDATA%\nsh`) and kept there. `--tsc <path>` /
+`NSH_TSC` run another `tsc` (a TypeScript 5 / 6 one, an offline copy). An app with Rust crates (`nsh.json` `"rust"`)
+has each crate checked first (`check::cargo_check`, called from `main.rs` `run` before the crates are described, so
+their errors are Cargo's own): `cargo check --all-targets --manifest-path <crate>/Cargo.toml` in the crate's directory,
+in the workspace and target directory Cargo uses there (`AppCrate::cargo`). A Rust app (`"root"`) is type checked only
+when it has a `tsconfig.json` (`check::has_typescript`: its test files'), which also decides whether `.nsh/types` is
+written for it. Updating TypeScript is a change of the version
+and the integrities (`npm view @typescript/typescript-<os>-<arch>@<version> dist.integrity`). The distribution
+(`cargo xtask dist`) does not ship the compiler: it is 24 MB per platform and most runs of `nsh` never check types.
 
 ## Project files
 
@@ -424,6 +443,8 @@ Headless runs play the platform's part NSH's protocol defines, and refuse what o
   (`Headless::on_pick`, `app.onPick`; given as they are, nothing scaled), else cancelled (no files); `nsh/test`'s `App`
   answers them after each step and its dialogs (`answer_picks_myself`), and `app.picks()` lists what was asked; a real
   platform shows its own picker, which the driver does not answer;
+- shares (`Command::Share`) are answered as `onShare` says (`Headless::on_share`, `app.onShare`, which also turns
+  `Environment::share` on), and `app.shares()` lists what was shared;
 - speech sessions run on a fake recognizer (`headless/speech.rs`, unless the test's `EngineConfig::speech` is set): a
   session starts at once, `Headless::hear` (`app.hear(text)`) reports `text` as the transcript so far, `stop` and
   `Headless::end_speech` (`app.endSpeech(error?)`) end it with the last transcript as final (`no-speech` when nothing
@@ -1011,6 +1032,22 @@ A Rust app's runners were and are what they were: `nsh package --target macos` a
 for the release runner in both. The test runner links QuickJS, so the first `nsh test` of such an app builds what its
 `nsh build` no longer does.
 
+
+### Third-party extensions (`nsh.json` `"extensions"`, `nsh add`)
+
+`crates/nsh-cli/src/extensions.rs`. An extension is a crate like the ones `"rust"` lists, from Git (`nsh add <url>
+[--tag|--rev]`, `{ "git", "tag"|"rev" }`, locked to a `commit`), crates.io (`nsh add <crate>[@<req>]`, `{ "crate",
+"version" }`, resolved by `cargo metadata` on a probe crate in the cache and locked to the exact version as `resolved`)
+or a directory (`nsh add --path <dir>`, `{ "path" }`, not locked, read as it is). `nsh.lock` holds `{ <source>,
+commit|resolved, package, module }`. A locked crate is Cargo's own download of that version. Each locked commit is a `git worktree` of one clone per repository in
+nsh's cache (`<cache>/extensions/<name>-<hash of url>/<commit>`), made again when missing, so a build after clearing
+the cache takes the same commit. `rust_app::of` appends the extensions to the app's crates (an app with extensions
+only is a `RustApp` too, its nsh crates this CLI's, as `runner_only`), checks them together (`check_crates`: the same
+directory, package or `#[native_module]` specifier), and the workspace links each like an app crate. The app's crate
+depends on the extension as `nsh add` writes it (Git at the locked `rev`, the resolved crate version, or a relative
+`path`), which the workspace's `[patch."<url>"]` / `[patch.crates-io]` sends to the same checkout. Before linking, the extension must have a `#[native_module]` at its root
+(its module) and its `nsh-core` dependency requirement, if any, must match this CLI; there is no NSH-specific metadata. `nsh check` does not `cargo check` extensions (only crates outside the cache). Not yet: per-target support checks, web and mobile packaging checks, and an OTA check of the shell's linked modules.
+
 ## Finding the runtimes
 
 The CLI finds prebuilt runtimes next to itself (`bin/../runtime`, the distribution layout) or, in a checkout, in
@@ -1067,10 +1104,11 @@ the profile's fat LTO over one, which linked each executable single-threaded for
 `xtask dist` strips the executables it copies (`copy_executable`: about a sixth of each), after the build rather
 than with the profile's `strip`, so the release builds a checkout keeps for profiling stay as they are. Asset
 names carry no version, so `releases/latest/download/<asset>` always resolves; the installers and package managers
-rely on that. To release, set `version` in the root `Cargo.toml`, push the tag `v<version>` (a tag that does not
-match fails the run) and publish the draft release the run creates once every platform has built. Running the
-workflow by hand without a tag builds the archives only (the run's artifacts): a dry run before tagging, and how to
-check a change to the workflow or to how xtask builds the distribution (`dist.rs`, `android.rs`, `ios.rs`).
+rely on that. To release, set `version` in the root `Cargo.toml` and commit both lock files refreshed (`Cargo.lock`,
+`crates/gpui/Cargo.lock`: the release builds `--locked`), push the tag `v<version>` (a tag that does not match fails
+the run) and publish the draft release the run creates once every platform has built. Running the workflow by hand
+without a tag builds the archives only (the run's artifacts): a dry run before tagging, and how to check a change to
+the workflow or to how xtask builds the distribution (`dist.rs`, `android.rs`, `ios.rs`, `cargo.rs`).
 
 Every night (18:00 UTC) the same workflow builds the latest `main` and publishes it as the release `nightly`, a
 prerelease never marked latest, so `releases/latest` and the package managers keep the stable release. A night

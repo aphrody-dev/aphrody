@@ -20,7 +20,7 @@
 //! The imperative layer (`toast("Copied")` from anywhere, with a title, a
 //! description and an action) is a styled library's, as `gpui-component`'s
 //! notifications are: an app builds it on these (the gallery's
-//! `examples/gallery/toast.tsx`).
+//! `examples/nsh/gallery/toast.tsx`).
 
 mod js;
 mod manager;

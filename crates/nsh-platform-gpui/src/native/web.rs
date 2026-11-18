@@ -260,6 +260,9 @@ mod imp {
         key: BuildKey,
         /// The source it shows.
         source: WebSource,
+        /// Its composition surface (Linux).
+        #[cfg(target_os = "linux")]
+        surface: Option<linux::NativeSurface>,
         /// The geometry applied, `None` while hidden.
         shown: Cell<Option<Geometry>>,
     }
@@ -268,10 +271,20 @@ mod imp {
         fn drop(&mut self) {
             let _ = self.webview.set_visible(false);
             #[cfg(target_os = "linux")]
-            linux::gone();
+            {
+                if let Some(surface) = self.surface.take() {
+                    surface.release(self.webview.clone());
+                }
+                linux::gone();
+            }
         }
     }
 
+    /// What a build keeps beside the web view (Linux: its composition
+    /// surface).
+    #[cfg(target_os = "linux")]
+    type Native = Option<linux::NativeSurface>;
+    #[cfg(not(target_os = "linux"))]
     type Native = ();
 
     /// GPUI's window by its handle, for a build outside the app.
@@ -541,7 +554,7 @@ mod imp {
             builder = self.listen(builder);
 
             match make(builder) {
-                Ok((webview, ())) => {
+                Ok((webview, _native)) => {
                     #[cfg(target_os = "linux")]
                     linux::made();
                     #[cfg(target_os = "linux")]
@@ -550,6 +563,8 @@ mod imp {
                         webview: Rc::new(webview),
                         key,
                         source: p.source.clone(),
+                        #[cfg(target_os = "linux")]
+                        surface: _native,
                         shown: Cell::new(None),
                     });
                     self.scale.set(0.0);
@@ -754,7 +769,15 @@ mod imp {
     }
 
     /// Shows `built` at `g`.
-    fn place(built: &Built, g: Geometry, _scale: f32) -> anyhow::Result<()> {
+    fn place(built: &Built, g: Geometry, scale: f32) -> anyhow::Result<()> {
+        #[cfg(target_os = "linux")]
+        if let Some(surface) = &built.surface {
+            surface.place(&built.webview, g, scale)?;
+            built.webview.set_visible(true)?;
+            built.shown.set(Some(g));
+            return Ok(());
+        }
+        let _ = scale;
         let d = g.document;
         built.webview.set_bounds(wry::Rect {
             position: wry::dpi::LogicalPosition::new(
@@ -775,6 +798,10 @@ mod imp {
 
     fn hide(built: &Built) -> anyhow::Result<()> {
         built.webview.set_visible(false)?;
+        #[cfg(target_os = "linux")]
+        if let Some(surface) = &built.surface {
+            surface.set_visible(false)?;
+        }
         Ok(())
     }
 
@@ -792,7 +819,7 @@ mod imp {
     mod linux {
         //! WebKitGTK in X11 child windows of GPUI's window.
 
-        use std::{cell::Cell, time::Duration};
+        use std::{cell::Cell, rc::Rc, time::Duration};
 
         use gpui::{App, Window};
         use nsh_core::{EventKind, EventPayload, PayloadValue};
@@ -803,7 +830,7 @@ mod imp {
             },
         };
 
-        use crate::native::Emitter;
+        use crate::native::{Emitter, Geometry};
 
         /// How often pending GTK events are dispatched between GPUI's.
         const GTK_POLL: Duration = Duration::from_millis(16);
@@ -876,17 +903,22 @@ mod imp {
         impl HasWindowHandle for X11Parent {
             fn window_handle(&self) -> Result<WindowHandle<'_>, HandleError> {
                 // SAFETY: the X11 window outlives the web view, which goes
-                // before GPUI's window.
+                // before the composition surface (and with GPUI's window).
                 Ok(unsafe { WindowHandle::borrow_raw(RawWindowHandle::Xlib(self.0)) })
             }
         }
 
-        /// Builds the web view directly as a child X11 window of `window`.
+        /// A web view and its composition surface.
+        type Made = (wry::WebView, Option<NativeSurface>);
+
+        /// Builds the web view in a composition surface of `window` (in
+        /// `window` itself without composition). The error says why, and
+        /// what the placeholder says.
         pub(super) fn build(
             builder: wry::WebViewBuilder<'_>,
             window: &mut Window,
             cx: &mut App,
-        ) -> Result<(wry::WebView, ()), (String, &'static str)> {
+        ) -> Result<Made, (String, &'static str)> {
             let handle = HasWindowHandle::window_handle(&*window)
                 .map(|h| h.as_raw())
                 .map_err(|e| (e.to_string(), "WebView is not available"))?;
@@ -900,8 +932,20 @@ mod imp {
             };
             ensure_gtk(cx).map_err(|e| (e, "WebView is not available"))?;
             let fail = |e: wry::Error| (e.to_string(), "WebView could not be made");
-            let webview = builder.build_as_child(&parent).map_err(fail)?;
-            Ok((webview, ()))
+            match NativeSurface::new(window, cx) {
+                Ok(surface) => {
+                    let parent = surface
+                        .parent()
+                        .map_err(|e| (e, "WebView is not available"))?;
+                    let webview = builder.build_as_child(&parent).map_err(fail)?;
+                    Ok((webview, Some(surface)))
+                }
+                Err(err) => {
+                    log::warn!("web view: no window composition ({err:#}): it is not clipped");
+                    let webview = builder.build_as_child(&parent).map_err(fail)?;
+                    Ok((webview, None))
+                }
+            }
         }
 
         /// Reports loads that fail with `onError` (refused navigations and
@@ -933,6 +977,42 @@ mod imp {
             use gtk::prelude::WidgetExt as _;
             let gdk = webview.webview().scale_factor().max(1);
             let _ = webview.zoom(f64::from(scale) / f64::from(gdk));
+        }
+
+        /// Fallback composition surface handle; falls back to direct X11 child window embedding
+        /// when GPUI window composition is not enabled in the unified core.
+        pub(super) struct NativeSurface;
+
+        impl NativeSurface {
+            fn new(_window: &Window, _cx: &App) -> anyhow::Result<Self> {
+                Err(anyhow::anyhow!(
+                    "window composition is disabled; using X11 child window embedding"
+                ))
+            }
+
+            /// Returns an X11 parent error so `build` falls back to `window`'s X11 parent handle.
+            fn parent(&self) -> Result<X11Parent, String> {
+                Err("window composition surface unavailable".to_owned())
+            }
+
+            /// No-op when `NativeSurface` is inactive.
+            pub(super) fn place(
+                &self,
+                _webview: &wry::WebView,
+                _g: Geometry,
+                _scale: f32,
+            ) -> anyhow::Result<()> {
+                Ok(())
+            }
+
+            pub(super) fn set_visible(&self, _visible: bool) -> anyhow::Result<()> {
+                Ok(())
+            }
+
+            /// Drops the web view cleanly when falling back to X11 child window embedding.
+            pub(super) fn release(self, webview: Rc<wry::WebView>) {
+                drop(webview);
+            }
         }
     }
 }

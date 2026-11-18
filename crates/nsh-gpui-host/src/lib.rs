@@ -87,8 +87,8 @@ pub fn main() -> std::process::ExitCode {
                 None => log::warn!("--display takes a display's number, from 1, or `secondary`"),
             },
             "--keep-window-size" => options.keep_size = true,
-            // Where apps keep their data (`nsh test --target` gives each app
-            // a fresh one); the system's data directory otherwise.
+            // The app's data directory (`nsh test --target` gives each app a
+            // fresh one); the one under its id in the system's otherwise.
             "--data-dir" => {
                 options.data_dir = args.next().map(PathBuf::from);
                 // Its caches too (downloaded images): a test's app starts with none.
@@ -107,21 +107,8 @@ pub fn main() -> std::process::ExitCode {
         }
     }
     let source = source.unwrap_or_else(|| {
-        if let Ok(url) = std::env::var("NSH_DEV_SERVER_URL")
-            && !url.trim().is_empty()
-        {
-            return AppSource::DevServer(url);
-        }
         use nsh_dev::protocol::{DEFAULT_PORT, WS_PATH};
-        let host = std::env::var("NSH_DEV_HOST")
-            .ok()
-            .filter(|h| !h.trim().is_empty())
-            .unwrap_or_else(|| std::net::Ipv4Addr::LOCALHOST.to_string());
-        let port = std::env::var("NSH_DEV_PORT")
-            .ok()
-            .and_then(|p| p.parse::<u16>().ok())
-            .unwrap_or(DEFAULT_PORT);
-        AppSource::DevServer(format!("ws://{host}:{port}{WS_PATH}"))
+        AppSource::DevServer(format!("ws://127.0.0.1:{DEFAULT_PORT}{WS_PATH}"))
     });
     options.title = "nsh".to_owned();
     run_app(source, options)

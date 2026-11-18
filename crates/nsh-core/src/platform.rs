@@ -16,10 +16,25 @@ pub const TAB_BAR_COMPONENT: &str = "nsh/tab-bar";
 /// backend registers itself (`UISegmentedControl`).
 pub const SEGMENTED_CONTROL_COMPONENT: &str = "nsh/segmented-control";
 
+/// The native component of `nsh/mobile`'s `Switch`, which the iOS backend
+/// (`UISwitch`) and the Android backend register themselves
+/// (`SwitchComponent.java`'s `NAME` keeps the same name).
+pub const SWITCH_COMPONENT: &str = "nsh/switch";
+
+/// The native component of `nsh/mobile`'s `DateTimePicker`, which the iOS
+/// backend (`UIDatePicker`) and the Android backend register themselves
+/// (`DateTimePickerComponent.java`'s `NAME` keeps the same name).
+pub const DATE_TIME_PICKER_COMPONENT: &str = "nsh/date-time-picker";
+
 /// The native component of `nsh/base`'s `MenuButton`, which the iOS backend
 /// registers itself (a `UIButton` showing its `UIMenu` as its primary
 /// action).
 pub const MENU_BUTTON_COMPONENT: &str = "nsh/menu-button";
+
+/// The native component of `nsh/base`'s `ContextMenu` given `items`, which
+/// the iOS backend registers itself (a `UIContextMenuInteraction` on the
+/// view around the trigger, the trigger lifted as its preview).
+pub const CONTEXT_MENU_COMPONENT: &str = "nsh/context-menu";
 
 /// The native component of `nsh/base`'s `SplitView`, which the iOS backend
 /// makes itself (a `UISplitViewController` whose columns are the
@@ -343,6 +358,16 @@ pub struct Environment {
     /// ([`crate::Command::RenderCanvas`], `OffscreenCanvas`); without it,
     /// a render fails at once with `ERR_FEATURE_UNAVAILABLE_ON_PLATFORM`.
     pub canvas_render: bool,
+    /// The platform shows the system's share sheet
+    /// ([`crate::Command::Share`], `Share.show`); without it, a share fails
+    /// at once with `ERR_FEATURE_UNAVAILABLE_ON_PLATFORM`.
+    pub share: bool,
+    /// The platform shows web sign-in sessions
+    /// ([`crate::Command::AuthSession`]: iOS's
+    /// `ASWebAuthenticationSession`, Android's Custom Tabs); without it,
+    /// a session opens the system browser and waits for a link of a scheme
+    /// the app claims ([`crate::auth_session`]).
+    pub auth_session: bool,
     /// The platform handles file requests ([`crate::Command::FileRequest`]).
     /// Desktops implement the full set; mobile platforms answer the open
     /// dialog and reject operations they do not support. Without it, all
@@ -368,12 +393,14 @@ pub struct Environment {
     /// so the app shows its tabs with `nsh/base`'s `Tabs`. Read only on iOS
     /// and Android.
     pub tab_bar: bool,
-    /// The platform puts images on the system clipboard and reads them back
-    /// (`Clipboard.readImage`, `writeImage`, `hasImage`). On by default;
-    /// off on Android, whose backend holds text only, and on a platform
-    /// built outside NSH without images (its image calls then reject with
-    /// `ERR_FEATURE_UNAVAILABLE_ON_PLATFORM`, `hasImage` is false).
-    pub clipboard_images: bool,
+    /// Whether the platform puts images on the system clipboard and reads
+    /// them back (`Clipboard.readImage`, `writeImage`, `hasImage`). `None`
+    /// (the default): as NSH's own backends on [`Self::os`], every OS but
+    /// Android, whose backend holds text only. A platform built outside
+    /// NSH says what it does with `Some`: without images its image calls
+    /// reject with `ERR_FEATURE_UNAVAILABLE_ON_PLATFORM` and `hasImage` is
+    /// false.
+    pub clipboard_images: Option<bool>,
     /// The size of one Cell of a grid surface (a terminal, whose content is
     /// whole character Cells), in points; `None` on every other surface.
     /// With it the core lays out with its terminal algorithm, ratatui's
@@ -476,12 +503,14 @@ impl Default for Environment {
             wake_count: 0,
             screen_color: false,
             canvas_render: false,
+            share: false,
+            auth_session: false,
             file_requests: false,
             speech: false,
             notifications: false,
             audio: false,
             tab_bar: true,
-            clipboard_images: true,
+            clipboard_images: None,
             cell: None,
             web_input: false,
             web_evaluate: false,

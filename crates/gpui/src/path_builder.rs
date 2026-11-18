@@ -59,6 +59,20 @@ impl Default for FillOptions {
     }
 }
 
+impl FillOptions {
+    /// Creates fill options using the default fill rule.
+    pub fn tolerance(_tolerance: f32) -> Self {
+        Self::default()
+    }
+
+    /// Creates fill options using the even-odd winding rule.
+    pub fn even_odd() -> Self {
+        Self {
+            fill_rule: FillRule::EvenOdd,
+        }
+    }
+}
+
 /// A [`Path`] builder.
 pub struct PathBuilder {
     raw: lyon_path::builder::WithSvg<lyon_path::BuilderImpl>,
@@ -384,17 +398,19 @@ impl PathBuilder {
 
 /// A filled path, ready to paint. Build one with [`PathBuilder`].
 #[derive(Clone, Debug)]
-pub struct Path {
+pub struct Path<T = Pixels> {
     /// Closed contours of monotone curves, in logical pixels.
     curves: Arc<[PathCurve]>,
     even_odd: bool,
+    _unit: std::marker::PhantomData<T>,
 }
 
-impl Path {
+impl<T> Path<T> {
     pub(crate) fn from_curves(curves: Vec<PathCurve>, fill_rule: FillRule) -> Self {
         Self {
             curves: curves.into(),
             even_odd: matches!(fill_rule, FillRule::EvenOdd),
+            _unit: std::marker::PhantomData,
         }
     }
 
@@ -406,6 +422,27 @@ impl Path {
     /// display scale.
     pub(crate) fn bin(&self, scale: f32) -> PathTiles {
         crate::path_winding::bin(&self.curves, self.even_odd, scale)
+    }
+
+    /// Return a copy of this path translated by `offset`.
+    pub fn translate(&self, offset: Point<Pixels>) -> Self {
+        let curves = self
+            .curves
+            .iter()
+            .map(|curve| PathCurve {
+                p0: point(curve.p0.x + offset.x.0, curve.p0.y + offset.y.0),
+                p1: point(curve.p1.x + offset.x.0, curve.p1.y + offset.y.0),
+                a: curve.a,
+                b: curve.b,
+                sign: curve.sign,
+                pad: curve.pad,
+            })
+            .collect();
+        Self {
+            curves,
+            even_odd: self.even_odd,
+            _unit: std::marker::PhantomData,
+        }
     }
 }
 

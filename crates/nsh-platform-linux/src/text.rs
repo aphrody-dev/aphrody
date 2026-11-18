@@ -154,13 +154,13 @@ pub(crate) fn main_font_description(style: &ResolvedTextStyle) -> pango::FontDes
 fn resolve_family(name: &str, ui: &str) -> String {
     let mut out = String::with_capacity(name.len());
     use nsh_core::FamilyName;
-    for family in nsh_core::font_families(name) {
+    nsh_core::for_each_font_family(name, |family| {
         let family = match family {
             FamilyName::Monospace => "monospace",
             FamilyName::Serif => "serif",
             // Pango's list is comma-separated: a quoted name with a comma
             // in it can't be one of its families.
-            FamilyName::Named(f) if f.contains(',') => continue,
+            FamilyName::Named(f) if f.contains(',') => return,
             FamilyName::Named(f) => f,
             _ => ui,
         };
@@ -168,7 +168,7 @@ fn resolve_family(name: &str, ui: &str) -> String {
             out.push(',');
         }
         out.push_str(family);
-    }
+    });
     if out.is_empty() {
         out.push_str(ui);
     }
@@ -782,8 +782,9 @@ impl TextEngine for PangoTextEngine {
             } else {
                 self.attachment_font(context, text, a)
             };
-            let top = a.ascent(font, alignments.get(a.index));
-            let (up, down) = a.extent(font, alignments.get(a.index));
+            // By the baseline of its own text where it has one.
+            let top = alignments.ascent(a, font);
+            let (up, down) = alignments.extent(a, font);
             let (mut up, mut down) = (to_pango(up.0), to_pango(down.0));
             // With a fixed `lineHeight`, at least the box the text's runs
             // take (their font with the line height spread evenly above and
@@ -2404,6 +2405,7 @@ mod tests {
 
     #[test]
     fn families() {
+        assert_eq!(resolve_family(r#"'A\\B', 'A\"B'"#, "X"), "A\\B,A\"B");
         assert_eq!(resolve_family("Inter", "Adwaita Sans"), "Inter");
         assert_eq!(resolve_family("system-ui", "Adwaita Sans"), "Adwaita Sans");
         assert_eq!(resolve_family("ui-monospace", "X"), "monospace");
@@ -2777,7 +2779,7 @@ mod tests {
     #[test]
     fn registered_fonts_lay_out() {
         let engine = PangoTextEngine::new("sans-serif".into());
-        let data = include_bytes!("../../../examples/gallery/fonts/Pacifico-Regular.ttf");
+        let data = include_bytes!("../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf");
         engine.register_font(data).expect("registered");
         let other = PangoTextEngine::new("sans-serif".into());
         let config = |engine: &PangoTextEngine| {
@@ -2914,6 +2916,8 @@ mod tests {
                 color: nsh_core::Color(0xeeee_eeff),
                 radius: Points(4.0),
                 node: 4,
+                top: Default::default(),
+                bottom: Default::default(),
             }),
             ..style
         };

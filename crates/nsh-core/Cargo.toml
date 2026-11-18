@@ -3,7 +3,6 @@ name = "nsh-core"
 description = "Platform-independent core: shadow tree, styles, layout and mount instructions."
 version.workspace = true
 edition.workspace = true
-publish.workspace = true
 rust-version.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -18,7 +17,7 @@ unicode-linebreak.workspace = true
 unicode-properties.workspace = true
 rustc-hash.workspace = true
 slab.workspace = true
-taffy = { workspace = true, features = ["std", "flexbox", "grid", "block_layout", "content_size"] }
+taffy.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 rust-i18n.workspace = true
@@ -41,6 +40,8 @@ naga = { workspace = true, optional = true }
 wuff.workspace = true
 # Fonts' family names (`text::font_family`).
 ttf-parser.workspace = true
+# `nsh/mobile`'s `DateTimePicker` values (`mobile.rs`).
+chrono.workspace = true
 
 [features]
 # SVG images for the native backends (`svg`: sniffing, sizes and rasters with
@@ -80,7 +81,7 @@ cap-std.workspace = true
 # The native WebSocket client (feature `websocket`).
 futures-util = { workspace = true, optional = true }
 tokio-tungstenite = { workspace = true, optional = true }
-rustls = { workspace = true, optional = true, features = ["ring", "std", "tls12"] }
+rustls = { workspace = true, optional = true }
 # The image disk cache (`image/cache.rs`).
 httpdate.workspace = true
 # The image loader's downloads (`image/loader.rs`, feature `loader`).
@@ -117,5 +118,5 @@ nsh-core = { workspace = true, features = ["shader"] }
 # The tests use `futures_util` directly.
 futures-util.workspace = true
 # The `unit_types` check reads the crate's public API.
-syn = { workspace = true, features = ["full", "parsing", "visit"] }
+syn = { workspace = true, features = ["visit"] }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "time"] }

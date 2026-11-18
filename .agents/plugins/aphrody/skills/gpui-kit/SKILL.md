@@ -82,6 +82,8 @@ A floor, not a substitute for the guides.
   reader methods.
 - **Spell `Context` out.** `cx` is GPUI's; name anything else after what it
   holds.
+- **Retention hygiene (`gpui-fast` enabled by default).** Keep `render`/`prepaint`/`paint` pure of per-frame global writes or `cx.notify()`; use `window.refresh()` in unit tests needing forced full rebuilds.
+- **Cross-crate unification seam.** `crates/gpui` provides `Path<T = Pixels>`, blanket `IntoElement`, and 1-arg `Window::paint_layer(|w| ...)`; `gpui-base`/`gpui-component` alias `lsp_types_kit` (`0.97`, `proposed`) and declare nested modules (`display_map`, `lsp`) directly from directory parents without `mod.rs`.
 
 ## Documentation
 
@@ -277,4 +279,3 @@ Deep dives, for when the topic file is not enough:
   [entity-advanced.md](references/gpui/entity-advanced.md) (collections, registry, debounce, state machines)
 - **Testing**: [test-examples.md](references/gpui/test-examples.md) (organization, setup, assertions, running tests) ·
   [test-reference.md](references/gpui/test-reference.md) (re-entrancy, property tests, mocking)
-- **Aphrody Pure-Rust Starter Pack (`aphrody_ui::starter_pack`)**: For Tailwind v4 / shadcn / Base UI semantic GPUI tokens anchored to `https://design.google/` (`DESIGN.md`), Core Web Vitals / Lighthouse (`aphrody_design::web_standards`), and 16 agent-ready `RenderOnce` components, see `crates/aphrody_ui/src/starter_pack.rs` and [Architecture & Parity Matrix](../../../../docs/architecture/gpui-starterpack-and-parity-matrix.md).

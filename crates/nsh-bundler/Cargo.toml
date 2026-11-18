@@ -3,7 +3,6 @@ name = "nsh-bundler"
 description = "JS bundler: rolldown + nsh's JSX compiler; the compiler alone without feature `bundle`."
 version.workspace = true
 edition.workspace = true
-publish.workspace = true
 rust-version.workspace = true
 license.workspace = true
 homepage.workspace = true

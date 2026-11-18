@@ -1,0 +1,90 @@
+[package]
+description = "Behavior, interaction, and infrastructure foundations for GPUI applications."
+keywords = ["desktop", "gpui", "ui", "foundation"]
+license = "Apache-2.0"
+name = "gpui-base"
+# The examples are development tools that read fixtures from `crates/story`;
+# they stay out of the published package.
+exclude = ["examples/"]
+repository = "https://github.com/longbridge/gpui-kit"
+homepage = "https://gpui-kit.com"
+documentation = "https://docs.rs/gpui-base"
+version = "0.10.0"
+publish.workspace = true
+edition.workspace = true
+
+[lib]
+doctest = false
+
+
+
+[features]
+default = ["gpui-fast"]
+gpui-fast = []
+decimal = ["dep:rust_decimal"]
+test-support = ["gpui/test-support"]
+inspector = ["gpui_macros/inspector", "gpui/inspector"]
+
+[dependencies]
+anyhow.workspace = true
+aho-corasick.workspace = true
+data-url.workspace = true
+futures.workspace = true
+gpui.workspace = true
+gpui_macros.workspace = true
+instant.workspace = true
+itertools.workspace = true
+jiff.workspace = true
+lsp_types_kit.workspace = true
+markdown-rs.workspace = true
+html5ever.workspace = true
+markup5ever_rcdom.workspace = true
+num-traits.workspace = true
+ropey_kit.workspace = true
+regex.workspace = true
+rust_decimal = { workspace = true, optional = true }
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+smallvec.workspace = true
+sum_tree.workspace = true
+log.workspace = true
+sys-locale.workspace = true
+tracing.workspace = true
+unicode-bidi.workspace = true
+unicode-linebreak.workspace = true
+unicode-segmentation.workspace = true
+web-time.workspace = true
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+smol.workspace = true
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+async-channel.workspace = true
+# Read the current date from the browser, as `CalendarState::new` does.
+jiff.workspace = true
+[target.'cfg(target_os = "macos")'.dependencies]
+raw-window-handle.workspace = true
+objc2.workspace = true
+objc2-app-kit = { workspace = true, features = ["NSAccessibility", "NSView", "NSWindow", "NSWorkspace"] }
+objc2-foundation = { workspace = true, features = ["NSGeometry", "NSString"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+# The reduced-motion preference (SystemParametersInfoW).
+windows = { workspace = true, features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The reduced-motion preference, through the XDG desktop portal's Settings
+# interface. The same version and features `gpui-pre-linux` already pulls in.
+ashpd = { workspace = true, features = ["async-io", "settings"] }
+
+[dev-dependencies]
+criterion.workspace = true
+gpui-base = { workspace = true, features = ["test-support"] }
+gpui = { workspace = true, features = ["test-support", "bench-support"] }
+gpui_platform = { workspace = true, features = ["bench-support"] }
+
+indoc.workspace = true
+reqwest_client.workspace = true
+
+[lints]
+workspace = true

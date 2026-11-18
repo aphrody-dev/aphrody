@@ -1,7 +1,12 @@
 # Text
 
 - **Text**: `<Text>`; styles `numberOfLines`, `textOverflow` (`ellipsis|clip|ellipsis-start|ellipsis-middle`: `EllipsizeMode`'s
-  `Tail|Clip|Head|Middle`), `fontFamily` (system or imported fonts:
+  `Tail|Clip|Head|Middle`; on macOS the cut last line goes where its paragraph's alignment puts the other lines, and a
+  `clip` line wider than its box starts at its paragraph's start edge whatever the alignment, as CSS does for a
+  paragraph of that direction (`dir="auto"`): the right one for a right-to-left paragraph (its `writingDirection`, else
+  its first strong character's, as CoreText resolves a natural direction), so the beginning of the text stays in view;
+  such a right-to-left line's box starts left of the content box, and `onTextLayout` reports its negative `x`),
+  `fontFamily` (system or imported fonts:
   `import Inter from "./Inter.ttf"` evaluates to the family name and registers the font before the first frame; a host can register the same files itself, `NshView.registerFont` / `NshAppView.registerFont`, and the app names the family), `fontWeight`,
   `fontStyle` (italic runs leave color emoji upright, in runs of their own: `AttributedText::push`, as WebKit does;
   Chrome and Android would slant them), `letterSpacing`, `textDecorationLine` + `textDecorationColor`, `textTransform`, `lineHeight`, `textAlign`,
@@ -166,7 +171,12 @@
   box, `align-*` classes; a node field like `zIndex`, a change rebuilds the block) places it in its line:
   `AttachmentAlignments` keeps alignment separately from the legacy `TextAttachment` and
   `AttributedText` structs; `TextEngine::prepare_aligned` accepts it, with a default that calls `prepare` for existing
-  engines.
+  engines. On the baseline, a view that holds text stands on the line by the baseline of the first line of
+  text in it, as CSS stands an `inline-block` / `inline-flex` box; one without text (an image, a box) stands on its
+  bottom edge, as a replaced box. The core finds that text in the attachment's layout
+  (`attachment_baselines`, `TextEngine::first_baseline`, which every engine answers) and
+  `AttachmentAlignments::baseline` carries how far below the attachment's top it is; every engine places an
+  attachment by `AttachmentAlignments::ascent` and `extent`, so the line reserves what is above and below it.
   `TextAttachment::ascent(font, align)` is how far its top is above the baseline (`baseline` the height, the default and the only
   value before; `text-top` the font's ascent, `text-bottom` the height minus the descent, `middle` half the height
   plus the x height), `extent` what the line reserves above and below (each at least 0), both from the
@@ -180,7 +190,7 @@
   spread around it, CSS's strut) and grows only where the attachment reaches past that box, on every engine: the
   line height is never a cap that cuts an attachment to the line. CSS's
   `top` / `bottom` (the line box's) and `sub` / `super` / lengths are not offered: the engines size placeholders
-  before lines exist. The headless engine's font is its line (ascent 1.2 em, descent 0, x height 0.5 em). After the final layout the core places its native view, a child of the text view (Android's
+  before lines exist. The headless engine's natural font is 1.2 em (ascent 1.2 em, descent 0, x height 0.5 em), with explicit `lineHeight` spread around that ascent by half-leading. After the final layout the core places its native view, a child of the text view (Android's
   `TextBox` is a ViewGroup for this), on the placeholder (`TextEngine::attachments`); attachments cut off by the line limit or
   an ellipsis move out of sight. Their own children are normal layout children, made with the attachment: a scroll
   view around the text never culls them (`Core::cull_scope`), as its walk does not reach inside texts, though past

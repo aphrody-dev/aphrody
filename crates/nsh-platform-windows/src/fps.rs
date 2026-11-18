@@ -1,7 +1,7 @@
 //! The performance monitor ([`crate::AppOptions::fps`], `--fps`): once a
 //! second, one `nsh::fps` line of what the surface's frames and commits
 //! cost, from its [`PerfMonitor`], in the shape of the other desktop
-//! backends' (`examples/gallery/tools/perf.py` reads them all):
+//! backends' (`examples/nsh/gallery/tools/perf.py` reads them all):
 //!
 //! `fps 120/120 frame 1.21/1.10/2.40/3.90 gap 8.33/8.33/8.40/16.70 over 0%
 //! tick 0.10/… drain 0.20/… paint 1.00/… present 6.50/… canvas 0.10/…

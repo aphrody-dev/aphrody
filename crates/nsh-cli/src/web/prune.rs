@@ -45,8 +45,8 @@ pub(crate) fn unlinked(wasm: &[u8]) -> anyhow::Result<Vec<u8>> {
         }
         if let Some((id, range)) = payload.as_section() {
             out.push(id);
-            put_uleb(&mut out, (range.end - range.start) as u64);
-            out.extend_from_slice(&wasm[range.start..range.end]);
+            put_uleb(&mut out, range.end - range.start);
+            out.extend_from_slice(&wasm[range.start as usize..range.end as usize]);
         }
     }
     Ok(out)
@@ -245,9 +245,9 @@ impl<'a> Module<'a> {
                         module.elements = Some((offset, funcs));
                     }
                 }
-                Payload::CodeSectionStart { range, .. } => {
-                    module.code_start = range.start;
-                }
+                Payload::CodeSectionStart {
+                    unchecked_range, ..
+                } => module.code_start = unchecked_range.start as usize,
                 Payload::CodeSectionEntry(body) => {
                     let range = body.range();
                     module.bodies.push(range.start as usize..range.end as usize);

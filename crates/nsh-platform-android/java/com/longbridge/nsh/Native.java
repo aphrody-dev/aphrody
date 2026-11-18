@@ -99,6 +99,9 @@ final class Native {
     static final int DOWNLOAD_OFFER = 87;
     static final int DOWNLOAD_PROGRESS = 88;
     static final int DOWNLOAD_END = 89;
+    static final int SHARE = 90;
+    static final int DETENT_CHANGE = 91;
+    static final int AUTH_SESSION = 92;
 
     /**
      * Draws the SVG {@code bytes} for a view {@code maxPx} pixels on its longer side, with its shorter side that long
@@ -125,6 +128,9 @@ final class Native {
 
     /** No VM limits for the apps loaded next: they run on their own. */
     static native void setStandaloneLimits(long handle);
+
+    /** Whether scroll views make their content's native views only near their viewport (default: true). */
+    static native void setContentCulling(long handle, boolean enabled);
 
     /** The directory the storage of the apps loaded next is kept in (null: each app's own in the data directory). */
     static native void setStorage(long handle, String dir);

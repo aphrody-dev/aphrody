@@ -144,6 +144,7 @@ pub struct PluginSection {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[allow(dead_code)]
 pub struct GitSection {
     pub default_branch: String,
     pub upstream_zed: String,

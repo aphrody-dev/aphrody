@@ -28,7 +28,7 @@ enum Gap {
 #[ignore]
 fn bench_gallery_scroll() {
     let entry =
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/gallery/Bench.tsx");
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/nsh/gallery/Bench.tsx");
     let bundle = nsh_bundler::bundle(&nsh_bundler::BundleOptions {
         entry,
         minify: false,

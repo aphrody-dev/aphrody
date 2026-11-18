@@ -47,8 +47,10 @@ use crate::{
     web::WebHost,
 };
 
+/// The mounter of a surface, reached on the main thread.
+pub(crate) type MounterCell = MainThreadBound<RefCell<Option<Mounter>>>;
 /// The mounter of one surface, shared with native callbacks.
-pub(crate) type SharedMounter = Arc<MainThreadBound<RefCell<Option<Mounter>>>>;
+pub(crate) type SharedMounter = Arc<MounterCell>;
 
 enum Native {
     /// The surface root (owned by the platform).
@@ -462,12 +464,15 @@ fn set_pan(view: &UIView, shift: CGFloat, motion: KeyboardMotion, mtm: MainThrea
     });
 }
 
-/// Sets the bottom inset of `scroll` and scrolls `reveal` (a rectangle in
-/// its content) into view in one animation along `motion`, the keyboard's,
-/// so that the content moves with the keyboard.
+/// Sets the bottom inset of `scroll`'s content to `bottom` and of its
+/// vertical indicator to `indicator` (the app's own insets plus the room
+/// kept for the keyboard), and scrolls `reveal` (a rectangle in its
+/// content) into view in one animation along `motion`, the keyboard's, so
+/// that the content moves with the keyboard.
 fn set_bottom_inset(
     scroll: &UIScrollView,
     bottom: CGFloat,
+    indicator: CGFloat,
     reveal: Option<CGRect>,
     motion: KeyboardMotion,
     mtm: MainThreadMarker,
@@ -479,7 +484,7 @@ fn set_bottom_inset(
         inset.bottom = bottom;
         scroll.setContentInset(inset);
         let mut indicators = scroll.verticalScrollIndicatorInsets();
-        indicators.bottom = bottom;
+        indicators.bottom = indicator;
         scroll.setVerticalScrollIndicatorInsets(indicators);
         if let Some(rect) = reveal {
             let insets = scroll.adjustedContentInset();
@@ -774,6 +779,13 @@ pub(crate) struct Mounter {
     /// The tint of this surface's alerts and action sheets, from its
     /// tokens ([`crate::system::alert_tint`]).
     alert_tint: Option<nsh_core::element::AdaptiveColor>,
+    /// The alerts shown and not answered yet (`Command::CloseDialog`).
+    dialogs: crate::system::Dialogs,
+    /// The surface's share sheet, which a new share replaces
+    /// ([`crate::share`]).
+    share: crate::share::Current,
+    /// The sign-in session showing ([`crate::auth_session`]).
+    auth_session: crate::auth_session::Current,
     /// `SplitView`s' splits, by their native component's node
     /// ([`crate::split`]).
     splits: rustc_hash::FxHashMap<NodeId, crate::split::SplitHost>,
@@ -796,6 +808,7 @@ impl Mounter {
         let scrolls = crate::scroll_watch::SurfaceScrolls::default();
         let target = EventTarget::new(mtm, control.clone(), shared.clone(), scrolls.clone());
         let target_for_link = target.clone();
+        let shaders = crate::shader::Shaders::new(&target_for_link, &shared);
         let mut views = Vec::with_capacity(256);
         views.resize_with(2, || None);
         root.setTag(nsh_core::ROOT_ID as isize);
@@ -840,11 +853,14 @@ impl Mounter {
             created: Vec::new(),
             disappearing: Default::default(),
             frame_link: crate::animation::frame_link(&target_for_link),
-            shaders: crate::shader::Shaders::new(&target_for_link),
+            shaders,
             text_colors: crate::interaction::TextColors::new(&target_for_link),
             nav_shaders: rustc_hash::FxHashMap::default(),
             leaving_screens: rustc_hash::FxHashMap::default(),
             alert_tint: None,
+            dialogs: Default::default(),
+            share: Default::default(),
+            auth_session: Default::default(),
             hosts: Default::default(),
             dirty_stacks: Vec::new(),
             bottom_bar_dirty: false,
@@ -1618,6 +1634,28 @@ impl Mounter {
                     inset.bottom += new.bottom - old.bottom;
                     inset.right += new.right - old.right;
                     scroll.setContentInset(inset);
+                    // The indicators' insets by the same change, keeping the
+                    // keyboard's room (`set_bottom_inset`) in the bottom one.
+                    let old = ui_insets(
+                        s.behavior
+                            .as_ref()
+                            .map(|b| b.scrollbar_inset)
+                            .unwrap_or_default(),
+                    );
+                    let new = ui_insets(b.scrollbar_inset);
+                    let moved = |mut i: objc2_ui_kit::UIEdgeInsets| {
+                        i.top += new.top - old.top;
+                        i.left += new.left - old.left;
+                        i.bottom += new.bottom - old.bottom;
+                        i.right += new.right - old.right;
+                        i
+                    };
+                    scroll.setVerticalScrollIndicatorInsets(moved(
+                        scroll.verticalScrollIndicatorInsets(),
+                    ));
+                    scroll.setHorizontalScrollIndicatorInsets(moved(
+                        scroll.horizontalScrollIndicatorInsets(),
+                    ));
                     // Zooming (UIKit asks the delegate for the zoom view).
                     scroll.setMinimumZoomScale(b.min_zoom as CGFloat);
                     scroll.setMaximumZoomScale(b.max_zoom.max(b.min_zoom) as CGFloat);
@@ -1963,7 +2001,16 @@ impl Mounter {
                 crate::system::set_status_bar(config, native.view());
             }
             (Command::Dialog(dialog), native) if id == nsh_core::ROOT_ID => {
-                crate::system::show_dialog(&dialog, self.alert_tint, native.view(), &self.control);
+                crate::system::show_dialog(
+                    &dialog,
+                    self.alert_tint,
+                    native.view(),
+                    &self.control,
+                    &self.dialogs,
+                );
+            }
+            (Command::CloseDialog(dialog), _) if id == nsh_core::ROOT_ID => {
+                crate::system::close_dialog(&self.dialogs, dialog);
             }
             (
                 Command::PickImages {
@@ -2001,6 +2048,29 @@ impl Mounter {
                 native,
             ) if id == nsh_core::ROOT_ID => {
                 crate::picker::pick_files(request, asked, native.view(), &self.control);
+            }
+            (Command::AuthSession { id: request, page }, native) if id == nsh_core::ROOT_ID => {
+                crate::auth_session::open(
+                    request,
+                    &page,
+                    native.view(),
+                    &self.auth_session,
+                    &self.control,
+                );
+            }
+            (Command::CloseAuthSession(request), _) if id == nsh_core::ROOT_ID => {
+                crate::auth_session::close(request, &self.auth_session);
+            }
+            (Command::Share { id: request, sheet }, native) if id == nsh_core::ROOT_ID => {
+                let anchor = sheet.anchor.and_then(|anchor| self.ui_view(anchor));
+                crate::share::show(
+                    request,
+                    &sheet,
+                    native.view(),
+                    anchor.as_deref(),
+                    &self.share,
+                    &self.control,
+                );
             }
             (
                 Command::RenderCanvas {
@@ -2467,8 +2537,11 @@ impl Mounter {
                 ..
             }) = self.slot(previous)
         {
-            let base = self.base_inset(previous).bottom;
-            set_bottom_inset(view, base, None, motion, self.mtm);
+            let (base, bar) = (
+                self.base_inset(previous).bottom,
+                self.base_bar_inset(previous).bottom,
+            );
+            set_bottom_inset(view, base, bar, None, motion, self.mtm);
         }
         let Some((scroll_id, scroll)) = scroll else {
             return;
@@ -2487,6 +2560,7 @@ impl Mounter {
         };
         let covered = (frame.origin.y + frame.size.height - keyboard_top).max(0.0);
         let base = self.base_inset(scroll_id).bottom;
+        let bar = self.base_bar_inset(scroll_id).bottom;
         let reveal = match self.focused.and_then(|id| self.slot(id)) {
             Some(Slot {
                 native: Native::Input(input),
@@ -2502,7 +2576,14 @@ impl Mounter {
             }
             _ => None,
         };
-        set_bottom_inset(&scroll, base + covered, reveal, motion, self.mtm);
+        set_bottom_inset(
+            &scroll,
+            base + covered,
+            bar + covered,
+            reveal,
+            motion,
+            self.mtm,
+        );
         self.avoiding = Some(scroll_id);
     }
 
@@ -2513,6 +2594,16 @@ impl Mounter {
             self.slot(id)
                 .and_then(|s| s.behavior.as_ref())
                 .map(|b| b.content_inset)
+                .unwrap_or_default(),
+        )
+    }
+
+    /// The `scrollbarInset` the app set on scroll view `id`.
+    fn base_bar_inset(&self, id: NodeId) -> objc2_ui_kit::UIEdgeInsets {
+        ui_insets(
+            self.slot(id)
+                .and_then(|s| s.behavior.as_ref())
+                .map(|b| b.scrollbar_inset)
                 .unwrap_or_default(),
         )
     }
@@ -2830,7 +2921,7 @@ impl Mounter {
         // `transition::restyle` and Android's mounter skip it the same way).
         let transition = style
             .transition
-            .filter(|t| t.duration > 0.0 && s.styled && view.window().is_some());
+            .filter(|t| t.run_ms() > 0.0 && s.styled && view.window().is_some());
         s.style = style;
         s.styled = true;
         view.setHidden(s.style.hidden);
@@ -5103,7 +5194,7 @@ impl Mounter {
                 ) || pan.state() == UIGestureRecognizerState::Ended && scroll.isDragging())
             {
                 let t = pan.translationInView(view.superview().as_deref());
-                if s.gesture_start[1] + t.y as f32 > touched.offset {
+                if t.y as f32 > touched.offset {
                     return CGPoint::new(offset.x, -scroll.adjustedContentInset().top);
                 }
             }
@@ -5164,12 +5255,15 @@ impl Mounter {
                 self.animator.set(n, start[0] + t.x as f32);
             }
             if let Some(n) = values.pan_y {
-                let y = self
-                    .slot(id)
-                    .and_then(|s| s.pan_scroll.as_ref())
-                    .map_or(start[1] + t.y as f32, |scroll| {
-                        (start[1] + t.y as f32 - scroll.offset).max(0.0)
-                    });
+                let y = self.slot(id).and_then(|s| s.pan_scroll.as_ref()).map_or(
+                    start[1] + t.y as f32,
+                    |scroll| {
+                        // From where the value was (a sheet resting at a
+                        // detent stands below 0): only the downward
+                        // distance the scroll left over moves it.
+                        start[1] + (t.y as f32 - scroll.offset).max(0.0)
+                    },
+                );
                 let begins = y != start[1]
                     && self
                         .slot_mut(id)
@@ -5282,6 +5376,14 @@ impl Mounter {
     /// The shaders' display link fired.
     pub(crate) fn shader_frame(&mut self) {
         self.shaders.frame();
+    }
+
+    /// The GPU device the shaders asked for opened (`None`: there is none,
+    /// which the app hears: `shadersAvailable()`).
+    pub(crate) fn shaders_opened(&mut self, renderer: Option<nsh_engine::shader::Renderer>) {
+        if self.shaders.opened(renderer) {
+            self.control.shaders_unavailable();
+        }
     }
 
     /// The display link of texts whose color transitions fired.

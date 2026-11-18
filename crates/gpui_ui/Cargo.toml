@@ -25,6 +25,14 @@ desktop = [
 ]
 inspector = ["gpui/inspector", "gpui_platform/inspector"]
 hot-reload = ["gpui/hot-reload"]
+kit = [
+    "desktop",
+    "dep:gpui-kit",
+    "dep:gpui-base",
+    "dep:gpui-component",
+    "dep:gpui-kit-assets",
+    "dep:gpui-fps",
+]
 nsh = [
     "desktop",
     "dep:nsh-core",
@@ -99,6 +107,11 @@ gpui_util.workspace = true
 icons.workspace = true
 log.workspace = true
 menu.workspace = true
+gpui-base = { workspace = true, optional = true }
+gpui-component = { workspace = true, optional = true }
+gpui-fps = { workspace = true, optional = true }
+gpui-kit = { workspace = true, optional = true }
+gpui-kit-assets = { workspace = true, optional = true }
 nsh-base = { workspace = true, optional = true }
 nsh-bundler = { workspace = true, optional = true }
 nsh-core = { workspace = true, optional = true }
