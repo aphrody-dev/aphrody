@@ -2,7 +2,7 @@
 description = "Ultra-fast, modular GPU-native code and UI studio, 100% compatible with the Zed ecosystem."
 edition.workspace = true
 name = "zed"
-version = "1.30.0"
+version = "1.31.0"
 publish.workspace = true
 license = "GPL-3.0-or-later"
 authors = ["Aphrody Labs <dev@aphrody.com>"]
