@@ -22,8 +22,8 @@ Resolve all paths relative to `.agents/plugins/aphrody/skills/wasm-bindgen/`:
 | **JS/DOM/Futures FFI Patterns** | [references/js-web-sys-patterns.md](references/js-web-sys-patterns.md) | Writing `Closure` listeners, `Uint8Array` transfers, `JsFuture`/`spawn_local` loops, `web-sys` feature lists, or `Reflect` feature probes |
 | **walrus, weedle, ts-gen & ABI R&D** | [references/walrus-weedle-tsgen.md](references/walrus-weedle-tsgen.md) | Inspecting Wasm IR passes (`walrus` -> `wasm-opt`), WebIDL parsing (`weedle`), `.d.ts` codegen (`ts-gen`), `js-bindgen`, or `Externref` RFC |
 | **Aphrody Build & Architecture Rules** | [references/aphrody-best-practices.md](references/aphrody-best-practices.md) | Configuring `[profile.web]`, Windows `RUSTC_WRAPPER=""` workaround, 3-cohort builds, or contrasting `gpui_web` vs `nsh-platform-web` |
-| **Canonical Architecture Doc** | [docs/architecture/wasm-bindgen-ecosystem.md](../../../../../docs/architecture/wasm-bindgen-ecosystem.md) | Full architectural synthesis grounded in `Cargo.lock`, `gpui_web`, and live GitIngest digests |
-| **Standardized `llms.txt`** | [docs/architecture/wasm-bindgen-llms.txt](../../../../../docs/architecture/wasm-bindgen-llms.txt) | Machine-readable `llmstxt.org` index of all repos, guides, and skill references |
+| **Canonical Architecture Doc** | [aphrody/docs/architecture/wasm-bindgen-ecosystem.md](../../../../../aphrody/docs/architecture/wasm-bindgen-ecosystem.md) | Full architectural synthesis grounded in `Cargo.lock`, `gpui_web`, and live GitIngest digests |
+| **Standardized `llms.txt`** | [aphrody/docs/architecture/wasm-bindgen-llms.txt](../../../../../aphrody/docs/architecture/wasm-bindgen-llms.txt) | Machine-readable `llmstxt.org` index of all repos, guides, and skill references |
 
 ## Non-Negotiable Engineering Rules
 

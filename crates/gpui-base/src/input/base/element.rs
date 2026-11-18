@@ -293,15 +293,6 @@ impl<M: InputModeKind> EditorScrollbar<M> {
     }
 }
 
-#[cfg(not(feature = "gpui-fast"))]
-impl<M: InputModeKind> IntoElement for EditorScrollbar<M> {
-    type Element = Self;
-
-    fn into_element(self) -> Self::Element {
-        self
-    }
-}
-
 impl<M: InputModeKind> Element for EditorScrollbar<M> {
     type RequestLayoutState = ();
     type PrepaintState = (Vec<PaintQuad>, Option<AnyElement>);
@@ -3027,15 +3018,6 @@ fn snap_caret_to_device_pixels(bounds: Bounds<Pixels>, scale_factor: f32) -> Bou
     Bounds::new(point(x, bounds.origin.y), size(width, bounds.size.height))
 }
 
-#[cfg(not(feature = "gpui-fast"))]
-impl<M: InputModeKind> IntoElement for TextElement<M> {
-    type Element = Self;
-
-    fn into_element(self) -> Self::Element {
-        self
-    }
-}
-
 /// A debug function to print points as SVG path.
 #[allow(unused)]
 fn print_points_as_svg_path(
@@ -5223,7 +5205,6 @@ mod tests {
     /// Paints an input moved by its parent, then counts the views a draw with
     /// nothing else to do builds: a notify during a draw only marks a view
     /// dirty, for the next draw. Only GPUI Fast reuses a clean view.
-    #[cfg(feature = "gpui-fast")]
     #[gpui::test]
     fn an_input_moved_by_its_parent_is_dirty_only_while_focused(cx: &mut TestAppContext) {
         use std::{cell::Cell, rc::Rc};
@@ -5293,7 +5274,6 @@ mod tests {
     /// while painting would read as a change to what the page read, and the
     /// page would be built again on the next frame. Only GPUI Fast draws a
     /// view around another.
-    #[cfg(feature = "gpui-fast")]
     #[gpui::test]
     fn drawing_an_input_leaves_the_view_around_it_clean(cx: &mut TestAppContext) {
         use gpui::{

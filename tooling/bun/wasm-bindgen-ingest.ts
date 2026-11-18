@@ -39,8 +39,8 @@ export const TARGET_CRATES = [
 export const DIGEST_DIR_REL = "target/gitingest/wasm-bindgen";
 export const SCAN_OUT_REL = "target/gitingest/wasm-bindgen/scan.json";
 export const INGEST_MANIFEST_REL = "target/gitingest/wasm-bindgen/ingest-manifest.json";
-export const LLMS_TXT_REL = "docs/architecture/wasm-bindgen-llms.txt";
-export const ECOSYSTEM_DOC_REL = "docs/architecture/wasm-bindgen-ecosystem.md";
+export const LLMS_TXT_REL = "aphrody/docs/architecture/wasm-bindgen-llms.txt";
+export const ECOSYSTEM_DOC_REL = "aphrody/docs/architecture/wasm-bindgen-ecosystem.md";
 export const SKILL_DIR_REL = ".agents/plugins/aphrody/skills/wasm-bindgen";
 
 const USER_AGENT = "AphrodyWasmBindgenIngest/1.0 (+https://github.com/aphrody-dev/aphrody)";
@@ -1094,17 +1094,17 @@ export function renderLlmsTxt(scan: ScanReport, manifest: IngestManifest | null)
     "## Core Documentation & Best Practices",
     "",
     `- [Aphrody wasm-bindgen Ecosystem Guide](./wasm-bindgen-ecosystem.md): Full architectural analysis of all 8 upstream repos, live \`crates.io\` vs \`Cargo.lock\` telemetry, \`walrus\`/\`wasm-opt\` pipelines, and \`gpui_web\` FFI standards.`,
-    `- [wasm-bindgen Agent Skill](../../.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md): Progressive-disclosure skill entrypoint (\`agentskills.io\` compliant) with non-negotiable FFI invariants and build verification commands.`,
-    `- [Unified Web Build Pipeline](../../tooling/bun/web-build.ts): Single-source Bun orchestrator enforcing exact \`wasm-bindgen\` CLI == \`Cargo.lock\` pinning, \`[profile.web]\`, 3-cohort builds (\`baseline\`, \`simd-baseline\`, \`multithreaded\`), \`wasm-opt -Oz\`, and Brotli size budgets.`,
-    `- [GPUI Web Platform Crate](../../crates/gpui_web/Cargo.toml): Production browser platform backend (\`${lt.gpuiWebFeaturesCount}\` minimized \`web-sys\` features, \`Closure\` lifecycle cleanup, \`async_channel\` Fetch streaming, and \`Atomics.waitAsync\` worker mailbox).`,
-    `- [Workspace Cargo Manifest](../../Cargo.toml): Workspace dependency pins (\`wasm-bindgen = "${lt.workspaceConstraints.wasmBindgen}"\`, \`wasm_thread\` rev \`${lt.workspaceConstraints.wasmThreadGitRev}\`) and \`[profile.web]\` linker/opt settings.`,
+    `- [wasm-bindgen Agent Skill](../../../.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md): Progressive-disclosure skill entrypoint (\`agentskills.io\` compliant) with non-negotiable FFI invariants and build verification commands.`,
+    `- [Unified Web Build Pipeline](../../../tooling/bun/web-build.ts): Single-source Bun orchestrator enforcing exact \`wasm-bindgen\` CLI == \`Cargo.lock\` pinning, \`[profile.web]\`, 3-cohort builds (\`baseline\`, \`simd-baseline\`, \`multithreaded\`), \`wasm-opt -Oz\`, and Brotli size budgets.`,
+    `- [GPUI Web Platform Crate](../../../crates/gpui_web/Cargo.toml): Production browser platform backend (\`${lt.gpuiWebFeaturesCount}\` minimized \`web-sys\` features, \`Closure\` lifecycle cleanup, \`async_channel\` Fetch streaming, and \`Atomics.waitAsync\` worker mailbox).`,
+    `- [Workspace Cargo Manifest](../../../Cargo.toml): Workspace dependency pins (\`wasm-bindgen = "${lt.workspaceConstraints.wasmBindgen}"\`, \`wasm_thread\` rev \`${lt.workspaceConstraints.wasmThreadGitRev}\`) and \`[profile.web]\` linker/opt settings.`,
     "",
     "## Skill Reference Modules",
     "",
-    `- [8-Repo Ecosystem Matrix](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/repos-matrix.md): Live GitHub commits, stars, MSRV, sub-crate manifests, and \`crates.io\` parity across all 8 \`wasm-bindgen\` org repos.`,
-    `- [js-sys, web-sys & Futures FFI Patterns](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/js-web-sys-patterns.md): \`Closure\` drop guards vs \`once_into_js\`, zero-copy \`Uint8Array::view\` vs \`to_vec\`, \`wasm-bindgen-futures\` microtasks, \`web-sys\` feature minimization, and \`Reflect\` feature probing.`,
-    `- [walrus, weedle, ts-gen & js-bindgen](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/walrus-weedle-tsgen.md): How \`walrus\` dead-symbol/section/\`externref\` passes prepare binaries for \`wasm-opt\`, \`weedle\` WebIDL parsing for \`web-sys\`, \`ts-gen\` \`.d.ts\` codegen, \`js-bindgen\` linker interop, and boxed \`Externref\` RFC.`,
-    `- [Aphrody Best Practices & WebGPU Integration](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/aphrody-best-practices.md): Why \`cargo build + wasm-bindgen + wasm-opt\` beats \`wasm-pack\`, \`gpui_web\` reentrancy take/call/restore safety, \`web-build.ts\` cohort verification, and \`nsh-platform-web\` custom ABI contrast.`,
+    `- [8-Repo Ecosystem Matrix](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/repos-matrix.md): Live GitHub commits, stars, MSRV, sub-crate manifests, and \`crates.io\` parity across all 8 \`wasm-bindgen\` org repos.`,
+    `- [js-sys, web-sys & Futures FFI Patterns](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/js-web-sys-patterns.md): \`Closure\` drop guards vs \`once_into_js\`, zero-copy \`Uint8Array::view\` vs \`to_vec\`, \`wasm-bindgen-futures\` microtasks, \`web-sys\` feature minimization, and \`Reflect\` feature probing.`,
+    `- [walrus, weedle, ts-gen & js-bindgen](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/walrus-weedle-tsgen.md): How \`walrus\` dead-symbol/section/\`externref\` passes prepare binaries for \`wasm-opt\`, \`weedle\` WebIDL parsing for \`web-sys\`, \`ts-gen\` \`.d.ts\` codegen, \`js-bindgen\` linker interop, and boxed \`Externref\` RFC.`,
+    `- [Aphrody Best Practices & WebGPU Integration](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/aphrody-best-practices.md): Why \`cargo build + wasm-bindgen + wasm-opt\` beats \`wasm-pack\`, \`gpui_web\` reentrancy take/call/restore safety, \`web-build.ts\` cohort verification, and \`nsh-platform-web\` custom ABI contrast.`,
     "",
     "## Repositories (github.com/wasm-bindgen)",
     "",
@@ -1118,9 +1118,9 @@ export function renderLlmsTxt(scan: ScanReport, manifest: IngestManifest | null)
     "",
     "## Optional",
     "",
-    `- [GitIngest Automation CLI](../../tooling/bun/wasm-bindgen-ingest.ts): Deterministic CLI (\`scan\`, \`ingest\`, \`emit\`, \`all\`) writing raw per-repo digests to gitignored \`${DIGEST_DIR_REL}/*.txt\`.`,
-    `- [GPUI Web Fetch Client](../../crates/gpui_web/src/http_client.rs): Reference \`ReadableStreamDefaultReader\` + \`wasm_bindgen_futures::spawn_local\` streaming implementation.`,
-    `- [NSH Browser Value Bridge](../../crates/nsh-platform-web/src/browser/values.rs): Slot-based custom Wasm/JS import ABI used alongside \`gpui_web\` for QuickJS-hosted web apps.`,
+    `- [GitIngest Automation CLI](../../../tooling/bun/wasm-bindgen-ingest.ts): Deterministic CLI (\`scan\`, \`ingest\`, \`emit\`, \`all\`) writing raw per-repo digests to gitignored \`${DIGEST_DIR_REL}/*.txt\`.`,
+    `- [GPUI Web Fetch Client](../../../crates/gpui_web/src/http_client.rs): Reference \`ReadableStreamDefaultReader\` + \`wasm_bindgen_futures::spawn_local\` streaming implementation.`,
+    `- [NSH Browser Value Bridge](../../../crates/nsh-platform-web/src/browser/values.rs): Slot-based custom Wasm/JS import ABI used alongside \`gpui_web\` for QuickJS-hosted web apps.`,
     "",
   ];
   return lines.join("\n");
@@ -1133,11 +1133,11 @@ function renderTelemetryMarkdownTable(scan: ScanReport, manifest: IngestManifest
     "| Metric | Verified Live Value | Source |",
     "| :--- | :--- | :--- |",
     `| **\`wasm-bindgen\` Org Repositories** | \`${scan.repoCount}\` repositories audited & ingested (100% coverage) | \`gh api --paginate orgs/wasm-bindgen/repos\` |`,
-    `| **Aphrody Pinned \`wasm-bindgen\`** | \`Cargo.lock\` \`${lt.cargoLockVersions.wasmBindgen}\` == CLI \`${lt.cliVersions.wasmBindgen}\` (constraint \`${lt.workspaceConstraints.wasmBindgen}\`) | [\`Cargo.lock\`](../../Cargo.lock) + [\`web-build.ts\`](../../tooling/bun/web-build.ts) |`,
-    `| **Binaryen Optimizer** | \`${lt.cliVersions.wasmOpt}\` (\`-Oz --enable-bulk-memory --enable-reference-types\`) | Local PATH + [\`web-build.ts\`](../../tooling/bun/web-build.ts) |`,
-    `| **\`gpui_web\` Minimized \`web-sys\`** | \`${lt.gpuiWebFeaturesCount}\` explicit features (\`crates/gpui_wgpu\` uses \`${lt.gpuiWgpuWebSysFeatures.length}\`) | [\`crates/gpui_web/Cargo.toml\`](../../crates/gpui_web/Cargo.toml) |`,
+    `| **Aphrody Pinned \`wasm-bindgen\`** | \`Cargo.lock\` \`${lt.cargoLockVersions.wasmBindgen}\` == CLI \`${lt.cliVersions.wasmBindgen}\` (constraint \`${lt.workspaceConstraints.wasmBindgen}\`) | [\`Cargo.lock\`](../../../Cargo.lock) + [\`web-build.ts\`](../../../tooling/bun/web-build.ts) |`,
+    `| **Binaryen Optimizer** | \`${lt.cliVersions.wasmOpt}\` (\`-Oz --enable-bulk-memory --enable-reference-types\`) | Local PATH + [\`web-build.ts\`](../../../tooling/bun/web-build.ts) |`,
+    `| **\`gpui_web\` Minimized \`web-sys\`** | \`${lt.gpuiWebFeaturesCount}\` explicit features (\`crates/gpui_wgpu\` uses \`${lt.gpuiWgpuWebSysFeatures.length}\`) | [\`crates/gpui_web/Cargo.toml\`](../../../crates/gpui_web/Cargo.toml) |`,
     `| **GitIngest Endpoint & CLI** | \`${GITINGEST_API}\` reachable=\`${scan.gitingestEndpointProbe.reachable}\` (HTTP ${scan.gitingestEndpointProbe.status}); CLI \`${lt.cliVersions.gitingest}\` | Live HTTP probe + \`gitingest\` |`,
-    `| **Persisted Raw Digests** | \`${manifest ? manifest.entries.length : 0}\` files under \`${DIGEST_DIR_REL}/\` (\`${fmtBytes(manifest?.totalDigestBytes ?? 0)}\`, \`${fmtNum(manifest?.totalDigestFiles ?? 0)}\` extracted file sections) | [\`wasm-bindgen-ingest.ts\`](../../tooling/bun/wasm-bindgen-ingest.ts) |`,
+    `| **Persisted Raw Digests** | \`${manifest ? manifest.entries.length : 0}\` files under \`${DIGEST_DIR_REL}/\` (\`${fmtBytes(manifest?.totalDigestBytes ?? 0)}\`, \`${fmtNum(manifest?.totalDigestFiles ?? 0)}\` extracted file sections) | [\`wasm-bindgen-ingest.ts\`](../../../tooling/bun/wasm-bindgen-ingest.ts) |`,
     "<!-- END WASM_BINDGEN_TELEMETRY -->",
   ];
   return lines.join("\n");
@@ -1241,8 +1241,8 @@ Resolve all paths relative to \`.agents/plugins/aphrody/skills/wasm-bindgen/\`:
 | **JS/DOM/Futures FFI Patterns** | [references/js-web-sys-patterns.md](references/js-web-sys-patterns.md) | Writing \`Closure\` listeners, \`Uint8Array\` transfers, \`JsFuture\`/\`spawn_local\` loops, \`web-sys\` feature lists, or \`Reflect\` feature probes |
 | **walrus, weedle, ts-gen & ABI R&D** | [references/walrus-weedle-tsgen.md](references/walrus-weedle-tsgen.md) | Inspecting Wasm IR passes (\`walrus\` -> \`wasm-opt\`), WebIDL parsing (\`weedle\`), \`.d.ts\` codegen (\`ts-gen\`), \`js-bindgen\`, or \`Externref\` RFC |
 | **Aphrody Build & Architecture Rules** | [references/aphrody-best-practices.md](references/aphrody-best-practices.md) | Configuring \`[profile.web]\`, Windows \`RUSTC_WRAPPER=""\` workaround, 3-cohort builds, or contrasting \`gpui_web\` vs \`nsh-platform-web\` |
-| **Canonical Architecture Doc** | [docs/architecture/wasm-bindgen-ecosystem.md](../../../../../docs/architecture/wasm-bindgen-ecosystem.md) | Full architectural synthesis grounded in \`Cargo.lock\`, \`gpui_web\`, and live GitIngest digests |
-| **Standardized \`llms.txt\`** | [docs/architecture/wasm-bindgen-llms.txt](../../../../../docs/architecture/wasm-bindgen-llms.txt) | Machine-readable \`llmstxt.org\` index of all repos, guides, and skill references |
+| **Canonical Architecture Doc** | [aphrody/docs/architecture/wasm-bindgen-ecosystem.md](../../../../../aphrody/docs/architecture/wasm-bindgen-ecosystem.md) | Full architectural synthesis grounded in \`Cargo.lock\`, \`gpui_web\`, and live GitIngest digests |
+| **Standardized \`llms.txt\`** | [aphrody/docs/architecture/wasm-bindgen-llms.txt](../../../../../aphrody/docs/architecture/wasm-bindgen-llms.txt) | Machine-readable \`llmstxt.org\` index of all repos, guides, and skill references |
 
 ## Non-Negotiable Engineering Rules
 
@@ -1497,7 +1497,7 @@ ${renderReposMarkdownTable(scan, manifest)}
 - **\`wasm-bindgen/ts-gen\`**: \`oxc_parser 0.154\` + \`syn 2\` + \`prettyplease\` compiler turning TypeScript \`.d.ts\` declarations into \`#[wasm_bindgen]\` Rust bindings (supporting \`--strict-nullable\` and Cloudflare Worker TypeScript contracts).
 - **\`wasm-bindgen/js-bindgen\`**: Next-gen \`#![no_std]\` linker-driven JS interop (\`js-bindgen-ld\`, \`embed_js\`, \`import_js\`, \`unsafe_global_wat\`) exploring real-generic \`js-sys\`, \`wasm64-unknown-unknown\`, and \`bun\` testing.
 - **\`wasm-bindgen/rust-externref-rfc\`**: Draft proposal for boxed \`Externref\` / \`ExternrefRef<'a>\` / \`ByValue<T>\` / \`with_stack_slot\` over \`ptr addrspace(2)\`, solving RFC 3987's operational-semantics objection while letting LLVM fold away \`__externref_table_alloc\`/\`free\` pairs.
-- **\`wasm-bindgen/wasm-pack\`**: Legacy npm/webpack packager (\`0.15.1\`); deliberately omitted from Aphrody in favor of [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts).
+- **\`wasm-bindgen/wasm-pack\`**: Legacy npm/webpack packager (\`0.15.1\`); deliberately omitted from Aphrody in favor of [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts).
 - **\`wasm-bindgen/wasm-bindgen-bot\`**: Sandboxed Cloudflare AI Gateway PR reviewer & issue triage bot maintaining the \`wasm-bindgen\` organization.
 
 ---
@@ -1508,8 +1508,8 @@ ${renderCratesMatrixMarkdownTable(scan)}
 
 ### Version Pinning & Upgrade Policy
 
-- **Exact Lockstep Rule**: [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts) runs \`verifyBindgenVersion()\` to guarantee CLI \`wasm-bindgen\` (${lt.cliVersions.wasmBindgen}) strictly equals \`Cargo.lock\` (${lt.cargoLockVersions.wasmBindgen}). Never update \`Cargo.lock\` to \`0.2.130\` without installing matching \`wasm-bindgen-cli@0.2.130\`.
-- **\`wasm_thread\` Fork Rationale**: Root [\`Cargo.toml\`](../../Cargo.toml) pins \`wasm_thread\` to \`zed-industries/wasm_thread\` rev \`${lt.workspaceConstraints.wasmThreadGitRev}\` (\`features = ["es_modules"]\`) because upstream \`crates.io\` \`wasm_thread\` invokes deprecated positional \`wasm-bindgen\` init arguments (deprecated since \`0.2.93\`).
+- **Exact Lockstep Rule**: [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts) runs \`verifyBindgenVersion()\` to guarantee CLI \`wasm-bindgen\` (${lt.cliVersions.wasmBindgen}) strictly equals \`Cargo.lock\` (${lt.cargoLockVersions.wasmBindgen}). Never update \`Cargo.lock\` to \`0.2.130\` without installing matching \`wasm-bindgen-cli@0.2.130\`.
+- **\`wasm_thread\` Fork Rationale**: Root [\`Cargo.toml\`](../../../Cargo.toml) pins \`wasm_thread\` to \`zed-industries/wasm_thread\` rev \`${lt.workspaceConstraints.wasmThreadGitRev}\` (\`features = ["es_modules"]\`) because upstream \`crates.io\` \`wasm_thread\` invokes deprecated positional \`wasm-bindgen\` init arguments (deprecated since \`0.2.93\`).
 
 ---
 
@@ -1517,9 +1517,9 @@ ${renderCratesMatrixMarkdownTable(scan)}
 
 ### 4.1 \`ExternRef\` & \`Closure\` Cleanup Discipline
 
-1. **RAII Unregistration Over \`.forget()\`**: [\`crates/gpui_web/src/events.rs\`](../../crates/gpui_web/src/events.rs) wraps every DOM event listener in \`EventListenerHandle\`, whose \`Drop\` implementation calls \`target.remove_event_listener_with_callback(...)\` before dropping the \`Closure\`. Simply dropping a \`Closure\` without removing the listener triggers *"closure invoked after being dropped"*; calling \`.forget()\` leaks Wasm heap/table entries on view teardown.
-2. **Owner Lifetime + \`Weak\` Back-References**: [\`crates/gpui_web/src/window.rs\`](../../crates/gpui_web/src/window.rs) retains \`_raf_closure\`, \`_resize_observer_closure\`, and \`_safe_area_observer_closure\` directly on \`WebWindow\`, using \`Rc::downgrade(&inner)\` on observers to eliminate retain cycles.
-3. **One-Shot Closures**: [\`crates/gpui_web/src/dispatcher.rs\`](../../crates/gpui_web/src/dispatcher.rs) and [\`ime_mirror.rs\`](../../crates/gpui_web/src/ime_mirror.rs) use \`Closure::once_into_js\` for \`setTimeout\`, \`queueMicrotask\`, and \`requestIdleCallback\`.
+1. **RAII Unregistration Over \`.forget()\`**: [\`crates/gpui_web/src/events.rs\`](../../../crates/gpui_web/src/events.rs) wraps every DOM event listener in \`EventListenerHandle\`, whose \`Drop\` implementation calls \`target.remove_event_listener_with_callback(...)\` before dropping the \`Closure\`. Simply dropping a \`Closure\` without removing the listener triggers *"closure invoked after being dropped"*; calling \`.forget()\` leaks Wasm heap/table entries on view teardown.
+2. **Owner Lifetime + \`Weak\` Back-References**: [\`crates/gpui_web/src/window.rs\`](../../../crates/gpui_web/src/window.rs) retains \`_raf_closure\`, \`_resize_observer_closure\`, and \`_safe_area_observer_closure\` directly on \`WebWindow\`, using \`Rc::downgrade(&inner)\` on observers to eliminate retain cycles.
+3. **One-Shot Closures**: [\`crates/gpui_web/src/dispatcher.rs\`](../../../crates/gpui_web/src/dispatcher.rs) and [\`ime_mirror.rs\`](../../../crates/gpui_web/src/ime_mirror.rs) use \`Closure::once_into_js\` for \`setTimeout\`, \`queueMicrotask\`, and \`requestIdleCallback\`.
 4. **Reentrancy Safety Under \`panic = "abort"\`**: \`WebWindowInner::with_callback\` moves callbacks out via \`.take()\` before execution so nested DOM events cannot trigger fatal \`RefCell\` double-borrow aborts.
 
 ### 4.2 Zero-Copy \`&[u8]\` / \`Uint8Array\` Views vs Heap-Safe Copies
@@ -1542,20 +1542,20 @@ ${renderCratesMatrixMarkdownTable(scan)}
 ### 4.5 \`walrus\` + \`wasm-opt\` Optimization & Why Aphrody Rejects \`wasm-pack\`
 
 1. **Compiler & Optimizer Pipeline**: \`rustc --profile web\` (\`opt-level = "z"\`, \`lto = "thin"\`, \`codegen-units = 1\`, \`strip = true\`, \`panic = "abort"\`) -> \`wasm-bindgen\` CLI (\`walrus\` \`externref\` lowering, descriptor decoding, dead-stub \`passes::gc\`) -> Binaryen \`${lt.cliVersions.wasmOpt}\` (\`-Oz --enable-bulk-memory --enable-bulk-memory-opt --enable-nontrapping-float-to-int --enable-sign-ext --enable-reference-types --enable-multivalue --strip-debug\`).
-2. **Why Not \`wasm-pack\`?** Legacy \`wasm-pack 0.15.1\` enforces single-target \`npm\`/\`webpack\` outputs, hits Windows \`sccache\` \`CreateProcess\` 32 KB argv overflow on \`web-sys\`, cannot build Aphrody's 3 runtime-selected cohorts (\`baseline\`, \`simd-baseline\`, opt-in COI \`multithreaded\`), and skips native Wasm section validation + \`--brotli-budget\` checks implemented in [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts).
+2. **Why Not \`wasm-pack\`?** Legacy \`wasm-pack 0.15.1\` enforces single-target \`npm\`/\`webpack\` outputs, hits Windows \`sccache\` \`CreateProcess\` 32 KB argv overflow on \`web-sys\`, cannot build Aphrody's 3 runtime-selected cohorts (\`baseline\`, \`simd-baseline\`, opt-in COI \`multithreaded\`), and skips native Wasm section validation + \`--brotli-budget\` checks implemented in [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts).
 
 ---
 
 ## 5. Linked Artifacts & Progressive-Disclosure Skill
 
-- **\`llms.txt\` Index**: [\`docs/architecture/wasm-bindgen-llms.txt\`](./wasm-bindgen-llms.txt)
-- **Agent Skill**: [\`.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md\`](../../.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md)
+- **\`llms.txt\` Index**: [\`aphrody/docs/architecture/wasm-bindgen-llms.txt\`](./wasm-bindgen-llms.txt)
+- **Agent Skill**: [\`.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md\`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md)
 - **Skill References**:
-  - [\`repos-matrix.md\`](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/repos-matrix.md)
-  - [\`js-web-sys-patterns.md\`](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/js-web-sys-patterns.md)
-  - [\`walrus-weedle-tsgen.md\`](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/walrus-weedle-tsgen.md)
-  - [\`aphrody-best-practices.md\`](../../.agents/plugins/aphrody/skills/wasm-bindgen/references/aphrody-best-practices.md)
-- **Automation CLI & Test Suite**: [\`tooling/bun/wasm-bindgen-ingest.ts\`](../../tooling/bun/wasm-bindgen-ingest.ts), [\`tooling/bun/wasm-bindgen-ingest.test.ts\`](../../tooling/bun/wasm-bindgen-ingest.test.ts)
+  - [\`repos-matrix.md\`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/repos-matrix.md)
+  - [\`js-web-sys-patterns.md\`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/js-web-sys-patterns.md)
+  - [\`walrus-weedle-tsgen.md\`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/walrus-weedle-tsgen.md)
+  - [\`aphrody-best-practices.md\`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/aphrody-best-practices.md)
+- **Automation CLI & Test Suite**: [\`tooling/bun/wasm-bindgen-ingest.ts\`](../../../tooling/bun/wasm-bindgen-ingest.ts), [\`tooling/bun/wasm-bindgen-ingest.test.ts\`](../../../tooling/bun/wasm-bindgen-ingest.test.ts)
 - **Gitignored Digest Cache**: \`${DIGEST_DIR_REL}/*.txt\` + \`${INGEST_MANIFEST_REL}\`
 `;
 }

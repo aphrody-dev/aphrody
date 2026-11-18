@@ -150,34 +150,11 @@ pub fn load_bundled_root_design_md() -> Result<DesignMdDocument> {
 }
 
 pub fn parse_hex_rgb(hex: &str) -> Option<(u8, u8, u8)> {
-    let clean = hex.trim().strip_prefix('#')?;
-    if clean.len() != 6 || !clean.chars().all(|c| c.is_ascii_hexdigit()) {
-        return None;
-    }
-    let r = u8::from_str_radix(&clean[0..2], 16).ok()?;
-    let g = u8::from_str_radix(&clean[2..4], 16).ok()?;
-    let b = u8::from_str_radix(&clean[4..6], 16).ok()?;
-    Some((r, g, b))
+    brand::design::parse_hex_rgb(hex)
 }
 
 pub fn contrast_ratio_hex(fg: &str, bg: &str) -> Option<f32> {
-    let (r1, g1, b1) = parse_hex_rgb(fg)?;
-    let (r2, g2, b2) = parse_hex_rgb(bg)?;
-    let lum = |(r, g, b): (u8, u8, u8)| -> f32 {
-        let chan = |c: u8| {
-            let s = f32::from(c) / 255.0;
-            if s <= 0.03928 {
-                s / 12.92
-            } else {
-                ((s + 0.055) / 1.055).powf(2.4)
-            }
-        };
-        0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b)
-    };
-    let l1 = lum((r1, g1, b1));
-    let l2 = lum((r2, g2, b2));
-    let (hi, lo) = if l1 >= l2 { (l1, l2) } else { (l2, l1) };
-    Some((hi + 0.05) / (lo + 0.05))
+    brand::design::contrast_ratio_hex(fg, bg)
 }
 
 pub fn lint_design_md(doc: &DesignMdDocument) -> DesignMdLintReport {

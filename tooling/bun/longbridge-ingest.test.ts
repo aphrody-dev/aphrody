@@ -242,7 +242,7 @@ describe("longbridge-ingest offline Cargo centralization & Graphify fixture", ()
       mkdirSync(join(fixtureRoot, "crates/nsh-core"), { recursive: true });
       mkdirSync(join(fixtureRoot, "extensions/html"), { recursive: true });
       mkdirSync(join(fixtureRoot, "vendor/taffy"), { recursive: true });
-      mkdirSync(join(fixtureRoot, "docs/architecture"), { recursive: true });
+      mkdirSync(join(fixtureRoot, "aphrody/docs/architecture"), { recursive: true });
 
       writeFileSync(
         join(fixtureRoot, ".gitmodules"),
@@ -311,7 +311,7 @@ zed_extension_api = "0.2.0"
 `,
       );
 
-      const docPath = join(fixtureRoot, "docs/architecture/longbridge-gpui-unification.md");
+      const docPath = join(fixtureRoot, "aphrody/docs/architecture/longbridge-gpui-unification.md");
       writeFileSync(
         docPath,
         `# Test Doc\n<!-- BEGIN LONGBRIDGE_INGEST_METRICS -->\nold\n<!-- END LONGBRIDGE_INGEST_METRICS -->\n<!-- BEGIN LONGBRIDGE_INGEST_MERMAID -->\nold\n<!-- END LONGBRIDGE_INGEST_MERMAID -->\n`,
@@ -508,7 +508,7 @@ describe("live Aphrody repository inventory, architecture doc & Graphify integri
     expect(parsed.longbridge_repos.length).toBe(parsed.summary.longbridge_total_repos);
   });
 
-  test("docs/architecture/longbridge-gpui-unification.md contains valid markers and Mermaid topology", () => {
+  test("aphrody/docs/architecture/longbridge-gpui-unification.md contains valid markers and Mermaid topology", () => {
     const docPath = join(REPO_ROOT, ARCH_DOC_REL);
     expect(existsSync(docPath)).toBe(true);
     const md = readFileSync(docPath, "utf8");

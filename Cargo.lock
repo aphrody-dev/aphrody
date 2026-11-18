@@ -319,7 +319,7 @@ dependencies = [
  "git",
  "gpui",
  "gpui_tokio",
- "handlebars",
+ "handlebars 4.5.0",
  "heck 0.5.0",
  "html_to_markdown",
  "http_client",
@@ -373,9 +373,9 @@ dependencies = [
 
 [[package]]
 name = "agent-client-protocol"
-version = "5.3.0"
+version = "5.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "956559bd2dfddb5c8bc86792b1669bd2611fb4bd2c31865e4b8165ab6ea63109"
+checksum = "5480352b071301dfa2ba98d36d02132ad95c336116b469548feca2f45eaf0b3d"
 dependencies = [
  "agent-client-protocol-derive",
  "agent-client-protocol-schema",
@@ -392,9 +392,9 @@ dependencies = [
 
 [[package]]
 name = "agent-client-protocol-derive"
-version = "5.3.0"
+version = "5.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4956a27f160f7ff73b17822066d1cb57d415ef9f442d3bcebb8074d2c8f24ec3"
+checksum = "a2ff29b1cc0de7ea56df8971f559741872119ddf8d2245bce264a9fb2f577aaf"
 dependencies = [
  "quote",
  "syn 3.0.10",
@@ -402,9 +402,9 @@ dependencies = [
 
 [[package]]
 name = "agent-client-protocol-schema"
-version = "1.18.0"
+version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5128cd57704892e3978c85bfce0d532ef3162f585739f44726fa80d464c1782f"
+checksum = "5d27fec60e79b5682eae06f9c94e028eb7043dfc972a4a38e7008701b4408d21"
 dependencies = [
  "anyhow",
  "derive_more",
@@ -413,6 +413,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "strum",
+ "uuid",
 ]
 
 [[package]]
@@ -756,6 +757,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9d4ee0d472d1cd2e28c97dfa124b3d8d992e10eb0a035f33f5d12e3a177ba3b"
 
 [[package]]
+name = "ammonia"
+version = "4.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b34ca49e407c06daac53f0c4debe8ff5df9cc2a4e9369d164a5d86ef8c219319"
+dependencies = [
+ "cssparser",
+ "html5ever 0.40.1",
+ "maplit",
+ "url",
+]
+
+[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1017,7 +1030,7 @@ dependencies = [
  "craft-xlsx",
  "craft-xml",
  "craft-zip",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "egui_gpui",
  "gpui",
  "gpui-kit",
@@ -1041,6 +1054,7 @@ name = "aphrody_design"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "brand",
  "html5ever 0.39.0",
  "image",
  "log",
@@ -1170,7 +1184,7 @@ version = "0.1.0"
 dependencies = [
  "bitflags 2.13.1",
  "brand",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "log",
  "serde",
  "serde_json",
@@ -1185,7 +1199,7 @@ version = "0.1.0"
 dependencies = [
  "aphrody_ui",
  "brand",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "gpui",
  "gpui_ui",
  "nsh-base",
@@ -1211,7 +1225,7 @@ dependencies = [
  "aphrody_design",
  "aphrody_session",
  "brand",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "gpui",
  "log",
  "palette",
@@ -1231,7 +1245,7 @@ dependencies = [
  "assets",
  "ayvpn-daemon",
  "brand",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "futures 0.3.34",
  "gpui",
  "gpui_app_shell",
@@ -4627,7 +4641,21 @@ name = "craft-anything-formats"
 version = "0.6.1"
 dependencies = [
  "bzip2-rs",
+ "craft-dex",
+ "craft-elf",
+ "craft-evm",
+ "craft-har",
+ "craft-java-class",
+ "craft-jsonc",
+ "craft-macho",
+ "craft-mime",
+ "craft-pcap",
+ "craft-pe",
  "craft-plist",
+ "craft-sourcemap",
+ "craft-tar",
+ "craft-wasm",
+ "craft-zip",
  "lzma-rs",
  "miniz_oxide 0.8.9",
  "object 0.36.7",
@@ -4642,8 +4670,6 @@ dependencies = [
  "sha1 0.10.6",
  "sha2 0.10.9",
  "thiserror 2.0.21",
- "wasmparser 0.261.0",
- "wasmprinter 0.261.0",
 ]
 
 [[package]]
@@ -4704,6 +4730,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-dex"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "craft-docx"
 version = "0.1.0"
 dependencies = [
@@ -4757,6 +4791,15 @@ name = "craft-elf"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "craft-evm"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
  "thiserror 2.0.21",
 ]
 
@@ -4831,6 +4874,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-har"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "craft-hdr"
 version = "0.1.0"
 dependencies = [
@@ -4857,6 +4908,21 @@ dependencies = [
  "unicode-bidi",
  "windows-registry 0.6.1",
  "writeable",
+]
+
+[[package]]
+name = "craft-java-class"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "craft-jsonc"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
 ]
 
 [[package]]
@@ -4934,6 +5000,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-mime"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "craft-codepage",
+ "encoding_rs",
+]
+
+[[package]]
 name = "craft-offcrypto"
 version = "0.1.0"
 dependencies = [
@@ -4965,6 +5040,15 @@ version = "0.1.0"
 dependencies = [
  "craft-xml",
  "craft-zip",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "craft-pcap"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
  "thiserror 2.0.21",
 ]
 
@@ -5054,8 +5138,20 @@ name = "craft-sniff"
 version = "0.1.0"
 
 [[package]]
+name = "craft-sourcemap"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "craft-tar"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "craft-tcraft"
@@ -5108,6 +5204,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-wasm"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "thiserror 2.0.21",
+ "wasmparser 0.261.0",
+ "wasmprinter 0.261.0",
+]
+
+[[package]]
 name = "craft-wordmodel"
 version = "0.1.0"
 dependencies = [
@@ -5152,7 +5258,12 @@ dependencies = [
 name = "craft-zip"
 version = "0.1.0"
 dependencies = [
+ "bzip2-rs",
  "flate2",
+ "lzma-rs",
+ "miniz_oxide 0.8.9",
+ "ruzstd",
+ "serde",
  "thiserror 2.0.21",
  "zip",
 ]
@@ -6574,6 +6685,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "docs_preprocessor"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "collections",
+ "jsonschema",
+ "mdbook",
+ "regex",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
+ "settings",
+ "task",
+ "theme",
+ "util",
+ "zlog",
+]
+
+[[package]]
 name = "document-features"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6915,7 +7045,7 @@ dependencies = [
  "postage",
  "pretty_assertions",
  "project",
- "pulldown-cmark",
+ "pulldown-cmark 0.13.6",
  "rand 0.9.4",
  "regex",
  "release_channel",
@@ -6954,7 +7084,7 @@ dependencies = [
  "collections",
  "db",
  "debug_adapter_extension",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "edit_prediction",
  "edit_prediction_context",
  "edit_prediction_metrics",
@@ -7284,6 +7414,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "elasticlunr-rs"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b40e20979244f65741f32baab82c0f12953b13ce78b15d644764556be123f09"
+dependencies = [
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
 ]
 
 [[package]]
@@ -9883,6 +10025,7 @@ version = "0.10.0"
 dependencies = [
  "anyhow",
  "block2 0.6.2",
+ "brand",
  "core-text",
  "cpal",
  "enum-iterator",
@@ -10952,6 +11095,20 @@ dependencies = [
  "pest",
  "pest_derive",
  "rust-embed",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "handlebars"
+version = "5.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d08485b96a0e6393e9e4d1b8d48cf74ad6c063cd905eb33f42c1ce3f0377539b"
+dependencies = [
+ "log",
+ "pest",
+ "pest_derive",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -14219,6 +14376,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "maplit"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
+
+[[package]]
 name = "markdown"
 version = "0.1.0"
 dependencies = [
@@ -14240,7 +14403,7 @@ dependencies = [
  "markup5ever_rcdom",
  "mermaid_render",
  "node_runtime",
- "pulldown-cmark",
+ "pulldown-cmark 0.13.6",
  "settings",
  "smallvec",
  "stacksafe",
@@ -14386,6 +14549,34 @@ checksum = "69b6441f590336821bb897fb28fc622898ccceb1d6cea3fde5ea86b090c4de98"
 dependencies = [
  "cfg-if",
  "digest 0.11.3",
+]
+
+[[package]]
+name = "mdbook"
+version = "0.4.40"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b45a38e19bd200220ef07c892b0157ad3d2365e5b5a267ca01ad12182491eea5"
+dependencies = [
+ "ammonia",
+ "anyhow",
+ "chrono",
+ "clap",
+ "clap_complete",
+ "elasticlunr-rs",
+ "env_logger 0.11.8",
+ "handlebars 5.1.2",
+ "log",
+ "memchr",
+ "once_cell",
+ "opener",
+ "pulldown-cmark 0.10.3",
+ "regex",
+ "serde",
+ "serde_json",
+ "shlex 1.3.0",
+ "tempfile",
+ "toml 0.5.11",
+ "topological-sort",
 ]
 
 [[package]]
@@ -14570,7 +14761,7 @@ dependencies = [
  "manatee",
  "merman-core",
  "merman-unicode-linebreak",
- "pulldown-cmark",
+ "pulldown-cmark 0.13.6",
  "quick-xml 0.42.0",
  "roughr-merman",
  "roxmltree 0.21.2",
@@ -15642,6 +15833,7 @@ dependencies = [
 name = "nsh-base"
 version = "0.6.0"
 dependencies = [
+ "brand",
  "chrono",
  "html5ever 0.39.0",
  "imara-diff",
@@ -17290,6 +17482,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "opener"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0812e5e4df08da354c851a3376fead46db31c2214f849d3de356d774d057681"
+dependencies = [
+ "bstr",
+ "dbus",
+ "normpath",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
 name = "openssl"
 version = "0.10.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -18225,7 +18429,7 @@ version = "0.1.0"
 dependencies = [
  "brand",
  "const_format",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "ignore",
  "util",
 ]
@@ -19984,7 +20188,7 @@ dependencies = [
  "fs",
  "futures 0.3.34",
  "gpui",
- "handlebars",
+ "handlebars 4.5.0",
  "heed",
  "language",
  "log",
@@ -20181,6 +20385,18 @@ dependencies = [
 
 [[package]]
 name = "pulldown-cmark"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76979bea66e7875e7509c4ec5300112b316af87fa7a252ca91c448b32dfe3993"
+dependencies = [
+ "bitflags 2.13.1",
+ "memchr",
+ "pulldown-cmark-escape",
+ "unicase",
+]
+
+[[package]]
+name = "pulldown-cmark"
 version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3db2be46835f013dd3f4fa7f5f7402c537787b54ebb6fe2b94bbdd7e2669bb7b"
@@ -20189,6 +20405,12 @@ dependencies = [
  "memchr",
  "unicase",
 ]
+
+[[package]]
+name = "pulldown-cmark-escape"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd348ff538bc9caeda7ee8cad2d1d48236a1f443c1fa3913c6a02fe0043b1dd3"
 
 [[package]]
 name = "pulley-interpreter"
@@ -25253,7 +25475,7 @@ dependencies = [
  "breadcrumbs",
  "collections",
  "db",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "editor",
  "futures 0.3.34",
  "gpui",
@@ -25800,6 +26022,15 @@ dependencies = [
  "futures-util",
  "pin-project-lite",
  "tokio",
+]
+
+[[package]]
+name = "toml"
+version = "0.5.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4f7f0dd8d50a853a531c426359045b1998f04219d88799810762cd4ad314234"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -27243,7 +27474,7 @@ dependencies = [
  "async_zip",
  "collections",
  "command-fds",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "dunce",
  "futures 0.3.34",
  "futures-lite 2.6.1",
@@ -29936,7 +30167,7 @@ dependencies = [
  "collections",
  "component",
  "db",
- "dirs 6.0.0",
+ "dirs 7.0.0",
  "fs",
  "futures 0.3.34",
  "futures-lite 2.6.1",
@@ -30056,7 +30287,7 @@ dependencies = [
 
 [[package]]
 name = "wry"
-version = "0.57.2"
+version = "0.57.3"
 dependencies = [
  "base64 0.23.1",
  "block2 0.6.2",

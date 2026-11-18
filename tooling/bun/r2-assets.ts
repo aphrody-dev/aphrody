@@ -69,7 +69,7 @@ const ASSET_ROOTS = [
   "assets/sounds",
   "assets/fonts",
   "assets/images",
-  "docs/design",
+  "aphrody/docs/design",
   "crates/gpui/examples/image",
   "examples/gpu/webgpu",
   "examples/nsh/gallery",
@@ -102,7 +102,7 @@ export function isKeepLocalBoot(relPath: string): boolean {
 
 export function categorizeAsset(relPath: string): string {
   const p = relPath.replaceAll("\\", "/");
-  if (p.startsWith("docs/design/")) return "design-reference";
+  if (p.startsWith("aphrody/docs/design/") || p.startsWith("docs/design/")) return "design-reference";
   if (p.startsWith("assets/sounds/")) return "audio-sfx";
   if (p.startsWith("assets/fonts/")) return "fonts";
   if (p.startsWith("assets/images/")) return "brand-images";

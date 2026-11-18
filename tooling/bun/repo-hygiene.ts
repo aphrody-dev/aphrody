@@ -63,7 +63,7 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
     (readmeLines[1]?.includes("Remove this line to confirm you've reviewed this PR") ?? false);
 
   const managedScopes = [
-    "docs/architecture",
+    "aphrody/docs/architecture",
     ".agents/plugins/aphrody",
     "tooling/bun",
     ".github",
@@ -83,7 +83,7 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
 
   // Include untracked candidate files under managed folders so new additions are validated pre-commit.
   const untracked = Bun.spawnSync(
-    ["git", "-C", root, "ls-files", "--others", "--exclude-standard", "docs/architecture", ".agents/plugins/aphrody", "tooling/bun", ".github", ".cloudflare"],
+    ["git", "-C", root, "ls-files", "--others", "--exclude-standard", "aphrody/docs/architecture", ".agents/plugins/aphrody", "tooling/bun", ".github", ".cloudflare"],
     { stdout: "pipe", stderr: "pipe" },
   );
   for (const extra of new TextDecoder().decode(untracked.stdout).split(/\r?\n/).map((s) => s.trim()).filter(Boolean)) {
@@ -105,7 +105,7 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
       }
     }
 
-    if (rel.startsWith("docs/architecture/") && rel.endsWith(".md")) {
+    if (rel.startsWith("aphrody/docs/architecture/") && rel.endsWith(".md")) {
       for (const match of content.matchAll(/\]\(([^)]+)\)/g)) {
         const rawTarget = match[1].split("#")[0].trim();
         if (!rawTarget || rawTarget.startsWith("http://") || rawTarget.startsWith("https://") || rawTarget.startsWith("mailto:")) {

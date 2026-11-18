@@ -19,5 +19,4 @@ pub const BUNDLED_DESIGN_SITEMAP_TOML: &str =
 pub const BUNDLED_ROOT_DESIGN_MD: &str = include_str!("../../../DESIGN.md");
 
 /// Authoritative 3-tier Material 3 Expressive + Google Sans Flex token TOML.
-pub const BUNDLED_GOOGLE_DESIGN_TOKENS_TOML: &str =
-    include_str!("../../../assets/os/google_design_tokens.toml");
+pub use brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;

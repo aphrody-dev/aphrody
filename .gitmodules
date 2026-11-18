@@ -1,7 +1,3 @@
-[submodule "vendor/bun"]
-	path = vendor/bun
-	url = ../../aphrody-labs/bun.git
-	branch = main
 [submodule "vendor/craft-libs"]
 	path = vendor/craft-libs
 	url = ../../aphrody-labs/craft-libs.git
@@ -18,10 +14,6 @@
 	path = vendor/taffy
 	url = ../../aphrody-labs/taffy.git
 	branch = main
-[submodule "vendor/winit"]
-	path = vendor/winit
-	url = ../../aphrody-labs/winit.git
-	branch = main
 [submodule "vendor/accesskit"]
 	path = vendor/accesskit
 	url = ../../aphrody-labs/accesskit.git
@@ -30,66 +22,18 @@
 	path = vendor/cosmic-text
 	url = ../../aphrody-labs/cosmic-text.git
 	branch = main
-[submodule "vendor/vello"]
-	path = vendor/vello
-	url = ../../aphrody-labs/vello.git
-	branch = main
-[submodule "vendor/softbuffer"]
-	path = vendor/softbuffer
-	url = ../../aphrody-labs/softbuffer.git
-	branch = master
-[submodule "vendor/dioxus"]
-	path = vendor/dioxus
-	url = ../../aphrody-labs/dioxus.git
-	branch = main
-[submodule "vendor/blitz"]
-	path = vendor/blitz
-	url = ../../aphrody-labs/blitz.git
-	branch = main
-[submodule "vendor/anyrender"]
-	path = vendor/anyrender
-	url = ../../aphrody-labs/anyrender.git
-	branch = main
 [submodule "vendor/egui"]
 	path = vendor/egui
 	url = ../../aphrody-labs/egui.git
 	branch = main
-[submodule "vendor/iced"]
-	path = vendor/iced
-	url = ../../aphrody-labs/iced.git
-	branch = master
-[submodule "vendor/tauri/tauri"]
-	path = vendor/tauri/tauri
-	url = ../../aphrody-labs/tauri.git
-	branch = v3
 [submodule "vendor/tauri/wry"]
 	path = vendor/tauri/wry
 	url = ../../aphrody-labs/wry.git
 	branch = dev
-[submodule "vendor/tauri/cef-rs"]
-	path = vendor/tauri/cef-rs
-	url = ../../aphrody-labs/cef-rs.git
-	branch = dev
-[submodule "vendor/libcosmic"]
-	path = vendor/libcosmic
-	url = ../../aphrody-labs/libcosmic.git
-	branch = master
-[submodule "vendor/cosmic-epoch"]
-	path = vendor/cosmic-epoch
-	url = ../../aphrody-labs/cosmic-epoch.git
-	branch = master
-[submodule "vendor/smithay"]
-	path = vendor/smithay
-	url = ../../aphrody-labs/smithay.git
-	branch = master
 [submodule "vendor/mullvad"]
 	path = vendor/mullvad
 	url = ../../aphrody-labs/mullvadvpn-app.git
 	branch = main
-[submodule "vendor/new-cli-installer"]
-	path = vendor/new-cli-installer
-	url = ../../aphrody-labs/New-Cli-Installer.git
-	branch = master
 [submodule "vendor/browser"]
 	path = vendor/browser
 	url = ../../aphrody-labs/browser.git

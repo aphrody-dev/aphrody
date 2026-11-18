@@ -1459,7 +1459,6 @@ mod tests {
 
     /// A view reading a text view state, inside a view notified on every
     /// frame, counting its renders.
-    #[cfg(feature = "gpui-fast")]
     mod parse_ack {
         use std::{cell::Cell, rc::Rc};
 

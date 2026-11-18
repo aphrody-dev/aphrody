@@ -6,12 +6,11 @@
 //! `JetBrains Mono`, Spatial (`0.9` damping) / Effects (`1.0` damping) spring presets,
 //! WCAG 2.2 AA (`>= 4.5:1`) contrast validation, and 16 native `RenderOnce` components.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::rc::Rc;
-use std::sync::OnceLock;
 use std::time::Duration;
 
-use anyhow::{Context as _, Result, anyhow, ensure};
+use anyhow::{Context as _, Result, ensure};
 use gpui::{
     AnyElement, App, BoxShadow, ClickEvent, ElementId, Entity, FontWeight, Global, Hsla,
     InteractiveElement, IntoElement, KeyDownEvent, MouseButton, ParentElement, RenderOnce, Rgba,
@@ -33,21 +32,20 @@ use crate::{
     input::{Input, InputState},
     spinner::Spinner,
     styled::{FocusLine, focus_style},
-    try_parse_color, v_flex,
+    v_flex,
 };
 
 /// Authoritative URL for Google Design / Material 3 Expressive tokens.
-pub const M3_DESIGN_SOURCE_OF_TRUTH: &str = "https://design.google/";
+pub const M3_DESIGN_SOURCE_OF_TRUTH: &str = brand::design::SOURCE_OF_TRUTH;
 
 /// Minimum WCAG 2.2 AA contrast ratio for normal body and UI control text.
-pub const M3_WCAG_AA_MIN_CONTRAST: f32 = 4.5;
+pub const M3_WCAG_AA_MIN_CONTRAST: f32 = brand::design::WCAG_AA_MIN_CONTRAST;
 
 /// Minimum WCAG 2.2 AA contrast ratio for large display text (`>= 18pt` or `14pt` bold) and UI graphics.
-pub const M3_WCAG_AA_LARGE_CONTRAST: f32 = 3.0;
+pub const M3_WCAG_AA_LARGE_CONTRAST: f32 = brand::design::WCAG_AA_LARGE_CONTRAST;
 
 /// Embedded 3-tier Material 3 Expressive + Google Sans Flex manifest (`assets/os/google_design_tokens.toml`).
-pub const BUNDLED_GOOGLE_DESIGN_TOKENS_TOML: &str =
-    include_str!("../../../assets/os/google_design_tokens.toml");
+pub use brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;
 
 type ClickHandler = Rc<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>;
 type BoolChangeHandler = Rc<dyn Fn(&bool, &mut Window, &mut App) + 'static>;
@@ -96,6 +94,16 @@ impl M3AppearanceMode {
             Self::Dark => "dark",
             Self::NeuralObsidian => "neural_obsidian",
             Self::OledPitch => "oled_pitch",
+        }
+    }
+
+    #[must_use]
+    const fn to_brand_mode(self) -> brand::design::ThemeModeSlug {
+        match self {
+            Self::Light => brand::design::ThemeModeSlug::Light,
+            Self::Dark => brand::design::ThemeModeSlug::Dark,
+            Self::NeuralObsidian => brand::design::ThemeModeSlug::NeuralObsidian,
+            Self::OledPitch => brand::design::ThemeModeSlug::OledPitch,
         }
     }
 
@@ -313,7 +321,6 @@ impl M3GoogleSansFlexAxes {
 
     /// Validates that every axis lies within the specification bounds from `google_design_tokens.toml`.
     pub fn validate(&self) -> Result<()> {
-        let manifest = M3TokenManifest::bundled()?;
         let checks = [
             ("opsz", self.opsz),
             ("wght", self.wght),
@@ -323,9 +330,7 @@ impl M3GoogleSansFlexAxes {
             ("ROND", self.rond),
         ];
         for (tag, value) in checks {
-            let bounds = manifest
-                .variable_axes
-                .get(tag)
+            let bounds = brand::design::axis_spec(tag)
                 .with_context(|| format!("missing variable axis `{tag}` in token manifest"))?;
             ensure!(
                 value.is_finite() && value >= bounds.min && value <= bounds.max,
@@ -350,10 +355,10 @@ pub struct M3TypefaceTokens {
 impl Default for M3TypefaceTokens {
     fn default() -> Self {
         Self {
-            brand: "Google Sans Flex, Google Sans, Inter, system-ui, sans-serif".into(),
-            plain: "Google Sans Flex, Inter, Google Sans Text, system-ui, sans-serif".into(),
-            mono: "JetBrains Mono, Roboto Mono, monospace".into(),
-            fallback: "Noto Sans, sans-serif".into(),
+            brand: brand::design::TYPEFACE_BRAND.into(),
+            plain: brand::design::TYPEFACE_PLAIN.into(),
+            mono: brand::design::TYPEFACE_MONO.into(),
+            fallback: brand::design::TYPEFACE_FALLBACK.into(),
         }
     }
 }
@@ -431,81 +436,38 @@ impl Default for M3TypographyScale {
 }
 
 impl M3TypographyScale {
-    /// Resolves the typography scale from `assets/os/google_design_tokens.toml`.
+    /// Resolves the typography scale from `assets/os/google_design_tokens.toml` via `brand::design`.
     pub fn try_bundled() -> Result<Self> {
-        let manifest = M3TokenManifest::bundled()?;
-        let entry = |name: &str,
-                     fallback_font: &str,
-                     size_sp: f32,
-                     line_height_sp: f32,
-                     weight: u16,
-                     tracking_sp: f32| {
-            manifest
-                .typescales
-                .get(name)
-                .cloned()
-                .unwrap_or(M3TypeScaleEntry {
-                    font_role: fallback_font.to_owned().into(),
-                    size_sp,
-                    line_height_sp,
-                    weight,
-                    tracking_sp,
-                })
-        };
-        Ok(Self {
-            typeface: manifest.typeface.clone(),
-            display_large: entry("display_large", "brand", 57.0, 64.0, 400, -0.25),
-            display_medium: entry("display_medium", "brand", 45.0, 52.0, 400, 0.0),
-            display_small: entry("display_small", "brand", 36.0, 44.0, 400, 0.0),
-            headline_large: entry("headline_large", "brand", 32.0, 40.0, 500, 0.0),
-            headline_medium: entry("headline_medium", "brand", 28.0, 36.0, 500, 0.0),
-            headline_small: entry("headline_small", "brand", 24.0, 32.0, 500, 0.0),
-            title_large: entry("title_large", "brand", 22.0, 28.0, 500, 0.0),
-            title_medium: entry("title_medium", "plain", 16.0, 24.0, 600, 0.15),
-            title_small: entry("title_small", "plain", 14.0, 20.0, 600, 0.1),
-            body_large: entry("body_large", "plain", 16.0, 24.0, 400, 0.5),
-            body_medium: entry("body_medium", "plain", 14.0, 20.0, 400, 0.25),
-            body_small: entry("body_small", "plain", 12.0, 16.0, 400, 0.4),
-            label_large: entry("label_large", "plain", 14.0, 20.0, 600, 0.1),
-            label_medium: entry("label_medium", "plain", 12.0, 16.0, 600, 0.5),
-            label_small: entry("label_small", "plain", 11.0, 16.0, 600, 0.5),
-        })
+        Ok(Self::bundled_or_default())
     }
 
     #[must_use]
     pub fn bundled_or_default() -> Self {
-        Self::try_bundled().unwrap_or_else(|_| Self::static_fallback())
-    }
-
-    fn static_fallback() -> Self {
-        let entry = |font_role: &'static str,
-                     size_sp: f32,
-                     line_height_sp: f32,
-                     weight: u16,
-                     tracking_sp: f32| M3TypeScaleEntry {
-            font_role: font_role.into(),
-            size_sp,
-            line_height_sp,
-            weight,
-            tracking_sp,
+        let to_entry = |src: brand::design::TypeScaleEntry| M3TypeScaleEntry {
+            font_role: src.font.into(),
+            size_sp: src.size_sp,
+            line_height_sp: src.line_height_sp,
+            weight: src.weight.round().clamp(100.0, 1000.0) as u16,
+            tracking_sp: src.tracking_sp,
         };
+        let src = &brand::design::TYPESCALE;
         Self {
             typeface: M3TypefaceTokens::default(),
-            display_large: entry("brand", 57.0, 64.0, 400, -0.25),
-            display_medium: entry("brand", 45.0, 52.0, 400, 0.0),
-            display_small: entry("brand", 36.0, 44.0, 400, 0.0),
-            headline_large: entry("brand", 32.0, 40.0, 500, 0.0),
-            headline_medium: entry("brand", 28.0, 36.0, 500, 0.0),
-            headline_small: entry("brand", 24.0, 32.0, 500, 0.0),
-            title_large: entry("brand", 22.0, 28.0, 500, 0.0),
-            title_medium: entry("plain", 16.0, 24.0, 600, 0.15),
-            title_small: entry("plain", 14.0, 20.0, 600, 0.1),
-            body_large: entry("plain", 16.0, 24.0, 400, 0.5),
-            body_medium: entry("plain", 14.0, 20.0, 400, 0.25),
-            body_small: entry("plain", 12.0, 16.0, 400, 0.4),
-            label_large: entry("plain", 14.0, 20.0, 600, 0.1),
-            label_medium: entry("plain", 12.0, 16.0, 600, 0.5),
-            label_small: entry("plain", 11.0, 16.0, 600, 0.5),
+            display_large: to_entry(src.display_large),
+            display_medium: to_entry(src.display_medium),
+            display_small: to_entry(src.display_small),
+            headline_large: to_entry(src.headline_large),
+            headline_medium: to_entry(src.headline_medium),
+            headline_small: to_entry(src.headline_small),
+            title_large: to_entry(src.title_large),
+            title_medium: to_entry(src.title_medium),
+            title_small: to_entry(src.title_small),
+            body_large: to_entry(src.body_large),
+            body_medium: to_entry(src.body_medium),
+            body_small: to_entry(src.body_small),
+            label_large: to_entry(src.label_large),
+            label_medium: to_entry(src.label_medium),
+            label_small: to_entry(src.label_small),
         }
     }
 }
@@ -531,22 +493,21 @@ impl Default for M3ShapeTokens {
 
 impl M3ShapeTokens {
     pub fn try_bundled() -> Result<Self> {
-        let manifest = M3TokenManifest::bundled()?;
-        Ok(manifest.shape)
+        Ok(Self::bundled_or_default())
     }
 
     #[must_use]
-    pub fn bundled_or_default() -> Self {
-        Self::try_bundled().unwrap_or(Self {
-            none_px: 0.0,
-            extra_small_px: 4.0,
-            small_px: 8.0,
-            medium_px: 12.0,
-            large_px: 16.0,
-            large_increased_px: 20.0,
-            extra_large_px: 28.0,
-            full_px: 9999.0,
-        })
+    pub const fn bundled_or_default() -> Self {
+        Self {
+            none_px: brand::design::SHAPES.none_px,
+            extra_small_px: brand::design::SHAPES.extra_small_px,
+            small_px: brand::design::SHAPES.small_px,
+            medium_px: brand::design::SHAPES.medium_px,
+            large_px: brand::design::SHAPES.large_px,
+            large_increased_px: brand::design::SHAPES.large_increased_px,
+            extra_large_px: brand::design::SHAPES.extra_large_px,
+            full_px: brand::design::SHAPES.full_px,
+        }
     }
 }
 
@@ -570,21 +531,20 @@ impl Default for M3StateLayerTokens {
 
 impl M3StateLayerTokens {
     pub fn try_bundled() -> Result<Self> {
-        let manifest = M3TokenManifest::bundled()?;
-        Ok(manifest.state)
+        Ok(Self::bundled_or_default())
     }
 
     #[must_use]
-    pub fn bundled_or_default() -> Self {
-        Self::try_bundled().unwrap_or(Self {
-            hover_opacity: 0.08,
-            focus_opacity: 0.10,
-            pressed_opacity: 0.10,
-            dragged_opacity: 0.16,
-            disabled_container_opacity: 0.12,
-            disabled_content_opacity: 0.38,
-            focus_ring_px: 2.0,
-        })
+    pub const fn bundled_or_default() -> Self {
+        Self {
+            hover_opacity: brand::design::STATES.hover_opacity,
+            focus_opacity: brand::design::STATES.focus_opacity,
+            pressed_opacity: brand::design::STATES.pressed_opacity,
+            dragged_opacity: brand::design::STATES.dragged_opacity,
+            disabled_container_opacity: brand::design::STATES.disabled_container_opacity,
+            disabled_content_opacity: brand::design::STATES.disabled_content_opacity,
+            focus_ring_px: brand::design::STATES.focus_ring_px,
+        }
     }
 }
 
@@ -607,20 +567,19 @@ impl Default for M3DensityTokens {
 
 impl M3DensityTokens {
     pub fn try_bundled() -> Result<Self> {
-        let manifest = M3TokenManifest::bundled()?;
-        Ok(manifest.density)
+        Ok(Self::bundled_or_default())
     }
 
     #[must_use]
-    pub fn bundled_or_default() -> Self {
-        Self::try_bundled().unwrap_or(Self {
-            default: 0,
-            compact_1: -1,
-            compact_2: -2,
-            compact_3: -3,
-            touch_target_min_px: 44.0,
-            control_height_min_px: 36.0,
-        })
+    pub const fn bundled_or_default() -> Self {
+        Self {
+            default: brand::design::DENSITY.default,
+            compact_1: brand::design::DENSITY.compact_1,
+            compact_2: brand::design::DENSITY.compact_2,
+            compact_3: brand::design::DENSITY.compact_3,
+            touch_target_min_px: brand::design::DENSITY.touch_target_min_px,
+            control_height_min_px: brand::design::DENSITY.control_height_min_px,
+        }
     }
 }
 
@@ -639,16 +598,12 @@ impl M3WindowSizeClass {
     /// Classifies viewport width in logical pixels against `[sys.window_size_classes]`.
     #[must_use]
     pub fn from_width_px(width_px: f32) -> Self {
-        if width_px < 600.0 {
-            Self::Compact
-        } else if width_px < 840.0 {
-            Self::Medium
-        } else if width_px < 1200.0 {
-            Self::Expanded
-        } else if width_px < 1600.0 {
-            Self::Large
-        } else {
-            Self::ExtraLarge
+        match brand::design::classify_window_width(width_px) {
+            brand::design::WindowSizeTier::Compact => Self::Compact,
+            brand::design::WindowSizeTier::Medium => Self::Medium,
+            brand::design::WindowSizeTier::Expanded => Self::Expanded,
+            brand::design::WindowSizeTier::Large => Self::Large,
+            brand::design::WindowSizeTier::ExtraLarge => Self::ExtraLarge,
         }
     }
 }
@@ -664,31 +619,7 @@ impl M3SpringSpec {
     /// Evaluates normalized `0.0 -> 1.0` displacement at `t_secs` for a unit-mass spring.
     #[must_use]
     pub fn sample_position(&self, t_secs: f32) -> f32 {
-        if t_secs <= 0.0 || self.stiffness <= 0.0 {
-            return 0.0;
-        }
-        let omega0 = self.stiffness.sqrt();
-        let zeta = self.damping_ratio.max(0.05);
-        if (zeta - 1.0).abs() < 1e-4 {
-            let decay = (-omega0 * t_secs).exp();
-            1.0 - decay * (1.0 + omega0 * t_secs)
-        } else if zeta < 1.0 {
-            let root = (1.0 - zeta * zeta).sqrt();
-            let omega_d = omega0 * root;
-            let decay = (-zeta * omega0 * t_secs).exp();
-            let ratio = zeta / root;
-            1.0 - decay * ((omega_d * t_secs).cos() + ratio * (omega_d * t_secs).sin())
-        } else {
-            let root = (zeta * zeta - 1.0).sqrt();
-            let r1 = -omega0 * (zeta - root);
-            let r2 = -omega0 * (zeta + root);
-            let denom = r1 - r2;
-            if denom.abs() < 1e-6 {
-                1.0
-            } else {
-                1.0 - (r2 * (r1 * t_secs).exp() - r1 * (r2 * t_secs).exp()) / -denom
-            }
-        }
+        brand::design::sample_spring_position(self.stiffness, self.damping_ratio, t_secs)
     }
 
     /// Natural period $2\pi / \sqrt{k}$ used as the `response` argument of [`gpui_base::Spring`].
@@ -810,66 +741,25 @@ impl M3SpringToken {
 
     /// Resolves spring stiffness & damping ratio from the bundled `google_design_tokens.toml` manifest.
     pub fn try_spec(&self) -> Result<M3SpringSpec> {
-        let manifest = M3TokenManifest::bundled()?;
-        manifest
-            .springs
-            .get(self.as_str())
-            .copied()
-            .with_context(|| format!("missing M3 spring `{}` in token manifest", self.as_str()))
+        let spec = brand::design::spring_spec(self.as_str())
+            .with_context(|| format!("missing M3 spring `{}` in token manifest", self.as_str()))?;
+        Ok(M3SpringSpec {
+            stiffness: spec.stiffness,
+            damping_ratio: spec.damping_ratio,
+        })
     }
 
-    /// Resolves spring stiffness & damping ratio, falling back to exact bundled defaults.
+    /// Resolves spring stiffness & damping ratio from `brand::design`.
     #[must_use]
-    pub fn spec(&self) -> M3SpringSpec {
-        self.try_spec().unwrap_or_else(|_| self.default_spec())
-    }
-
-    #[must_use]
-    const fn default_spec(&self) -> M3SpringSpec {
-        match self {
-            Self::SpatialFast => M3SpringSpec {
-                stiffness: 1400.0,
-                damping_ratio: 0.90,
+    pub const fn spec(&self) -> M3SpringSpec {
+        match brand::design::spring_spec_const(self.as_str()) {
+            Some(spec) => M3SpringSpec {
+                stiffness: spec.stiffness,
+                damping_ratio: spec.damping_ratio,
             },
-            Self::SpatialDefault => M3SpringSpec {
+            None => M3SpringSpec {
                 stiffness: 700.0,
-                damping_ratio: 0.90,
-            },
-            Self::SpatialSlow => M3SpringSpec {
-                stiffness: 300.0,
-                damping_ratio: 0.90,
-            },
-            Self::EffectsFast => M3SpringSpec {
-                stiffness: 3800.0,
-                damping_ratio: 1.00,
-            },
-            Self::EffectsDefault => M3SpringSpec {
-                stiffness: 1600.0,
-                damping_ratio: 1.00,
-            },
-            Self::EffectsSlow => M3SpringSpec {
-                stiffness: 800.0,
-                damping_ratio: 1.00,
-            },
-            Self::QuireUnfold => M3SpringSpec {
-                stiffness: 380.0,
-                damping_ratio: 0.80,
-            },
-            Self::QuireSettle => M3SpringSpec {
-                stiffness: 700.0,
-                damping_ratio: 0.90,
-            },
-            Self::QuireExpand => M3SpringSpec {
-                stiffness: 300.0,
-                damping_ratio: 0.85,
-            },
-            Self::QuireFold => M3SpringSpec {
-                stiffness: 900.0,
-                damping_ratio: 1.00,
-            },
-            Self::QuireTick => M3SpringSpec {
-                stiffness: 1400.0,
-                damping_ratio: 0.70,
+                damping_ratio: 0.9,
             },
         }
     }
@@ -953,58 +843,48 @@ impl Default for M3ColorRoles {
 }
 
 impl M3ColorRoles {
-    /// Resolves all 30 color roles for `mode` directly from `assets/os/google_design_tokens.toml`.
+    /// Resolves all 30 color roles for `mode` directly from `brand::design`.
     pub fn try_for_mode(mode: M3AppearanceMode) -> Result<Self> {
-        let manifest = M3TokenManifest::bundled()?;
-        let map = manifest
-            .color_modes
-            .get(mode.as_str())
-            .with_context(|| format!("missing sys.color.{} in token manifest", mode.as_str()))?;
-        let role = |key: &str| -> Result<Hsla> {
-            let hex = map.get(key).with_context(|| {
-                format!("missing sys.color.{}.{key} in token manifest", mode.as_str())
-            })?;
-            try_parse_color(hex.trim())
-                .with_context(|| format!("invalid hex `{hex}` at sys.color.{}.{key}", mode.as_str()))
-        };
-        Ok(Self {
-            background: role("background")?,
-            on_background: role("on_background")?,
-            surface: role("surface")?,
-            surface_dim: role("surface_dim")?,
-            surface_bright: role("surface_bright")?,
-            surface_container_lowest: role("surface_container_lowest")?,
-            surface_container_low: role("surface_container_low")?,
-            surface_container: role("surface_container")?,
-            surface_container_high: role("surface_container_high")?,
-            surface_container_highest: role("surface_container_highest")?,
-            on_surface: role("on_surface")?,
-            on_surface_variant: role("on_surface_variant")?,
-            outline: role("outline")?,
-            outline_variant: role("outline_variant")?,
-            primary: role("primary")?,
-            on_primary: role("on_primary")?,
-            primary_container: role("primary_container")?,
-            on_primary_container: role("on_primary_container")?,
-            secondary: role("secondary")?,
-            on_secondary: role("on_secondary")?,
-            secondary_container: role("secondary_container")?,
-            on_secondary_container: role("on_secondary_container")?,
-            tertiary: role("tertiary")?,
-            on_tertiary: role("on_tertiary")?,
-            tertiary_container: role("tertiary_container")?,
-            on_tertiary_container: role("on_tertiary_container")?,
-            error: role("error")?,
-            on_error: role("on_error")?,
-            error_container: role("error_container")?,
-            on_error_container: role("on_error_container")?,
-        })
+        Ok(Self::for_mode(mode))
     }
 
-    /// Resolves all 30 color roles for `mode`, using verified compile-time fallbacks only if parsing fails.
+    /// Resolves all 30 color roles for `mode` directly from compile-time `brand::design` palettes.
     #[must_use]
     pub fn for_mode(mode: M3AppearanceMode) -> Self {
-        Self::try_for_mode(mode).unwrap_or_else(|_| Self::fallback_for_mode(mode))
+        let p = brand::design::palette_rgb(mode.to_brand_mode());
+        let color = |rgb_u32: u32| -> Hsla { gpui::rgb(rgb_u32).into() };
+        Self {
+            background: color(p.background),
+            on_background: color(p.on_background),
+            surface: color(p.surface),
+            surface_dim: color(p.surface_dim),
+            surface_bright: color(p.surface_bright),
+            surface_container_lowest: color(p.surface_container_lowest),
+            surface_container_low: color(p.surface_container_low),
+            surface_container: color(p.surface_container),
+            surface_container_high: color(p.surface_container_high),
+            surface_container_highest: color(p.surface_container_highest),
+            on_surface: color(p.on_surface),
+            on_surface_variant: color(p.on_surface_variant),
+            outline: color(p.outline),
+            outline_variant: color(p.outline_variant),
+            primary: color(p.primary),
+            on_primary: color(p.on_primary),
+            primary_container: color(p.primary_container),
+            on_primary_container: color(p.on_primary_container),
+            secondary: color(p.secondary),
+            on_secondary: color(p.on_secondary),
+            secondary_container: color(p.secondary_container),
+            on_secondary_container: color(p.on_secondary_container),
+            tertiary: color(p.tertiary),
+            on_tertiary: color(p.on_tertiary),
+            tertiary_container: color(p.tertiary_container),
+            on_tertiary_container: color(p.on_tertiary_container),
+            error: color(p.error),
+            on_error: color(p.on_error),
+            error_container: color(p.error_container),
+            on_error_container: color(p.on_error_container),
+        }
     }
 
     /// Composites an M3 state layer (`state_ink` at `opacity`) over `base`.
@@ -1064,142 +944,6 @@ impl M3ColorRoles {
             ("on_tertiary/tertiary", self.on_tertiary, self.tertiary),
             ("on_error/error", self.on_error, self.error),
         ]
-    }
-
-    fn fallback_for_mode(mode: M3AppearanceMode) -> Self {
-        let parse = |hex: &str| {
-            try_parse_color(hex).unwrap_or_else(|_| hsla(0.0, 0.0, 0.5, 1.0))
-        };
-        match mode {
-            M3AppearanceMode::Light => Self {
-                background: parse("#F7F9FF"),
-                on_background: parse("#161C24"),
-                surface: parse("#F7F9FF"),
-                surface_dim: parse("#D5DBE4"),
-                surface_bright: parse("#FFFFFF"),
-                surface_container_lowest: parse("#FFFFFF"),
-                surface_container_low: parse("#EEF3FA"),
-                surface_container: parse("#E7EDF6"),
-                surface_container_high: parse("#E0E7F1"),
-                surface_container_highest: parse("#D9E1EC"),
-                on_surface: parse("#161C24"),
-                on_surface_variant: parse("#3D4754"),
-                outline: parse("#6E7886"),
-                outline_variant: parse("#BEC7D4"),
-                primary: parse("#006399"),
-                on_primary: parse("#FFFFFF"),
-                primary_container: parse("#CEE5FF"),
-                on_primary_container: parse("#004972"),
-                secondary: parse("#4B6078"),
-                on_secondary: parse("#FFFFFF"),
-                secondary_container: parse("#D2E4FF"),
-                on_secondary_container: parse("#34485F"),
-                tertiary: parse("#5B5891"),
-                on_tertiary: parse("#FFFFFF"),
-                tertiary_container: parse("#E2DFFF"),
-                on_tertiary_container: parse("#434077"),
-                error: parse("#BA1A1A"),
-                on_error: parse("#FFFFFF"),
-                error_container: parse("#FFDAD6"),
-                on_error_container: parse("#93000A"),
-            },
-            M3AppearanceMode::Dark => Self {
-                background: parse("#0E141B"),
-                on_background: parse("#E0E6F0"),
-                surface: parse("#0E141B"),
-                surface_dim: parse("#0B1016"),
-                surface_bright: parse("#343B44"),
-                surface_container_lowest: parse("#080D13"),
-                surface_container_low: parse("#161D25"),
-                surface_container: parse("#1B222B"),
-                surface_container_high: parse("#252C36"),
-                surface_container_highest: parse("#303843"),
-                on_surface: parse("#E0E6F0"),
-                on_surface_variant: parse("#C0CAD7"),
-                outline: parse("#8A94A2"),
-                outline_variant: parse("#404956"),
-                primary: parse("#8FD0FF"),
-                on_primary: parse("#003352"),
-                primary_container: parse("#004B75"),
-                on_primary_container: parse("#CEE5FF"),
-                secondary: parse("#B4C9E5"),
-                on_secondary: parse("#1D3248"),
-                secondary_container: parse("#34485F"),
-                on_secondary_container: parse("#D2E4FF"),
-                tertiary: parse("#C6C2FF"),
-                on_tertiary: parse("#2C295F"),
-                tertiary_container: parse("#434077"),
-                on_tertiary_container: parse("#E2DFFF"),
-                error: parse("#FFB4AB"),
-                on_error: parse("#690005"),
-                error_container: parse("#93000A"),
-                on_error_container: parse("#FFDAD6"),
-            },
-            M3AppearanceMode::NeuralObsidian => Self {
-                background: parse("#0B0E14"),
-                on_background: parse("#E4EAF4"),
-                surface: parse("#0B0E14"),
-                surface_dim: parse("#07090E"),
-                surface_bright: parse("#2B3140"),
-                surface_container_lowest: parse("#06080C"),
-                surface_container_low: parse("#13161F"),
-                surface_container: parse("#181C26"),
-                surface_container_high: parse("#1C202B"),
-                surface_container_highest: parse("#262C3A"),
-                on_surface: parse("#E4EAF4"),
-                on_surface_variant: parse("#BAC4D6"),
-                outline: parse("#8792A6"),
-                outline_variant: parse("#384152"),
-                primary: parse("#8FD0FF"),
-                on_primary: parse("#003352"),
-                primary_container: parse("#004B75"),
-                on_primary_container: parse("#CEE5FF"),
-                secondary: parse("#B4C9E5"),
-                on_secondary: parse("#1D3248"),
-                secondary_container: parse("#34485F"),
-                on_secondary_container: parse("#D2E4FF"),
-                tertiary: parse("#C6C2FF"),
-                on_tertiary: parse("#2C295F"),
-                tertiary_container: parse("#434077"),
-                on_tertiary_container: parse("#E2DFFF"),
-                error: parse("#FFB4AB"),
-                on_error: parse("#690005"),
-                error_container: parse("#93000A"),
-                on_error_container: parse("#FFDAD6"),
-            },
-            M3AppearanceMode::OledPitch => Self {
-                background: parse("#000000"),
-                on_background: parse("#EDF2FA"),
-                surface: parse("#000000"),
-                surface_dim: parse("#000000"),
-                surface_bright: parse("#222834"),
-                surface_container_lowest: parse("#000000"),
-                surface_container_low: parse("#0A0E14"),
-                surface_container: parse("#121720"),
-                surface_container_high: parse("#1B222E"),
-                surface_container_highest: parse("#252E3D"),
-                on_surface: parse("#EDF2FA"),
-                on_surface_variant: parse("#C2CCDC"),
-                outline: parse("#8C96A8"),
-                outline_variant: parse("#2B3545"),
-                primary: parse("#8FD0FF"),
-                on_primary: parse("#003352"),
-                primary_container: parse("#004B75"),
-                on_primary_container: parse("#CEE5FF"),
-                secondary: parse("#B4C9E5"),
-                on_secondary: parse("#1D3248"),
-                secondary_container: parse("#34485F"),
-                on_secondary_container: parse("#D2E4FF"),
-                tertiary: parse("#C6C2FF"),
-                on_tertiary: parse("#2C295F"),
-                tertiary_container: parse("#434077"),
-                on_tertiary_container: parse("#E2DFFF"),
-                error: parse("#FFB4AB"),
-                on_error: parse("#690005"),
-                error_container: parse("#93000A"),
-                on_error_container: parse("#FFDAD6"),
-            },
-        }
     }
 }
 
@@ -1287,32 +1031,18 @@ pub fn active_m3_theme(cx: &App) -> M3ActiveTheme {
 #[must_use]
 pub fn m3_relative_luminance(color: Hsla) -> f32 {
     let rgb: Rgba = color.to_rgb();
-    let linearize = |channel: f32| {
-        if channel <= 0.03928 {
-            channel / 12.92
-        } else {
-            ((channel + 0.055) / 1.055).powf(2.4)
-        }
-    };
-    0.2126 * linearize(rgb.r) + 0.7152 * linearize(rgb.g) + 0.0722 * linearize(rgb.b)
+    brand::design::relative_luminance_srgb(rgb.r, rgb.g, rgb.b)
 }
 
 /// Computes WCAG 2.2 contrast ratio `(L1 + 0.05) / (L2 + 0.05)` in range `1.0..=21.0`.
 #[must_use]
 pub fn m3_contrast_ratio(foreground: Hsla, background: Hsla) -> f32 {
-    let fg = if foreground.a < 1.0 {
-        background.blend(foreground)
-    } else {
-        foreground
-    };
-    let lum_fg = m3_relative_luminance(fg);
-    let lum_bg = m3_relative_luminance(background);
-    let (hi, lo) = if lum_fg >= lum_bg {
-        (lum_fg, lum_bg)
-    } else {
-        (lum_bg, lum_fg)
-    };
-    (hi + 0.05) / (lo + 0.05)
+    let fg_rgb: Rgba = foreground.to_rgb();
+    let bg_rgb: Rgba = background.to_rgb();
+    brand::design::contrast_ratio_rgba(
+        [fg_rgb.r, fg_rgb.g, fg_rgb.b, foreground.a],
+        [bg_rgb.r, bg_rgb.g, bg_rgb.b],
+    )
 }
 
 /// Returns `true` when `(foreground, background)` meets WCAG 2.2 AA (`>= 4.5:1`).
@@ -1392,23 +1122,21 @@ pub fn m3_hsla_to_hex(color: Hsla) -> SharedString {
     }
 }
 
-/// Returns `(source_of_truth, system, seed_hex)` parsed from the bundled `google_design_tokens.toml`.
+/// Returns `(source_of_truth, system, seed_hex)` resolved from `brand::design`.
 pub fn m3_manifest_metadata() -> Result<(&'static str, &'static str, &'static str)> {
-    let manifest = M3TokenManifest::bundled()?;
     Ok((
-        manifest.source_of_truth.as_str(),
-        manifest.system.as_str(),
-        manifest.seed_hex.as_str(),
+        brand::design::SOURCE_OF_TRUTH,
+        brand::design::SYSTEM_NAME,
+        brand::design::SEED_HEX,
     ))
 }
 
 /// Builds a `gpui-component` [`ThemeConfig`] derived from `assets/os/google_design_tokens.toml` for `mode`.
 pub fn try_m3_theme_config(mode: M3AppearanceMode) -> Result<ThemeConfig> {
-    let manifest = M3TokenManifest::bundled()?;
-    let roles = M3ColorRoles::try_for_mode(mode)?;
-    let shape = manifest.shape;
-    let state = manifest.state;
-    let typography = M3TypographyScale::try_bundled()?;
+    let roles = M3ColorRoles::for_mode(mode);
+    let shape = M3ShapeTokens::bundled_or_default();
+    let state = M3StateLayerTokens::bundled_or_default();
+    let typography = M3TypographyScale::bundled_or_default();
 
     let hex = m3_hsla_to_hex;
     let hover_bg = |base: Hsla, ink: Hsla| hex(roles.state_layer(base, ink, state.hover_opacity));
@@ -1543,16 +1271,10 @@ pub fn try_m3_theme_config(mode: M3AppearanceMode) -> Result<ThemeConfig> {
     colors.chart_1 = Some(hex(roles.primary));
     colors.chart_2 = Some(hex(roles.secondary));
     colors.chart_3 = Some(hex(roles.tertiary));
-    colors.chart_4 = manifest
-        .reference_palette
-        .get("gemini_blue")
-        .cloned()
+    colors.chart_4 = brand::design::reference_palette_hex("gemini_blue")
         .map(Into::into)
         .or_else(|| Some(hex(roles.primary)));
-    colors.chart_5 = manifest
-        .reference_palette
-        .get("gemini_violet")
-        .cloned()
+    colors.chart_5 = brand::design::reference_palette_hex("gemini_violet")
         .map(Into::into)
         .or_else(|| Some(hex(roles.tertiary)));
     colors.chart_grid = Some(hex(roles.outline_variant));
@@ -4877,318 +4599,6 @@ impl RenderOnce for M3DialogSheet {
 }
 
 // ---------------------------------------------------------------------------
-// Minimal deterministic parser for `assets/os/google_design_tokens.toml`
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-struct M3TokenManifest {
-    source_of_truth: String,
-    system: String,
-    seed_hex: String,
-    reference_palette: BTreeMap<String, String>,
-    typeface: M3TypefaceTokens,
-    variable_axes: BTreeMap<String, M3AxisBounds>,
-    color_modes: BTreeMap<String, BTreeMap<String, String>>,
-    shape: M3ShapeTokens,
-    state: M3StateLayerTokens,
-    density: M3DensityTokens,
-    springs: BTreeMap<String, M3SpringSpec>,
-    typescales: BTreeMap<String, M3TypeScaleEntry>,
-}
-
-static BUNDLED_MANIFEST: OnceLock<std::result::Result<M3TokenManifest, String>> = OnceLock::new();
-
-impl M3TokenManifest {
-    fn bundled() -> Result<&'static Self> {
-        let cached = BUNDLED_MANIFEST
-            .get_or_init(|| parse_m3_tokens_toml(BUNDLED_GOOGLE_DESIGN_TOKENS_TOML).map_err(|e| format!("{e:#}")));
-        match cached {
-            Ok(manifest) => Ok(manifest),
-            Err(err) => Err(anyhow!("{err}")),
-        }
-    }
-}
-
-fn unquote_toml_str(raw: &str) -> Result<String> {
-    let trimmed = raw.trim();
-    if trimmed.len() >= 2 && trimmed.starts_with('"') && trimmed.ends_with('"') {
-        Ok(trimmed[1..trimmed.len() - 1].replace("\\\"", "\""))
-    } else {
-        Err(anyhow!("expected quoted TOML string, got `{trimmed}`"))
-    }
-}
-
-fn parse_toml_f32(raw: &str, key: &str) -> Result<f32> {
-    raw.trim()
-        .parse::<f32>()
-        .with_context(|| format!("invalid numeric value `{}` for `{key}`", raw.trim()))
-}
-
-fn parse_m3_tokens_toml(toml_src: &str) -> Result<M3TokenManifest> {
-    let mut source_of_truth = String::new();
-    let mut system = String::new();
-    let mut seed_hex = String::new();
-    let mut reference_palette = BTreeMap::new();
-    let mut typeface = M3TypefaceTokens::default();
-    let mut variable_axes_raw: BTreeMap<String, BTreeMap<String, String>> = BTreeMap::new();
-    let mut color_modes: BTreeMap<String, BTreeMap<String, String>> = BTreeMap::new();
-    let mut shape = M3ShapeTokens {
-        none_px: 0.0,
-        extra_small_px: 4.0,
-        small_px: 8.0,
-        medium_px: 12.0,
-        large_px: 16.0,
-        large_increased_px: 20.0,
-        extra_large_px: 28.0,
-        full_px: 9999.0,
-    };
-    let mut state = M3StateLayerTokens {
-        hover_opacity: 0.08,
-        focus_opacity: 0.10,
-        pressed_opacity: 0.10,
-        dragged_opacity: 0.16,
-        disabled_container_opacity: 0.12,
-        disabled_content_opacity: 0.38,
-        focus_ring_px: 2.0,
-    };
-    let mut density = M3DensityTokens {
-        default: 0,
-        compact_1: -1,
-        compact_2: -2,
-        compact_3: -3,
-        touch_target_min_px: 44.0,
-        control_height_min_px: 36.0,
-    };
-    let mut springs_raw: BTreeMap<String, BTreeMap<String, String>> = BTreeMap::new();
-    let mut typescales_raw: BTreeMap<String, BTreeMap<String, String>> = BTreeMap::new();
-
-    let mut current_section = String::new();
-    for raw_line in toml_src.lines() {
-        let line = raw_line.trim();
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-        if line.starts_with('[') && line.ends_with(']') {
-            current_section = line[1..line.len() - 1].trim().to_owned();
-            continue;
-        }
-        let Some((lhs, rhs)) = line.split_once('=') else {
-            continue;
-        };
-        let key = lhs.trim();
-        let val = rhs.trim();
-
-        match current_section.as_str() {
-            "" => match key {
-                "source_of_truth" => source_of_truth = unquote_toml_str(val)?,
-                "system" => system = unquote_toml_str(val)?,
-                "seed_hex" => seed_hex = unquote_toml_str(val)?,
-                _ => {}
-            },
-            "ref.palette" => {
-                reference_palette.insert(key.to_owned(), unquote_toml_str(val)?);
-            }
-            "ref.typeface" => {
-                let s = unquote_toml_str(val)?;
-                match key {
-                    "brand" => typeface.brand = s.into(),
-                    "plain" => typeface.plain = s.into(),
-                    "mono" => typeface.mono = s.into(),
-                    "fallback" => typeface.fallback = s.into(),
-                    _ => {}
-                }
-            }
-            "sys.shape" => {
-                let num = parse_toml_f32(val, key)?;
-                match key {
-                    "none_px" => shape.none_px = num,
-                    "extra_small_px" => shape.extra_small_px = num,
-                    "small_px" => shape.small_px = num,
-                    "medium_px" => shape.medium_px = num,
-                    "large_px" => shape.large_px = num,
-                    "large_increased_px" => shape.large_increased_px = num,
-                    "extra_large_px" => shape.extra_large_px = num,
-                    "full_px" => shape.full_px = num,
-                    _ => {}
-                }
-            }
-            "sys.state" => {
-                let num = parse_toml_f32(val, key)?;
-                match key {
-                    "hover_opacity" => state.hover_opacity = num,
-                    "focus_opacity" => state.focus_opacity = num,
-                    "pressed_opacity" => state.pressed_opacity = num,
-                    "dragged_opacity" => state.dragged_opacity = num,
-                    "disabled_container_opacity" => state.disabled_container_opacity = num,
-                    "disabled_content_opacity" => state.disabled_content_opacity = num,
-                    "focus_ring_px" => state.focus_ring_px = num,
-                    _ => {}
-                }
-            }
-            "sys.density" => {
-                let num = parse_toml_f32(val, key)?;
-                match key {
-                    "default" => density.default = num as i32,
-                    "compact_1" => density.compact_1 = num as i32,
-                    "compact_2" => density.compact_2 = num as i32,
-                    "compact_3" => density.compact_3 = num as i32,
-                    "touch_target_min_px" => density.touch_target_min_px = num,
-                    "control_height_min_px" => density.control_height_min_px = num,
-                    _ => {}
-                }
-            }
-            section => {
-                if let Some(mode_key) = section.strip_prefix("sys.color.") {
-                    color_modes
-                        .entry(mode_key.to_owned())
-                        .or_default()
-                        .insert(key.to_owned(), unquote_toml_str(val)?);
-                } else if let Some(axis_key) = section.strip_prefix("ref.variable_axes.") {
-                    variable_axes_raw
-                        .entry(axis_key.to_owned())
-                        .or_default()
-                        .insert(key.to_owned(), val.to_owned());
-                } else if let Some(spring_key) = section.strip_prefix("sys.motion.springs.") {
-                    springs_raw
-                        .entry(spring_key.to_owned())
-                        .or_default()
-                        .insert(key.to_owned(), val.to_owned());
-                } else if let Some(scale_key) = section.strip_prefix("sys.typescale.") {
-                    typescales_raw
-                        .entry(scale_key.to_owned())
-                        .or_default()
-                        .insert(key.to_owned(), val.to_owned());
-                }
-            }
-        }
-    }
-
-    let mut variable_axes = BTreeMap::new();
-    for (axis_key, map) in variable_axes_raw {
-        let tag = map
-            .get("tag")
-            .map(|v| unquote_toml_str(v))
-            .transpose()?
-            .unwrap_or_else(|| axis_key.clone());
-        let name = map
-            .get("name")
-            .map(|v| unquote_toml_str(v))
-            .transpose()?
-            .unwrap_or_else(|| axis_key.clone());
-        let min = parse_toml_f32(
-            map.get("min")
-                .with_context(|| format!("missing min on axis {axis_key}"))?,
-            "min",
-        )?;
-        let default_value = parse_toml_f32(
-            map.get("default_value")
-                .with_context(|| format!("missing default_value on axis {axis_key}"))?,
-            "default_value",
-        )?;
-        let max = parse_toml_f32(
-            map.get("max")
-                .with_context(|| format!("missing max on axis {axis_key}"))?,
-            "max",
-        )?;
-        variable_axes.insert(
-            axis_key,
-            M3AxisBounds {
-                tag,
-                name,
-                min,
-                default_value,
-                max,
-            },
-        );
-    }
-
-    let mut springs = BTreeMap::new();
-    for (spring_key, map) in springs_raw {
-        let stiffness = parse_toml_f32(
-            map.get("stiffness")
-                .with_context(|| format!("missing stiffness on spring {spring_key}"))?,
-            "stiffness",
-        )?;
-        let damping_ratio = parse_toml_f32(
-            map.get("damping_ratio")
-                .with_context(|| format!("missing damping_ratio on spring {spring_key}"))?,
-            "damping_ratio",
-        )?;
-        springs.insert(
-            spring_key,
-            M3SpringSpec {
-                stiffness,
-                damping_ratio,
-            },
-        );
-    }
-
-    let mut typescales = BTreeMap::new();
-    for (scale_key, map) in typescales_raw {
-        let font_role = map
-            .get("font")
-            .map(|v| unquote_toml_str(v))
-            .transpose()?
-            .unwrap_or_else(|| "plain".to_owned());
-        let size_sp = parse_toml_f32(
-            map.get("size_sp")
-                .with_context(|| format!("missing size_sp on typescale {scale_key}"))?,
-            "size_sp",
-        )?;
-        let line_height_sp = parse_toml_f32(
-            map.get("line_height_sp")
-                .with_context(|| format!("missing line_height_sp on typescale {scale_key}"))?,
-            "line_height_sp",
-        )?;
-        let weight = parse_toml_f32(
-            map.get("weight")
-                .with_context(|| format!("missing weight on typescale {scale_key}"))?,
-            "weight",
-        )?
-        .round() as u16;
-        let tracking_sp = parse_toml_f32(
-            map.get("tracking_sp")
-                .with_context(|| format!("missing tracking_sp on typescale {scale_key}"))?,
-            "tracking_sp",
-        )?;
-        typescales.insert(
-            scale_key,
-            M3TypeScaleEntry {
-                font_role: font_role.into(),
-                size_sp,
-                line_height_sp,
-                weight,
-                tracking_sp,
-            },
-        );
-    }
-
-    ensure!(
-        !source_of_truth.is_empty(),
-        "google_design_tokens.toml missing source_of_truth"
-    );
-    ensure!(
-        color_modes.len() >= 4,
-        "expected 4 color modes in google_design_tokens.toml, got {}",
-        color_modes.len()
-    );
-
-    Ok(M3TokenManifest {
-        source_of_truth,
-        system,
-        seed_hex,
-        reference_palette,
-        typeface,
-        variable_axes,
-        color_modes,
-        shape,
-        state,
-        density,
-        springs,
-        typescales,
-    })
-}
-
 // ---------------------------------------------------------------------------
 // Unit & GPUI Integration Tests
 // ---------------------------------------------------------------------------
@@ -5203,28 +4613,31 @@ mod tests {
 
     #[test]
     fn bundled_manifest_parses_all_four_modes_typefaces_axes_and_springs() -> Result<()> {
-        let manifest = M3TokenManifest::bundled()?;
-        assert_eq!(manifest.source_of_truth, M3_DESIGN_SOURCE_OF_TRUTH);
-        assert_eq!(manifest.system, "Material 3 Expressive");
-        assert_eq!(manifest.seed_hex, "#135B82");
-        assert_eq!(manifest.typeface.brand_family().as_ref(), "Google Sans Flex");
-        assert_eq!(manifest.typeface.mono_family().as_ref(), "JetBrains Mono");
-        assert_eq!(manifest.shape.medium_px, 12.0);
-        assert_eq!(manifest.shape.large_px, 16.0);
-        assert_eq!(manifest.shape.extra_large_px, 28.0);
-        assert_eq!(manifest.density.touch_target_min_px, 44.0);
+        let (source_of_truth, system, seed_hex) = m3_manifest_metadata()?;
+        assert_eq!(source_of_truth, M3_DESIGN_SOURCE_OF_TRUTH);
+        assert_eq!(system, "Material 3 Expressive");
+        assert_eq!(seed_hex, "#135B82");
+        let typography = M3TypographyScale::try_bundled()?;
+        let shape = M3ShapeTokens::try_bundled()?;
+        let density = M3DensityTokens::try_bundled()?;
+        assert_eq!(typography.typeface.brand_family().as_ref(), "Google Sans Flex");
+        assert_eq!(typography.typeface.mono_family().as_ref(), "JetBrains Mono");
+        assert_eq!(shape.medium_px, 12.0);
+        assert_eq!(shape.large_px, 16.0);
+        assert_eq!(shape.extra_large_px, 28.0);
+        assert_eq!(density.touch_target_min_px, 44.0);
 
         for axis in ["opsz", "wght", "wdth", "GRAD", "slnt", "ROND"] {
             assert!(
-                manifest.variable_axes.contains_key(axis),
+                brand::design::axis_spec(axis).is_some(),
                 "missing Google Sans Flex axis {axis}"
             );
         }
 
         for mode in M3AppearanceMode::ALL {
             let parsed = M3ColorRoles::try_for_mode(mode)?;
-            let fallback = M3ColorRoles::fallback_for_mode(mode);
-            assert_eq!(parsed, fallback, "fallback out of sync for {mode:?}");
+            let direct = M3ColorRoles::for_mode(mode);
+            assert_eq!(parsed, direct, "palette mismatch for {mode:?}");
         }
 
         Ok(())

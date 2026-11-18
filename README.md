@@ -77,9 +77,9 @@ cargo xtask new-app my-code-tool --template code
 cargo xtask new-app my-widget --template minimal
 ```
 
-### 5. Native Shell (`nsh`) × `vendor/bun` Zero-Dependency Workflow
+### 5. Native Shell (`nsh`) × `bun` Toolchain Workflow
 
-[`vendor/bun`](./vendor/bun) (`aphrody-labs/bun` Git submodule) powers TypeScript checking, formatting, Tailwind sorting, and linting with zero npm downloads:
+Driven by Aphrody Bun runtime (see [`.agents/plugins/aphrody/skills/bun-gpui/SKILL.md`](./.agents/plugins/aphrody/skills/bun-gpui/SKILL.md)) for TypeScript checking, formatting, Tailwind sorting, and linting with zero npm downloads:
 
 ```sh
 cargo run -p nsh-cli -- check examples/nsh/counter
@@ -90,7 +90,7 @@ cargo run -p nsh-cli -- test examples/nsh/counter
 
 ### 6. WGPU v30.0.0 CLI (`gpui-wgpu`), GPU Backends & Unified Plugin
 
-Backed by [`vendor/wgpu`](./vendor/wgpu), [`docs/wgpu/llms.txt`](./docs/wgpu/llms.txt), [`docs/wgpu/llms-full.txt`](./docs/wgpu/llms-full.txt), [`docs/gpu/`](./docs/gpu), and the unified agent plugin in [`.agents/plugins/aphrody/`](./.agents/plugins/aphrody/plugin.json) (bundling all skills, hooks, rules, and docs for Zed, GPUI, WGPU, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Brand, and GitHub Ops):
+Backed by [`vendor/wgpu`](./vendor/wgpu), [`aphrody/docs/wgpu/llms.txt`](./aphrody/docs/wgpu/llms.txt), [`aphrody/docs/wgpu/llms-full.txt`](./aphrody/docs/wgpu/llms-full.txt), [`aphrody/docs/gpu/`](./aphrody/docs/gpu), and the unified agent plugin in [`.agents/plugins/aphrody/`](./.agents/plugins/aphrody/plugin.json) (bundling all skills, hooks, rules, and docs for Zed, GPUI, WGPU, Vulkan, DirectX 12, WebGPU, NSH, gpui-kit, Bun, Brand, and GitHub Ops):
 
 ```sh
 cargo run -p aphrody_cli -- adapters

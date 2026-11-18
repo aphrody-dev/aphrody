@@ -15,8 +15,8 @@ import { join, resolve } from "node:path";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 export const DEFAULT_TOML_OUT = join(repoRoot, "assets/os/webassembly_ecosystem.toml");
-export const DEFAULT_MD_OUT = join(repoRoot, "docs/architecture/webassembly-org-ecosystem.md");
-export const DEFAULT_LLMS_OUT = join(repoRoot, "docs/architecture/webassembly-org-llms.txt");
+export const DEFAULT_MD_OUT = join(repoRoot, "aphrody/docs/architecture/webassembly-org-ecosystem.md");
+export const DEFAULT_LLMS_OUT = join(repoRoot, "aphrody/docs/architecture/webassembly-org-llms.txt");
 export const DEFAULT_SKILL_OUT = join(
   repoRoot,
   ".agents/plugins/aphrody/skills/webassembly/SKILL.md",
@@ -273,9 +273,9 @@ Synced snapshot of [${cat.total_repos} repositories](https://github.com/orgs/Web
 | --- | ---: | --- | --- |
 ${rows}
 
-- Registry manifest: [webassembly_ecosystem.toml](../../assets/os/webassembly_ecosystem.toml)
+- Registry manifest: [webassembly_ecosystem.toml](../../../assets/os/webassembly_ecosystem.toml)
 - Compact agent index: [webassembly-org-llms.txt](./webassembly-org-llms.txt)
-- Toolchain skill: [.agents/plugins/aphrody/skills/webassembly/SKILL.md](../../.agents/plugins/aphrody/skills/webassembly/SKILL.md)
+- Toolchain skill: [.agents/plugins/aphrody/skills/webassembly/SKILL.md](../../../.agents/plugins/aphrody/skills/webassembly/SKILL.md)
 `;
 }
 
@@ -300,7 +300,7 @@ description: Authoritative github.com/orgs/WebAssembly ecosystem reference (Bina
 
 # \`orgs/WebAssembly\` Unified Toolchain & Spec Guide
 
-Aphrody mirrors the top ${cat.total_repos} \`WebAssembly/*\` repositories directly into its native Rust/Bun Wasm toolchain ([webassembly_ecosystem.toml](../../../../assets/os/webassembly_ecosystem.toml)).
+Aphrody mirrors the top ${cat.total_repos} \`WebAssembly/*\` repositories directly into its native Rust/Bun Wasm toolchain ([webassembly_ecosystem.toml](../../../../../assets/os/webassembly_ecosystem.toml)).
 
 ## Core Workflows
 

@@ -450,15 +450,6 @@ impl<E: Element> Observed<E> {
         }
     }
 }
-#[cfg(not(feature = "gpui-fast"))]
-impl<E: Element<PrepaintState = Option<Hitbox>> + InteractiveElement> gpui::IntoElement
-    for Observed<E>
-{
-    type Element = Self;
-    fn into_element(self) -> Self {
-        self
-    }
-}
 impl<E: Element<PrepaintState = Option<Hitbox>> + InteractiveElement> Element for Observed<E> {
     type RequestLayoutState = E::RequestLayoutState;
     type PrepaintState = (Option<Hitbox>, Rc<Registration>);
@@ -645,13 +636,6 @@ impl<E: Element> ObservedText<E> {
         E: InteractiveElement,
     {
         ObservedText::new(self.inner.id(id), self.text, self.alternative)
-    }
-}
-#[cfg(not(feature = "gpui-fast"))]
-impl<E: Element> gpui::IntoElement for ObservedText<E> {
-    type Element = Self;
-    fn into_element(self) -> Self {
-        self
     }
 }
 impl<E: Element> Element for ObservedText<E> {

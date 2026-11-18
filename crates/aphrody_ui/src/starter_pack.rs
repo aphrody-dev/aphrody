@@ -736,7 +736,7 @@ mod tests {
     fn bundled_submodule_parity_matrix_parses_cleanly() -> Result<()> {
         let matrix = SubmoduleParityMatrix::bundled()?;
         assert_eq!(matrix.design_source_of_truth, "https://design.google/");
-        assert!(matrix.frameworks.len() >= 17);
+        assert!(matrix.frameworks.len() >= 11);
         assert!(matrix.core_web_vitals_budgets.lcp_good_ms <= 2500);
         assert!(matrix.core_web_vitals_budgets.inp_good_ms <= 200);
         assert_eq!(matrix.monorepo_audit_summary.rust_prod_unwrap_violations, 0);

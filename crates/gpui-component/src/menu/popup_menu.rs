@@ -1652,6 +1652,9 @@ impl Render for PopupMenu {
                             .map(|(ix, item)| self.render_item(ix, item, options, window, cx)),
                     ),
             )
+            .when(self.scrollable, |this| {
+                this.vertical_scrollbar(&self.scroll_handle)
+            })
             // Measure on this element, not on the scrolling `items` container:
             // the probe is a full-size absolute child, which would count as
             // scrollable content there and, with the container's padding added
@@ -1670,9 +1673,6 @@ impl Render for PopupMenu {
                         }
                     }
                 });
-            })
-            .when(self.scrollable, |this| {
-                this.vertical_scrollbar(&self.scroll_handle)
             })
     }
 }

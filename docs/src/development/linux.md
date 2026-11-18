@@ -1,13 +1,13 @@
 ---
-title: Building Aphrody for Linux
-description: "Guide to building Aphrody for Linux from source."
+title: Building Zed for Linux
+description: "Guide to building zed for linux for Zed development."
 ---
 
-# Building Aphrody for Linux
+# Building Zed for Linux
 
 ## Repository
 
-Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with submodules (or sync submodules with `bun run submodules:sync`).
+Clone the [Zed repository](https://github.com/zed-industries/zed).
 
 ## Dependencies
 
@@ -23,28 +23,21 @@ Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with subm
 
 ## Building from source
 
-Once the dependencies are installed, you can build Aphrody using [Cargo](https://doc.rust-lang.org/cargo/).
+Once the dependencies are installed, you can build Zed using [Cargo](https://doc.rust-lang.org/cargo/).
 
-For a debug build of Aphrody Studio:
-
-```sh
-cargo run -p zed
-```
-
-Or for the local-first editor core (`--no-default-features`) or Aphrody GPUI OS shell (`aphrody_desktop`):
+For a debug build of the editor:
 
 ```sh
-cargo run -p zed --no-default-features
-cargo run -p aphrody_desktop --bin aphrody-os
+cargo run
 ```
 
-And to run the workspace tests:
+And to run the tests:
 
 ```sh
 cargo test --workspace
 ```
 
-In release mode, the primary CLI interface is the `cli` crate. You can run it in development with:
+In release mode, the primary user interface is the `cli` crate. You can run it in development with:
 
 ```sh
 cargo run -p cli
@@ -58,36 +51,42 @@ You can install a local build on your machine with:
 ./script/install-linux
 ```
 
-This builds `zed` and the `cli` in release mode, installs the binary under `~/.local/bin`, and installs `.desktop` files to `~/.local/share`.
+This builds `zed` and the `cli` in release mode, installs the binary at `~/.local/bin/zed`, and installs `.desktop` files to `~/.local/share`.
 
 ## Wayland & X11
 
-Aphrody supports both X11 and Wayland. By default, we pick whichever we can find at runtime. If you're on Wayland and want to run in X11 mode, use the environment variable `WAYLAND_DISPLAY=''`.
+Zed supports both X11 and Wayland. By default, we pick whichever we can find at runtime. If you're on Wayland and want to run in X11 mode, use the environment variable `WAYLAND_DISPLAY=''`.
 
-## Notes for packaging Aphrody {#notes-for-packaging-zed}
+## Notes for packaging Zed
 
-This section is for distribution maintainers packaging Aphrody.
+This section is for distribution maintainers packaging Zed.
 
 ### Technical requirements
 
-Aphrody has two main studio binaries (plus optional `aphrody-os` and `gpui-wgpu`):
+Zed has two main binaries:
 
-- You will need to build `crates/cli` and make its binary available in `$PATH` (defaulting to `aphrody`, alongside optional compatibility aliases).
-- You will need to build `crates/zed` (`--bin aphrody`) and place the studio binary alongside the launcher layout (for example `$PREFIX/libexec/aphrody-editor` or `$PREFIX/lib/aphrody/aphrody-editor`).
-- If you are going to provide a `.desktop` file you can find a template in `crates/zed/resources/zed.desktop.in` (synchronized from `product.toml` via `cargo xtask brand apply`), and use `envsubst` to populate it with the values required. Rename it to `$APP_ID.desktop` so it follows FreeDesktop standards and make it executable (`chmod 755`).
-- You will need to ensure that the necessary shared libraries are installed (inspect the built binary with `ldd` or check `script/bundle-linux`).
-- For an example of a complete Linux bundle script, see [`script/bundle-linux`](https://github.com/aphrody-dev/aphrody/blob/main/script/bundle-linux).
-- You can disable auto updates and provide custom update instructions by building or running with `APHRODY_UPDATE_EXPLANATION` (or `ZED_UPDATE_EXPLANATION`), for example: `APHRODY_UPDATE_EXPLANATION="Please use your system package manager to update Aphrody."`.
-- Set `crates/zed/RELEASE_CHANNEL` to `stable`, `preview`, `canary`, `nightly`, `lts`, or `dev` (with no trailing newline) when packaging a non-dev build so credential storage uses the system keychain.
+- You will need to build `crates/cli` and make its binary available in `$PATH` with the name `zed`.
+- You will need to build `crates/zed` and put it at `$PATH/to/cli/../../libexec/zed-editor`. For example, if you are going to put the cli at `~/.local/bin/zed` put zed at `~/.local/libexec/zed-editor`. As some linux distributions (notably Arch) discourage the use of `libexec`, you can also put this binary at `$PATH/to/cli/../../lib/zed/zed-editor` (e.g. `~/.local/lib/zed/zed-editor`) instead.
+- If you are going to provide a `.desktop` file you can find a template in `crates/zed/resources/zed.desktop.in`, and use `envsubst` to populate it with the values required. This file should also be renamed to `$APP_ID.desktop` so that the file [follows the FreeDesktop standards](https://github.com/zed-industries/zed/issues/12707#issuecomment-2168742761). You should also make this desktop file executable (`chmod 755`).
+- You will need to ensure that the necessary libraries are installed. You can get the current list by [inspecting the built binary](https://github.com/zed-industries/zed/blob/935cf542aebf55122ce6ed1c91d0fe8711970c82/script/bundle-linux#L65-L67) on your system.
+- For an example of a complete build script, see [script/bundle-linux](https://github.com/zed-industries/zed/blob/935cf542aebf55122ce6ed1c91d0fe8711970c82/script/bundle-linux).
+- You can disable Zed's auto updates and provide instructions for users who try to update Zed manually by building (or running) Zed with the environment variable `ZED_UPDATE_EXPLANATION`. For example: `ZED_UPDATE_EXPLANATION="Please use flatpak to update zed."`.
+- Make sure to update the contents of the `crates/zed/RELEASE_CHANNEL` file to 'nightly', 'preview', or 'stable', with no newline. This will cause Zed to use the credentials manager to remember a user's login.
 
 ### Other things to note
 
-- **Local-first defaults**: Aphrody ships with telemetry (`telemetry.diagnostics = false`, `telemetry.metrics = false`), automatic updates (`auto_update = false`), and sign-in/user-menu bars disabled in [`assets/settings/default.json`](https://github.com/aphrody-dev/aphrody/blob/main/assets/settings/default.json).
-- **Toolchains & Extensions**: Aphrody maintains `zed:extension` WIT compatibility and can install user-requested language servers or extensions locally.
+Zed moves quickly, and distribution maintainers often have different constraints and priorities. The points below describe current trade-offs:
+
+- Zed is a fast-moving project. We typically publish 2-3 builds per week to address reported issues and ship larger changes.
+- There are a couple of other `zed` binaries that may be present on Linux systems ([1](https://openzfs.github.io/openzfs-docs/man/v2.2/8/zed.8.html), [2](https://zed.brimdata.io/docs/commands/zed)). If you want to rename our CLI binary because of these issues, we suggest `zedit`, `zeditor`, or `zed-cli`.
+- Zed automatically installs versions of common developer tools, similar to rustup/rbenv/pyenv. This behavior is discussed [here](https://github.com/zed-industries/zed/issues/12589).
+- Users can install extensions locally and from [zed-industries/extensions](https://github.com/zed-industries/extensions). Extensions may install additional tools such as language servers. Planned safety improvements are tracked [here](https://github.com/zed-industries/zed/issues/12358).
+- Zed connects to several online services by default (AI, telemetry, collaboration). AI and our telemetry can be disabled by your users with their zed settings or by patching our [default settings file](https://github.com/zed-industries/zed/blob/main/assets/settings/default.json).
+- Because of the points above, Zed currently does not work well with sandboxes. See [this discussion](https://github.com/zed-industries/zed/pull/12006#issuecomment-2130421220).
 
 ## Flatpak
 
-> Current Flatpak integration exits the sandbox on startup when accessing host toolchains. Workflows that rely on strict Flatpak sandboxing may not work as expected.
+> Zed's current Flatpak integration exits the sandbox on startup. Workflows that rely on Flatpak's sandboxing may not work as expected.
 
 To build & install the Flatpak package locally follow the steps below:
 

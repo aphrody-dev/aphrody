@@ -6,9 +6,9 @@ on:
     paths:
       - 'README.md'
       - 'product.toml'
-      - 'docs/wgpu/**'
-      - 'docs/gpu/**'
-      - 'docs/nsh/**'
+      - 'aphrody/docs/wgpu/**'
+      - 'aphrody/docs/gpu/**'
+      - 'aphrody/docs/nsh/**'
       - '.agents/plugins/aphrody/**'
   schedule:
     - cron: '0 6 * * 1'
@@ -52,12 +52,12 @@ jobs:
           PLUGIN_DIR=".agents/plugins/${PLUGIN_NAME}"
 
           cp README.md /tmp/wiki/Home.md
-          [ -f docs/wgpu/llms.txt ] && cp docs/wgpu/llms.txt /tmp/wiki/WGPU-and-Naga.md
-          [ -f docs/wgpu/llms-full.txt ] && cp docs/wgpu/llms-full.txt /tmp/wiki/WGPU-Reference.md
-          [ -f docs/gpu/vulkan/README.md ] && cp docs/gpu/vulkan/README.md /tmp/wiki/GPU-Vulkan.md
-          [ -f docs/gpu/directx/README.md ] && cp docs/gpu/directx/README.md /tmp/wiki/GPU-DirectX12.md
-          [ -f docs/gpu/webgpu/README.md ] && cp docs/gpu/webgpu/README.md /tmp/wiki/GPU-WebGPU.md
-          [ -f docs/nsh/README.md ] && cp docs/nsh/README.md /tmp/wiki/NSH-Overview.md
+          [ -f aphrody/docs/wgpu/llms.txt ] && cp aphrody/docs/wgpu/llms.txt /tmp/wiki/WGPU-and-Naga.md
+          [ -f aphrody/docs/wgpu/llms-full.txt ] && cp aphrody/docs/wgpu/llms-full.txt /tmp/wiki/WGPU-Reference.md
+          [ -f aphrody/docs/gpu/vulkan/README.md ] && cp aphrody/docs/gpu/vulkan/README.md /tmp/wiki/GPU-Vulkan.md
+          [ -f aphrody/docs/gpu/directx/README.md ] && cp aphrody/docs/gpu/directx/README.md /tmp/wiki/GPU-DirectX12.md
+          [ -f aphrody/docs/gpu/webgpu/README.md ] && cp aphrody/docs/gpu/webgpu/README.md /tmp/wiki/GPU-WebGPU.md
+          [ -f aphrody/docs/nsh/README.md ] && cp aphrody/docs/nsh/README.md /tmp/wiki/NSH-Overview.md
           [ -f "${PLUGIN_DIR}/docs/INDEX.md" ] && cp "${PLUGIN_DIR}/docs/INDEX.md" /tmp/wiki/Plugin-and-Skills.md
           [ -f "${PLUGIN_DIR}/docs/gpui-kit/ARCHITECTURE.md" ] && cp "${PLUGIN_DIR}/docs/gpui-kit/ARCHITECTURE.md" /tmp/wiki/GPUI-Kit-Architecture.md
           [ -f "${PLUGIN_DIR}/skills/github-ops/SKILL.md" ] && cp "${PLUGIN_DIR}/skills/github-ops/SKILL.md" /tmp/wiki/GitHub-Automation.md

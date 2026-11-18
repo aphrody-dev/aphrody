@@ -4,7 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   applyAphrodyOnboardingTransforms,
+  applyIsolatedFencedBlocks,
   ensureReadmeReviewGuard,
+  extractIsolatedFencedBlocks,
   flattenModRsTree,
   mergeXtaskMainKeepingAphrodyCommands,
   normalizeGpuiKitManifest,
@@ -126,5 +128,21 @@ jiff = "1.0"
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  test("preserves APHRODY ISOLATED fenced blocks across upstream text merges", () => {
+    const ours = `
+*.json linguist-language=JSON-with-Comments
+
+# === APHRODY ISOLATED GITATTRIBUTES START ===
+*.wasm binary
+# === APHRODY ISOLATED GITATTRIBUTES END ===
+`;
+    const theirs = `*.json linguist-language=JSON-with-Comments\n*.sh text eol=lf\n`;
+    expect(extractIsolatedFencedBlocks(ours).length).toBe(1);
+    const merged = applyIsolatedFencedBlocks(theirs, ours);
+    expect(merged).toContain("*.sh text eol=lf");
+    expect(merged).toContain("# === APHRODY ISOLATED GITATTRIBUTES START ===");
+    expect(merged).toContain("*.wasm binary");
   });
 });

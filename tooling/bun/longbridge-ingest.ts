@@ -18,7 +18,7 @@ import { parseGitmodules, type SubmoduleEntry } from "./submodules.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const INVENTORY_TOML_REL = "assets/os/longbridge_gpui_inventory.toml";
-export const ARCH_DOC_REL = "docs/architecture/longbridge-gpui-unification.md";
+export const ARCH_DOC_REL = "aphrody/docs/architecture/longbridge-gpui-unification.md";
 export const GRAPH_OUT_REL = "target/longbridge-ingest/graph.json";
 export const SCAN_OUT_REL = "target/longbridge-ingest/scan.json";
 export const CENTRALIZE_OUT_REL = "target/longbridge-ingest/centralize.json";
@@ -732,7 +732,7 @@ export function classifyRepo(
       category: isBench ? "benchmark-compat" : isShowcase ? "showcase-app" : "docs-skills-reference",
       relevanceScore: isBench || isShowcase ? 78 : 55,
       localMatches: findLocalAnchorsForRepo(shortName, localIndex),
-      targetCrates: shortName.includes("bench") ? ["tooling/perf", "crates/bench_metrics"] : ["docs/architecture", "crates/aphrody_desktop"],
+      targetCrates: shortName.includes("bench") ? ["tooling/perf", "crates/bench_metrics"] : ["aphrody/docs/architecture", "crates/aphrody_desktop"],
       rationale: isBench
         ? "Benchmark/compatibility harness retained as reference validation suite."
         : isShowcase
@@ -756,7 +756,7 @@ export function classifyRepo(
       category: isLib ? "community-gpui-lib" : "community-gpui-app",
       relevanceScore: Math.min(95, (isLib ? 74 : 58) + Math.round(Math.log10(Math.max(10, repo.stars)) * 5)),
       localMatches: localMatch,
-      targetCrates: isLib ? ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"] : ["docs/architecture"],
+      targetCrates: isLib ? ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"] : ["aphrody/docs/architecture"],
       rationale: isLib
         ? "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
         : "Community GPUI production application benchmarked for UX patterns and ecosystem showcase parity.",
@@ -772,7 +772,7 @@ export function classifyRepo(
         category: "discovered-showcase-docs",
         relevanceScore: 60,
         localMatches: findLocalAnchorsForRepo(shortName, localIndex),
-        targetCrates: ["docs/architecture"],
+        targetCrates: ["aphrody/docs/architecture"],
         rationale: "Discovered GPUI/NSH/UI showcase, benchmark, or documentation repository.",
       };
     }
@@ -2325,7 +2325,7 @@ export function updateArchitectureDoc(graph: GraphifyDocument, docPath = join(RE
     `| **Longbridge Org Repos Scanned** | \`${graph.summary.longbridgeRepoCount}\` repos (\`${graph.summary.absorbedCount}\` absorbed, \`${graph.summary.mergeCandidateCount}\` merge candidates, \`${graph.summary.referenceBenchShowcaseCount}\` ref/bench/showcase, \`${graph.summary.infraOutOfScopeCount}\` infra) | \`gh api --paginate orgs/longbridge/repos\` |`,
     `| **Community GPUI Repos Tracked** | \`${graph.summary.communityGpuiCount}\` repositories | GitHub Search + \`crates.io\` |`,
     `| **Aphrody Workspace Crates** | \`${graph.summary.workspaceCrateCount}\` members (\`${graph.summary.featureMatrixCrateCount}\` core GPUI/NSH/OS crates in feature matrix) | \`cargo metadata --format-version 1\` |`,
-    `| **Cargo Dependency Centralization** | \`${graph.summary.nonWorkspaceDepCount}\` non-workspace dep entries across \`${graph.summary.uniqueNonWorkspaceDepCount}\` unique deps; \`${graph.summary.missingWorkspaceLintsCount}\` crates missing \`[lints] workspace = true\` | Root [\`Cargo.toml\`](../../Cargo.toml) + member manifests |`,
+    `| **Cargo Dependency Centralization** | \`${graph.summary.nonWorkspaceDepCount}\` non-workspace dep entries across \`${graph.summary.uniqueNonWorkspaceDepCount}\` unique deps; \`${graph.summary.missingWorkspaceLintsCount}\` crates missing \`[lints] workspace = true\` | Root [\`Cargo.toml\`](../../../Cargo.toml) + member manifests |`,
     `| **Resolved Graph Duplicates** | \`${graph.summary.duplicateGraphCrateCount}\` crates with >1 resolved version (\`${graph.summary.duplicateMajorMinorCount}\` major.minor splits) | \`target/longbridge-ingest/graph.json\` |`,
     `| **Live Sitemaps & Screenshots** | \`${graph.summary.sitemapTargetsCount}\` showcase/docs sites (\`${graph.summary.sitemapTotalUrls}\` discovered URLs), \`${graph.summary.screenshotSuccessCount}/${graph.summary.screenshotCount}\` validated PNG captures | \`target/longbridge-screenshots/*.png\` |`,
     "<!-- END LONGBRIDGE_INGEST_METRICS -->",

@@ -12,7 +12,7 @@ const repoRoot = resolve(import.meta.dir, "../..");
 describe("aphrody repo-native bun tooling", () => {
   test("parses .gitmodules and preserves relative aphrody-labs submodule URLs", () => {
     const entries = parseGitmodules(readFileSync(resolve(repoRoot, ".gitmodules"), "utf8"));
-    expect(entries.length).toBeGreaterThanOrEqual(24);
+    expect(entries.length).toBe(10);
     for (const entry of entries) {
       expect(entry.url.startsWith("../../aphrody-labs/") || entry.url.startsWith("../")).toBe(true);
     }
@@ -39,7 +39,7 @@ describe("aphrody repo-native bun tooling", () => {
     });
     expect(brainRun.exitCode).toBe(0);
     const msg = JSON.parse(new TextDecoder().decode(brainRun.stdout)) as { systemMessage?: string };
-    expect(msg.systemMessage).toContain("docs/architecture/");
+    expect(msg.systemMessage).toContain("aphrody/docs/architecture/");
   });
 
   test("worktreePaths isolates out-of-tree checkout and Cargo target dirs", () => {

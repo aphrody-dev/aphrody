@@ -17,8 +17,8 @@ gpui_input_latency_ms = 8
 wasm_critical_brotli_bytes = 358400
 
 [monorepo_audit_summary]
-ts_files_scanned = 54
-rust_files_scanned = 52
+ts_files_scanned = 66
+rust_files_scanned = 56
 ts_compile_errors = 0
 rust_mod_rs_violations = 0
 rust_prod_unwrap_violations = 0
@@ -39,26 +39,8 @@ accesskit_aria = true
 google_design_tailwind = true
 shadcn_base_ui_starter = true
 ai_agent_mcp = true
-module_file_count = 396
+module_file_count = 399
 role = "Unified Core Web Vitals, Lighthouse, W3C, Google Design, Vercel, and shadcn/Base UI/Tailwind GPUI starter stack"
-
-[[frameworks]]
-id = "bun"
-label = "Bun (aphrody-labs/bun)"
-repo_or_submodule = "vendor/bun"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = false
-wasip2_aot = false
-wgpu_v30_webgpu = false
-taffy_layout = false
-accesskit_aria = false
-google_design_tailwind = true
-shadcn_base_ui_starter = true
-ai_agent_mcp = true
-module_file_count = 254
-role = "Ultra-fast JS/TS runtime, bundler, Tailwind/TSX toolchain, and test runner"
 
 [[frameworks]]
 id = "wgpu"
@@ -94,7 +76,7 @@ google_design_tailwind = false
 shadcn_base_ui_starter = false
 ai_agent_mcp = false
 module_file_count = 115
-role = "CSS Flexbox, Grid, and Block layout engine patched across GPUI & Blitz"
+role = "CSS Flexbox, Grid, and Block layout engine patched into GPUI & NSH"
 
 [[frameworks]]
 id = "accesskit"
@@ -112,7 +94,7 @@ google_design_tailwind = false
 shadcn_base_ui_starter = false
 ai_agent_mcp = true
 module_file_count = 116
-role = "OS UIA/AT-SPI2/AX/ARIA semantic tree bridge used by aphrody_pilot & GPUI"
+role = "OS UIA/AT-SPI2/AX/ARIA semantic tree bridge used by aphrody_pilot, egui & GPUI"
 
 [[frameworks]]
 id = "cosmic-text"
@@ -133,96 +115,6 @@ module_file_count = 51
 role = "Shared HarfBuzz/Swash multi-line text shaping and Google Sans Flex metrics"
 
 [[frameworks]]
-id = "vello"
-label = "Vello 2D (aphrody-labs/vello)"
-repo_or_submodule = "vendor/vello"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = true
-wasip2_aot = false
-wgpu_v30_webgpu = true
-taffy_layout = false
-accesskit_aria = false
-google_design_tailwind = false
-shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 355
-role = "GPU compute & CPU sparse-strips vector rasterizer"
-
-[[frameworks]]
-id = "dioxus"
-label = "Dioxus (aphrody-labs/dioxus)"
-repo_or_submodule = "vendor/dioxus"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = true
-wasip2_aot = true
-wgpu_v30_webgpu = false
-taffy_layout = false
-accesskit_aria = true
-google_design_tailwind = false
-shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 500
-role = "Signals/RSX reference & dx fullstack benchmark target"
-
-[[frameworks]]
-id = "blitz"
-label = "Blitz HTML5/CSS (aphrody-labs/blitz)"
-repo_or_submodule = "vendor/blitz"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = true
-wasip2_aot = false
-wgpu_v30_webgpu = true
-taffy_layout = true
-accesskit_aria = true
-google_design_tailwind = false
-shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 364
-role = "Stylo CSS + Taffy + Parley HTML rendering benchmark submodule"
-
-[[frameworks]]
-id = "anyrender"
-label = "AnyRender (aphrody-labs/anyrender)"
-repo_or_submodule = "vendor/anyrender"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = true
-wasip2_aot = false
-wgpu_v30_webgpu = true
-taffy_layout = false
-accesskit_aria = false
-google_design_tailwind = false
-shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 99
-role = "Portable 2D paint trait abstraction (Vello, Skia, CPU)"
-
-[[frameworks]]
-id = "iced"
-label = "Iced (aphrody-labs/iced)"
-repo_or_submodule = "vendor/iced"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = true
-wasip2_aot = false
-wgpu_v30_webgpu = true
-taffy_layout = false
-accesskit_aria = true
-google_design_tailwind = false
-shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 379
-role = "Elm reactive architecture baseline (mirrored in aphrody_ui::reactive)"
-
-[[frameworks]]
 id = "egui"
 label = "Egui (aphrody-labs/egui)"
 repo_or_submodule = "vendor/egui"
@@ -237,44 +129,26 @@ accesskit_aria = true
 google_design_tailwind = false
 shadcn_base_ui_starter = false
 ai_agent_mcp = false
-module_file_count = 442
-role = "Immediate-mode inspector baseline (mirrored in aphrody_ui::immediate)"
+module_file_count = 443
+role = "Immediate-mode inspector embedded cleanly via crates/egui_gpui on shared wgpu + accesskit"
 
 [[frameworks]]
-id = "libcosmic"
-label = "Libcosmic (aphrody-labs/libcosmic)"
-repo_or_submodule = "vendor/libcosmic"
+id = "wry"
+label = "WRY WebView (aphrody-labs/wry)"
+repo_or_submodule = "vendor/tauri/wry"
 present_on_disk = true
 manifest_present = true
 cargo_patched = false
 wasm32_unknown = false
 wasip2_aot = false
-wgpu_v30_webgpu = true
-taffy_layout = false
-accesskit_aria = true
-google_design_tailwind = false
-shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 500
-role = "COSMIC responsive shell & RON theme tokens (mirrored in aphrody_ui::cosmic_shell)"
-
-[[frameworks]]
-id = "tauri"
-label = "Tauri v3 (aphrody-labs/tauri)"
-repo_or_submodule = "vendor/tauri/tauri"
-present_on_disk = true
-manifest_present = true
-cargo_patched = false
-wasm32_unknown = true
-wasip2_aot = true
 wgpu_v30_webgpu = false
 taffy_layout = false
 accesskit_aria = true
 google_design_tailwind = false
 shadcn_base_ui_starter = false
 ai_agent_mcp = false
-module_file_count = 431
-role = "Hybrid webview capability & WRY desktop host"
+module_file_count = 59
+role = "Cross-platform OS WebView engine consumed by nsh-platform-gpui"
 
 [[frameworks]]
 id = "craft-libs"
@@ -310,12 +184,30 @@ google_design_tailwind = false
 shadcn_base_ui_starter = false
 ai_agent_mcp = true
 module_file_count = 500
-role = "Creative viewport host & MCP inspector integration"
+role = "Creative format analysis, JS/disasm inspector & MCP integration"
 
 [[frameworks]]
-id = "winit"
-label = "Winit (aphrody-labs/winit)"
-repo_or_submodule = "vendor/winit"
+id = "mullvad"
+label = "Mullvad VPN (aphrody-labs/mullvadvpn-app)"
+repo_or_submodule = "vendor/mullvad"
+present_on_disk = true
+manifest_present = true
+cargo_patched = false
+wasm32_unknown = false
+wasip2_aot = false
+wgpu_v30_webgpu = false
+taffy_layout = false
+accesskit_aria = false
+google_design_tailwind = false
+shadcn_base_ui_starter = false
+ai_agent_mcp = true
+module_file_count = 500
+role = "WireGuard split-tunnel daemon & Talpid crates used by aphrody_vpn"
+
+[[frameworks]]
+id = "browser"
+label = "Aphrody Browser (aphrody-labs/browser)"
+repo_or_submodule = "vendor/browser"
 present_on_disk = true
 manifest_present = true
 cargo_patched = false
@@ -326,7 +218,7 @@ taffy_layout = false
 accesskit_aria = true
 google_design_tailwind = false
 shadcn_base_ui_starter = false
-ai_agent_mcp = false
-module_file_count = 205
-role = "Cross-platform event loop & WebCanvas surface adapter"
+ai_agent_mcp = true
+module_file_count = 26
+role = "Browser automation CLI + CDP daemon powering aphrody_browser & web verification"
 

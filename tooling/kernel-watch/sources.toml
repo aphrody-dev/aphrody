@@ -936,7 +936,7 @@ yields = ["commit", "version"]
 min_interval = "1h"
 
 # ------------------------------------------------------------------------------------------------ structure reports (phase B)
-# Blob-less shallow clones on the build host, one per repository; the reports go to docs/watch/graph/.
+# Blob-less shallow clones on the build host, one per repository; the reports go to aphrody/docs/watch/graph/.
 
 [[clone]]
 id = "linux"

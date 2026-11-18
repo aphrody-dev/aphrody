@@ -1,0 +1,63 @@
+{
+  "numbers": {
+    "decimal": ".",
+    "group": ",",
+    "minGrouping": 1,
+    "indian": false,
+    "minus": "-",
+    "percent": "%",
+    "currencyBefore": false,
+    "currencySpace": " ",
+    "compactShort": [[3, " אלף"], [6, " מיליון"], [9, " מיליארד"], [12, " טריליון"]],
+    "compactLong": [[3, " אלף"], [6, " מיליון"], [9, " מיליארד"], [12, " טריליון"]]
+  },
+  "dates": {
+    "hour12": false,
+    "padHour24": false,
+    "am": "לפנה״צ",
+    "pm": "אחה״צ",
+    "periodFirst": false,
+    "periodSpace": " ",
+    "hourSuffix": "",
+    "numeric": [["day", "."], ["month", "."], ["year", ""]],
+    "shortYear2digit": false,
+    "text": [["day", " ב"], ["month", " "], ["year", ""]],
+    "textLong": null,
+    "weekdayFirst": true,
+    "weekdaySep": ", ",
+    "dateTimeSep": ", ",
+    "names": {
+      "months": [
+        "ינואר",
+        "פברואר",
+        "מרץ",
+        "אפריל",
+        "מאי",
+        "יוני",
+        "יולי",
+        "אוגוסט",
+        "ספטמבר",
+        "אוקטובר",
+        "נובמבר",
+        "דצמבר"
+      ],
+      "monthsShort": [
+        "ינו׳",
+        "פבר׳",
+        "מרץ",
+        "אפר׳",
+        "מאי",
+        "יוני",
+        "יולי",
+        "אוג׳",
+        "ספט׳",
+        "אוק׳",
+        "נוב׳",
+        "דצמ׳"
+      ],
+      "weekdays": ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "יום שבת"],
+      "weekdaysShort": ["יום א׳", "יום ב׳", "יום ג׳", "יום ד׳", "יום ה׳", "יום ו׳", "שבת"]
+    },
+    "cjk": false
+  }
+}

@@ -17,7 +17,7 @@ extern crate lsp_types_kit as lsp_types;
 #[path = "../common/helpers.rs"]
 mod common;
 
-#[cfg(all(feature = "test-support", feature = "gpui-fast"))]
+#[cfg(feature = "test-support")]
 mod a11y_text;
 
 mod assets;
@@ -60,7 +60,7 @@ mod menu;
 mod overlays;
 #[cfg(all(feature = "test-support", feature = "component"))]
 mod painted_text;
-#[cfg(all(feature = "test-support", feature = "gpui-fast", feature = "component"))]
+#[cfg(all(feature = "test-support", feature = "component"))]
 mod popover_a11y;
 #[cfg(feature = "test-support")]
 mod query_helpers;

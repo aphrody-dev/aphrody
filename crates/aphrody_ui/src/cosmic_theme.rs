@@ -558,23 +558,18 @@ fn extract_ron_color(text: &str, key: &str) -> Option<Hsla> {
 #[must_use]
 pub fn relative_luminance(color: Hsla) -> f32 {
     let rgb: Rgba = color.to_rgb();
-    let lin = |c: f32| {
-        if c <= 0.03928 {
-            c / 12.92
-        } else {
-            ((c + 0.055) / 1.055).powf(2.4)
-        }
-    };
-    0.2126 * lin(rgb.r) + 0.7152 * lin(rgb.g) + 0.0722 * lin(rgb.b)
+    brand::design::relative_luminance_srgb(rgb.r, rgb.g, rgb.b)
 }
 
 /// Computes WCAG 2.2 contrast ratio `(L1 + 0.05) / (L2 + 0.05)` in range `1.0..=21.0`.
 #[must_use]
 pub fn contrast_ratio(fg: Hsla, bg: Hsla) -> f32 {
-    let l1 = relative_luminance(fg);
-    let l2 = relative_luminance(bg);
-    let (hi, lo) = if l1 >= l2 { (l1, l2) } else { (l2, l1) };
-    (hi + 0.05) / (lo + 0.05)
+    let fg_rgb: Rgba = fg.to_rgb();
+    let bg_rgb: Rgba = bg.to_rgb();
+    brand::design::contrast_ratio_rgba(
+        [fg_rgb.r, fg_rgb.g, fg_rgb.b, fg.a],
+        [bg_rgb.r, bg_rgb.g, bg_rgb.b],
+    )
 }
 
 #[cfg(test)]

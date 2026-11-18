@@ -17,19 +17,19 @@ use nsh_core::{
 use crate::theme::{Theme, ThemeError};
 
 /// Authoritative Google Design URL (`https://design.google/`).
-pub const DESIGN_SOURCE_OF_TRUTH: &str = "https://design.google/";
+pub const DESIGN_SOURCE_OF_TRUTH: &str = brand::design::SOURCE_OF_TRUTH;
 
 /// Default Google Design Material 3 Expressive brand typeface.
-pub const M3_FONT_BRAND: &str = "Google Sans Flex";
+pub const M3_FONT_BRAND: &str = brand::DESIGN_SANS_FLEX_FAMILY;
 
 /// Default Google Design Material 3 Expressive plain body typeface.
-pub const M3_FONT_PLAIN: &str = "Google Sans Flex";
+pub const M3_FONT_PLAIN: &str = brand::DESIGN_SANS_FLEX_FAMILY;
 
 /// Default Google Design Material 3 Expressive monospace typeface.
 pub const M3_FONT_MONO: &str = "JetBrains Mono";
 
 /// Minimum WCAG 2.2 AA normal-text contrast ratio.
-pub const WCAG_AA_MIN_CONTRAST: f32 = 4.5;
+pub const WCAG_AA_MIN_CONTRAST: f32 = brand::design::WCAG_AA_MIN_CONTRAST;
 
 /// Four Material 3 Expressive surface modes synchronized with `assets/os/google_design_tokens.toml`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -136,17 +136,19 @@ pub struct M3BrandAccents {
     pub neural_indigo: Hsla,
 }
 
-/// Canonical Google Design brand accents.
+/// Canonical Google Design brand accents resolved from `brand::design`.
 pub const M3_ACCENTS: M3BrandAccents = M3BrandAccents {
-    gemini_blue: rgb(0x4285F4).to_hsla(),
-    gemini_violet: rgb(0x9B72CB).to_hsla(),
-    gemini_rose: rgb(0xD96570).to_hsla(),
-    gemini_peach: rgb(0xFFDCC1).to_hsla(),
-    glimmer_gold: rgb(0xFAE366).to_hsla(),
-    glimmer_mint: rgb(0xC3ECD0).to_hsla(),
-    glimmer_lime: rgb(0xBFF28D).to_hsla(),
-    bolt_amber: rgb(0xFFB300).to_hsla(),
-    neural_indigo: rgb(0x111B3A).to_hsla(),
+    gemini_blue: rgb(brand::design::reference_palette_u32_or("gemini_blue", 0x4285F4)).to_hsla(),
+    gemini_violet: rgb(brand::design::reference_palette_u32_or("gemini_violet", 0x9B72CB))
+        .to_hsla(),
+    gemini_rose: rgb(brand::design::reference_palette_u32_or("gemini_rose", 0xD96570)).to_hsla(),
+    gemini_peach: rgb(brand::design::reference_palette_u32_or("gemini_peach", 0xFFDCC1)).to_hsla(),
+    glimmer_gold: rgb(brand::design::reference_palette_u32_or("glimmer_gold", 0xFAE366)).to_hsla(),
+    glimmer_mint: rgb(brand::design::reference_palette_u32_or("glimmer_mint", 0xC3ECD0)).to_hsla(),
+    glimmer_lime: rgb(brand::design::reference_palette_u32_or("glimmer_lime", 0xBFF28D)).to_hsla(),
+    bolt_amber: rgb(brand::design::reference_palette_u32_or("bolt50", 0xFFB300)).to_hsla(),
+    neural_indigo: rgb(brand::design::reference_palette_u32_or("neural_indigo", 0x111B3A))
+        .to_hsla(),
 };
 
 /// Semantic Material 3 Expressive color role palette for a single mode.
@@ -216,141 +218,55 @@ pub struct M3RolePalette {
     pub on_error_container: Hsla,
 }
 
-const LIGHT_PALETTE: M3RolePalette = M3RolePalette {
-    mode: M3Mode::Light,
-    background: rgb(0xF7F9FF).to_hsla(),
-    on_background: rgb(0x161C24).to_hsla(),
-    surface: rgb(0xF7F9FF).to_hsla(),
-    surface_dim: rgb(0xD5DBE4).to_hsla(),
-    surface_bright: rgb(0xFFFFFF).to_hsla(),
-    surface_container_lowest: rgb(0xFFFFFF).to_hsla(),
-    surface_container_low: rgb(0xEEF3FA).to_hsla(),
-    surface_container: rgb(0xE7EDF6).to_hsla(),
-    surface_container_high: rgb(0xE0E7F1).to_hsla(),
-    surface_container_highest: rgb(0xD9E1EC).to_hsla(),
-    on_surface: rgb(0x161C24).to_hsla(),
-    on_surface_variant: rgb(0x3D4754).to_hsla(),
-    outline: rgb(0x6E7886).to_hsla(),
-    outline_variant: rgb(0xBEC7D4).to_hsla(),
-    primary: rgb(0x006399).to_hsla(),
-    on_primary: rgb(0xFFFFFF).to_hsla(),
-    primary_container: rgb(0xCEE5FF).to_hsla(),
-    on_primary_container: rgb(0x004972).to_hsla(),
-    secondary: rgb(0x4B6078).to_hsla(),
-    on_secondary: rgb(0xFFFFFF).to_hsla(),
-    secondary_container: rgb(0xD2E4FF).to_hsla(),
-    on_secondary_container: rgb(0x34485F).to_hsla(),
-    tertiary: rgb(0x5B5891).to_hsla(),
-    on_tertiary: rgb(0xFFFFFF).to_hsla(),
-    tertiary_container: rgb(0xE2DFFF).to_hsla(),
-    on_tertiary_container: rgb(0x434077).to_hsla(),
-    error: rgb(0xBA1A1A).to_hsla(),
-    on_error: rgb(0xFFFFFF).to_hsla(),
-    error_container: rgb(0xFFDAD6).to_hsla(),
-    on_error_container: rgb(0x93000A).to_hsla(),
-};
+const fn palette_from_brand(
+    mode: M3Mode,
+    src: &brand::design::ColorPaletteRgb,
+) -> M3RolePalette {
+    M3RolePalette {
+        mode,
+        background: rgb(src.background).to_hsla(),
+        on_background: rgb(src.on_background).to_hsla(),
+        surface: rgb(src.surface).to_hsla(),
+        surface_dim: rgb(src.surface_dim).to_hsla(),
+        surface_bright: rgb(src.surface_bright).to_hsla(),
+        surface_container_lowest: rgb(src.surface_container_lowest).to_hsla(),
+        surface_container_low: rgb(src.surface_container_low).to_hsla(),
+        surface_container: rgb(src.surface_container).to_hsla(),
+        surface_container_high: rgb(src.surface_container_high).to_hsla(),
+        surface_container_highest: rgb(src.surface_container_highest).to_hsla(),
+        on_surface: rgb(src.on_surface).to_hsla(),
+        on_surface_variant: rgb(src.on_surface_variant).to_hsla(),
+        outline: rgb(src.outline).to_hsla(),
+        outline_variant: rgb(src.outline_variant).to_hsla(),
+        primary: rgb(src.primary).to_hsla(),
+        on_primary: rgb(src.on_primary).to_hsla(),
+        primary_container: rgb(src.primary_container).to_hsla(),
+        on_primary_container: rgb(src.on_primary_container).to_hsla(),
+        secondary: rgb(src.secondary).to_hsla(),
+        on_secondary: rgb(src.on_secondary).to_hsla(),
+        secondary_container: rgb(src.secondary_container).to_hsla(),
+        on_secondary_container: rgb(src.on_secondary_container).to_hsla(),
+        tertiary: rgb(src.tertiary).to_hsla(),
+        on_tertiary: rgb(src.on_tertiary).to_hsla(),
+        tertiary_container: rgb(src.tertiary_container).to_hsla(),
+        on_tertiary_container: rgb(src.on_tertiary_container).to_hsla(),
+        error: rgb(src.error).to_hsla(),
+        on_error: rgb(src.on_error).to_hsla(),
+        error_container: rgb(src.error_container).to_hsla(),
+        on_error_container: rgb(src.on_error_container).to_hsla(),
+    }
+}
 
-const DARK_PALETTE: M3RolePalette = M3RolePalette {
-    mode: M3Mode::Dark,
-    background: rgb(0x0E141B).to_hsla(),
-    on_background: rgb(0xE0E6F0).to_hsla(),
-    surface: rgb(0x0E141B).to_hsla(),
-    surface_dim: rgb(0x0B1016).to_hsla(),
-    surface_bright: rgb(0x343B44).to_hsla(),
-    surface_container_lowest: rgb(0x080D13).to_hsla(),
-    surface_container_low: rgb(0x161D25).to_hsla(),
-    surface_container: rgb(0x1B222B).to_hsla(),
-    surface_container_high: rgb(0x252C36).to_hsla(),
-    surface_container_highest: rgb(0x303843).to_hsla(),
-    on_surface: rgb(0xE0E6F0).to_hsla(),
-    on_surface_variant: rgb(0xC0CAD7).to_hsla(),
-    outline: rgb(0x8A94A2).to_hsla(),
-    outline_variant: rgb(0x404956).to_hsla(),
-    primary: rgb(0x8FD0FF).to_hsla(),
-    on_primary: rgb(0x003352).to_hsla(),
-    primary_container: rgb(0x004B75).to_hsla(),
-    on_primary_container: rgb(0xCEE5FF).to_hsla(),
-    secondary: rgb(0xB4C9E5).to_hsla(),
-    on_secondary: rgb(0x1D3248).to_hsla(),
-    secondary_container: rgb(0x34485F).to_hsla(),
-    on_secondary_container: rgb(0xD2E4FF).to_hsla(),
-    tertiary: rgb(0xC6C2FF).to_hsla(),
-    on_tertiary: rgb(0x2C295F).to_hsla(),
-    tertiary_container: rgb(0x434077).to_hsla(),
-    on_tertiary_container: rgb(0xE2DFFF).to_hsla(),
-    error: rgb(0xFFB4AB).to_hsla(),
-    on_error: rgb(0x690005).to_hsla(),
-    error_container: rgb(0x93000A).to_hsla(),
-    on_error_container: rgb(0xFFDAD6).to_hsla(),
-};
-
-const NEURAL_OBSIDIAN_PALETTE: M3RolePalette = M3RolePalette {
-    mode: M3Mode::NeuralObsidian,
-    background: rgb(0x0B0E14).to_hsla(),
-    on_background: rgb(0xE4EAF4).to_hsla(),
-    surface: rgb(0x0B0E14).to_hsla(),
-    surface_dim: rgb(0x07090E).to_hsla(),
-    surface_bright: rgb(0x2B3140).to_hsla(),
-    surface_container_lowest: rgb(0x06080C).to_hsla(),
-    surface_container_low: rgb(0x13161F).to_hsla(),
-    surface_container: rgb(0x181C26).to_hsla(),
-    surface_container_high: rgb(0x1C202B).to_hsla(),
-    surface_container_highest: rgb(0x262C3A).to_hsla(),
-    on_surface: rgb(0xE4EAF4).to_hsla(),
-    on_surface_variant: rgb(0xBAC4D6).to_hsla(),
-    outline: rgb(0x8792A6).to_hsla(),
-    outline_variant: rgb(0x384152).to_hsla(),
-    primary: rgb(0x8FD0FF).to_hsla(),
-    on_primary: rgb(0x003352).to_hsla(),
-    primary_container: rgb(0x004B75).to_hsla(),
-    on_primary_container: rgb(0xCEE5FF).to_hsla(),
-    secondary: rgb(0xB4C9E5).to_hsla(),
-    on_secondary: rgb(0x1D3248).to_hsla(),
-    secondary_container: rgb(0x34485F).to_hsla(),
-    on_secondary_container: rgb(0xD2E4FF).to_hsla(),
-    tertiary: rgb(0xC6C2FF).to_hsla(),
-    on_tertiary: rgb(0x2C295F).to_hsla(),
-    tertiary_container: rgb(0x434077).to_hsla(),
-    on_tertiary_container: rgb(0xE2DFFF).to_hsla(),
-    error: rgb(0xFFB4AB).to_hsla(),
-    on_error: rgb(0x690005).to_hsla(),
-    error_container: rgb(0x93000A).to_hsla(),
-    on_error_container: rgb(0xFFDAD6).to_hsla(),
-};
-
-const OLED_PITCH_PALETTE: M3RolePalette = M3RolePalette {
-    mode: M3Mode::OledPitch,
-    background: rgb(0x000000).to_hsla(),
-    on_background: rgb(0xEDF2FA).to_hsla(),
-    surface: rgb(0x000000).to_hsla(),
-    surface_dim: rgb(0x000000).to_hsla(),
-    surface_bright: rgb(0x222834).to_hsla(),
-    surface_container_lowest: rgb(0x000000).to_hsla(),
-    surface_container_low: rgb(0x0A0E14).to_hsla(),
-    surface_container: rgb(0x121720).to_hsla(),
-    surface_container_high: rgb(0x1B222E).to_hsla(),
-    surface_container_highest: rgb(0x252E3D).to_hsla(),
-    on_surface: rgb(0xEDF2FA).to_hsla(),
-    on_surface_variant: rgb(0xC2CCDC).to_hsla(),
-    outline: rgb(0x8C96A8).to_hsla(),
-    outline_variant: rgb(0x2B3545).to_hsla(),
-    primary: rgb(0x8FD0FF).to_hsla(),
-    on_primary: rgb(0x003352).to_hsla(),
-    primary_container: rgb(0x004B75).to_hsla(),
-    on_primary_container: rgb(0xCEE5FF).to_hsla(),
-    secondary: rgb(0xB4C9E5).to_hsla(),
-    on_secondary: rgb(0x1D3248).to_hsla(),
-    secondary_container: rgb(0x34485F).to_hsla(),
-    on_secondary_container: rgb(0xD2E4FF).to_hsla(),
-    tertiary: rgb(0xC6C2FF).to_hsla(),
-    on_tertiary: rgb(0x2C295F).to_hsla(),
-    tertiary_container: rgb(0x434077).to_hsla(),
-    on_tertiary_container: rgb(0xE2DFFF).to_hsla(),
-    error: rgb(0xFFB4AB).to_hsla(),
-    on_error: rgb(0x690005).to_hsla(),
-    error_container: rgb(0x93000A).to_hsla(),
-    on_error_container: rgb(0xFFDAD6).to_hsla(),
-};
+const LIGHT_PALETTE: M3RolePalette =
+    palette_from_brand(M3Mode::Light, &brand::design::PALETTE_LIGHT_RGB);
+const DARK_PALETTE: M3RolePalette =
+    palette_from_brand(M3Mode::Dark, &brand::design::PALETTE_DARK_RGB);
+const NEURAL_OBSIDIAN_PALETTE: M3RolePalette = palette_from_brand(
+    M3Mode::NeuralObsidian,
+    &brand::design::PALETTE_NEURAL_OBSIDIAN_RGB,
+);
+const OLED_PITCH_PALETTE: M3RolePalette =
+    palette_from_brand(M3Mode::OledPitch, &brand::design::PALETTE_OLED_PITCH_RGB);
 
 impl M3RolePalette {
     /// Returns the authoritative M3 Expressive role palette for `mode`.
@@ -480,7 +396,9 @@ impl M3RolePalette {
 
 /// Computes the WCAG 2.x relative contrast ratio (`1.0..=21.0`) between `foreground` and `background`.
 pub fn wcag_contrast_ratio(foreground: Hsla, background: Hsla) -> f32 {
-    foreground.contrast_ratio(background)
+    let fg = foreground.to_rgb();
+    let bg = background.to_rgb();
+    brand::design::contrast_ratio_rgba([fg.r, fg.g, fg.b, foreground.a], [bg.r, bg.g, bg.b])
 }
 
 /// Material 3 Expressive corner radius scale (`[sys.shape]` in `google_design_tokens.toml`).
@@ -504,16 +422,16 @@ pub struct M3ShapeTokens {
     pub full_px: f32,
 }
 
-/// Authoritative M3 Expressive shape/corner tokens.
+/// Authoritative M3 Expressive shape/corner tokens resolved from `brand::design`.
 pub const M3_SHAPES: M3ShapeTokens = M3ShapeTokens {
-    none_px: 0.0,
-    extra_small_px: 4.0,
-    small_px: 8.0,
-    medium_px: 12.0,
-    large_px: 16.0,
-    large_increased_px: 20.0,
-    extra_large_px: 28.0,
-    full_px: 9999.0,
+    none_px: brand::design::SHAPES.none_px,
+    extra_small_px: brand::design::SHAPES.extra_small_px,
+    small_px: brand::design::SHAPES.small_px,
+    medium_px: brand::design::SHAPES.medium_px,
+    large_px: brand::design::SHAPES.large_px,
+    large_increased_px: brand::design::SHAPES.large_increased_px,
+    extra_large_px: brand::design::SHAPES.extra_large_px,
+    full_px: brand::design::SHAPES.full_px,
 };
 
 impl M3ShapeTokens {
@@ -577,15 +495,15 @@ pub struct M3StateLayerTokens {
     pub focus_ring_px: f32,
 }
 
-/// Authoritative M3 Expressive interaction state layer tokens.
+/// Authoritative M3 Expressive interaction state layer tokens resolved from `brand::design`.
 pub const M3_STATE_LAYERS: M3StateLayerTokens = M3StateLayerTokens {
-    hover_opacity: 0.08,
-    focus_opacity: 0.10,
-    pressed_opacity: 0.10,
-    dragged_opacity: 0.16,
-    disabled_container_opacity: 0.12,
-    disabled_content_opacity: 0.38,
-    focus_ring_px: 2.0,
+    hover_opacity: brand::design::STATES.hover_opacity,
+    focus_opacity: brand::design::STATES.focus_opacity,
+    pressed_opacity: brand::design::STATES.pressed_opacity,
+    dragged_opacity: brand::design::STATES.dragged_opacity,
+    disabled_container_opacity: brand::design::STATES.disabled_container_opacity,
+    disabled_content_opacity: brand::design::STATES.disabled_content_opacity,
+    focus_ring_px: brand::design::STATES.focus_ring_px,
 };
 
 /// Material 3 Expressive physics spring presets (`[sys.motion.springs]`).
@@ -635,44 +553,36 @@ pub struct M3SpringTokens {
     pub effects_slow: M3SpringSpec,
 }
 
-/// Authoritative M3 Expressive Spatial & Effects spring tokens.
+const fn spring_from_brand(
+    key: &'static str,
+    fallback_stiffness: f32,
+    fallback_damping: f32,
+    is_spatial: bool,
+) -> M3SpringSpec {
+    match brand::design::spring_spec_const(key) {
+        Some(spec) => M3SpringSpec {
+            name: spec.key,
+            stiffness: spec.stiffness,
+            damping_ratio: spec.damping_ratio,
+            is_spatial,
+        },
+        None => M3SpringSpec {
+            name: key,
+            stiffness: fallback_stiffness,
+            damping_ratio: fallback_damping,
+            is_spatial,
+        },
+    }
+}
+
+/// Authoritative M3 Expressive Spatial & Effects spring tokens resolved from `brand::design`.
 pub const M3_SPRINGS: M3SpringTokens = M3SpringTokens {
-    spatial_fast: M3SpringSpec {
-        name: "spatial_fast",
-        stiffness: 1400.0,
-        damping_ratio: 0.90,
-        is_spatial: true,
-    },
-    spatial_default: M3SpringSpec {
-        name: "spatial_default",
-        stiffness: 700.0,
-        damping_ratio: 0.90,
-        is_spatial: true,
-    },
-    spatial_slow: M3SpringSpec {
-        name: "spatial_slow",
-        stiffness: 300.0,
-        damping_ratio: 0.90,
-        is_spatial: true,
-    },
-    effects_fast: M3SpringSpec {
-        name: "effects_fast",
-        stiffness: 3800.0,
-        damping_ratio: 1.00,
-        is_spatial: false,
-    },
-    effects_default: M3SpringSpec {
-        name: "effects_default",
-        stiffness: 1600.0,
-        damping_ratio: 1.00,
-        is_spatial: false,
-    },
-    effects_slow: M3SpringSpec {
-        name: "effects_slow",
-        stiffness: 800.0,
-        damping_ratio: 1.00,
-        is_spatial: false,
-    },
+    spatial_fast: spring_from_brand("spatial_fast", 1400.0, 0.90, true),
+    spatial_default: spring_from_brand("spatial_default", 700.0, 0.90, true),
+    spatial_slow: spring_from_brand("spatial_slow", 300.0, 0.90, true),
+    effects_fast: spring_from_brand("effects_fast", 3800.0, 1.00, false),
+    effects_default: spring_from_brand("effects_default", 1600.0, 1.00, false),
+    effects_slow: spring_from_brand("effects_slow", 800.0, 1.00, false),
 };
 
 impl M3SpringSpec {
@@ -1303,7 +1213,7 @@ mod tests {
 
     #[test]
     fn bundled_google_design_toml_matches_m3_palettes_and_springs() {
-        let toml_text = include_str!("../../../assets/os/google_design_tokens.toml");
+        let toml_text = brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;
         for mode in M3Mode::ALL {
             let palette = M3RolePalette::for_mode(mode);
             let section_header = format!("[sys.color.{}]", mode.slug());

@@ -20,7 +20,7 @@ const USAGE = `usage: bun cli.ts <command> [options]
   status                            per-source poll state
   search <text> [--kernel id] [--kind kind] [--limit N]
   versions [--json]                 kernel versions table, closest to mainline first
-  build [--now EPOCH]               regenerate docs/watch from the store
+  build [--now EPOCH]               regenerate aphrody/docs/watch from the store
   gate [--slow-minutes N]           print commit or skip for the regenerated files in --out (versions now, activity every N minutes, default 360)
   verify [--write]                  probe every manifest URL live and record status and shape
   probe <host-id> [--record FIXTURE_DIR]   read-only probe of a lanes.toml host over ssh (never from CI): writes data/probe/<id>.json and probe.md

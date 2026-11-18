@@ -13,20 +13,6 @@ members = [
     "crates/agent_ui_benchmarks",
     "crates/ai_onboarding",
     "crates/anthropic",
-    "crates/aphrody",
-    "crates/aphrody_auto",
-    "crates/aphrody_browser",
-    "crates/aphrody_cli",
-    "crates/aphrody_craft",
-    "crates/aphrody_design",
-    "crates/aphrody_desktop",
-    "crates/aphrody_installer",
-    "crates/aphrody_nsh",
-    "crates/aphrody_pilot",
-    "crates/aphrody_session",
-    "crates/aphrody_store",
-    "crates/aphrody_ui",
-    "crates/aphrody_vpn",
     "crates/askpass",
     "crates/assets",
     "crates/audio",
@@ -34,12 +20,9 @@ members = [
     "crates/auto_update_helper",
     "crates/auto_update_ui",
     "crates/aws_http_client",
-    "crates/ayvpn_daemon",
     "crates/bedrock",
     "crates/bench_metrics",
     "crates/benchmarks",
-    "crates/bevy_gpui",
-    "crates/brand",
     "crates/breadcrumbs",
     "crates/buffer_diff",
     "crates/call",
@@ -61,8 +44,6 @@ members = [
     "crates/context_server",
     "crates/copilot",
     "crates/copilot_chat",
-    "crates/copilot_ui",
-    "crates/cosmic_gpui",
     "crates/crashes",
     "crates/credentials_provider",
     "crates/dap",
@@ -74,6 +55,7 @@ members = [
     "crates/deepseek",
     "crates/dev_container",
     "crates/diagnostics",
+    "crates/docs_preprocessor",
     "crates/edit_prediction",
     "crates/edit_prediction_cli",
     "crates/edit_prediction_context",
@@ -82,7 +64,6 @@ members = [
     "crates/edit_prediction_ui",
     "crates/editor",
     "crates/editor_benchmarks",
-    "crates/egui_gpui",
     "crates/encoding_selector",
     "crates/env_var",
     "crates/etw_tracing",
@@ -113,12 +94,6 @@ members = [
     "crates/go_to_line",
     "crates/google_ai",
     "crates/gpui",
-    "crates/gpui-base",
-    "crates/gpui-component",
-    "crates/gpui-component-macros",
-    "crates/gpui-fps",
-    "crates/gpui-kit",
-    "crates/gpui-kit-assets",
     "crates/gpui_apple",
     "crates/gpui_ios",
     "crates/gpui_linux",
@@ -131,16 +106,12 @@ members = [
     "crates/gpui_web",
     "crates/gpui_wgpu",
     "crates/gpui_windows",
-    "crates/gpui_ui",
-    "crates/gpui_code",
-    "crates/gpui_app_shell",
     "crates/grammars",
     "crates/hang_telemetry",
     "crates/html_to_markdown",
     "crates/http_client",
     "crates/http_client_tls",
     "crates/http_proxy",
-    "crates/iced_gpui",
     "crates/icons",
     "crates/image_viewer",
     "crates/input_latency_ui",
@@ -181,37 +152,6 @@ members = [
     "crates/net",
     "crates/node_runtime",
     "crates/notifications",
-    "crates/nsh-base",
-    "crates/nsh-bundler",
-    "crates/nsh-cli",
-    "crates/nsh-core",
-    "crates/nsh-dev",
-    "crates/nsh-engine",
-    "crates/nsh-gpui-host",
-    "crates/nsh-i18n",
-    "crates/nsh-ios-app",
-    "crates/nsh-ios-host",
-    "crates/nsh-js",
-    "crates/nsh-linux-app",
-    "crates/nsh-linux-host",
-    "crates/nsh-macos-app",
-    "crates/nsh-macos-host",
-    "crates/nsh-macros",
-    "crates/nsh-package",
-    "crates/nsh-platform-android",
-    "crates/nsh-platform-apple",
-    "crates/nsh-platform-gpui",
-    "crates/nsh-platform-ios",
-    "crates/nsh-platform-linux",
-    "crates/nsh-platform-macos",
-    "crates/nsh-platform-tui",
-    "crates/nsh-platform-web",
-    "crates/nsh-platform-windows",
-    "crates/nsh-testing",
-    "crates/nsh-tui-host",
-    "crates/nsh-updater",
-    "crates/nsh-windows-app",
-    "crates/nsh-windows-host",
     "crates/oauth_callback_server",
     "crates/ollama",
     "crates/onboarding",
@@ -275,7 +215,6 @@ members = [
     "crates/tabular_data_preview",
     "crates/task",
     "crates/tasks_ui",
-    "crates/tauri_gpui",
     "crates/telemetry",
     "crates/telemetry_events",
     "crates/terminal",
@@ -334,30 +273,84 @@ members = [
     "tooling/crates_io_client",
     "tooling/perf",
     "tooling/xtask",
+
+    # === APHRODY_ISOLATED_WORKSPACE_MEMBERS START ===
+    "crates/aphrody",
+    "crates/aphrody_auto",
+    "crates/aphrody_browser",
+    "crates/aphrody_cli",
+    "crates/aphrody_craft",
+    "crates/aphrody_design",
+    "crates/aphrody_desktop",
+    "crates/aphrody_installer",
+    "crates/aphrody_nsh",
+    "crates/aphrody_pilot",
+    "crates/aphrody_session",
+    "crates/aphrody_store",
+    "crates/aphrody_ui",
+    "crates/aphrody_vpn",
+    "crates/ayvpn_daemon",
+    "crates/bevy_gpui",
+    "crates/brand",
+    "crates/copilot_ui",
+    "crates/cosmic_gpui",
+    "crates/egui_gpui",
+    "crates/gpui-base",
+    "crates/gpui-component",
+    "crates/gpui-component-macros",
+    "crates/gpui-fps",
+    "crates/gpui-kit",
+    "crates/gpui-kit-assets",
+    "crates/gpui_ui",
+    "crates/gpui_code",
+    "crates/gpui_app_shell",
+    "crates/iced_gpui",
+    "crates/nsh-base",
+    "crates/nsh-bundler",
+    "crates/nsh-cli",
+    "crates/nsh-core",
+    "crates/nsh-dev",
+    "crates/nsh-engine",
+    "crates/nsh-gpui-host",
+    "crates/nsh-i18n",
+    "crates/nsh-ios-app",
+    "crates/nsh-ios-host",
+    "crates/nsh-js",
+    "crates/nsh-linux-app",
+    "crates/nsh-linux-host",
+    "crates/nsh-macos-app",
+    "crates/nsh-macos-host",
+    "crates/nsh-macros",
+    "crates/nsh-package",
+    "crates/nsh-platform-android",
+    "crates/nsh-platform-apple",
+    "crates/nsh-platform-gpui",
+    "crates/nsh-platform-ios",
+    "crates/nsh-platform-linux",
+    "crates/nsh-platform-macos",
+    "crates/nsh-platform-tui",
+    "crates/nsh-platform-web",
+    "crates/nsh-platform-windows",
+    "crates/nsh-testing",
+    "crates/nsh-tui-host",
+    "crates/nsh-updater",
+    "crates/nsh-windows-app",
+    "crates/nsh-windows-host",
+    "crates/tauri_gpui",
+    # === APHRODY_ISOLATED_WORKSPACE_MEMBERS END ===
 ]
+# === APHRODY_ISOLATED_WORKSPACE_CONFIG START ===
 exclude = [
     "vendor/accesskit",
-    "vendor/anyrender",
-    "vendor/blitz",
     "vendor/browser",
-    "vendor/bun",
-    "vendor/cosmic-epoch",
     "vendor/cosmic-text",
     "vendor/craft-anything",
     "vendor/craft-libs",
-    "vendor/dioxus",
     "vendor/egui",
-    "vendor/iced",
-    "vendor/libcosmic",
     "vendor/mullvad",
-    "vendor/new-cli-installer",
-    "vendor/smithay",
-    "vendor/softbuffer",
     "vendor/taffy",
     "vendor/tauri",
-    "vendor/vello",
     "vendor/wgpu",
-    "vendor/winit",
     "templates/wasm-wgpu/*",
 ]
 default-members = [
@@ -391,6 +384,7 @@ homepage = "https://aphrody.com"
 readme = "README.md"
 repository = "https://github.com/aphrody-dev/aphrody"
 publish = false
+# === APHRODY_ISOLATED_WORKSPACE_CONFIG END ===
 
 [workspace.dependencies]
 
@@ -409,8 +403,6 @@ agent_skills = { path = "crates/agent_skills" }
 agent_ui = { path = "crates/agent_ui" }
 ai_onboarding = { path = "crates/ai_onboarding" }
 anthropic = { path = "crates/anthropic" }
-aphrody = { path = "crates/aphrody", default-features = false }
-aphrody_auto = { path = "crates/aphrody_auto" }
 askpass = { path = "crates/askpass" }
 assets = { path = "crates/assets" }
 audio = { path = "crates/audio" }
@@ -419,8 +411,6 @@ auto_update = { path = "crates/auto_update" }
 auto_update_ui = { path = "crates/auto_update_ui" }
 aws_http_client = { path = "crates/aws_http_client" }
 bedrock = { path = "crates/bedrock" }
-bevy_gpui = { path = "crates/bevy_gpui" }
-brand = { path = "crates/brand" }
 breadcrumbs = { path = "crates/breadcrumbs" }
 buffer_diff = { path = "crates/buffer_diff" }
 call = { path = "crates/call" }
@@ -444,7 +434,6 @@ context_server = { path = "crates/context_server" }
 copilot = { path = "crates/copilot" }
 copilot_chat = { path = "crates/copilot_chat" }
 copilot_ui = { path = "crates/copilot_ui" }
-cosmic_gpui = { path = "crates/cosmic_gpui" }
 crashes = { path = "crates/crashes" }
 credentials_provider = { path = "crates/credentials_provider" }
 dap = { path = "crates/dap" }
@@ -463,7 +452,6 @@ edit_prediction_metrics = { path = "crates/edit_prediction_metrics", features = 
 edit_prediction_types = { path = "crates/edit_prediction_types" }
 edit_prediction_ui = { path = "crates/edit_prediction_ui" }
 editor = { path = "crates/editor" }
-egui_gpui = { path = "crates/egui_gpui" }
 encoding_selector = { path = "crates/encoding_selector" }
 env_var = { path = "crates/env_var" }
 etw_tracing = { path = "crates/etw_tracing" }
@@ -488,14 +476,7 @@ git_ui_core = { path = "crates/git_ui_core" }
 github_releases = { path = "crates/github_releases" }
 go_to_line = { path = "crates/go_to_line" }
 google_ai = { path = "crates/google_ai" }
-aphrody_design = { path = "crates/aphrody_design" }
 gpui = { path = "crates/gpui", default-features = false }
-gpui-base = { version = "0.10.0", path = "crates/gpui-base" }
-gpui-component = { version = "0.10.0", path = "crates/gpui-component" }
-gpui-component-macros = { version = "0.10.0", path = "crates/gpui-component-macros" }
-gpui-fps = { version = "0.10.0", path = "crates/gpui-fps" }
-gpui-kit = { version = "0.10.0", path = "crates/gpui-kit" }
-gpui-kit-assets = { version = "0.10.0", path = "crates/gpui-kit-assets" }
 gpui_apple = { path = "crates/gpui_apple" }
 gpui_ios = { path = "crates/gpui_ios" }
 gpui_linux = { path = "crates/gpui_linux", default-features = false }
@@ -508,17 +489,12 @@ gpui_util = { path = "crates/gpui_util" }
 gpui_web = { path = "crates/gpui_web", default-features = false }
 gpui_wgpu = { path = "crates/gpui_wgpu" }
 gpui_windows = { path = "crates/gpui_windows", default-features = false }
-aphrody_store = { path = "crates/aphrody_store", default-features = false }
-gpui_ui = { path = "crates/gpui_ui" }
-gpui_code = { path = "crates/gpui_code" }
-gpui_app_shell = { path = "crates/gpui_app_shell" }
 grammars = { path = "crates/grammars" }
 hang_telemetry = { path = "crates/hang_telemetry" }
 html_to_markdown = { path = "crates/html_to_markdown" }
 http_client = { path = "crates/http_client" }
 http_client_tls = { path = "crates/http_client_tls" }
 http_proxy = { path = "crates/http_proxy" }
-iced_gpui = { path = "crates/iced_gpui" }
 icons = { path = "crates/icons" }
 image_viewer = { path = "crates/image_viewer" }
 input_latency_ui = { path = "crates/input_latency_ui" }
@@ -559,26 +535,6 @@ multi_buffer = { path = "crates/multi_buffer" }
 net = { path = "crates/net" }
 node_runtime = { path = "crates/node_runtime" }
 notifications = { path = "crates/notifications" }
-nsh-base = { version = "0.6.0", path = "crates/nsh-base", default-features = false }
-nsh-bundler = { version = "0.6.0", path = "crates/nsh-bundler", default-features = false }
-nsh-core = { version = "0.6.0", path = "crates/nsh-core" }
-nsh-dev = { version = "0.6.0", path = "crates/nsh-dev" }
-nsh-engine = { version = "0.6.0", path = "crates/nsh-engine", default-features = false }
-nsh-i18n = { version = "0.6.0", path = "crates/nsh-i18n" }
-nsh-js = { version = "0.6.0", path = "crates/nsh-js", default-features = false }
-nsh-macros = { version = "0.6.0", path = "crates/nsh-macros" }
-nsh-package = { version = "0.6.0", path = "crates/nsh-package" }
-nsh-platform-apple = { version = "0.6.0", path = "crates/nsh-platform-apple" }
-nsh-platform-gpui = { version = "0.6.0", path = "crates/nsh-platform-gpui", default-features = false }
-nsh-platform-ios = { version = "0.6.0", path = "crates/nsh-platform-ios", default-features = false }
-nsh-platform-linux = { version = "0.6.0", path = "crates/nsh-platform-linux", default-features = false }
-nsh-platform-macos = { version = "0.6.0", path = "crates/nsh-platform-macos", default-features = false }
-nsh-platform-tui = { version = "0.6.0", path = "crates/nsh-platform-tui", default-features = false }
-nsh-platform-windows = { version = "0.6.0", path = "crates/nsh-platform-windows", default-features = false }
-nsh-testing = { version = "0.6.0", path = "crates/nsh-testing", default-features = false }
-nsh-updater = { version = "0.6.0", path = "crates/nsh-updater" }
-aphrody_nsh = { path = "crates/aphrody_nsh" }
-aphrody_browser = { path = "crates/aphrody_browser" }
 oauth_callback_server = { path = "crates/oauth_callback_server" }
 ollama = { path = "crates/ollama" }
 onboarding = { path = "crates/onboarding" }
@@ -587,11 +543,6 @@ open_path_prompt = { path = "crates/open_path_prompt" }
 open_router = { path = "crates/open_router", features = ["schemars"] }
 openai_subscribed = { path = "crates/openai_subscribed" }
 opencode = { path = "crates/opencode" }
-aphrody_craft = { path = "crates/aphrody_craft" }
-aphrody_installer = { path = "crates/aphrody_installer", default-features = false }
-aphrody_pilot = { path = "crates/aphrody_pilot" }
-aphrody_session = { path = "crates/aphrody_session" }
-aphrody_ui = { path = "crates/aphrody_ui" }
 outline = { path = "crates/outline" }
 outline_panel = { path = "crates/outline_panel" }
 path = { path = "crates/path" }
@@ -646,7 +597,6 @@ tab_switcher = { path = "crates/tab_switcher" }
 tabular_data_preview = { path = "crates/tabular_data_preview"}
 task = { path = "crates/task" }
 tasks_ui = { path = "crates/tasks_ui" }
-tauri_gpui = { path = "crates/tauri_gpui" }
 telemetry = { path = "crates/telemetry" }
 telemetry_events = { path = "crates/telemetry_events" }
 terminal = { path = "crates/terminal" }
@@ -667,7 +617,6 @@ util = { path = "crates/util" }
 util_macros = { path = "crates/util_macros" }
 vim = { path = "crates/vim" }
 vim_mode_setting = { path = "crates/vim_mode_setting" }
-aphrody_vpn = { path = "crates/aphrody_vpn" }
 watch = { path = "crates/watch" }
 web_search = { path = "crates/web_search" }
 web_search_providers = { path = "crates/web_search_providers" }
@@ -690,22 +639,11 @@ ztracing_macro = { path = "crates/ztracing_macro" }
 # External crates
 #
 
-ayvpn-daemon = { path = "crates/ayvpn_daemon" }
-mullvad-api = { path = "vendor/mullvad/mullvad-api" }
-mullvad-daemon = { path = "vendor/mullvad/mullvad-daemon", default-features = false, features = ["embedded"] }
-mullvad-management-interface = { path = "vendor/mullvad/mullvad-management-interface" }
-mullvad-paths = { path = "vendor/mullvad/mullvad-paths" }
-mullvad-types = { path = "vendor/mullvad/mullvad-types" }
-browser-browse = { path = "vendor/browser/components/browser-browse" }
-browser-detect = { path = "vendor/browser/components/browser-detect", default-features = false }
-browser-engine = { path = "vendor/browser/components/browser-engine" }
-browser-views = { path = "vendor/browser/components/browser-views" }
-browser-vpn = { path = "vendor/browser/components/browser-vpn" }
 accesskit = { path = "vendor/accesskit/accesskit", features = ["enumn"] }
 accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
 accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
 accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
-agent-client-protocol = { version = "=5.3.0", features = ["schemars", "unstable", "unstable_protocol_v2"] }
+agent-client-protocol = { version = "=5.4.0", features = ["schemars", "unstable", "unstable_protocol_v2"] }
 aho-corasick = "1.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 any_vec = "0.14"
@@ -778,61 +716,6 @@ core-graphics = "0.24"
 core-services = "1"
 core-text = "21"
 coreaudio-rs = { version = "0.12", default-features = false }
-cosmic-text = { path = "vendor/cosmic-text" }
-craft-anicraft-format = { path = "vendor/craft-libs/crates/anicraft-format" }
-craft-anything-analysis = { path = "vendor/craft-anything/crates/analysis" }
-craft-anything-disasm = { path = "vendor/craft-anything/crates/disasm" }
-craft-anything-evidence = { path = "vendor/craft-anything/crates/evidence" }
-craft-anything-formats = { path = "vendor/craft-anything/crates/formats" }
-craft-anything-js = { path = "vendor/craft-anything/crates/js" }
-craft-color = { path = "vendor/craft-libs/crates/color" }
-craft-csv = { path = "vendor/craft-libs/crates/csv" }
-craft-dds = { path = "vendor/craft-libs/crates/dds" }
-craft-deckcraft-format = { path = "vendor/craft-libs/crates/deckcraft-format" }
-craft-docx = { path = "vendor/craft-libs/crates/docx" }
-craft-dxf = { path = "vendor/craft-libs/crates/dxf" }
-craft-ecproj-format = { path = "vendor/craft-libs/crates/ecproj-format" }
-craft-elf = { path = "vendor/craft-libs/crates/elf" }
-craft-exr = { path = "vendor/craft-libs/crates/exr" }
-craft-fcproj-format = { path = "vendor/craft-libs/crates/fcproj-format" }
-craft-fig = { path = "vendor/craft-libs/crates/fig" }
-craft-figcraft-format = { path = "vendor/craft-libs/crates/figcraft-format" }
-craft-figma-rest = { path = "vendor/craft-libs/crates/figma-rest" }
-craft-gcode = { path = "vendor/craft-libs/crates/gcode" }
-craft-gridcraft-format = { path = "vendor/craft-libs/crates/gridcraft-format" }
-craft-hdr = { path = "vendor/craft-libs/crates/hdr" }
-craft-i18n = { path = "vendor/craft-libs/crates/i18n" }
-craft-kiwi = { path = "vendor/craft-libs/crates/kiwi" }
-craft-kra = { path = "vendor/craft-libs/crates/kra" }
-craft-lottie = { path = "vendor/craft-libs/crates/lottie" }
-craft-macho = { path = "vendor/craft-libs/crates/macho" }
-craft-materialx = { path = "vendor/craft-libs/crates/materialx" }
-craft-math = { path = "vendor/craft-libs/crates/math" }
-craft-mcmat = { path = "vendor/craft-libs/crates/mcmat" }
-craft-mesh = { path = "vendor/craft-libs/crates/mesh" }
-craft-midi = { path = "vendor/craft-libs/crates/midi" }
-craft-ora = { path = "vendor/craft-libs/crates/ora" }
-craft-pcraft-format = { path = "vendor/craft-libs/crates/pcraft-format" }
-craft-pe = { path = "vendor/craft-libs/crates/pe" }
-craft-penpot = { path = "vendor/craft-libs/crates/penpot" }
-craft-plist = { path = "vendor/craft-libs/crates/plist" }
-craft-pptx = { path = "vendor/craft-libs/crates/pptx" }
-craft-psd = { path = "vendor/craft-libs/crates/psd" }
-craft-sf2 = { path = "vendor/craft-libs/crates/sf2" }
-craft-sheet = { path = "vendor/craft-libs/crates/sheet" }
-craft-sketch = { path = "vendor/craft-libs/crates/sketch" }
-craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
-craft-tar = { path = "vendor/craft-libs/crates/tar" }
-craft-tcraft = { path = "vendor/craft-libs/crates/tcraft" }
-craft-tga = { path = "vendor/craft-libs/crates/tga" }
-craft-timeline = { path = "vendor/craft-libs/crates/timeline" }
-craft-usd = { path = "vendor/craft-libs/crates/usd" }
-craft-vectorcraft-format = { path = "vendor/craft-libs/crates/vectorcraft-format" }
-craft-wordmodel = { path = "vendor/craft-libs/crates/wordmodel" }
-craft-xcf = { path = "vendor/craft-libs/crates/xcf" }
-craft-xlsx = { path = "vendor/craft-libs/crates/xlsx" }
-craft-xml = { path = "vendor/craft-libs/crates/xml" }
-craft-zip = { path = "vendor/craft-libs/crates/zip" }
 cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7" }
 crash-handler = "0.8"
 criterion = { version = "0.8.2", features = ["html_reports"] }
@@ -843,19 +726,13 @@ dap-types = { git = "https://github.com/zed-industries/dap-types", rev = "1b461b
 derive_more = { version = "2.1", features = ["deref", "deref_mut", "from_str"] }
 dialoguer = { version = "0.12", default-features = false }
 diffy = "0.4.2"
-dirs = "6.0"
+dirs = "7.0"
 dispatch2 = { version = "0.3", default-features = false, features = ["std"] }
 documented = "0.10"
 dotenvy = "0.15.0"
 dunce = "1.0"
 ec4rs = { version = "1.2", features = ["allow-empty-values"] }
-ecolor = { path = "vendor/egui/crates/ecolor", default-features = false }
-egui = { path = "vendor/egui/crates/egui", default-features = false }
-egui-wgpu = { path = "vendor/egui/crates/egui-wgpu", default-features = false }
-egui_extras = { path = "vendor/egui/crates/egui_extras", default-features = false }
-emath = { path = "vendor/egui/crates/emath", default-features = false }
 emojis = "0.9"
-epaint = { path = "vendor/egui/crates/epaint", default-features = false }
 encoding_rs = "0.8"
 env_logger = "0.11"
 etagere = "0.2"
@@ -922,9 +799,9 @@ livekit = { version = "0.7.32", features = ["tokio", "rustls-tls-native-roots"] 
 log = { version = "0.4", default-features = false, features = ["std"] }
 lru = "0.16"
 lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "82d7fc66ebdfabcfeb26ba16bbed9f3d26211fc3" }
-lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }
 mach2 = "0.6"
 markup5ever_rcdom = "0.39"
+mdbook = { version = "=0.4.40", default-features = false, features = ["search"] }
 merman = { version = "=0.9.3", default-features = false }
 mime = "0.3.17"
 minidumper = "0.11"
@@ -1214,36 +1091,6 @@ objc2-foundation = { version = "=0.3.2", default-features = false, features = [
     "NSUserDefaults",
     "NSValue",
 ] }
-objc2-image-io = { version = "0.3.2", default-features = false, features = [
-    "std",
-    "objc2-core-graphics",
-    "CGImageDestination",
-    "CGImageProperties",
-    "CGImageSource",
-] }
-objc2-io-kit = { version = "0.3.2", default-features = false, features = ["std", "libc"] }
-objc2-io-surface = { version = "0.3.2", default-features = false, features = [
-    "std",
-    "libc",
-    "objc2",
-    "objc2-core-foundation",
-    "IOSurfaceBase",
-    "IOSurfaceRef",
-    "IOSurfaceTypes",
-] }
-objc2-metal = { version = "0.3.2", default-features = false, features = [
-    "std",
-    "block2",
-    "objc2-io-surface",
-    "MTLAllocation",
-    "MTLCommandBuffer",
-    "MTLCommandQueue",
-    "MTLDevice",
-    "MTLPixelFormat",
-    "MTLResource",
-    "MTLTexture",
-    "MTLTypes",
-] }
 objc2-security = { version = "0.3.2", default-features = false, features = ["std", "SecBase", "SecItem"] }
 objc2-quartz-core = { version = "=0.3.2", default-features = false, features = [
     "std",
@@ -1286,7 +1133,6 @@ objc2-user-notifications = { version = "0.3", default-features = false, features
     "UNNotificationTrigger",
     "UNUserNotificationCenter",
 ] }
-object = { version = "0.37.3", default-features = false, features = ["read", "std"] }
 octocrab = { version = "0.49", default-features = false }
 oo7 = { git = "https://github.com/zed-industries/oo7", rev = "731c1215edb6905876c6137ab300428c7b8d7c13", version = "0.6", default-features = false }
 ordered-float = "5"
@@ -1340,7 +1186,6 @@ resvg = { version = "0.46.0", default-features = false, features = [
     "memmap-fonts",
     "raster-images",
 ] }
-roxmltree = "0.21"
 rsa = { version = "0.9", default-features = false, features = ["std", "u64_digit"] }
 jupyter-zmq-client = { version = "3.0.0", default-features = false, features = [
     "async-dispatcher-runtime", "aws-lc-rs"
@@ -1356,7 +1201,6 @@ schemars = { version = "1.0", default-features = false, features = ["std", "inde
 seccompiler = "0.5"
 semver = { version = "1.0", features = ["serde"] }
 serde = { version = "1.0", features = ["rc", "derive"] }
-serde_ignored = "0.1.14"
 serde_json = { version = "1.0.144", features = ["preserve_order", "raw_value"] }
 serde_json_lenient = { version = "0.2", features = [
     "preserve_order",
@@ -1434,7 +1278,6 @@ unicode-script = "0.5.7"
 unicode-segmentation = "1.10"
 unicode-width = "0.2"
 unindent = "0.2.0"
-upt = "0.9.0"
 url = "2.2"
 urlencoding = "2.1.2"
 usvg = { version = "0.46.0", default-features = false }
@@ -1464,7 +1307,7 @@ web-sys = "0.3"
 web-time = "1.1.0"
 webpki-roots = "1.0.10"
 webrtc-sys = "0.3.23"
-# Vendored WGPU v30.0.0 (cddb2f5d80dc0009b2ef6767635140cacf90a007)
+# 30.0.1 lacks the Vulkan surface-drop fix (wgpu#10230) and WebGL resize fix (wgpu#10348).
 wgpu = { path = "vendor/wgpu/wgpu", default-features = false }
 which = "8"
 windows-core = "0.62"
@@ -1475,7 +1318,159 @@ yawc = { version = "0.4", default-features = false }
 zeroize = "1.8"
 zstd = { version = "0.13", default-features = false, features = ["legacy", "arrays"] }
 
-# Unified NSH external dependencies (deduplicated onto workspace versions)
+# === APHRODY_ISOLATED_WORKSPACE_DEPENDENCIES START ===
+aphrody = { path = "crates/aphrody", default-features = false }
+aphrody_auto = { path = "crates/aphrody_auto" }
+bevy_gpui = { path = "crates/bevy_gpui" }
+brand = { path = "crates/brand" }
+cosmic_gpui = { path = "crates/cosmic_gpui" }
+egui_gpui = { path = "crates/egui_gpui" }
+aphrody_design = { path = "crates/aphrody_design" }
+gpui-base = { version = "0.10.0", path = "crates/gpui-base" }
+gpui-component = { version = "0.10.0", path = "crates/gpui-component" }
+gpui-component-macros = { version = "0.10.0", path = "crates/gpui-component-macros" }
+gpui-fps = { version = "0.10.0", path = "crates/gpui-fps" }
+gpui-kit = { version = "0.10.0", path = "crates/gpui-kit" }
+gpui-kit-assets = { version = "0.10.0", path = "crates/gpui-kit-assets" }
+aphrody_store = { path = "crates/aphrody_store", default-features = false }
+gpui_ui = { path = "crates/gpui_ui" }
+gpui_code = { path = "crates/gpui_code" }
+gpui_app_shell = { path = "crates/gpui_app_shell" }
+iced_gpui = { path = "crates/iced_gpui" }
+nsh-base = { version = "0.6.0", path = "crates/nsh-base", default-features = false }
+nsh-bundler = { version = "0.6.0", path = "crates/nsh-bundler", default-features = false }
+nsh-core = { version = "0.6.0", path = "crates/nsh-core" }
+nsh-dev = { version = "0.6.0", path = "crates/nsh-dev" }
+nsh-engine = { version = "0.6.0", path = "crates/nsh-engine", default-features = false }
+nsh-i18n = { version = "0.6.0", path = "crates/nsh-i18n" }
+nsh-js = { version = "0.6.0", path = "crates/nsh-js", default-features = false }
+nsh-macros = { version = "0.6.0", path = "crates/nsh-macros" }
+nsh-package = { version = "0.6.0", path = "crates/nsh-package" }
+nsh-platform-apple = { version = "0.6.0", path = "crates/nsh-platform-apple" }
+nsh-platform-gpui = { version = "0.6.0", path = "crates/nsh-platform-gpui", default-features = false }
+nsh-platform-ios = { version = "0.6.0", path = "crates/nsh-platform-ios", default-features = false }
+nsh-platform-linux = { version = "0.6.0", path = "crates/nsh-platform-linux", default-features = false }
+nsh-platform-macos = { version = "0.6.0", path = "crates/nsh-platform-macos", default-features = false }
+nsh-platform-tui = { version = "0.6.0", path = "crates/nsh-platform-tui", default-features = false }
+nsh-platform-windows = { version = "0.6.0", path = "crates/nsh-platform-windows", default-features = false }
+nsh-testing = { version = "0.6.0", path = "crates/nsh-testing", default-features = false }
+nsh-updater = { version = "0.6.0", path = "crates/nsh-updater" }
+aphrody_nsh = { path = "crates/aphrody_nsh" }
+aphrody_browser = { path = "crates/aphrody_browser" }
+aphrody_craft = { path = "crates/aphrody_craft" }
+aphrody_installer = { path = "crates/aphrody_installer", default-features = false }
+aphrody_pilot = { path = "crates/aphrody_pilot" }
+aphrody_session = { path = "crates/aphrody_session" }
+aphrody_ui = { path = "crates/aphrody_ui" }
+tauri_gpui = { path = "crates/tauri_gpui" }
+aphrody_vpn = { path = "crates/aphrody_vpn" }
+ayvpn-daemon = { path = "crates/ayvpn_daemon" }
+mullvad-api = { path = "vendor/mullvad/mullvad-api" }
+mullvad-daemon = { path = "vendor/mullvad/mullvad-daemon", default-features = false, features = ["embedded"] }
+mullvad-management-interface = { path = "vendor/mullvad/mullvad-management-interface" }
+mullvad-paths = { path = "vendor/mullvad/mullvad-paths" }
+mullvad-types = { path = "vendor/mullvad/mullvad-types" }
+browser-browse = { path = "vendor/browser/components/browser-browse" }
+browser-detect = { path = "vendor/browser/components/browser-detect", default-features = false }
+browser-engine = { path = "vendor/browser/components/browser-engine" }
+browser-views = { path = "vendor/browser/components/browser-views" }
+browser-vpn = { path = "vendor/browser/components/browser-vpn" }
+cosmic-text = { path = "vendor/cosmic-text" }
+craft-anicraft-format = { path = "vendor/craft-libs/crates/anicraft-format" }
+craft-anything-analysis = { path = "vendor/craft-anything/crates/analysis" }
+craft-anything-disasm = { path = "vendor/craft-anything/crates/disasm" }
+craft-anything-evidence = { path = "vendor/craft-anything/crates/evidence" }
+craft-anything-formats = { path = "vendor/craft-anything/crates/formats" }
+craft-anything-js = { path = "vendor/craft-anything/crates/js" }
+craft-color = { path = "vendor/craft-libs/crates/color" }
+craft-csv = { path = "vendor/craft-libs/crates/csv" }
+craft-dds = { path = "vendor/craft-libs/crates/dds" }
+craft-deckcraft-format = { path = "vendor/craft-libs/crates/deckcraft-format" }
+craft-docx = { path = "vendor/craft-libs/crates/docx" }
+craft-dxf = { path = "vendor/craft-libs/crates/dxf" }
+craft-ecproj-format = { path = "vendor/craft-libs/crates/ecproj-format" }
+craft-elf = { path = "vendor/craft-libs/crates/elf" }
+craft-exr = { path = "vendor/craft-libs/crates/exr" }
+craft-fcproj-format = { path = "vendor/craft-libs/crates/fcproj-format" }
+craft-fig = { path = "vendor/craft-libs/crates/fig" }
+craft-figcraft-format = { path = "vendor/craft-libs/crates/figcraft-format" }
+craft-figma-rest = { path = "vendor/craft-libs/crates/figma-rest" }
+craft-gcode = { path = "vendor/craft-libs/crates/gcode" }
+craft-gridcraft-format = { path = "vendor/craft-libs/crates/gridcraft-format" }
+craft-hdr = { path = "vendor/craft-libs/crates/hdr" }
+craft-i18n = { path = "vendor/craft-libs/crates/i18n" }
+craft-kiwi = { path = "vendor/craft-libs/crates/kiwi" }
+craft-kra = { path = "vendor/craft-libs/crates/kra" }
+craft-lottie = { path = "vendor/craft-libs/crates/lottie" }
+craft-macho = { path = "vendor/craft-libs/crates/macho" }
+craft-materialx = { path = "vendor/craft-libs/crates/materialx" }
+craft-math = { path = "vendor/craft-libs/crates/math" }
+craft-mcmat = { path = "vendor/craft-libs/crates/mcmat" }
+craft-mesh = { path = "vendor/craft-libs/crates/mesh" }
+craft-midi = { path = "vendor/craft-libs/crates/midi" }
+craft-ora = { path = "vendor/craft-libs/crates/ora" }
+craft-pcraft-format = { path = "vendor/craft-libs/crates/pcraft-format" }
+craft-pe = { path = "vendor/craft-libs/crates/pe" }
+craft-penpot = { path = "vendor/craft-libs/crates/penpot" }
+craft-plist = { path = "vendor/craft-libs/crates/plist" }
+craft-pptx = { path = "vendor/craft-libs/crates/pptx" }
+craft-psd = { path = "vendor/craft-libs/crates/psd" }
+craft-sf2 = { path = "vendor/craft-libs/crates/sf2" }
+craft-sheet = { path = "vendor/craft-libs/crates/sheet" }
+craft-sketch = { path = "vendor/craft-libs/crates/sketch" }
+craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
+craft-tar = { path = "vendor/craft-libs/crates/tar" }
+craft-tcraft = { path = "vendor/craft-libs/crates/tcraft" }
+craft-tga = { path = "vendor/craft-libs/crates/tga" }
+craft-timeline = { path = "vendor/craft-libs/crates/timeline" }
+craft-usd = { path = "vendor/craft-libs/crates/usd" }
+craft-vectorcraft-format = { path = "vendor/craft-libs/crates/vectorcraft-format" }
+craft-wordmodel = { path = "vendor/craft-libs/crates/wordmodel" }
+craft-xcf = { path = "vendor/craft-libs/crates/xcf" }
+craft-xlsx = { path = "vendor/craft-libs/crates/xlsx" }
+craft-xml = { path = "vendor/craft-libs/crates/xml" }
+craft-zip = { path = "vendor/craft-libs/crates/zip" }
+ecolor = { path = "vendor/egui/crates/ecolor", default-features = false }
+egui = { path = "vendor/egui/crates/egui", default-features = false }
+egui-wgpu = { path = "vendor/egui/crates/egui-wgpu", default-features = false }
+egui_extras = { path = "vendor/egui/crates/egui_extras", default-features = false }
+emath = { path = "vendor/egui/crates/emath", default-features = false }
+epaint = { path = "vendor/egui/crates/epaint", default-features = false }
+lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }
+objc2-image-io = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "objc2-core-graphics",
+    "CGImageDestination",
+    "CGImageProperties",
+    "CGImageSource",
+] }
+objc2-io-kit = { version = "0.3.2", default-features = false, features = ["std", "libc"] }
+objc2-io-surface = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "libc",
+    "objc2",
+    "objc2-core-foundation",
+    "IOSurfaceBase",
+    "IOSurfaceRef",
+    "IOSurfaceTypes",
+] }
+objc2-metal = { version = "0.3.2", default-features = false, features = [
+    "std",
+    "block2",
+    "objc2-io-surface",
+    "MTLAllocation",
+    "MTLCommandBuffer",
+    "MTLCommandQueue",
+    "MTLDevice",
+    "MTLPixelFormat",
+    "MTLResource",
+    "MTLTexture",
+    "MTLTypes",
+] }
+object = { version = "0.37.3", default-features = false, features = ["read", "std"] }
+roxmltree = "0.21"
+serde_ignored = "0.1.14"
+upt = "0.9.0"
 accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
 axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "ws"] }
 brotli = { version = "9", default-features = false, features = ["std"] }
@@ -1554,8 +1549,6 @@ wuff = "0.2.9"
 x11rb = { version = "0.13", default-features = false, features = ["composite", "dri3", "present"] }
 zbus = { version = "5.13", default-features = false, features = ["async-io", "blocking-api"] }
 zip = { version = "9", default-features = false, features = ["deflate"] }
-
-# Shared conformant workspace external dependencies (enforced by xtask package-conformity)
 annotate-snippets = "0.12.1"
 arrayvec = "0.7.6"
 ctrlc = "3.5"
@@ -1578,8 +1571,6 @@ tiny-skia-path = "0.11"
 trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d884a89351f3b8856d12894cccee261d" }
 vscode_theme = "0.2.0"
 waker-fn = "1.2.0"
-
-# Consolidated GPUI-Kit & NSH 0.6.0 shared workspace dependencies (enforced by xtask package-conformity)
 data-url = "0.3"
 enum-iterator = "2.1.0"
 instant = { version = "0.1", features = ["wasm-bindgen"] }
@@ -1613,6 +1604,7 @@ tree-sitter-svelte-next = "0.1.1"
 tree-sitter-swift = "0.7.0"
 tree-sitter-toml-ng = "0.7.0"
 tree-sitter-zig = "1.1.2"
+# === APHRODY_ISOLATED_WORKSPACE_DEPENDENCIES END ===
 
 [workspace.dependencies.windows]
 version = "0.62"
@@ -1674,27 +1666,6 @@ features = [
 ]
 
 [patch.crates-io]
-# Unified single-source framework crates across Aphrody submodules
-taffy = { path = "vendor/taffy" }
-cosmic-text = { path = "vendor/cosmic-text" }
-wgpu = { path = "vendor/wgpu/wgpu" }
-wgpu-core = { path = "vendor/wgpu/wgpu-core" }
-wgpu-hal = { path = "vendor/wgpu/wgpu-hal" }
-wgpu-types = { path = "vendor/wgpu/wgpu-types" }
-wgpu-naga-bridge = { path = "vendor/wgpu/wgpu-naga-bridge" }
-naga = { path = "vendor/wgpu/naga" }
-accesskit = { path = "vendor/accesskit/accesskit" }
-accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
-accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
-accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
-accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
-ecolor = { path = "vendor/egui/crates/ecolor" }
-emath = { path = "vendor/egui/crates/emath" }
-epaint = { path = "vendor/egui/crates/epaint" }
-epaint_default_fonts = { path = "vendor/egui/crates/epaint_default_fonts" }
-egui = { path = "vendor/egui/crates/egui" }
-egui-wgpu = { path = "vendor/egui/crates/egui-wgpu" }
-egui_extras = { path = "vendor/egui/crates/egui_extras" }
 cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7" }
 # Unify `tree_sitter_language::LanguageFn` between crates.io grammar crates and
 # the git tree-sitter above; two instances of the crate would make grammar
@@ -1727,11 +1698,49 @@ crash-context = { git = "https://github.com/rust-minidump/minidump-writer", rev 
 # per-crate scratch dirs are sufficient. Upstream issue:
 # https://github.com/dtolnay/cxx/issues/1752
 scratch = { path = "tooling/corgi/patches/scratch" }
+
+# === APHRODY_ISOLATED_PATCHES START ===
+taffy = { path = "vendor/taffy" }
+cosmic-text = { path = "vendor/cosmic-text" }
+wgpu = { path = "vendor/wgpu/wgpu" }
+wgpu-core = { path = "vendor/wgpu/wgpu-core" }
+wgpu-hal = { path = "vendor/wgpu/wgpu-hal" }
+wgpu-types = { path = "vendor/wgpu/wgpu-types" }
+wgpu-naga-bridge = { path = "vendor/wgpu/wgpu-naga-bridge" }
+naga = { path = "vendor/wgpu/naga" }
+accesskit = { path = "vendor/accesskit/accesskit" }
+accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
+accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
+accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
+accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
+ecolor = { path = "vendor/egui/crates/ecolor" }
+emath = { path = "vendor/egui/crates/emath" }
+epaint = { path = "vendor/egui/crates/epaint" }
+epaint_default_fonts = { path = "vendor/egui/crates/epaint_default_fonts" }
+egui = { path = "vendor/egui/crates/egui" }
+egui-wgpu = { path = "vendor/egui/crates/egui-wgpu" }
+egui_extras = { path = "vendor/egui/crates/egui_extras" }
 msvc_spectre_libs = { path = "tooling/corgi/patches/msvc_spectre_libs" }
 
 [patch."https://github.com/storytold/craft-libs"]
+craft-codepage = { path = "vendor/craft-libs/crates/codepage" }
+craft-dex = { path = "vendor/craft-libs/crates/dex" }
+craft-elf = { path = "vendor/craft-libs/crates/elf" }
+craft-evm = { path = "vendor/craft-libs/crates/evm" }
+craft-har = { path = "vendor/craft-libs/crates/har" }
+craft-java-class = { path = "vendor/craft-libs/crates/java-class" }
+craft-jsonc = { path = "vendor/craft-libs/crates/jsonc" }
+craft-macho = { path = "vendor/craft-libs/crates/macho" }
+craft-mime = { path = "vendor/craft-libs/crates/mime" }
+craft-pcap = { path = "vendor/craft-libs/crates/pcap" }
+craft-pe = { path = "vendor/craft-libs/crates/pe" }
 craft-plist = { path = "vendor/craft-libs/crates/plist" }
 craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
+craft-sourcemap = { path = "vendor/craft-libs/crates/sourcemap" }
+craft-tar = { path = "vendor/craft-libs/crates/tar" }
+craft-wasm = { path = "vendor/craft-libs/crates/wasm" }
+craft-zip = { path = "vendor/craft-libs/crates/zip" }
+# === APHRODY_ISOLATED_PATCHES END ===
 
 [profile.dev]
 split-debuginfo = "unpacked"
@@ -1858,6 +1867,7 @@ debug = "full"
 lto = false
 codegen-units = 16
 
+# === APHRODY_ISOLATED_PROFILES START ===
 [profile.dist]
 inherits = "release"
 debug = false
@@ -1901,6 +1911,7 @@ codegen-units = 1
 debug = false
 strip = "symbols"
 panic = "abort"
+# === APHRODY_ISOLATED_PROFILES END ===
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "allow" }

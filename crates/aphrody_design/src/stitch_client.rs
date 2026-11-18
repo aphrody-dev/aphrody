@@ -243,18 +243,18 @@ pub struct StitchMaquetteSpec {
 #[must_use]
 pub fn bundled_maquette_catalog() -> Vec<StitchMaquetteSpec> {
     let entries = [
-        ("01-labs-ecosystem-architecture", "stitch-labs-architecture", "labs", "DESKTOP", "Aphrody Labs 10-Domain Ecosystem Architecture", "docs/design/maquettes/01-labs-ecosystem-architecture.html", "aphrody_nsh::StudioMode::GoogleDesignMirror"),
-        ("02-labs-roadmap-2026-2027", "stitch-labs-roadmap", "labs", "DESKTOP", "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)", "docs/design/maquettes/02-labs-roadmap-2026-2027.html", "aphrody_ui::RoadmapHorizonCard"),
-        ("03-web-landing-hero", "stitch-web-landing", "website", "DESKTOP", "aphrody.com — Website Landing & Live WebGPU Playground", "docs/design/maquettes/03-web-landing-hero.html", "aphrody_desktop::examples::web_os"),
-        ("04-web-docs-llms-portal", "stitch-web-docs", "website", "DESKTOP", "docs.aphrody.com — Fumadocs v16, Twoslash & llms.txt Portal", "docs/design/maquettes/04-web-docs-llms-portal.html", "aphrody_nsh::StudioMode::GpuiStarterPack"),
-        ("05-web-store-and-downloads", "stitch-web-store", "website", "DESKTOP", "releases.aphrody.com & Store — 22-Target Distribution Portal", "docs/design/maquettes/05-web-store-and-downloads.html", "aphrody_store::AwesomeGpuiCatalog"),
-        ("06-desktop-aphrody-ide", "stitch-desktop-ide", "desktop", "DESKTOP", "Desktop: Aphrody Studio IDE", "docs/design/maquettes/06-desktop-aphrody-ide.html", "crates/zed + aphrody_nsh::DesignStitchStudioItem"),
-        ("07-desktop-aphrody-os-cosmic", "stitch-desktop-cosmic-os", "desktop", "DESKTOP", "Desktop: aphrody-os COSMIC Compositor & Dual Craft Studio", "docs/design/maquettes/07-desktop-aphrody-os-cosmic.html", "aphrody_desktop::OsDesktopShell"),
-        ("08-desktop-agy-neural-session", "stitch-desktop-neural-agy", "desktop", "DESKTOP", "Desktop: Neural Expressive Home & Grounding Stack", "docs/design/maquettes/08-desktop-agy-neural-session.html", "aphrody_ui::google_design_components"),
-        ("09-desktop-browser-vpn-shield", "stitch-desktop-browser-vpn", "desktop", "DESKTOP", "Desktop: Aphrody Browser + Per-Tab Mullvad WireGuard VPN", "docs/design/maquettes/09-desktop-browser-vpn-shield.html", "aphrody_browser::ChromiumBrowserView"),
-        ("10-mobile-companion-home", "stitch-mobile-home", "mobile", "MOBILE", "Mobile: Companion Home & Agent", "docs/design/maquettes/10-mobile-companion-home.html", "gpui_ios + nsh-platform-android"),
-        ("11-mobile-code-diff-review", "stitch-mobile-diff", "mobile", "MOBILE", "Mobile: Code Diff Review & Bottom Sheet", "docs/design/maquettes/11-mobile-code-diff-review.html", "nsh_base::DiffView"),
-        ("12-mobile-pocket-craft-vpn", "stitch-mobile-craft-oled", "mobile", "TABLET", "Mobile / Tablet OLED Pitch: Pocket Craft & VPN", "docs/design/maquettes/12-mobile-pocket-craft-vpn.html", "nsh-platform-ios + nsh-platform-android"),
+        ("01-labs-ecosystem-architecture", "stitch-labs-architecture", "labs", "DESKTOP", "Aphrody Labs 10-Domain Ecosystem Architecture", "aphrody/docs/design/maquettes/01-labs-ecosystem-architecture.html", "aphrody_nsh::StudioMode::GoogleDesignMirror"),
+        ("02-labs-roadmap-2026-2027", "stitch-labs-roadmap", "labs", "DESKTOP", "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)", "aphrody/docs/design/maquettes/02-labs-roadmap-2026-2027.html", "aphrody_ui::RoadmapHorizonCard"),
+        ("03-web-landing-hero", "stitch-web-landing", "website", "DESKTOP", "aphrody.com — Website Landing & Live WebGPU Playground", "aphrody/docs/design/maquettes/03-web-landing-hero.html", "aphrody_desktop::examples::web_os"),
+        ("04-web-docs-llms-portal", "stitch-web-docs", "website", "DESKTOP", "docs.aphrody.com — Fumadocs v16, Twoslash & llms.txt Portal", "aphrody/docs/design/maquettes/04-web-docs-llms-portal.html", "aphrody_nsh::StudioMode::GpuiStarterPack"),
+        ("05-web-store-and-downloads", "stitch-web-store", "website", "DESKTOP", "releases.aphrody.com & Store — 22-Target Distribution Portal", "aphrody/docs/design/maquettes/05-web-store-and-downloads.html", "aphrody_store::AwesomeGpuiCatalog"),
+        ("06-desktop-aphrody-ide", "stitch-desktop-ide", "desktop", "DESKTOP", "Desktop: Aphrody Studio IDE", "aphrody/docs/design/maquettes/06-desktop-aphrody-ide.html", "crates/zed + aphrody_nsh::DesignStitchStudioItem"),
+        ("07-desktop-aphrody-os-cosmic", "stitch-desktop-cosmic-os", "desktop", "DESKTOP", "Desktop: aphrody-os COSMIC Compositor & Dual Craft Studio", "aphrody/docs/design/maquettes/07-desktop-aphrody-os-cosmic.html", "aphrody_desktop::OsDesktopShell"),
+        ("08-desktop-agy-neural-session", "stitch-desktop-neural-agy", "desktop", "DESKTOP", "Desktop: Neural Expressive Home & Grounding Stack", "aphrody/docs/design/maquettes/08-desktop-agy-neural-session.html", "aphrody_ui::google_design_components"),
+        ("09-desktop-browser-vpn-shield", "stitch-desktop-browser-vpn", "desktop", "DESKTOP", "Desktop: Aphrody Browser + Per-Tab Mullvad WireGuard VPN", "aphrody/docs/design/maquettes/09-desktop-browser-vpn-shield.html", "aphrody_browser::ChromiumBrowserView"),
+        ("10-mobile-companion-home", "stitch-mobile-home", "mobile", "MOBILE", "Mobile: Companion Home & Agent", "aphrody/docs/design/maquettes/10-mobile-companion-home.html", "gpui_ios + nsh-platform-android"),
+        ("11-mobile-code-diff-review", "stitch-mobile-diff", "mobile", "MOBILE", "Mobile: Code Diff Review & Bottom Sheet", "aphrody/docs/design/maquettes/11-mobile-code-diff-review.html", "nsh_base::DiffView"),
+        ("12-mobile-pocket-craft-vpn", "stitch-mobile-craft-oled", "mobile", "TABLET", "Mobile / Tablet OLED Pitch: Pocket Craft & VPN", "aphrody/docs/design/maquettes/12-mobile-pocket-craft-vpn.html", "nsh-platform-ios + nsh-platform-android"),
     ];
     entries
         .into_iter()

@@ -2,7 +2,7 @@
 /**
  * Reproducible Google Design (`https://design.google/?home` + Neural Expressive Nov 2026)
  * Asset Optimizer, Stylesheet Compiler, W3C DTCG Figma & Stitch Kit Builder, MDX Guideline
- * Generator, and Typed Contract Validator for `docs/design/`.
+ * Generator, and Typed Contract Validator for \`aphrody/docs/design/\`.
  *
  * Usage:
  *   bun tooling/bun/design-docs-pack.ts build
@@ -15,7 +15,7 @@ import { buildCanonicalDesignTokens, contrastRatioHex } from "./google-design-sy
 import { buildAllMaquettes, captureMaquetteScreenshots, MAQUETTE_DEFINITIONS } from "./design-maquettes.ts";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
-export const DESIGN_DOCS_DIR = join(repoRoot, "docs/design");
+export const DESIGN_DOCS_DIR = join(repoRoot, "aphrody/docs/design");
 
 function sha256Hex(content: Uint8Array | string): string {
   return createHash("sha256").update(content).digest("hex");
@@ -193,7 +193,7 @@ function normalizeSvgMarkup(raw: string, fallbackTitle: string): { clean: string
 
 function buildSchemaTsSource(): string {
   return `/**
- * Authoritative TypeScript Schema & Runtime Validator for \`docs/design/manifest.json\`.
+ * Authoritative TypeScript Schema & Runtime Validator for \`aphrody/docs/design/manifest.json\`.
  * Anchored to \`https://design.google/?home\`, Material 3 Expressive, Google Sans Flex,
  * W3C DTCG Figma Variables, Google Stitch (\`data-stitch-id\`), GPUI, and \`egui 0.37\` / Bevy UE5.8.
  */
@@ -354,7 +354,7 @@ function buildStylesheetCss(): string {
 
 ${emitPaletteVars(d)}
 
-  /* Neural Expressive Obsidian Backdrop & Aura (from docs/design/*.png) */
+  /* Neural Expressive Obsidian Backdrop & Aura (from aphrody/docs/design/*.png) */
   --md-sys-neural-obsidian: #0B0E14;
   --md-sys-neural-rail: #13161F;
   --md-sys-neural-popover: #1C202B;
@@ -616,7 +616,7 @@ spacing:
   touch-min: 44px
 ---
 
-# Google Design & Neural Expressive Specification (\`docs/design/DESIGN.md\`)
+# Google Design & Neural Expressive Specification (\`aphrody/docs/design/DESIGN.md\`)
 
 Anchored to \`https://design.google/?home\` and \`https://design.google/library/code-is-a-design-material\`, uniting **GPUI**, **NSH**, **\`egui 0.37\` (\`egui_gpui\`)**, **Bevy Unreal Engine 5.8 (\`bevy_gpui\`)**, **FigCraft**, and **Craft Anything**.
 
@@ -779,7 +779,7 @@ const MATERIAL3_FIGMA_KIT = {
   fileKey: "vEr6T5SQaJfMpLxjMUfD55",
   nodeId: "11:1833",
   url: "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
-  localArchive: "docs/design/Material 3 Design Kit (Community).zip",
+  localArchive: "aphrody/docs/design/Material 3 Design Kit (Community).zip",
   r2Manifest: "assets/os/r2_assets_manifest.toml",
   license: "CC BY 4.0",
 } as const;
@@ -958,7 +958,7 @@ source: "https://design.google/library/code-is-a-design-material"
 
 In Aphrody, live Rust GPUI entities (\`crates/aphrody_ui\`, \`crates/aphrody_craft\`), NSH TSX signals (\`examples/nsh/agy-session-studio\`), migrated \`egui 0.37\` surfaces (\`crates/egui_gpui\`), and Naga v30 WGSL shaders (\`crates/bevy_gpui\`) operate directly on one shared token graph rather than static handoff mocks.
 
-- **Single Token Source**: \`assets/os/google_design_tokens.toml\` -> \`DESIGN.md\` -> \`docs/design/stylesheet.css\` -> \`ShadcnGpuiTheme\` & \`egui::Visuals\`.
+- **Single Token Source**: \`assets/os/google_design_tokens.toml\` -> \`DESIGN.md\` -> \`aphrody/docs/design/stylesheet.css\` -> \`ShadcnGpuiTheme\` & \`egui::Visuals\`.
 - **Dual-Engine Verification**: Every Craft Studio screen renders both in **GPUI Google Design** and **\`egui 0.37\`** side-by-side to validate layout ergonomics, AccessKit node parity, and sub-millisecond tessellation budgets.
 `,
   },
@@ -973,7 +973,7 @@ source: "https://design.google/?home"
 
 # Material 3 Expressive & Neural Surfaces
 
-Derived from \`https://design.google/?home\` and the 5 Neural Expressive reference captures in \`docs/design/*.png\`:
+Derived from \`https://design.google/?home\` and the 5 Neural Expressive reference captures in \`aphrody/docs/design/*.png\`:
 
 1. **Surface Hierarchy**: \`surface-container-lowest\` (\`#080D13\`) -> \`surface\` (\`#0E141B\`) -> \`surface-container-low\` (\`#161D25\`) -> \`surface-container-high\` (\`#252C36\`).
 2. **Containment Geometry**: \`20px\` (\`large_increased_px\`) for cascading popovers, \`24px-28px\` (\`extra_large_px\`) for grounding card stacks, and \`9999px\` (\`full_px\`) morphing to \`12px\` (\`medium_px\`) on active press for primary pills.
@@ -1006,7 +1006,7 @@ source: "https://m3.material.io/"
 
 # Spatial vs Effects Spring Motion Physics
 
-Implemented analytically in \`aphrody_ui::google_design::SpringSpec::sample_position\` and exported to CSS \`linear(...)\` in \`docs/design/stylesheet.css\`:
+Implemented analytically in \`aphrody_ui::google_design::SpringSpec::sample_position\` and exported to CSS \`linear(...)\` in \`aphrody/docs/design/stylesheet.css\`:
 
 - **Spatial Springs (\`damping_ratio = 0.9\`)**: \`spatial_fast\` (\`k=1400\`), \`spatial_default\` (\`k=700\`), \`spatial_slow\` (\`k=300\`) for bounds, drawers, and corner morphing.
 - **Effects Springs (\`damping_ratio = 1.0\`, critically damped)**: \`effects_fast\` (\`k=3800\`), \`effects_default\` (\`k=1600\`), \`effects_slow\` (\`k=800\`) for opacity and color washes with zero overshoot.
@@ -1071,7 +1071,7 @@ Each reference is a value-like GPUI element in \`aphrody_ui::google_design_mirro
 | [OpenBook Quire](https://github.com/Mhsbrian/OpenBook) | \`QuireGlassNote\` | \`openbook-quire\` | Per-step Undo; consent card only for deletion (\`Delete "Old drafts"?\`, Keep it / Delete); Esc stops the agent when \`on_dismiss\` is set |
 | [Angular](https://material.angular.dev/components/categories) · [Flutter](https://docs.flutter.dev/ui/widgets/material) · [Compose](https://developer.android.com/jetpack/androidx/releases/compose-material) · [Figma M3 kit](https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833) | \`MaterialComponentMatrix\` | \`m3\` | Read-only six-row matrix |
 
-The Figma kit archive is versioned as \`docs/design/Material 3 Design Kit (Community).zip\`; \`figma-kit.json\` exposes it under \`material3Kit\`.
+The Figma kit archive is versioned as \`aphrody/docs/design/Material 3 Design Kit (Community).zip\`; \`figma-kit.json\` exposes it under \`material3Kit\`.
 `,
   },
 ];
@@ -1267,8 +1267,8 @@ export function buildDesignDocsPackage(outDir = DESIGN_DOCS_DIR) {
   const referenceCaptures = refSpecs
     .map((r) => {
       const full = join(outDir, r.file);
-      const cached = join(repoRoot, "target/r2-cache/docs/design", r.file);
-      const r2Entry = r2ByPath.get(`docs/design/${r.file}`);
+      const cached = join(repoRoot, "target/r2-cache/aphrody/docs/design", r.file);
+      const r2Entry = r2ByPath.get(`aphrody/docs/design/${r.file}`) ?? r2ByPath.get(`docs/design/${r.file}`);
       if (existsSync(full)) {
         const bytes = readFileSync(full);
         return {

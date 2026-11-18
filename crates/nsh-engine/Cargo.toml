@@ -49,7 +49,7 @@ nsh-js = { workspace = true, optional = true }
 crossbeam-channel.workspace = true
 tokio = { workspace = true, features = ["rt", "time"] }
 ureq = { workspace = true, optional = true }
-wgpu = { workspace = true, optional = true }
+wgpu = { workspace = true, optional = true, features = ["wgsl"] }
 pollster = { workspace = true, optional = true }
 
 # WebAssembly has no threads: `LocalEngine` drives the engine there.
@@ -78,6 +78,7 @@ libc.workspace = true
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_Foundation", "Win32_System_ProcessStatus", "Win32_System_Threading"] }
 windows = { workspace = true, optional = true, features = ["Win32_Graphics_Direct3D12", "Win32_Graphics_Dxgi_Common", "Win32_Security"] }
+wgpu = { workspace = true, optional = true, features = ["dx12"] }
 
 [dev-dependencies]
 # The shader tests compile the apps' WGSL (nsh-core `shader`).

@@ -33,7 +33,7 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   { domain: "workspace", action: "shell-doctor", scriptRel: "tooling/bun/shell-path-doctor.ts", defaultArgs: ["audit"], summary: "Audit modern Windows/Linux CLI PATH tiering" },
   { domain: "workspace", action: "worktree", scriptRel: "tooling/bun/worktree.ts", defaultArgs: ["list"], summary: "Manage isolated out-of-tree Git worktrees" },
   { domain: "workspace", action: "agent-desktop", scriptRel: "tooling/bun/agent-desktop-audit.ts", defaultArgs: [], summary: "Verify aphrody_pilot zero-mod.rs & 58-tool MCP parity" },
-  { domain: "workspace", action: "gpui-vs-dioxus", scriptRel: "tooling/bun/gpui-vs-dioxus-audit.ts", defaultArgs: ["all"], summary: "Audit 9-submodule GPUI/Wgpu/Taffy/AccessKit parity matrix" },
+  { domain: "workspace", action: "gpui-vs-dioxus", scriptRel: "tooling/bun/gpui-vs-dioxus-audit.ts", defaultArgs: ["all"], summary: "Audit GPUI/NSH vs Dioxus vs egui/craft-libs vs Iced/libcosmic (bench, features, conflicts)" },
   { domain: "workspace", action: "crate-skill", scriptRel: "tooling/bun/crate-to-skill.ts", defaultArgs: ["--help"], summary: "Generate portable Agent Skill bundle from a workspace crate" },
   { domain: "workspace", action: "slim", scriptRel: "tooling/bun/disk-slim.ts", defaultArgs: ["apply"], summary: "Reclaim multi-GB target/* caches and compact bloated submodule packs" },
   { domain: "workspace", action: "r2-manifest", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["manifest"], summary: "Generate content-addressed assets/os/r2_assets_manifest.toml" },
@@ -44,7 +44,7 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   // 2. Google Design System & Stitch Studio (`https://design.google/`)
   { domain: "design", action: "sync", scriptRel: "tooling/bun/google-design-sync.ts", defaultArgs: ["sync"], summary: "Synchronize 3-tier Material 3 Expressive tokens, sitemap, and root DESIGN.md" },
   { domain: "design", action: "audit", scriptRel: "tooling/bun/google-design-sync.ts", defaultArgs: ["audit"], summary: "Verify WCAG 2.2 AA contrast ratios and Google Design token integrity" },
-  { domain: "design", action: "pack", scriptRel: "tooling/bun/design-docs-pack.ts", defaultArgs: ["build"], summary: "Build & validate complete docs/design SVGs, CSS, Figma DTCG, Stitch & MDX pack" },
+  { domain: "design", action: "pack", scriptRel: "tooling/bun/design-docs-pack.ts", defaultArgs: ["build"], summary: "Build & validate complete aphrody/docs/design SVGs, CSS, Figma DTCG, Stitch & MDX pack" },
 
   // 3. Storytold 82-Repository Ecosystem (`craft-libs` + `craft-anything` + `egui` + `bevy`)
   { domain: "storytold", action: "sync", scriptRel: "tooling/bun/storytold-unify.ts", defaultArgs: ["sync"], summary: "Generate assets/os/storytold_ecosystem.toml across all 82 repositories" },

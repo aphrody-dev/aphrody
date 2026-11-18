@@ -122,7 +122,7 @@ async fn test_fuzzy_score(cx: &mut TestAppContext) {
 
 #[gpui::test]
 async fn test_sort_text(cx: &mut TestAppContext) {
-    // sort text takes precedence over sort_kind, when fuzzy is same
+    // sort text takes precedance over sort_kind, when fuzzy is same
     {
         let completions = vec![
             CompletionBuilder::variable("unreachable", None, "80000000"),

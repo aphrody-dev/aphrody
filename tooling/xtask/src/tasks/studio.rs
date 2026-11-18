@@ -99,8 +99,8 @@ pub fn collect_studio_status(root: &Path) -> Result<StudioStatusReport> {
     let product_toml_present = root.join("product.toml").is_file();
     let storytold_manifest_present = root.join("assets/os/storytold_ecosystem.toml").is_file();
     let craft_catalog_present = root.join("assets/os/craft_catalog.toml").is_file();
-    let design_manifest_present = root.join("docs/design/manifest.json").is_file();
-    let design_md_uppercase_present = root.join("docs/design/DESIGN.md").is_file();
+    let design_manifest_present = root.join("aphrody/docs/design/manifest.json").is_file();
+    let design_md_uppercase_present = root.join("aphrody/docs/design/DESIGN.md").is_file();
     let unified_bun_cli_present = root.join("tooling/bun/cli.ts").is_file();
 
     let zed_cargo = fs::read_to_string(root.join("crates/zed/Cargo.toml"))

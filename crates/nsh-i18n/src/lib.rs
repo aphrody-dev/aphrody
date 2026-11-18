@@ -34,8 +34,8 @@ pub const ENGLISH: &str = include_str!("../data/en.json");
 /// The languages with data here an app ships (English is the runtime's
 /// own: [`ENGLISH`]).
 pub const LANGUAGES: &[&str] = &[
-    "de", "es", "fr", "hi", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "th", "tr", "vi",
-    "zh",
+    "ar", "de", "es", "fa", "fr", "he", "hi", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv",
+    "th", "tr", "vi", "zh",
 ];
 
 /// The data of `language` (`"de"`, a language subtag): JSON, as the
@@ -43,9 +43,12 @@ pub const LANGUAGES: &[&str] = &[
 /// data.
 pub fn language_data(language: &str) -> Option<&'static str> {
     Some(match language {
+        "ar" => include_str!("../data/ar.json"),
         "de" => include_str!("../data/de.json"),
         "es" => include_str!("../data/es.json"),
+        "fa" => include_str!("../data/fa.json"),
         "fr" => include_str!("../data/fr.json"),
+        "he" => include_str!("../data/he.json"),
         "hi" => include_str!("../data/hi.json"),
         "id" => include_str!("../data/id.json"),
         "it" => include_str!("../data/it.json"),

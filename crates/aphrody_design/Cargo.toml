@@ -15,6 +15,7 @@ doctest = false
 
 [dependencies]
 anyhow.workspace = true
+brand.workspace = true
 html5ever.workspace = true
 image.workspace = true
 log.workspace = true

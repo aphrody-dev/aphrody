@@ -9,9 +9,9 @@ import {
 } from "./prod-standards-starterpack.ts";
 
 describe("prod-standards-starterpack", () => {
-  test("builds fork submodule parity matrix including aphrody-core and 16 vendor stacks", () => {
+  test("builds fork submodule parity matrix including aphrody-core and 10 kept vendor stacks", () => {
     const matrix = buildParityMatrix();
-    expect(matrix.length).toBe(17);
+    expect(matrix.length).toBe(11);
     const core = matrix.find((r) => r.id === "aphrody-core");
     expect(core).toBeDefined();
     expect(core?.shadcnBaseUiStarter).toBe(true);

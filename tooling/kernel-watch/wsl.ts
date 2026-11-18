@@ -1,4 +1,4 @@
-// Records of the WSL2 kernel build and of the merge experiment, the generated docs/watch/wsl.md page, and the rows they add to the versions table.
+// Records of the WSL2 kernel build and of the merge experiment, the generated aphrody/docs/watch/wsl.md page, and the rows they add to the versions table.
 export interface WslBuildRecord {
   /** Record id, also the data/wsl file stem. */
   id: string;

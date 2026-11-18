@@ -245,14 +245,6 @@ impl CodeText {
     }
 }
 
-#[cfg(not(feature = "gpui-fast"))]
-impl gpui::IntoElement for CodeText {
-    type Element = Self;
-    fn into_element(self) -> Self {
-        self
-    }
-}
-
 impl Element for CodeText {
     type RequestLayoutState = ();
     type PrepaintState = ();
@@ -439,13 +431,6 @@ impl SelectionLayer {
     }
 }
 
-#[cfg(not(feature = "gpui-fast"))]
-impl gpui::IntoElement for SelectionLayer {
-    type Element = Self;
-    fn into_element(self) -> Self {
-        self
-    }
-}
 impl Element for SelectionLayer {
     type RequestLayoutState = ();
     type PrepaintState = Hitbox;

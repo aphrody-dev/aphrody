@@ -75,7 +75,7 @@ version = "1.0.228"
 
     const liveReport = analyzeProfiles(cargoToml, cargoConfig, lockStats, bundleConfig);
     expect(liveReport.workspaceMembers).toBeGreaterThanOrEqual(300);
-    expect(liveReport.excludedCount).toBeGreaterThanOrEqual(20);
+    expect(liveReport.excludedCount).toBeGreaterThanOrEqual(10);
     expect(liveReport.defaultMembers).toBeGreaterThanOrEqual(7);
     expect(liveReport.profiles.dev?.debug).toBe("line-tables-only");
 

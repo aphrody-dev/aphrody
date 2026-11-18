@@ -21,7 +21,57 @@ import { basename, dirname, join, relative, resolve, sep } from "node:path";
 export const repoRoot = resolve(import.meta.dir, "../..");
 export const UPSTREAM_LOCK_REL = "assets/os/upstream_sync_lock.toml";
 
-export const EXCISED_UPSTREAM_PREFIXES = ["crates/collab/"] as const;
+export const EXCISED_UPSTREAM_PREFIXES = [
+  "crates/collab/",
+  ".github/workflows/after_release.yml",
+  ".github/workflows/release_nightly.yml",
+  ".github/workflows/release.yml",
+  ".github/workflows/run_tests.yml",
+  ".github/workflows/run_bundling.yml",
+  ".github/workflows/deploy_",
+  ".github/workflows/bump_",
+  ".github/workflows/extension_",
+  ".github/workflows/guild_",
+  ".github/workflows/community_",
+  ".github/workflows/slack_",
+] as const;
+
+export function extractIsolatedFencedBlocks(content: string): Array<{ tag: string; block: string }> {
+  const blocks: Array<{ tag: string; block: string }> = [];
+  const re = /(# === APHRODY[_ ]ISOLATED[_ ]([A-Z0-9_]+) START ===[\s\S]*?# === APHRODY[_ ]ISOLATED[_ ]\2 END ===)/g;
+  let match: RegExpExecArray | null = re.exec(content);
+  while (match !== null) {
+    blocks.push({ tag: match[2], block: match[1] });
+    match = re.exec(content);
+  }
+  return blocks;
+}
+
+export function applyIsolatedFencedBlocks(theirsContent: string, oursContent: string): string {
+  const blocks = extractIsolatedFencedBlocks(oursContent);
+  if (blocks.length === 0) return oursContent;
+  let out = theirsContent;
+  for (const { tag, block } of blocks) {
+    const markerPattern = `# === APHRODY[_ ]ISOLATED[_ ]${tag} START ===[\\s\\S]*?# === APHRODY[_ ]ISOLATED[_ ]${tag} END ===`;
+    const existingRe = new RegExp(markerPattern, "g");
+    if (existingRe.test(out)) {
+      out = out.replace(existingRe, block);
+    } else if (tag === "WORKSPACE_MEMBERS" && /members\s*=\s*\[[\s\S]*?^\]/m.test(out)) {
+      out = out.replace(/(members\s*=\s*\[[\s\S]*?)(^\]\r?\n)/m, `$1\n    ${block.replace(/\r?\n/g, "\n    ")}\n$2`);
+    } else if (tag === "WORKSPACE_CONFIG" && /^default-members\s*=[\s\S]*?^\[workspace\.package\][\s\S]*?(?=\n\[workspace\.dependencies\])/m.test(out)) {
+      out = out.replace(/^default-members\s*=[\s\S]*?^\[workspace\.package\][\s\S]*?(?=\n\[workspace\.dependencies\])/m, block);
+    } else if (tag === "WORKSPACE_DEPENDENCIES" && /^\[patch\.crates-io\]/m.test(out)) {
+      out = out.replace(/^(\[workspace\.dependencies\.[^\n]+\]|^\[patch\.crates-io\])/m, `${block}\n\n$1`);
+    } else if ((tag === "PATCHES" || tag === "PATCH_CRATES_IO") && /^\[profile\.dev\]/m.test(out)) {
+      out = out.replace(/^(\[profile\.dev\])/m, `${block}\n\n$1`);
+    } else if (tag === "PROFILES" && /^\[workspace\.lints\.rust\]/m.test(out)) {
+      out = out.replace(/^(\[workspace\.lints\.rust\])/m, `${block}\n\n$1`);
+    } else if (!out.includes(block)) {
+      out = `${out.trimEnd()}\n\n${block}\n`;
+    }
+  }
+  return out;
+}
 
 export type SyncTarget = "all" | "zed" | "nsh" | "gpui-kit" | "bun" | "agent-browser" | "agent-desktop";
 
@@ -240,6 +290,39 @@ export function resolveActiveZedMergeConflicts(root = repoRoot): ConflictResolut
       runGit(root, ["add", "--", p]);
       resolvedFiles.push(p);
       continue;
+    }
+
+    if (p === ".gitignore" || p === ".gitattributes") {
+      const ours = runGit(root, ["show", `:2:${p}`]).stdout;
+      const theirs = runGit(root, ["show", `:3:${p}`]).stdout;
+      if (ours && theirs) {
+        let merged = applyIsolatedFencedBlocks(theirs, ours);
+        if (p === ".gitignore") {
+          merged = merged.replace(/^\.agents$/m, ".agents/*\n!.agents/plugins.json\n!.agents/plugins/\n!.agents/skills/");
+        }
+        writeFileSync(join(root, p), merged, "utf8");
+        runGit(root, ["add", "--", p]);
+        resolvedFiles.push(p);
+        continue;
+      }
+    }
+
+    if (p === "Cargo.toml") {
+      const ours = runGit(root, ["show", `:2:${p}`]).stdout;
+      const theirs = runGit(root, ["show", `:3:${p}`]).stdout;
+      if (ours && theirs) {
+        const blocks = extractIsolatedFencedBlocks(ours);
+        if (blocks.length > 0) {
+          let merged = applyIsolatedFencedBlocks(theirs, ours);
+          // Re-apply upstream collab exclusion cleanly if present
+          merged = merged.replace(/^\s*"crates\/collab",\r?\n/m, "");
+          merged = merged.replace(/^collab = \{ path = "crates\/collab" \}\r?\n/m, "");
+          writeFileSync(join(root, p), merged, "utf8");
+          runGit(root, ["add", "--", p]);
+          resolvedFiles.push(p);
+          continue;
+        }
+      }
     }
 
     if (p === "Cargo.lock") {
@@ -794,10 +877,8 @@ if (import.meta.main) {
     }
 
     if (target === "all" || target === "bun") {
-      if (!dryRun) {
-        runGit(repoRoot, ["submodule", "update", "--remote", "--merge", "vendor/bun"]);
-      }
-      summary.bun = { synced: !dryRun };
+      const bunSha = runGit(repoRoot, ["ls-remote", "https://github.com/aphrody-labs/bun.git", "HEAD"]).stdout.split(/\s+/)[0] ?? "";
+      summary.bun = { repo: "aphrody-labs/bun", sha: bunSha.slice(0, 12), dryRun };
     }
 
     if (target === "all" || target === "agent-browser") {

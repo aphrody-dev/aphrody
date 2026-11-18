@@ -36,7 +36,7 @@ const summary = [
   "Rules: never create mod.rs files, never use .unwrap() on fallible calls, preserve README.md lines 1-2, keep docs/scripts repo-native.",
   "Host & MCP: os-craft MCP (aphrody-os mcp) exposes Craft/Compositor/AI Pilot tools; CI/host tuning lives in tooling/bun/ci-host-optimize.ts.",
   hasPluginDocs
-    ? `Docs index: ${docsIndexRel}; Architecture: docs/architecture/README.md; Hygiene: bun tooling/bun/repo-hygiene.ts.`
+    ? `Docs index: ${docsIndexRel}; Architecture: aphrody/docs/architecture/README.md; Hygiene: bun tooling/bun/repo-hygiene.ts.`
     : "",
 ]
   .filter(Boolean)

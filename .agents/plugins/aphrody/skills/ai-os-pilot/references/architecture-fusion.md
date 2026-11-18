@@ -5,7 +5,7 @@
 | Source Path | Blob Count / Size | Reason Purged | Aphrody Replacement |
 |---|---|---|---|
 | `assets/` | 7 files (~37.2 MB) | Heavy marketing MP4/GIF/PNG assets | Live GPUI `visual_smoke` PNGs + `screenshot` |
-| `apps/docs/` | 102 files (~1.16 MB) | Vercel Next.js Geist docs website | `docs/architecture/*.md` + GitIngest/skills |
+| `apps/docs/` | 102 files (~1.16 MB) | Vercel Next.js Geist docs website | `aphrody/docs/architecture/*.md` + GitIngest/skills |
 | `probes/` | 345 files (~5.52 MB) | Historical exploratory PowerShell/Python scripts | Distilled into `backend_*.rs` + `platforms-matrix.md` |
 | `crates/ffi/` + `tests/ffi-python/` | 201 files (~648 KB) | External C ABI (`cdylib`, `cbindgen`, Python `ctypes`) | Pure Rust `aphrody_pilot` + MCP JSON-RPC + Bun TS |
 | `tests/fixture-app*`, `tests/native/`, `tests/real-apps/`, `tests/linux-dist/` | ~65 files (~315 KB) | Multi-language C#/Swift/ObjC/C test rigs | Headless GPUI `AccessKit` tests + `cargo test -p aphrody_pilot` |

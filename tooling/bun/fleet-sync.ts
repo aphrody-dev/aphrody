@@ -266,9 +266,6 @@ async function syncOneHostAsync(
       ...payload.specs.map((s) => `git update-index --add --cacheinfo 160000,${s.sha},${s.path}`),
       // Keep .gitmodules clean when checking submodules recursively
       "git submodule sync --recursive >/dev/null 2>&1 || true",
-      'if [ -f vendor/libcosmic/.gitmodules ] && [ ! -e vendor/libcosmic/iced/Cargo.toml ]; then',
-      '  git -C vendor/libcosmic submodule update --init --depth 1 iced >/dev/null 2>&1 || true',
-      "fi",
     ].join("\n") + "\n";
 
   const syncRes = await runSshAsync(host, "bash -s", remoteSubSync);

@@ -301,25 +301,28 @@ function publishInstallScripts(dryRun: boolean): { uploaded: string[]; dryRun: b
   return { uploaded, dryRun };
 }
 
-function deployWorkers(dryRun: boolean, _allWorkers: boolean): Array<{ worker: string; exitCode: number }> {
+function deployWorkers(dryRun: boolean, allWorkers: boolean): Array<{ worker: string; env: string; exitCode: number }> {
   const wrangler = resolveWranglerCmd();
   const dirs = [".cloudflare/aphrody-worker"];
-  const results: Array<{ worker: string; exitCode: number }> = [];
+  const envs = allWorkers ? ["", "learn"] : [""];
+  const results: Array<{ worker: string; env: string; exitCode: number }> = [];
   for (const rel of dirs) {
-    const args = dryRun
-      ? [
-          ...wrangler,
-          "deploy",
-          "--env=",
-          "--dry-run",
-          "--outdir",
-          join(repoRoot, "target", "wrangler-dry", rel.replace(/[/.]/g, "_")),
-        ]
-      : [...wrangler, "deploy", "--env="];
-    const res = Bun.spawnSync(args, { cwd: join(repoRoot, rel), stdout: "inherit", stderr: "inherit" });
-    results.push({ worker: rel, exitCode: res.exitCode });
-    if (res.exitCode !== 0) {
-      throw new Error(`Worker deploy failed in ${rel} (${res.exitCode})`);
+    for (const envName of envs) {
+      const args = dryRun
+        ? [
+            ...wrangler,
+            "deploy",
+            ...(envName ? ["--env", envName] : ["--env="]),
+            "--dry-run",
+            "--outdir",
+            join(repoRoot, "target", "wrangler-dry", `${rel.replace(/[/.]/g, "_")}_${envName || "default"}`),
+          ]
+        : [...wrangler, "deploy", ...(envName ? ["--env", envName] : ["--env="])];
+      const res = Bun.spawnSync(args, { cwd: join(repoRoot, rel), stdout: "inherit", stderr: "inherit" });
+      results.push({ worker: rel, env: envName || "default", exitCode: res.exitCode });
+      if (res.exitCode !== 0) {
+        throw new Error(`Worker deploy failed in ${rel} (env=${envName || "default"}, exit=${res.exitCode})`);
+      }
     }
   }
   return results;

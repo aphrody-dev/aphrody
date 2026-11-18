@@ -28,8 +28,8 @@ export const SITEMAP_XML_REL = "target/emscripten-crawl/sitemap.xml";
 export const GITINGEST_DIR_REL = "target/gitingest/emscripten-core";
 export const ORG_MANIFEST_REL = "target/gitingest/emscripten-core/org-manifest.json";
 
-export const LLMS_TXT_REL = "docs/architecture/emscripten-llms.txt";
-export const ARCH_DOC_REL = "docs/architecture/emscripten-ecosystem.md";
+export const LLMS_TXT_REL = "aphrody/docs/architecture/emscripten-llms.txt";
+export const ARCH_DOC_REL = "aphrody/docs/architecture/emscripten-ecosystem.md";
 export const SKILL_DIR_REL = ".agents/plugins/aphrody/skills/emscripten";
 export const SKILL_MD_REL = ".agents/plugins/aphrody/skills/emscripten/SKILL.md";
 export const REF_REPOS_REL = ".agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md";
@@ -1540,11 +1540,11 @@ ${renderRepoMatrixRows(manifest)}
 
 ## 3. \`wasm32-unknown-emscripten\` vs \`wasm32-unknown-unknown\` vs \`wasm32-wasip2\` in Aphrody
 
-Aphrody targets three complementary WebAssembly ABIs documented across [\`rust-toolchain.toml\`](../../rust-toolchain.toml), [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts), and [\`docs/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md):
+Aphrody targets three complementary WebAssembly ABIs documented across [\`rust-toolchain.toml\`](../../../rust-toolchain.toml), [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts), and [\`aphrody/docs/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md):
 
 | Dimension | \`wasm32-unknown-unknown\` (Aphrody Browser UI) | \`wasm32-wasip2\` (Aphrody Extensions) | \`wasm32-unknown-emscripten\` (C/C++ POSIX & Emscripten) |
 | :--- | :--- | :--- | :--- |
-| **Primary Aphrody Crates** | [\`gpui_web\`](../../crates/gpui_web/Cargo.toml), \`aphrody_desktop\`, \`nsh-platform-web\`, \`gpui_wgpu\` | [\`extension_host\`](../../crates/extension_host/Cargo.toml) (Wasmtime \`48.0.7\`), \`extension_api\` (WIT) | [\`nsh-core\`](../../crates/nsh-core/Cargo.toml#L99-L100) (\`target_os = "emscripten"\`), [\`wgpu-core-deps-emscripten\`](../../vendor/wgpu/wgpu-core/platform-deps/emscripten/Cargo.toml) |
+| **Primary Aphrody Crates** | [\`gpui_web\`](../../../crates/gpui_web/Cargo.toml), \`aphrody_desktop\`, \`nsh-platform-web\`, \`gpui_wgpu\` | [\`extension_host\`](../../../crates/extension_host/Cargo.toml) (Wasmtime \`48.0.7\`), \`extension_api\` (WIT) | [\`nsh-core\`](../../../crates/nsh-core/Cargo.toml#L99-L100) (\`target_os = "emscripten"\`), [\`wgpu-core-deps-emscripten\`](../../../vendor/wgpu/wgpu-core/platform-deps/emscripten/Cargo.toml) |
 | **Standard C Library (\`libc\`)** | None (pure Rust \`std\` stub + JS bindings) | WASI Preview 2 component model + \`wasi-libc\` | Full POSIX/musl \`libc\` (\`emscripten-core/musl\`), \`cfg(unix)\`, signals, pthreads, virtual FS |
 | **JS / Host Bindings** | \`wasm-bindgen 0.2.129\` + \`web-sys\` / \`js-sys\` | Canonical ABI / \`wit-bindgen\` host imports | Embind (\`bind.h\` link-time invokers in 7.0.1), \`EM_JS\`, \`EM_ASM\`, \`ccall\`/\`cwrap\`, \`WebIDL Binder\` |
 | **WebGPU API Bridge** | Browser \`navigator.gpu\` via \`wgpu\` -> \`web-sys\` | Host-mediated WIT GPU/UI capability | **Emdawnwebgpu** (\`--use-port=emdawnwebgpu\`, \`<webgpu/webgpu.h>\`, replacing removed \`-sUSE_WEBGPU\`) |
@@ -1552,7 +1552,7 @@ Aphrody targets three complementary WebAssembly ABIs documented across [\`rust-t
 | **Threads & Shared Memory** | Opt-in \`wasm_thread\` (\`target-feature=+atomics\`, COOP/COEP) | Host thread pool outside guest sandbox | \`-pthread -sPTHREAD_POOL_SIZE=...\` (COOP/COEP \`SharedArrayBuffer\`) or \`-sWASM_WORKERS\` |
 | **Linker & Optimizer** | \`rust-lld\` + \`wasm-bindgen\` + Binaryen \`wasm-opt -Oz\` | \`wasm-tools component\` + Wasmtime Cranelift | \`emcc\` -> \`wasm-ld\` (LLVM \`24\`) + Binaryen \`wasm-opt\` + Closure (\`--closure=1\`) |
 
-> **When to choose Emscripten in Aphrody**: Reach for Emscripten only when integrating C/C++ libraries that require POSIX \`libc\`, C++ exceptions/RTTI, \`pthreads\`, virtual POSIX filesystems (\`MEMFS\`/\`IDBFS\`), or native C/C++ \`webgpu.h\` libraries (via Emdawnwebgpu). Keep pure-Rust Aphrody UI/apps (\`aphrody_desktop\`, \`gpui_web\`, \`nsh-platform-web\`) on \`wasm32-unknown-unknown\` via [\`tooling/bun/web-build.ts\`](../../tooling/bun/web-build.ts) and sandboxed IDE plugins on \`wasm32-wasip2\`.
+> **When to choose Emscripten in Aphrody**: Reach for Emscripten only when integrating C/C++ libraries that require POSIX \`libc\`, C++ exceptions/RTTI, \`pthreads\`, virtual POSIX filesystems (\`MEMFS\`/\`IDBFS\`), or native C/C++ \`webgpu.h\` libraries (via Emdawnwebgpu). Keep pure-Rust Aphrody UI/apps (\`aphrody_desktop\`, \`gpui_web\`, \`nsh-platform-web\`) on \`wasm32-unknown-unknown\` via [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts) and sandboxed IDE plugins on \`wasm32-wasip2\`.
 
 ---
 
@@ -1597,13 +1597,13 @@ xh --ignore-stdin --check-status --headers --follow GET https://emscripten.org/
 
 ### Progressive-Disclosure Skill & Companion Artifacts
 
-- **\`llms.txt\` Index**: [\`docs/architecture/emscripten-llms.txt\`](./emscripten-llms.txt)
-- **Agent Skill Entrypoint**: [\`.agents/plugins/aphrody/skills/emscripten/SKILL.md\`](../../.agents/plugins/aphrody/skills/emscripten/SKILL.md)
-- **Skill Reference — Repos & \`emsdk\`**: [\`references/repos-and-emsdk.md\`](../../.agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md)
-- **Skill Reference — Sitemap & APIs**: [\`references/sitemap-and-api-reference.md\`](../../.agents/plugins/aphrody/skills/emscripten/references/sitemap-and-api-reference.md)
-- **Skill Reference — \`emcc\` & Wasm Best Practices**: [\`references/emcc-wasm-best-practices.md\`](../../.agents/plugins/aphrody/skills/emscripten/references/emcc-wasm-best-practices.md)
-- **Skill Reference — C/C++ & WebGPU Interop**: [\`references/c-cpp-webgpu-interop.md\`](../../.agents/plugins/aphrody/skills/emscripten/references/c-cpp-webgpu-interop.md)
-- **Cross-Compilation Context**: [\`docs/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md) & [\`docs/architecture/production-guide.md\`](./production-guide.md)
+- **\`llms.txt\` Index**: [\`aphrody/docs/architecture/emscripten-llms.txt\`](./emscripten-llms.txt)
+- **Agent Skill Entrypoint**: [\`.agents/plugins/aphrody/skills/emscripten/SKILL.md\`](../../../.agents/plugins/aphrody/skills/emscripten/SKILL.md)
+- **Skill Reference — Repos & \`emsdk\`**: [\`references/repos-and-emsdk.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md)
+- **Skill Reference — Sitemap & APIs**: [\`references/sitemap-and-api-reference.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/sitemap-and-api-reference.md)
+- **Skill Reference — \`emcc\` & Wasm Best Practices**: [\`references/emcc-wasm-best-practices.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/emcc-wasm-best-practices.md)
+- **Skill Reference — C/C++ & WebGPU Interop**: [\`references/c-cpp-webgpu-interop.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/c-cpp-webgpu-interop.md)
+- **Cross-Compilation Context**: [\`aphrody/docs/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md) & [\`aphrody/docs/architecture/production-guide.md\`](./production-guide.md)
 `;
 }
 
@@ -1693,8 +1693,8 @@ bun test tooling/bun/emscripten-crawl.test.ts
 bun tooling/bun/repo-hygiene.ts
 \`\`\`
 
-- Architecture overview: [\`docs/architecture/emscripten-ecosystem.md\`](../../../../../docs/architecture/emscripten-ecosystem.md)
-- LLM compact index: [\`docs/architecture/emscripten-llms.txt\`](../../../../../docs/architecture/emscripten-llms.txt)
+- Architecture overview: [\`aphrody/docs/architecture/emscripten-ecosystem.md\`](../../../../../aphrody/docs/architecture/emscripten-ecosystem.md)
+- LLM compact index: [\`aphrody/docs/architecture/emscripten-llms.txt\`](../../../../../aphrody/docs/architecture/emscripten-llms.txt)
 `;
 }
 

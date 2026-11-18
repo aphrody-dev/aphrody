@@ -116,7 +116,7 @@ impl FrameworkLayer {
             Self::Cosmic => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: Some("vendor/libcosmic"),
+                vendor_submodule: None,
                 supports_wasm32_unknown: false,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -127,7 +127,7 @@ impl FrameworkLayer {
             Self::Iced => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: Some("vendor/iced"),
+                vendor_submodule: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -171,7 +171,7 @@ impl FrameworkLayer {
             Self::Blitz => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: Some("vendor/blitz"),
+                vendor_submodule: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -182,7 +182,7 @@ impl FrameworkLayer {
             Self::Winit => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/gpui_platform",
-                vendor_submodule: Some("vendor/winit"),
+                vendor_submodule: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -193,7 +193,7 @@ impl FrameworkLayer {
             Self::TauriBun => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_nsh",
-                vendor_submodule: Some("vendor/tauri"),
+                vendor_submodule: Some("vendor/tauri/wry"),
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: true,
                 supports_webgpu: true,

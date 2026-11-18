@@ -14,8 +14,7 @@ use crate::cosmic_theme::{AppearanceMode, contrast_ratio};
 pub const DESIGN_SOURCE_OF_TRUTH: &str = brand::DESIGN_SOURCE_OF_TRUTH;
 
 /// Embedded 3-tier Material 3 Expressive + Google Sans Flex token manifest (`assets/os/google_design_tokens.toml`).
-pub const BUNDLED_GOOGLE_DESIGN_TOKENS_TOML: &str =
-    include_str!("../../../assets/os/google_design_tokens.toml");
+pub use brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -30,16 +29,12 @@ pub enum WindowSizeClass {
 impl WindowSizeClass {
     #[must_use]
     pub fn from_width_px(width_px: f32) -> Self {
-        if width_px < 600.0 {
-            Self::Compact
-        } else if width_px < 840.0 {
-            Self::Medium
-        } else if width_px < 1200.0 {
-            Self::Expanded
-        } else if width_px < 1600.0 {
-            Self::Large
-        } else {
-            Self::ExtraLarge
+        match brand::design::classify_window_width(width_px) {
+            brand::design::WindowSizeTier::Compact => Self::Compact,
+            brand::design::WindowSizeTier::Medium => Self::Medium,
+            brand::design::WindowSizeTier::Expanded => Self::Expanded,
+            brand::design::WindowSizeTier::Large => Self::Large,
+            brand::design::WindowSizeTier::ExtraLarge => Self::ExtraLarge,
         }
     }
 }
@@ -55,33 +50,7 @@ impl SpringSpec {
     /// damped harmonic oscillator anchored to Material 3 Expressive motion physics.
     #[must_use]
     pub fn sample_position(&self, t_secs: f32) -> f32 {
-        if t_secs <= 0.0 || self.stiffness <= 0.0 {
-            return 0.0;
-        }
-        let omega0 = self.stiffness.sqrt();
-        let zeta = self.damping_ratio.max(0.05);
-        if (zeta - 1.0).abs() < 1e-4 {
-            // Critically damped (effects springs: zero bounce overshoot)
-            let decay = (-omega0 * t_secs).exp();
-            1.0 - decay * (1.0 + omega0 * t_secs)
-        } else if zeta < 1.0 {
-            // Underdamped (spatial springs: subtle organic settle)
-            let omega_d = omega0 * (1.0 - zeta * zeta).sqrt();
-            let decay = (-zeta * omega0 * t_secs).exp();
-            let ratio = zeta / (1.0 - zeta * zeta).sqrt();
-            1.0 - decay * ((omega_d * t_secs).cos() + ratio * (omega_d * t_secs).sin())
-        } else {
-            // Overdamped
-            let s = (zeta * zeta - 1.0).sqrt();
-            let r1 = -omega0 * (zeta - s);
-            let r2 = -omega0 * (zeta + s);
-            let denom = r1 - r2;
-            if denom.abs() < 1e-6 {
-                1.0
-            } else {
-                1.0 - (r2 * (r1 * t_secs).exp() - r1 * (r2 * t_secs).exp()) / -denom
-            }
-        }
+        brand::design::sample_spring_position(self.stiffness, self.damping_ratio, t_secs)
     }
 }
 

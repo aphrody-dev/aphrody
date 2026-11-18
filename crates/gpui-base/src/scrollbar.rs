@@ -1164,15 +1164,6 @@ impl Scrollbar {
     }
 }
 
-#[cfg(not(feature = "gpui-fast"))]
-impl gpui::IntoElement for Scrollbar {
-    type Element = Self;
-
-    fn into_element(self) -> Self::Element {
-        self
-    }
-}
-
 #[doc(hidden)]
 pub struct PrepaintState {
     hitbox: Hitbox,
@@ -2786,13 +2777,6 @@ mod tests {
         struct Probe {
             scrollbar: Scrollbar,
             painted: Rc<Cell<Bounds<Pixels>>>,
-        }
-        #[cfg(not(feature = "gpui-fast"))]
-        impl gpui::IntoElement for Probe {
-            type Element = Self;
-            fn into_element(self) -> Self {
-                self
-            }
         }
         impl Element for Probe {
             type RequestLayoutState = ();

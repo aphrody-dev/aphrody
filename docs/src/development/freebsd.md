@@ -1,15 +1,15 @@
 ---
-title: Building Aphrody for FreeBSD
-description: "Guide to building Aphrody for FreeBSD from source."
+title: Building Zed for FreeBSD
+description: "Guide to building zed for freebsd for Zed development."
 ---
 
-# Building Aphrody for FreeBSD
+# Building Zed for FreeBSD
 
-FreeBSD is not currently a supported platform, so this guide is experimental.
+FreeBSD is not currently a supported platform, so this guide is a work in progress.
 
 ## Repository
 
-Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with submodules (or sync via `bun run submodules:sync`).
+Clone the [Zed repository](https://github.com/zed-industries/zed).
 
 ## Dependencies
 
@@ -19,16 +19,16 @@ Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with subm
   script/freebsd
   ```
 
-  If preferred, you can inspect [`script/freebsd`](https://github.com/aphrody-dev/aphrody/blob/main/script/freebsd) and perform the steps manually.
+  If preferred, you can inspect [`script/freebsd`](https://github.com/zed-industries/zed/blob/main/script/freebsd) and perform the steps manually.
 
 ## Building from source
 
-Once the dependencies are installed, you can build Aphrody using [Cargo](https://doc.rust-lang.org/cargo/).
+Once the dependencies are installed, you can build Zed using [Cargo](https://doc.rust-lang.org/cargo/).
 
-For a debug build of the editor (or `--no-default-features` to omit WebRTC/collab):
+For a debug build of the editor:
 
 ```sh
-cargo run -p zed --no-default-features
+cargo run
 ```
 
 And to run the tests:
@@ -37,7 +37,7 @@ And to run the tests:
 cargo test --workspace
 ```
 
-In release mode, the primary CLI interface is the `cli` crate. You can run it in development with:
+In release mode, the primary user interface is the `cli` crate. You can run it in development with:
 
 ```sh
 cargo run -p cli
@@ -45,7 +45,9 @@ cargo run -p cli
 
 ### WebRTC Notice
 
-Building `webrtc-sys` on FreeBSD currently fails due to missing upstream support and unavailable prebuilt binaries. Collaboration features that depend on WebRTC (audio calls and screen sharing) are disabled unless building without the `collab` feature (`cargo run -p zed --no-default-features`).
+Building `webrtc-sys` on FreeBSD currently fails due to missing upstream support and unavailable prebuilt binaries. As a result, collaboration features that depend on WebRTC (audio calls and screen sharing) are temporarily disabled.
+
+See [Issue #15309: FreeBSD Support] and [Discussion #29550: Unofficial FreeBSD port for Zed] for more.
 
 ## Troubleshooting
 

@@ -191,7 +191,7 @@ const DEFAULT_PURGE_CATEGORIES: Omit<PurgeCategory, "count" | "bytes">[] = [
     category: "nextjs-docs-site",
     upstreamPatterns: [/^apps\/docs\//],
     purgedReason: "Standalone Vercel/Next.js Geist web template",
-    aphrodyReplacement: "docs/architecture/agent-desktop-ai-os.md",
+    aphrodyReplacement: "aphrody/docs/architecture/agent-desktop-ai-os.md",
   },
   {
     category: "exploratory-probes",
@@ -268,7 +268,7 @@ export function scanMigratedTree(root: string): AgentDesktopAuditReport["migrate
     "crates/aphrody_desktop/src/pilot_hud.rs",
     "crates/aphrody_desktop/src/main.rs",
     ".agents/plugins/aphrody/skills/ai-os-pilot/SKILL.md",
-    "docs/architecture/agent-desktop-ai-os.md",
+    "aphrody/docs/architecture/agent-desktop-ai-os.md",
   ];
   return targets.map((rel) => {
     const abs = join(root, rel);

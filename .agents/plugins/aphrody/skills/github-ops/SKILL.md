@@ -33,7 +33,7 @@ Verify live settings on `aphrody-dev/aphrody` with `gh api repos/aphrody-dev/aph
 4. **`aphrody-release.yml`**: Multi-platform release builds (`cargo-zigbuild` Linux `x86_64`/`aarch64`, Windows `x64`, macOS `arm64`) across `lts`/`stable`/`preview`/`canary`/`nightly`, Sigstore build provenance attestations, GitHub Releases, R2 `aphrody-releases` uploads, and `.cloudflare/aphrody-worker` deployment.
 5. **`aphrody-auto-merge.yml`**: Approves and enables squash auto-merge for `auto-merge`, `upstream-sync`, `issue-fix`, `dependencies`, Renovate, and Dependabot PRs once `aphrody CI` succeeds.
 6. **`aphrody-issue-fix.yml`**: Domain-labels issues/PRs (`gpu/vulkan`, `gpu/directx`, `gpu/webgpu`, `wgpu`, `nsh`, `gpui-kit`, `zed`, `issue-fix`), handles `/autofix` (`cargo fmt --all` + `cargo xtask brand apply`), and runs `zed-wasm-wgpu-issues.ts audit`.
-7. **`aphrody-wiki-sync.yml`**: Mirrors `README.md`, `docs/wgpu/`, `docs/gpu/`, `docs/nsh/`, and `.agents/plugins/aphrody/` docs/skills to `aphrody-dev/aphrody.wiki.git`.
+7. **`aphrody-wiki-sync.yml`**: Mirrors `README.md`, `aphrody/docs/wgpu/`, `aphrody/docs/gpu/`, `aphrody/docs/nsh/`, and `.agents/plugins/aphrody/` docs/skills to `aphrody-dev/aphrody.wiki.git`.
 8. **`aphrody-janitor.yml`** & **`aphrody-kernel-watch.yml`**: Weekly stale triage and merged `sync|bot|wt|autofix/*` branch pruning; 5-minute `tooling/kernel-watch` polling.
 
 ## Manual Operations Cheat Sheet

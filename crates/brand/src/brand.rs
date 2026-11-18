@@ -8,6 +8,8 @@
 use std::env;
 use std::ffi::OsString;
 
+pub mod design;
+
 include!(concat!(env!("OUT_DIR"), "/product_constants.rs"));
 
 /// Format `{ENV_PREFIX}_{suffix}` for diagnostics and user-facing override hints.

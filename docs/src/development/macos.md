@@ -1,13 +1,13 @@
 ---
-title: Building Aphrody for macOS
-description: "Guide to building Aphrody for macOS from source."
+title: Building Zed for macOS
+description: "Guide to building zed for macos for Zed development."
 ---
 
-# Building Aphrody for macOS
+# Building Zed for macOS
 
 ## Repository
 
-Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with submodules (or run `bun run submodules:sync`).
+Clone the [Zed repository](https://github.com/zed-industries/zed).
 
 ## Dependencies
 
@@ -39,20 +39,20 @@ Clone the [Aphrody repository](https://github.com/aphrody-dev/aphrody) with subm
 Release bundling with `script/bundle-mac` requires the macOS 26 SDK or newer, provided by Xcode 26 or newer.
 The bundled app requires macOS 12.0 (Monterey) or later.
 
-## Building Aphrody from Source
+## Building Zed from Source
 
-Once you have the dependencies installed, you can build Aphrody using [Cargo](https://doc.rust-lang.org/cargo/).
+Once you have the dependencies installed, you can build Zed using [Cargo](https://doc.rust-lang.org/cargo/).
 
 For a debug build:
 
 ```sh
-cargo run -p zed
+cargo run
 ```
 
 For a release build:
 
 ```sh
-cargo run -p zed --release
+cargo run --release
 ```
 
 And to run the tests:

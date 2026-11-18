@@ -1,21 +1,16 @@
 ---
 name: bun-gpui
-description: Bun integration in aphrody via the `vendor/bun` submodule (aphrody-labs/bun). Use whenever working on TypeScript/TSX Native Shell (NSH) surfaces, typechecking (`bun check` / `nsh check`), formatting (`bun fmt` / `nsh fmt`), linting (`bun lint` / `nsh lint`), bundling (`Bun.build` / `bun build`), or reading upstream Bun documentation offline in `vendor/bun/docs/`.
+description: Bun integration in aphrody via the Aphrody Bun fork (aphrody-labs/bun). Use whenever working on TypeScript/TSX Native Shell (NSH) surfaces, typechecking (`bun check` / `nsh check`), formatting (`bun fmt` / `nsh fmt`), linting (`bun lint` / `nsh lint`), bundling (`Bun.build` / `bun build`), or reading upstream Bun documentation via `bun-brain` MCP / `aphrody-labs/bun`.
 ---
 
-# Bun in `aphrody` (`vendor/bun` + Native Shell)
+# Bun in `aphrody` (`aphrody-labs/bun` + Native Shell)
 
-`aphrody` vendors `https://github.com/aphrody-labs/bun` as a Git submodule at `vendor/bun` (`.gitmodules`), providing offline upstream documentation (`vendor/bun/docs/`) and powering all TypeScript/TSX tooling for Native Shell (`nsh`) with zero npm/Node/Prettier/ESLint/TypeScript tarball dependencies.
+`aphrody` uses the installed Aphrody Bun runtime (`https://github.com/aphrody-labs/bun`, compacted offline in `bun-brain` MCP and `~/.gemini/brain/bun/`) for all TypeScript/TSX tooling across Native Shell (`nsh`) and repository scripts with zero npm/Node/Prettier/ESLint/TypeScript tarball dependencies.
 
 ## 1. Core Rules
 
 1. **Zero npm tool dependencies**: Never use `npx`, `bunx`, `tsc`, `prettier`, `biome`, `eslint`, `oxlint`, `vitest`, `jest`, or `vite`.
-2. **Offline source of truth**: Read `vendor/bun/docs/` directly before assuming any Bun CLI flag or API:
-   - Type checking: `vendor/bun/docs/runtime/check.mdx`
-   - Formatting & Tailwind class sorting: `vendor/bun/docs/format/index.mdx`
-   - Linting (1,000+ built-in rules): `vendor/bun/docs/lint/index.mdx`
-   - Bundler & universal plugins: `vendor/bun/docs/bundler/index.mdx`, `vendor/bun/docs/bundler/plugins.mdx`
-   - Native FFI (`bun:ffi`): `vendor/bun/docs/runtime/ffi.mdx`
+2. **Offline documentation lookup**: Query `bun-brain` MCP (`bun_brain_search`, `bun_types_lookup`, `bun_api_matrix`) or `~/.gemini/brain/bun/` (`docs/runtime/check.mdx`, `docs/format/index.mdx`, `docs/lint/index.mdx`, `docs/bundler/index.mdx`, `docs/runtime/ffi.mdx` in `aphrody-labs/bun`) before guessing any Bun CLI flag or API.
 3. **Root ignore configuration**: `bunfig.toml` at the repository root excludes `vendor/`, `target/`, and `**/.nsh/` from `bun fmt` and `bun lint`.
 4. **Dot-directory test discovery (`bun test`)**: Pass explicit `./`-prefixed paths for test files inside hidden directories (e.g., `bun test tooling/bun ./.cloudflare/aphrody-worker/src/index.test.ts`); bare `.cloudflare/...` arguments are silently skipped by `bun test`.
 
