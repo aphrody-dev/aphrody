@@ -14,6 +14,7 @@ runs:
         done)
         echo "Submodules referenced by path dependencies:"
         echo "$paths"
+        git config --global core.longpaths true
         git config --global submodule.fetchJobs 8
         [ -z "$paths" ] || echo "$paths" | xargs git submodule update --init --depth 1 --jobs 8 --
         for sub in $paths; do

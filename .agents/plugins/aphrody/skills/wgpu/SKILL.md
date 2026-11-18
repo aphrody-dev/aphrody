@@ -76,3 +76,11 @@ cargo run -p aphrody_cli -- compute path/to/compute.wgsl --workgroups 4,1,1 --ou
 # 6. Benchmark adapter init, upload bandwidth, compute dispatch, and offscreen render throughput
 cargo run -p aphrody_cli -- bench --iterations 50 --size 1024
 ```
+
+<!-- === APHRODY_AUTO_SKILLS_SYNC START === -->
+## Upstream Snapshot (auto-generated `2026-11-18` via `bun tooling/bun/skills-sync.ts`)
+
+- **crates.io** `wgpu`: `30.0.2` (updated 2026-11-12)
+- **crates.io** `naga`: `30.0.2` (updated 2026-11-12)
+- **GitHub** `gfx-rs/wgpu`: `v30.0.2` (2026-11-12)
+<!-- === APHRODY_AUTO_SKILLS_SYNC END === -->

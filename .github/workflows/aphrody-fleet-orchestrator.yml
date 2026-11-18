@@ -170,7 +170,7 @@ jobs:
           fi
 
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ "$INPUT_ACTION" = "rebalance" ] && [ "$INPUT_DRY_RUN" != "true" ]; then
-            bun tooling/bun/cloudflare-deploy.ts deploy
+            bun tooling/bun/cloudflare-deploy.ts deploy --all
           else
             bun tooling/bun/cloudflare-deploy.ts audit --dry-run
           fi

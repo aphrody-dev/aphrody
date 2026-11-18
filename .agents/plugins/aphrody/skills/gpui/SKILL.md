@@ -37,3 +37,13 @@ GPUI (`crates/gpui`) is the hybrid immediate/retained-mode GPU UI framework powe
   - `test.md`, `test-reference.md`, `test-examples.md`
 - GPU renderers & shader stack: see `wgpu`, `vulkan`, `directx`, `webgpu`, `nsh`, `gpui-kit`, `gpui-fast`.
 - Full indexed brain: `~/.gemini/brain/gpui/INDEX.md` (`bun ~/.gemini/scripts/learn.ts search "<terms>"`).
+
+<!-- === APHRODY_AUTO_SKILLS_SYNC START === -->
+## Upstream Snapshot (auto-generated `2026-11-18` via `bun tooling/bun/skills-sync.ts`)
+
+- **crates.io** `gpui`: `0.2.2` (updated 2026-10-30)
+- **crates.io** `taffy`: `0.15.1` (updated 2026-10-25)
+- **crates.io** `accesskit`: `0.25.2` (updated 2026-10-25)
+- **GitHub** `zed-industries/zed`: `v1.29.1` (2026-11-18)
+- **GitHub** `aphrody-dev/aphrody`: `24ef4bcc` (2026-11-18)
+<!-- === APHRODY_AUTO_SKILLS_SYNC END === -->

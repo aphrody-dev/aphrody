@@ -57,7 +57,7 @@ export function applyIsolatedFencedBlocks(theirsContent: string, oursContent: st
     if (existingRe.test(out)) {
       out = out.replace(existingRe, block);
     } else if (tag === "WORKSPACE_MEMBERS" && /members\s*=\s*\[[\s\S]*?^\]/m.test(out)) {
-      out = out.replace(/(members\s*=\s*\[[\s\S]*?)(^\]\r?\n)/m, `$1\n    ${block.replace(/\r?\n/g, "\n    ")}\n$2`);
+      out = out.replace(/(members\s*=\s*\[[\s\S]*?)(^\]\r?\n)/m, `$1\n${block}\n$2`);
     } else if (tag === "WORKSPACE_CONFIG" && /^default-members\s*=[\s\S]*?^\[workspace\.package\][\s\S]*?(?=\n\[workspace\.dependencies\])/m.test(out)) {
       out = out.replace(/^default-members\s*=[\s\S]*?^\[workspace\.package\][\s\S]*?(?=\n\[workspace\.dependencies\])/m, block);
     } else if (tag === "WORKSPACE_DEPENDENCIES" && /^\[patch\.crates-io\]/m.test(out)) {
@@ -308,20 +308,36 @@ export function resolveActiveZedMergeConflicts(root = repoRoot): ConflictResolut
     }
 
     if (p === "Cargo.toml") {
+      const base = runGit(root, ["show", `:1:${p}`]).stdout;
       const ours = runGit(root, ["show", `:2:${p}`]).stdout;
       const theirs = runGit(root, ["show", `:3:${p}`]).stdout;
       if (ours && theirs) {
-        const blocks = extractIsolatedFencedBlocks(ours);
-        if (blocks.length > 0) {
-          let merged = applyIsolatedFencedBlocks(theirs, ours);
-          // Re-apply upstream collab exclusion cleanly if present
-          merged = merged.replace(/^\s*"crates\/collab",\r?\n/m, "");
-          merged = merged.replace(/^collab = \{ path = "crates\/collab" \}\r?\n/m, "");
-          writeFileSync(join(root, p), merged, "utf8");
-          runGit(root, ["add", "--", p]);
-          resolvedFiles.push(p);
-          continue;
+        let merged = "";
+        if (base) {
+          const tmpDir = join(root, "target", "upstream-sync-tmp");
+          mkdirSync(tmpDir, { recursive: true });
+          const baseFile = join(tmpDir, "Cargo.toml.base");
+          const oursFile = join(tmpDir, "Cargo.toml.ours");
+          const theirsFile = join(tmpDir, "Cargo.toml.theirs");
+          writeFileSync(baseFile, base, "utf8");
+          writeFileSync(oursFile, ours, "utf8");
+          writeFileSync(theirsFile, theirs, "utf8");
+          const mf = runGit(root, ["merge-file", "-p", oursFile, baseFile, theirsFile]);
+          // Resolve any remaining conflict hunks by keeping Aphrody's ours side
+          merged = mf.stdout.replace(
+            /^<<<<<<<[^\r\n]*\r?\n([\s\S]*?)^=======\r?\n[\s\S]*?^>>>>>>>[^\r\n]*\r?\n/gm,
+            "$1",
+          );
+        } else {
+          merged = applyIsolatedFencedBlocks(theirs, ours);
         }
+        // Re-apply upstream collab exclusion cleanly if present
+        merged = merged.replace(/^\s*"crates\/collab",\r?\n/m, "");
+        merged = merged.replace(/^collab = \{ path = "crates\/collab" \}\r?\n/m, "");
+        writeFileSync(join(root, p), merged, "utf8");
+        runGit(root, ["add", "--", p]);
+        resolvedFiles.push(p);
+        continue;
       }
     }
 
