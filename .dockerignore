@@ -1,0 +1,24 @@
+# Reproducible root BuildKit exclusion list for Aphrody Docker & Bake builds.
+.git
+**/.git
+target
+**/target
+node_modules
+**/node_modules
+.blob_store
+.private
+.secrets
+.env
+.env.*
+!**/.env.example
+**/*.pem
+**/*.p12
+**/*.key
+.claude
+.gemini
+.agents
+.cursor
+tmp
+docs/web-screenshots
+os_screenshots
+agent-desktop-audit

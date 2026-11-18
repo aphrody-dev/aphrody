@@ -3,6 +3,10 @@
     "os-craft": {
       "command": "bun",
       "args": ["${PLUGIN_ROOT}/scripts/os-craft-mcp.ts"]
+    },
+    "docker-brain": {
+      "command": "bun",
+      "args": ["--no-install", "--no-env-file", "${PLUGIN_ROOT}/mcp/docker-mcp.ts"]
     }
   }
 }
