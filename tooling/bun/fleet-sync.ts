@@ -16,6 +16,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { resolveWranglerCmd } from "./cloudflare-deploy.ts";
 import { parseGitmodules } from "./submodules.ts";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
@@ -239,6 +240,7 @@ async function syncOneHostAsync(
       "set -euo pipefail",
       `cd ${remoteRepo}`,
       "git rm -rfq --ignore-unmatch vendor/wgpu || true",
+      "rm -rf vendor/cosmic vendor/tauri/plugins-workspace vendor/tauri/tao",
       "if [ -d vendor/wgpu ] && [ ! -e vendor/wgpu/.git ]; then rm -rf vendor/wgpu; fi",
       "sync_one() {",
       '  local path="$1" sha="$2" url="$3" branch="$4"',
@@ -531,8 +533,9 @@ async function runEndToEndDeploy(
         [`aphrody-releases/channels/${channel}/linux-x86_64.json`, join(distDir, "linux-x86_64.json"), "application/json"],
         [`aphrody-releases/channels/${channel}/latest.json`, join(distDir, "linux-x86_64.json"), "application/json"],
       ];
+      const wrangler = resolveWranglerCmd();
       for (const [key, file, ct] of r2Uploads) {
-        runChecked(["bunx", "wrangler", "r2", "object", "put", key, "--file", file, "--content-type", ct, "--remote"], repoRoot);
+        runChecked([...wrangler, "r2", "object", "put", key, "--file", file, "--content-type", ct, "--remote"], repoRoot);
       }
     }
     return { cloudflareWorker: "aphrody-releases", channel, version, dryRun, ok: true };

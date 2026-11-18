@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
- * Reproducible Cloudflare Workers, R2 release bucket, DNS route, and edge verification CLI.
- * Uses official `bunx wrangler` and `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` environment variables.
+ * Reproducible Cloudflare Workers, R2 release bucket, DNS route, MCP bridge, and edge verification CLI.
+ * Uses installed `wrangler` CLI, `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env vars, and Streamable HTTP MCP.
  *
  * Usage:
  *   bun tooling/bun/cloudflare-deploy.ts audit [--json]
@@ -9,11 +9,26 @@
  *   bun tooling/bun/cloudflare-deploy.ts deploy [--dry-run] [--all] [--json]
  *   bun tooling/bun/cloudflare-deploy.ts publish-scripts [--dry-run]
  *   bun tooling/bun/cloudflare-deploy.ts smoke [--base-url https://releases.aphrody.com] [--json]
+ *   bun tooling/bun/cloudflare-deploy.ts mcp-stdio
  */
 import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
+
+export function resolveWranglerCmd(): string[] {
+  const bunBin = join(homedir(), ".bun", "bin");
+  for (const candidate of [
+    Bun.which("wrangler"),
+    join(bunBin, process.platform === "win32" ? "wrangler.exe" : "wrangler"),
+    Bun.which("cf-wrangler"),
+    join(bunBin, process.platform === "win32" ? "cf-wrangler.exe" : "cf-wrangler"),
+  ]) {
+    if (candidate && existsSync(candidate)) return [candidate];
+  }
+  return ["bun", "x", "wrangler"];
+}
 
 export interface WorkerManifestAudit {
   name: string;
@@ -85,7 +100,7 @@ export function auditCloudflareRepoConfig(root = repoRoot, runDryRun = false): C
     let dryRunOk: boolean | undefined;
     if (runDryRun) {
       const dry = Bun.spawnSync(
-        ["bunx", "wrangler", "deploy", "--dry-run", "--outdir", join(root, "target", "wrangler-dry", parsed.name ?? "worker")],
+        [...resolveWranglerCmd(), "deploy", "--dry-run", "--outdir", join(root, "target", "wrangler-dry", parsed.name ?? "worker")],
         { cwd: absDir, stdout: "pipe", stderr: "pipe" },
       );
       dryRunOk = dry.exitCode === 0;
@@ -140,7 +155,8 @@ async function ensureInfra(): Promise<Record<string, unknown>> {
   if (!token) throw new Error("CLOUDFLARE_API_TOKEN is required for Cloudflare ensure-infra");
   const accountId = await resolveAccountId(token);
 
-  const bucketsRes = Bun.spawnSync(["bunx", "wrangler", "r2", "bucket", "list"], {
+  const wrangler = resolveWranglerCmd();
+  const bucketsRes = Bun.spawnSync([...wrangler, "r2", "bucket", "list"], {
     cwd: repoRoot,
     stdout: "pipe",
     stderr: "pipe",
@@ -148,7 +164,7 @@ async function ensureInfra(): Promise<Record<string, unknown>> {
   const bucketOut = new TextDecoder().decode(bucketsRes.stdout);
   let bucketCreated = false;
   if (!/name:\s+aphrody-releases\b/.test(bucketOut)) {
-    const createRes = Bun.spawnSync(["bunx", "wrangler", "r2", "bucket", "create", "aphrody-releases"], {
+    const createRes = Bun.spawnSync([...wrangler, "r2", "bucket", "create", "aphrody-releases"], {
       cwd: repoRoot,
       stdout: "pipe",
       stderr: "pipe",
@@ -219,11 +235,12 @@ function publishInstallScripts(dryRun: boolean): { uploaded: string[]; dryRun: b
       contentType: "text/plain; charset=utf-8",
     },
   ];
+  const wrangler = resolveWranglerCmd();
   const uploaded: string[] = [];
   for (const item of uploads) {
     if (!dryRun) {
       const res = Bun.spawnSync(
-        ["bunx", "wrangler", "r2", "object", "put", item.key, "--file", item.file, "--content-type", item.contentType, "--remote"],
+        [...wrangler, "r2", "object", "put", item.key, "--file", item.file, "--content-type", item.contentType, "--remote"],
         { cwd: repoRoot, stdout: "pipe", stderr: "pipe" },
       );
       if (res.exitCode !== 0) {
@@ -236,14 +253,15 @@ function publishInstallScripts(dryRun: boolean): { uploaded: string[]; dryRun: b
 }
 
 function deployWorkers(dryRun: boolean, allWorkers: boolean): Array<{ worker: string; exitCode: number }> {
+  const wrangler = resolveWranglerCmd();
   const dirs = allWorkers
     ? [".cloudflare/aphrody-releases", ".cloudflare/docs-proxy", ".cloudflare/open-source-website-assets"]
     : [".cloudflare/aphrody-releases"];
   const results: Array<{ worker: string; exitCode: number }> = [];
   for (const rel of dirs) {
     const args = dryRun
-      ? ["bunx", "wrangler", "deploy", "--dry-run", "--outdir", join(repoRoot, "target", "wrangler-dry", rel.replace(/[/.]/g, "_"))]
-      : ["bunx", "wrangler", "deploy"];
+      ? [...wrangler, "deploy", "--dry-run", "--outdir", join(repoRoot, "target", "wrangler-dry", rel.replace(/[/.]/g, "_"))]
+      : [...wrangler, "deploy"];
     const res = Bun.spawnSync(args, { cwd: join(repoRoot, rel), stdout: "inherit", stderr: "inherit" });
     results.push({ worker: rel, exitCode: res.exitCode });
     if (res.exitCode !== 0) {
@@ -272,6 +290,91 @@ async function smokeTest(baseUrl: string): Promise<{ ok: boolean; baseUrl: strin
     });
   }
   return { ok: allOk, baseUrl, checks };
+}
+
+function parseMcpSseOrJson(body: string): Record<string, unknown> | null {
+  const trimmed = body.trimStart();
+  if (!trimmed) return null;
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    return JSON.parse(trimmed) as Record<string, unknown>;
+  }
+  for (const event of body.split(/\r?\n\r?\n/)) {
+    const data = event
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith("data:"))
+      .map((line) => line.slice(5).replace(/^ /, ""))
+      .join("\n");
+    if (data) return JSON.parse(data) as Record<string, unknown>;
+  }
+  return null;
+}
+
+async function runMcpStdioBridge(endpoint = "https://mcp.cloudflare.com/mcp"): Promise<void> {
+  const token = process.env.CLOUDFLARE_API_TOKEN?.trim();
+  let sessionId: string | undefined;
+  let buffer = "";
+  const decoder = new TextDecoder();
+
+  for await (const chunk of Bun.stdin.stream()) {
+    buffer += decoder.decode(chunk, { stream: true });
+    let newlineIndex: number;
+    while ((newlineIndex = buffer.indexOf("\n")) >= 0) {
+      const line = buffer.slice(0, newlineIndex).trim();
+      buffer = buffer.slice(newlineIndex + 1);
+      if (!line) continue;
+
+      let msg: Record<string, unknown>;
+      try {
+        msg = JSON.parse(line) as Record<string, unknown>;
+      } catch (err) {
+        process.stdout.write(
+          `${JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: String(err) } })}\n`,
+        );
+        continue;
+      }
+
+      const headers: Record<string, string> = {
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+        "mcp-protocol-version": "2025-11-25",
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+        ...(sessionId ? { "mcp-session-id": sessionId } : {}),
+      };
+
+      try {
+        const res = await fetch(endpoint, { method: "POST", headers, body: line });
+        const nextSession = res.headers.get("mcp-session-id");
+        if (nextSession) sessionId = nextSession;
+        const text = await res.text();
+        if (!res.ok) {
+          if (msg.id !== undefined) {
+            process.stdout.write(
+              `${JSON.stringify({
+                jsonrpc: "2.0",
+                id: msg.id,
+                error: { code: -32000, message: `HTTP ${res.status}: ${text.slice(0, 300)}` },
+              })}\n`,
+            );
+          }
+          continue;
+        }
+        const parsed = parseMcpSseOrJson(text);
+        if (msg.id !== undefined && parsed) {
+          process.stdout.write(`${JSON.stringify(parsed)}\n`);
+        }
+      } catch (err) {
+        if (msg.id !== undefined) {
+          process.stdout.write(
+            `${JSON.stringify({
+              jsonrpc: "2.0",
+              id: msg.id,
+              error: { code: -32603, message: String(err) },
+            })}\n`,
+          );
+        }
+      }
+    }
+  }
 }
 
 if (import.meta.main) {
@@ -303,9 +406,11 @@ if (import.meta.main) {
     const res = await smokeTest(baseUrl);
     console.log(JSON.stringify(res, null, 2));
     process.exit(res.ok ? 0 : 1);
+  } else if (cmd === "mcp-stdio") {
+    await runMcpStdioBridge(args[1] ?? "https://mcp.cloudflare.com/mcp");
   } else {
     console.error(
-      "Usage: bun tooling/bun/cloudflare-deploy.ts [audit|ensure-infra|publish-scripts|deploy|smoke] [--dry-run] [--all] [--base-url <url>]",
+      "Usage: bun tooling/bun/cloudflare-deploy.ts [audit|ensure-infra|publish-scripts|deploy|smoke|mcp-stdio] [--dry-run] [--all] [--base-url <url>]",
     );
     process.exit(1);
   }
