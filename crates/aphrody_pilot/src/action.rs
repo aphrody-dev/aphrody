@@ -3,8 +3,8 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use web_time::Instant;
 
-use crate::adapter::{Deadline, InteractionLease, NativeHandle, PlatformAdapter};
-use crate::model::{DeliverySemantics, ElementState, ErrorCode, PilotError};
+use crate::adapter::{Deadline, InteractionLease, LiveElement, NativeHandle, PlatformAdapter};
+use crate::model::{DeliverySemantics, ElementState, ErrorCode, PilotError, RetryDisposition};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -221,6 +221,11 @@ impl Action {
                 | Self::Select(_)
         )
     }
+
+    #[must_use]
+    pub const fn writes_element_value(&self) -> bool {
+        matches!(self, Self::TypeText(_) | Self::SetValue(_) | Self::Clear)
+    }
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -272,8 +277,144 @@ pub struct ActionResult {
     pub steps: Vec<ActionStepOutcome>,
 }
 
+impl ActionResult {
+    #[must_use]
+    pub const fn retry_disposition(&self) -> RetryDisposition {
+        self.disposition.retry_disposition()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PostconditionVerdict {
+    Satisfied,
+    Mismatch(&'static str),
+    InsufficientEvidence(&'static str),
+}
+
+fn normalize_ws_value(raw: &str) -> String {
+    raw.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+fn state_value(state: &ElementState) -> Option<&str> {
+    state.value.as_deref()
+}
+
+fn checked_state(state: &ElementState) -> Option<bool> {
+    if state.has_state("indeterminate") {
+        return None;
+    }
+    state
+        .checked
+        .or_else(|| {
+            if state.has_state("checked") {
+                Some(true)
+            } else if !state.states.is_empty() {
+                Some(false)
+            } else {
+                None
+            }
+        })
+}
+
+fn secure_value_redacted(action: &Action, observed: &ElementState) -> bool {
+    action.writes_element_value()
+        && observed.value.is_none()
+        && observed.has_state("secure")
+}
+
+#[must_use]
+pub fn evaluate_postcondition(
+    action: &Action,
+    before: Option<&ElementState>,
+    after: &LiveElement,
+) -> PostconditionVerdict {
+    let state = &after.state;
+    if secure_value_redacted(action, state) {
+        return PostconditionVerdict::InsufficientEvidence("secure_field");
+    }
+    match action {
+        Action::Check | Action::Uncheck => match checked_state(state) {
+            Some(is_checked) if is_checked == matches!(action, Action::Check) => {
+                PostconditionVerdict::Satisfied
+            }
+            Some(_) => PostconditionVerdict::Mismatch("checked_state_mismatch"),
+            None => PostconditionVerdict::InsufficientEvidence("indeterminate_or_missing_checked"),
+        },
+        Action::Toggle => {
+            let prev = before.and_then(checked_state);
+            let next = checked_state(state);
+            match (prev, next) {
+                (Some(p), Some(n)) if p != n => PostconditionVerdict::Satisfied,
+                (Some(_), Some(_)) => PostconditionVerdict::Mismatch("toggle_unchanged"),
+                _ => PostconditionVerdict::InsufficientEvidence("missing_toggle_baseline"),
+            }
+        }
+        Action::Expand | Action::Collapse => {
+            let wants_expanded = matches!(action, Action::Expand);
+            let is_expanded = state.expanded.unwrap_or_else(|| state.has_state("expanded"));
+            if state.expanded.is_none() && state.states.is_empty() {
+                PostconditionVerdict::InsufficientEvidence("missing_expanded_state")
+            } else if is_expanded == wants_expanded {
+                PostconditionVerdict::Satisfied
+            } else {
+                PostconditionVerdict::Mismatch("expanded_state_mismatch")
+            }
+        }
+        Action::Clear => match state_value(state) {
+            Some("") => PostconditionVerdict::Satisfied,
+            Some(_) => PostconditionVerdict::Mismatch("value_not_cleared"),
+            None => PostconditionVerdict::InsufficientEvidence("missing_value_readback"),
+        },
+        Action::SetValue(expected) => match state_value(state) {
+            Some(actual)
+                if actual == expected.as_str()
+                    || normalize_ws_value(actual) == normalize_ws_value(expected) =>
+            {
+                PostconditionVerdict::Satisfied
+            }
+            Some(_) => PostconditionVerdict::Mismatch("value_mismatch"),
+            None => PostconditionVerdict::InsufficientEvidence("missing_value_readback"),
+        },
+        Action::TypeText(delta) => match state_value(state) {
+            Some(actual)
+                if actual.contains(delta.as_str())
+                    || normalize_ws_value(actual).contains(&normalize_ws_value(delta)) =>
+            {
+                PostconditionVerdict::Satisfied
+            }
+            Some(_) => PostconditionVerdict::Mismatch("typed_text_absent"),
+            None => PostconditionVerdict::InsufficientEvidence("missing_value_readback"),
+        },
+        Action::Select(option) => {
+            if state.selected == Some(true)
+                || state.has_state("selected")
+                || state_value(state).is_some_and(|val| {
+                    val == option.as_str()
+                        || normalize_ws_value(val) == normalize_ws_value(option)
+                })
+            {
+                PostconditionVerdict::Satisfied
+            } else {
+                PostconditionVerdict::Mismatch("selection_mismatch")
+            }
+        }
+        _ => PostconditionVerdict::Satisfied,
+    }
+}
+
+fn typed_by_synthetic_keys(action: &Action, result: &ActionResult) -> bool {
+    matches!(action, Action::TypeText(_))
+        && result.steps.iter().any(|step| {
+            step.ok
+                && (step.mechanism.contains("physical")
+                    || step.mechanism.contains("synthetic")
+                    || step.mechanism.contains("send_input"))
+        })
+}
+
 /// Executes an action once, then verifies stateful postconditions (`checked`, `expanded`,
-/// `value`, `selected`) via bounded 50 ms polling against live platform observations.
+/// `value`, `selected`) via bounded 50 ms readback polling (up to 400 ms settle window,
+/// extending while synthetic text drains) against live platform observations.
 pub fn execute_verified_action(
     adapter: &dyn PlatformAdapter,
     handle: &NativeHandle,
@@ -304,7 +445,7 @@ pub fn execute_verified_action(
 
     if matches!(original_action, Action::Toggle)
         && let Some(state) = &before
-        && let Some(checked) = state.checked.or_else(|| Some(state.has_state("checked")))
+        && let Some(checked) = checked_state(state)
     {
         request.action = if checked {
             Action::Uncheck
@@ -324,39 +465,70 @@ pub fn execute_verified_action(
     }
 
     let settle = Duration::from_millis(50);
-    let settle_deadline = deadline.capped(Duration::from_millis(350));
-    let mut after = adapter
-        .get_live_element(handle, deadline)
-        .ok()
-        .map(|e| e.state);
-    while let Some(obs) = &after {
-        if postcondition_satisfied(&original_action, before.as_ref(), obs) {
-            result.verified = true;
-            result.disposition = DeliverySemantics::delivered_verified();
-            result.after_state = Some(obs.clone());
-            result.duration_ms = started.elapsed().as_millis() as u64;
-            return Ok(result);
+    let settle_deadline = deadline.capped(Duration::from_millis(400));
+    let drains = typed_by_synthetic_keys(&original_action, &result);
+    let mut after_live = adapter.get_live_element(handle, deadline).ok();
+    let mut changing = true;
+
+    while let Some(obs) = &after_live {
+        let verdict = evaluate_postcondition(&original_action, before.as_ref(), obs);
+        if matches!(
+            verdict,
+            PostconditionVerdict::Satisfied | PostconditionVerdict::InsufficientEvidence(_)
+        ) {
+            break;
         }
-        if settle_deadline.remaining() <= settle {
+        if settle_deadline.remaining() <= settle && !(drains && changing && deadline.remaining() > settle) {
             break;
         }
         sleep_brief(settle);
-        after = adapter
-            .get_live_element(handle, deadline)
-            .ok()
-            .map(|e| e.state);
+        let next = adapter.get_live_element(handle, deadline).ok();
+        let next_val = next.as_ref().and_then(|el| el.state.value.as_deref());
+        let prev_val = after_live.as_ref().and_then(|el| el.state.value.as_deref());
+        changing = next_val != prev_val;
+        after_live = next;
     }
 
-    result.after_state = after.clone();
-    if let Some(obs) = &after
-        && postcondition_satisfied(&original_action, before.as_ref(), obs)
-    {
-        result.verified = true;
-        result.disposition = DeliverySemantics::delivered_verified();
-    } else {
-        result.verified = false;
-        result.disposition = DeliverySemantics::delivered_unverified();
-    }
+    result.after_state = after_live.as_ref().map(|el| el.state.clone());
+    let (scope, reason) = match &after_live {
+        Some(obs) => match evaluate_postcondition(&original_action, before.as_ref(), obs) {
+            PostconditionVerdict::Satisfied => {
+                result.verified = true;
+                result.disposition = DeliverySemantics::delivered_verified();
+                let scope = if original_action.writes_element_value() {
+                    "element_value"
+                } else {
+                    "element_state"
+                };
+                (scope, "postcondition_satisfied")
+            }
+            PostconditionVerdict::InsufficientEvidence(why) => {
+                result.verified = false;
+                result.disposition = DeliverySemantics::delivered_unverified();
+                ("unavailable", why)
+            }
+            PostconditionVerdict::Mismatch(why) => {
+                result.verified = false;
+                result.disposition = DeliverySemantics::delivered_unverified();
+                ("element_state", why)
+            }
+        },
+        None => {
+            result.verified = false;
+            result.disposition = DeliverySemantics::delivered_unverified();
+            ("unavailable", "readback_unavailable")
+        }
+    };
+    result.steps.push(ActionStepOutcome {
+        step: "post_action_verification".to_owned(),
+        mechanism: "live_readback".to_owned(),
+        ok: result.verified,
+        duration_ms: started.elapsed().as_millis() as u64,
+        detail: Some(format!(
+            "verification_scope={scope}; verification_reason={reason}; retry={:?}",
+            result.retry_disposition()
+        )),
+    });
     result.duration_ms = started.elapsed().as_millis() as u64;
     Ok(result)
 }
@@ -400,4 +572,68 @@ pub fn sleep_brief(dur: Duration) {
 #[must_use]
 pub fn validate_deadline(timeout_ms: Option<u64>) -> Deadline {
     Deadline::from_timeout_ms(timeout_ms)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::Rect;
+
+    fn live_with(state: ElementState) -> LiveElement {
+        LiveElement {
+            id: "n1".to_owned(),
+            role: "textfield".to_owned(),
+            name: Some("Test".to_owned()),
+            bounds: Some(Rect::new(0.0, 0.0, 100.0, 24.0)),
+            state,
+            actions: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn postcondition_readback_handles_secure_fields_whitespace_and_toggle() {
+        let mut secure_state = ElementState::default();
+        secure_state.push_flag("secure");
+        let secure_el = live_with(secure_state);
+        assert_eq!(
+            evaluate_postcondition(&Action::SetValue("secret".to_owned()), None, &secure_el),
+            PostconditionVerdict::InsufficientEvidence("secure_field")
+        );
+
+        let spaced = live_with(ElementState {
+            value: Some("hello   world".to_owned()),
+            ..Default::default()
+        });
+        assert_eq!(
+            evaluate_postcondition(&Action::SetValue("hello world".to_owned()), None, &spaced),
+            PostconditionVerdict::Satisfied
+        );
+
+        let before_toggle = ElementState {
+            checked: Some(false),
+            ..Default::default()
+        };
+        let after_toggle = live_with(ElementState {
+            checked: Some(true),
+            ..Default::default()
+        });
+        assert_eq!(
+            evaluate_postcondition(&Action::Toggle, Some(&before_toggle), &after_toggle),
+            PostconditionVerdict::Satisfied
+        );
+        assert_eq!(
+            ActionResult {
+                action: "toggle".to_owned(),
+                target_ref: None,
+                disposition: DeliverySemantics::delivered_verified(),
+                verified: true,
+                duration_ms: 1,
+                before_state: None,
+                after_state: None,
+                steps: Vec::new(),
+            }
+            .retry_disposition(),
+            RetryDisposition::Unsafe
+        );
+    }
 }

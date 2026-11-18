@@ -28,10 +28,13 @@ export interface AgentDesktopAuditReport {
     bannedBrandLeaks: string[];
   }[];
   zeroModRsInOsPilot: boolean;
+  zeroModRsInBrowser: boolean;
   zeroBannedLeaks: boolean;
   mcpToolParityCount: number;
   requiredMcpToolsPresent: string[];
   missingMcpTools: string[];
+  requiredFusedSymbolsPresent: string[];
+  missingFusedSymbols: string[];
   ok: boolean;
 }
 
@@ -93,7 +96,86 @@ export const REQUIRED_PILOT_TOOLS = [
   "desktop_batch",
   "desktop_session",
   "desktop_trace",
+  "desktop_act_verify",
   "desktop_ai_act_verify",
+  "browser_status",
+  "browser_validate_url",
+  "browser_connect_cdp",
+  "browser_open",
+  "browser_snapshot",
+  "browser_snapshot_diff",
+  "browser_find",
+  "browser_eval",
+  "browser_screenshot",
+  "browser_screenshot_annotated",
+  "browser_route",
+  "browser_unroute",
+  "browser_har_start",
+  "browser_har_stop",
+  "browser_console",
+  "browser_errors",
+  "browser_state_save",
+  "browser_state_load",
+  "browser_cookies",
+  "browser_storage",
+  "browser_tab_list",
+  "browser_tab_new",
+  "browser_tab_switch",
+  "browser_tab_close",
+  "browser_policy_check",
+  "browser_batch",
+];
+
+export const REQUIRED_FUSED_SYMBOLS: { file: string; symbols: string[] }[] = [
+  {
+    file: "crates/aphrody_pilot/src/model.rs",
+    symbols: ["RetryDisposition", "SnapshotSurface", "PlatformNotSupported"],
+  },
+  {
+    file: "crates/aphrody_pilot/src/action.rs",
+    symbols: ["PostconditionVerdict", "evaluate_postcondition", "execute_verified_action"],
+  },
+  {
+    file: "crates/aphrody_pilot/src/policy.rs",
+    symbols: ["act_verify", "BatchExecutionState", "MAX_BATCH_OUTPUT_BYTES"],
+  },
+  {
+    file: "crates/aphrody_pilot/src/browser.rs",
+    symbols: [
+      "SnapshotDiff",
+      "SemanticLocator",
+      "AnnotatedElementBox",
+      "NetworkRouteTable",
+      "HarRingBuffer",
+      "BrowserEventRingBuffer",
+      "BrowserStorageState",
+      "TabSessionManager",
+      "BrowserActionPolicy",
+      "BrowserBatchReport",
+    ],
+  },
+  {
+    file: "crates/aphrody_browser/src/agent_browser_core.rs",
+    symbols: [
+      "AgentBrowserCore",
+      "SnapshotDiff",
+      "SemanticLocator",
+      "AnnotatedElementBox",
+      "HarRingBuffer",
+      "BrowserEventRingBuffer",
+      "BrowserStorageState",
+      "TabSessionManager",
+      "BrowserActionPolicy",
+    ],
+  },
+  {
+    file: "crates/aphrody_browser/src/chromium_gpui.rs",
+    symbols: ["ChromiumBrowserView", "agent_core", "apply_omnibox_intent"],
+  },
+  {
+    file: "crates/aphrody_desktop/src/pilot_hud.rs",
+    symbols: ["render_pilot_status_pill", "append_pilot_drawer_section", "pilot_hud_summary"],
+  },
 ];
 
 const BANNED_LEGACY_LEAKS = ["vercel-labs", "agent-browser.dev", "jev-desktop"];
@@ -175,10 +257,16 @@ export function scanMigratedTree(root: string): AgentDesktopAuditReport["migrate
     "crates/aphrody_pilot/src/action.rs",
     "crates/aphrody_pilot/src/policy.rs",
     "crates/aphrody_pilot/src/adapter.rs",
+    "crates/aphrody_pilot/src/browser.rs",
     "crates/aphrody_pilot/src/gpui_bridge.rs",
     "crates/aphrody_pilot/src/backend_windows.rs",
     "crates/aphrody_pilot/src/backend_linux.rs",
     "crates/aphrody_pilot/src/backend_macos.rs",
+    "crates/aphrody_browser/src/aphrody_browser.rs",
+    "crates/aphrody_browser/src/agent_browser_core.rs",
+    "crates/aphrody_browser/src/chromium_gpui.rs",
+    "crates/aphrody_desktop/src/pilot_hud.rs",
+    "crates/aphrody_desktop/src/main.rs",
     ".agents/plugins/aphrody/skills/ai-os-pilot/SKILL.md",
     "docs/architecture/agent-desktop-ai-os.md",
   ];
@@ -267,17 +355,44 @@ export function fetchUpstreamTreeSync(): { path: string; size: number }[] {
   return [];
 }
 
+export function checkFusedSymbols(root: string): {
+  present: string[];
+  missing: string[];
+} {
+  const present: string[] = [];
+  const missing: string[] = [];
+  for (const group of REQUIRED_FUSED_SYMBOLS) {
+    const abs = join(root, group.file);
+    const content = existsSync(abs) ? readFileSync(abs, "utf8") : "";
+    for (const sym of group.symbols) {
+      const qualified = `${group.file}::${sym}`;
+      if (content.includes(sym)) present.push(qualified);
+      else missing.push(qualified);
+    }
+  }
+  return { present, missing };
+}
+
 export function runAudit(root: string, offline = false): AgentDesktopAuditReport {
   const blobs = offline ? [] : fetchUpstreamTreeSync();
   const totalBytes = blobs.reduce((acc, b) => acc + b.size, 0);
   const purgedCategories = categorizeUpstreamBlobs(blobs);
   const migratedFiles = scanMigratedTree(root);
   const modRsFiles = findModRsRecursive(join(root, "crates/aphrody_pilot/src"));
+  const browserModRsFiles = findModRsRecursive(join(root, "crates/aphrody_browser/src"));
   const { present, missing } = checkToolParity(join(root, "crates/aphrody_pilot/src/aphrody_pilot.rs"));
+  const fused = checkFusedSymbols(root);
   const zeroModRsInOsPilot = modRsFiles.length === 0;
+  const zeroModRsInBrowser = browserModRsFiles.length === 0;
   const zeroBannedLeaks = migratedFiles.every((f) => f.bannedBrandLeaks.length === 0);
   const allMigratedExist = migratedFiles.every((f) => f.exists);
-  const ok = zeroModRsInOsPilot && zeroBannedLeaks && allMigratedExist && missing.length === 0;
+  const ok =
+    zeroModRsInOsPilot &&
+    zeroModRsInBrowser &&
+    zeroBannedLeaks &&
+    allMigratedExist &&
+    missing.length === 0 &&
+    fused.missing.length === 0;
 
   return {
     generatedAt: new Date().toISOString(),
@@ -287,10 +402,13 @@ export function runAudit(root: string, offline = false): AgentDesktopAuditReport
     purgedCategories,
     migratedFiles,
     zeroModRsInOsPilot,
+    zeroModRsInBrowser,
     zeroBannedLeaks,
     mcpToolParityCount: present.length,
     requiredMcpToolsPresent: present,
     missingMcpTools: missing,
+    requiredFusedSymbolsPresent: fused.present,
+    missingFusedSymbols: fused.missing,
     ok,
   };
 }

@@ -101,7 +101,14 @@ export function auditCloudflareRepoConfig(root = repoRoot, runDryRun = false): C
     let dryRunOk: boolean | undefined;
     if (runDryRun) {
       const dry = Bun.spawnSync(
-        [...resolveWranglerCmd(), "deploy", "--dry-run", "--outdir", join(root, "target", "wrangler-dry", parsed.name ?? "worker")],
+        [
+          ...resolveWranglerCmd(),
+          "deploy",
+          "--env=",
+          "--dry-run",
+          "--outdir",
+          join(root, "target", "wrangler-dry", parsed.name ?? "worker"),
+        ],
         { cwd: absDir, stdout: "pipe", stderr: "pipe" },
       );
       dryRunOk = dry.exitCode === 0;
@@ -137,6 +144,34 @@ export function auditCloudflareRepoConfig(root = repoRoot, runDryRun = false): C
   const installScriptsPresent = existsSync(installSh) && existsSync(installPs1);
   if (!installScriptsPresent) {
     errors.push("Missing script/aphrody-install.sh or script/aphrody-install.ps1");
+  }
+
+  const topologyPath = join(root, "assets", "os", "cloudflare_topology.toml");
+  if (!existsSync(topologyPath)) {
+    errors.push("Missing assets/os/cloudflare_topology.toml");
+  } else {
+    const rawTopo = readFileSync(topologyPath, "utf8");
+    if (/[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(rawTopo)) {
+      errors.push("assets/os/cloudflare_topology.toml must not contain literal Cloudflare IDs or UUIDs");
+    }
+    const parsedTopo = Bun.TOML.parse(rawTopo) as {
+      buckets?: Record<string, { prefixes?: Array<{ prefix: string; owner: string }> }>;
+      workers?: Array<{ name: string; routes?: string[] }>;
+    };
+    const seenRoutes = new Set<string>();
+    for (const w of parsedTopo.workers ?? []) {
+      for (const rt of w.routes ?? []) {
+        if (seenRoutes.has(rt)) errors.push(`Duplicate route in cloudflare_topology.toml: ${rt}`);
+        seenRoutes.add(rt);
+      }
+    }
+    for (const [bKey, bVal] of Object.entries(parsedTopo.buckets ?? {})) {
+      const seenPrefixes = new Set<string>();
+      for (const p of bVal.prefixes ?? []) {
+        if (seenPrefixes.has(p.prefix)) errors.push(`Duplicate R2 prefix in ${bKey}: ${p.prefix}`);
+        seenPrefixes.add(p.prefix);
+      }
+    }
   }
 
   return {
@@ -195,32 +230,34 @@ async function ensureInfra(): Promise<Record<string, unknown>> {
   const zoneId = zonesJson.result?.[0]?.id;
   if (!zoneId) throw new Error("Cloudflare zone aphrody.com not found");
 
-  const dnsResp = await fetch(
-    `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=releases.aphrody.com`,
-    { headers: { Authorization: `Bearer ${token}` } },
-  );
-  const dnsJson = (await dnsResp.json()) as { result?: Array<{ id: string; type: string }> };
   let dnsCreated = false;
-  if ((dnsJson.result ?? []).length === 0) {
-    const addRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type: "AAAA",
-        name: "releases.aphrody.com",
-        content: "100::",
-        proxied: true,
-        comment: "Worker-only edge endpoint for aphrody-releases R2 distribution",
-      }),
-    });
-    const addJson = (await addRes.json()) as { success: boolean; errors?: unknown[] };
-    if (!addJson.success) {
-      throw new Error(`DNS creation failed: ${JSON.stringify(addJson.errors)}`);
+  for (const host of ["releases.aphrody.com", "learn.aphrody.com"]) {
+    const dnsResp = await fetch(
+      `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${host}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    const dnsJson = (await dnsResp.json()) as { result?: Array<{ id: string; type: string }> };
+    if ((dnsJson.result ?? []).length === 0) {
+      const addRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "AAAA",
+          name: host,
+          content: "100::",
+          proxied: true,
+          comment: `Worker-only edge endpoint for ${host}`,
+        }),
+      });
+      const addJson = (await addRes.json()) as { success: boolean; errors?: unknown[] };
+      if (!addJson.success) {
+        throw new Error(`DNS creation failed (${host}): ${JSON.stringify(addJson.errors)}`);
+      }
+      if (host === "releases.aphrody.com") dnsCreated = true;
     }
-    dnsCreated = true;
   }
 
   return {
@@ -270,8 +307,15 @@ function deployWorkers(dryRun: boolean, _allWorkers: boolean): Array<{ worker: s
   const results: Array<{ worker: string; exitCode: number }> = [];
   for (const rel of dirs) {
     const args = dryRun
-      ? [...wrangler, "deploy", "--dry-run", "--outdir", join(repoRoot, "target", "wrangler-dry", rel.replace(/[/.]/g, "_"))]
-      : [...wrangler, "deploy"];
+      ? [
+          ...wrangler,
+          "deploy",
+          "--env=",
+          "--dry-run",
+          "--outdir",
+          join(repoRoot, "target", "wrangler-dry", rel.replace(/[/.]/g, "_")),
+        ]
+      : [...wrangler, "deploy", "--env="];
     const res = Bun.spawnSync(args, { cwd: join(repoRoot, rel), stdout: "inherit", stderr: "inherit" });
     results.push({ worker: rel, exitCode: res.exitCode });
     if (res.exitCode !== 0) {

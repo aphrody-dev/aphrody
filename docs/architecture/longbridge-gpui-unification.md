@@ -1,6 +1,6 @@
 # Longbridge, Zed & Community GPUI Unification Architecture
 
-> Canonical, reproducible deduplication, dependency centralization, Graphify topology, feature-matrix audit, and live ecosystem verification for unifying upstream [`zed-industries/zed`](https://github.com/zed-industries/zed), [`longbridge`](https://github.com/orgs/longbridge/repositories) GPUI/NSH repositories, and community GPUI crates onto the flattened [`aphrody`](../../Cargo.toml) core.
+> Canonical, reproducible deduplication, dependency centralization, Graphify topology, feature-matrix audit, and live ecosystem verification for unifying upstream `zed-industries/zed`, `longbridge` GPUI/NSH repositories, Kitesurf absorbed forks, and community GPUI crates onto the flattened [`aphrody`](../../Cargo.toml) core.
 
 ---
 
@@ -91,27 +91,27 @@ flowchart LR
 
 ## 3. Repository Classification & Deduplication Matrix
 
-### 3.1 Already Absorbed & Flattened (`ABSORBED_FLATTENED`)
+### 3.1 Absorbed & Unified Architecture (`ABSORBED_FLATTENED`)
 
-| Upstream Repository | Local Aphrody Anchor | Integration & Centralization State |
+| Upstream / Stack Layer | Local Aphrody Anchor | Integration & Centralization State |
 | :--- | :--- | :--- |
-| `zed-industries/zed` | [`crates/gpui/Cargo.toml`](../../crates/gpui/Cargo.toml), `crates/ui`, `crates/editor`, `crates/zed` | Base workspace flattened into [`Cargo.toml`](../../Cargo.toml) (`301` members, `20` excluded submodules in [`.gitmodules`](../../.gitmodules)). |
-| `longbridge/nsh` | [`crates/nsh-core/Cargo.toml`](../../crates/nsh-core/Cargo.toml), [`crates/nsh-platform-gpui/Cargo.toml`](../../crates/nsh-platform-gpui/Cargo.toml), [`crates/gpui_ui/src/nsh.rs`](../../crates/gpui_ui/src/nsh.rs) | Flattened directly as `crates/nsh-*` (`0.5.0`, Edition 2024, Rust `1.97`) with live `gpui_ui` theme & `AppView` embedding bridge. |
-| `longbridge/native-shell-v1` | `crates/nsh-core`, `crates/nsh-engine` | Gen-1 Native Shell superseded and retired into `crates/nsh-*` v0.5.0. |
-| `longbridge/quickjs-jit` | [`Cargo.toml`](../../Cargo.toml) (`rquickjs`, `quickjs-jit-stdlib`), `crates/nsh-js` | Centralized at `=0.14.2` in `[workspace.dependencies]` (`quickjs-jit-sys` built at `opt-level = 3`). |
-| `longbridge/rust-i18n` | [`Cargo.toml`](../../Cargo.toml) (`rust-i18n`, `rust-i18n-support`), `crates/nsh-i18n` | Centralized at `4.2.4` in `[workspace.dependencies]`. |
+| **Single Unified GPUI Core** (`zed-industries/zed` + `gpui-fast` retained invariants) | [`crates/gpui/Cargo.toml`](../../crates/gpui/Cargo.toml), [`crates/gpui/src/gpui.rs`](../../crates/gpui/src/gpui.rs), [`path_builder.rs`](../../crates/gpui/src/path_builder.rs), [`window.rs`](../../crates/gpui/src/window.rs), [`taffy.rs`](../../crates/gpui/src/taffy.rs) | Single workspace `gpui` (`0.2.2`) with `Path<T = Pixels>` (`Path::translate`), 1-arg `Window::paint_layer`, and retained-mode invariants. Compatibility `default = ["gpui-fast"]` guards live in `gpui-base`/`gpui-component`/`gpui-kit` with `GPUI_FAST: bool = false` in [`crates/gpui-kit/src/lib.rs`](../../crates/gpui-kit/src/lib.rs). |
+| **Longbridge NSH `0.6.0` + M3 Kit** (`longbridge/nsh`, `native-shell-v1`) | [`crates/nsh-core/Cargo.toml`](../../crates/nsh-core/Cargo.toml), [`crates/nsh-base/src/material3.rs`](../../crates/nsh-base/src/material3.rs), [`crates/gpui_ui/src/nsh.rs`](../../crates/gpui_ui/src/nsh.rs), [`crates/aphrody_nsh/src/material3_kit.rs`](../../crates/aphrody_nsh/src/material3_kit.rs) | Flattened `crates/nsh-*` (`nsh-core`, `nsh-base`, `nsh-bundler`, `nsh-dev` at `0.6.0`), using `taffy::ScrollableOverflow::new` and `&self` `cache_get`. 4-mode Material 3 Expressive tokens (`M3Mode`, `M3_SPRINGS`) sync via `gpui_ui::nsh` and 12 `aphrody_nsh::material3_kit` builders + `export_m3_nsh_tsx_kit()`. |
+| **Longbridge GPUI Kit `0.10.0` + M3 Kit** (`longbridge/gpui-kit`) | [`crates/gpui-kit/Cargo.toml`](../../crates/gpui-kit/Cargo.toml), [`crates/gpui-component/Cargo.toml`](../../crates/gpui-component/Cargo.toml), [`crates/gpui-base/Cargo.toml`](../../crates/gpui-base/Cargo.toml), [`material3.rs`](../../crates/gpui-component/src/material3.rs), [`crates/gpui_ui/src/kit.rs`](../../crates/gpui_ui/src/kit.rs) | `gpui-kit`, `gpui-component`, `gpui-base`, `gpui-component-macros`, and `gpui-kit-assets` unified at `0.10.0` on single `gpui` + `lsp_types_kit = "0.97"` (`proposed`). Includes 4-mode M3 Expressive tokens (`M3AppearanceMode`, `M3SpringToken`) and 16 `RenderOnce` widgets re-exported via `gpui_kit::material3`. |
+| **Layout & GPU Primitives** (`taffy 0.15.1` + `wgpu v30`) | [`vendor/taffy/Cargo.toml`](../../vendor/taffy/Cargo.toml), [`vendor/wgpu/Cargo.toml`](../../vendor/wgpu/Cargo.toml), [`Cargo.toml`](../../Cargo.toml) | `[patch.crates-io]` pins `taffy = "0.15.1"` (`vendor/taffy`, `flexbox_balance`, `detailed_layout_info`) and `wgpu` / `naga` `30.0.0` (`vendor/wgpu`) across desktop, headless Linux, and WebGPU/Wasm targets. |
+| **Kitesurf Absorbed Forks & Browser Engine** | [`.gitmodules`](../../.gitmodules), [`vendor/browser/docs/kitesurf.md`](../../vendor/browser/docs/kitesurf.md), [`vendor/browser/third_party/README.md`](../../vendor/browser/third_party/README.md), [`upstreams.toml`](../../vendor/browser/tools/upstreams.toml) | Absorbs Kitesurf engine forks (`taffy`, `parley`, `stylo`, `blitz`, `vello`, `anyrender`, `boa`, `resvg`, `jpeg-encoder`, `ratatui-image`) across `vendor/*`, `Cargo.toml` (`resvg 0.46.0`), and `vendor/browser`. Heavy `vendor/browser/third_party` checkouts stay slimmed to gitlinks with `mode = "pin"` SHAs in `upstreams.lock.json`. |
+| `longbridge/quickjs-jit` | [`Cargo.toml`](../../Cargo.toml) (`rquickjs`, `quickjs-jit-stdlib`), `crates/nsh-js` | Centralized in `[workspace.dependencies]` (`quickjs-jit-sys` built at `opt-level = 3`). |
+| `longbridge/rust-i18n` | [`Cargo.toml`](../../Cargo.toml) (`rust-i18n`, `rust-i18n-support`), `crates/nsh-i18n` | Centralized in `[workspace.dependencies]`. |
 | `longbridge/wry` | [`.gitmodules`](../../.gitmodules) (`vendor/tauri/wry`), [`Cargo.toml`](../../Cargo.toml) (`wry`) | Single path submodule checkout `vendor/tauri/wry` referenced via `[workspace.dependencies]`. |
 
-### 3.2 Priority Merge Candidates (`MERGE_CANDIDATE`)
+### 3.2 Ongoing Convergence & Remaining Candidates (`MERGE_CANDIDATE`)
 
 | Upstream / Community Repo | Target Aphrody Crates | Technical Gap & Merge Plan |
 | :--- | :--- | :--- |
-| `longbridge/gpui-fast` | [`crates/gpui/src/taffy.rs`](../../crates/gpui/src/taffy.rs), `tooling/perf` | Local `TaffyLayoutEngine::clear()` still clears the entire `TaffyTree` every frame; adopt dirty-tracking layout retention & `gpui_perf` microbenchmarks. |
-| `longbridge/gpui-kit` | `crates/ui`, `crates/gpui_ui`, `crates/aphrody_ui` | Reconcile 60+ GPUI desktop widgets (`gpui-kit` / `gpui-component` 0.10.0), virtualized tables, dock, and `fps` monitor without duplicating `nsh-base` primitives. |
 | `longbridge/gpui-mobile` | [`crates/gpui_ios/Cargo.toml`](../../crates/gpui_ios/Cargo.toml), `crates/nsh-platform-android`, `crates/gpui_platform` | Port Android Vulkan surface lifecycle and unified mobile device/hardware features from `gpui-pre-mobile` onto centralized `gpui_platform`. |
 | `longbridge/wef` | `crates/nsh-platform-gpui`, `vendor/tauri/cef-rs`, `crates/aphrody_desktop` | Evaluate offscreen CEF3 rendering (`wef 0.6.0`, `gpui-webview 0.10.0`) alongside `vendor/tauri/cef-rs` for consistent embedded web surfaces. |
-| `longbridge/purview` | [`crates/aphrody_craft/src/mcp.rs`](../../crates/aphrody_craft/src/mcp.rs), `crates/inspector_ui`, `crates/gpui_ui` | Adopt structured semantic multi-window GPUI projection over `rmcp` so AI agents inspect and drive live GPUI windows without screenshot guessing. |
-| `longbridge/longbridge-ai-acp` & `acp-registry` | `crates/acp_thread`, `crates/acp_tools`, `crates/agent_servers` | Align ACP auth/rich-content contracts with root `agent-client-protocol =5.3.0`. |
+| `longbridge/purview` | [`crates/aphrody_craft/src/mcp.rs`](../../crates/aphrody_craft/src/mcp.rs), `crates/inspector_ui`, `crates/gpui_ui` | Adopt structured semantic multi-window GPUI projection over `rmcp` so AI agents inspect and drive live GPUI windows alongside `aphrody_pilot`. |
+| `longbridge/longbridge-ai-acp` & `acp-registry` | `crates/acp_thread`, `crates/acp_tools`, `crates/agent_servers` | Align ACP auth/rich-content contracts with root `agent-client-protocol`. |
 | `longbridge/longbridge-mcp` & `longbridge-terminal` | `crates/aphrody_craft`, `crates/context_server`, `crates/terminal_view`, `crates/nsh-platform-tui` | Harmonize streamable-HTTP `rmcp` servers and Ratatui/CLI release packaging profiles. |
 | Community GPUI Libs (`gpui-ce`, `gpui-motion`, `gpui-rsx`, `native-theme`, `gpuix`) | `crates/gpui`, `crates/ui`, `crates/gpui_ui`, `crates/aphrody_ui` | Harvest native OS theming, spring/motion presets, RSX ergonomics, and JS/TS host bindings without introducing duplicate `gpui` versions. |
 
@@ -121,12 +121,11 @@ flowchart LR
 
 [`tooling/bun/longbridge-ingest.ts`](../../tooling/bun/longbridge-ingest.ts) mirrors and extends [`tooling/xtask/src/tasks/package_conformity.rs`](../../tooling/xtask/src/tasks/package_conformity.rs) across all workspace members, including `[target.<cfg>.dependencies]` and resolved `cargo metadata` version graphs:
 
-1. **Workspace Lints (`[lints] workspace = true`)**: Flag any member missing workspace lint inheritance (currently `perf` in `tooling/perf`).
+1. **Workspace Lints (`[lints] workspace = true`)**: Flag any member missing workspace lint inheritance.
 2. **Non-Workspace Dependency Elimination**:
-   - **Already in root `[workspace.dependencies]`**: Migrate direct declarations in `compliance`, `edit_prediction_*`, `etw_tracing`, `fs`, `gpui`, `gpui_apple`, `gpui_linux`, `gpui_windows`, `rpc`, `vim`, `xtask` to `.workspace = true`.
-   - **Direct `git` dependencies outside `[workspace.dependencies]`**: Move `etw_tracing` (`wprcontrol`), `fs` (`trash`), `gpui_linux` (`xim`), and `vim` (`nvim-rs`) into root [`Cargo.toml`](../../Cargo.toml) for single-revision pinning.
-   - **Remaining uncentralized versions**: Hoist core `gpui` / `gpui_linux` / `gpui_shared_string` / `ztracing` dependencies (`num_cpus`, `parking`, `seahash`, `lyon_path`, `tiny-skia-path`, `smol_str`, `wayland-*`, `calloop`, `tracy-client`) into `[workspace.dependencies]`.
-3. **Resolved Graph Duplicate Reduction**: See [Production Guide](./production-guide.md) and `target/longbridge-ingest/graph.json` (`duplicatePackages`) for top multi-version splits (`hashbrown`, `itertools`, `quick-xml`, `rand*`, `windows*` at 5x; `darling*`, `toml_edit`, `wasm-*` at 4x).
+   - **Core pins in root [`Cargo.toml`](../../Cargo.toml)**: `gpui-kit` / `gpui-component` / `gpui-base` `0.10.0`, `nsh-core` / `nsh-base` / `nsh-bundler` / `nsh-dev` `0.6.0`, `lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }`, `resvg 0.46.0`, and `[patch.crates-io]` overrides for `taffy = "0.15.1"` (`vendor/taffy`) and `wgpu` / `naga` `30.0.0` (`vendor/wgpu`).
+   - **Direct `git` dependencies outside `[workspace.dependencies]`**: Hoist crate-local `git` and versioned dependencies (`etw_tracing`, `fs`, `gpui_linux`, `vim`, `gpui`, `gpui_shared_string`, `ztracing`) into root `[workspace.dependencies]` for single-revision pinning.
+3. **Resolved Graph Duplicate Reduction**: See [Production Guide](./production-guide.md) and `target/longbridge-ingest/graph.json` (`duplicatePackages`) for remaining multi-version splits.
 
 ---
 
@@ -135,5 +134,5 @@ flowchart LR
 The `sitemaps` and `screenshots` commands verify live ecosystem documentation and app directories (including `https://nsh.dev`, `https://nsh.dev/apps`, `https://gpui-kit.com`, `https://gpui-kit.com/apps/`, `https://zed.dev`, and `https://longbridge.github.io/purview/`):
 
 - XML `<urlset>` / `<sitemapindex>` crawling + same-origin `<a href>` route extraction with per-URL HTTP status tolerance.
-- Real headless Chromium/Edge CDP `1280x800` PNG captures stored under gitignored `target/longbridge-screenshots/*.png` with PNG IHDR signature and dimension verification.
-- See [Architecture Index](./README.md) for sibling subsystem guides and [`assets/os/longbridge_gpui_inventory.toml`](../../assets/os/longbridge_gpui_inventory.toml) for the complete machine-readable catalog.
+- Headless Chromium/Edge CDP `1280x800` PNG captures stored under gitignored `target/longbridge-screenshots/*.png` with PNG IHDR signature and dimension verification.
+- Cross-subsystem guides: [Agent Desktop & Browser AI OS](./agent-desktop-ai-os.md), [Fleet, Edge & Asset Orchestration](./fleet-edge-orchestration.md), [Architecture Index](./README.md), and [`assets/os/longbridge_gpui_inventory.toml`](../../assets/os/longbridge_gpui_inventory.toml).

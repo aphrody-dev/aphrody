@@ -20,9 +20,12 @@ use windows::Win32::System::Com::{
     CLSCTX_INPROC_SERVER, COINIT_MULTITHREADED, CoCreateInstance, CoInitializeEx,
 };
 use windows::Win32::System::DataExchange::{
-    CloseClipboard, EmptyClipboard, GetClipboardData, OpenClipboard, SetClipboardData,
+    CloseClipboard, EmptyClipboard, GetClipboardData, IsClipboardFormatAvailable, OpenClipboard,
+    RegisterClipboardFormatW, SetClipboardData,
 };
-use windows::Win32::System::Memory::{GMEM_MOVEABLE, GlobalAlloc, GlobalLock, GlobalUnlock};
+use windows::Win32::System::Memory::{
+    GMEM_MOVEABLE, GlobalAlloc, GlobalLock, GlobalSize, GlobalUnlock,
+};
 use windows::Win32::System::Threading::{
     OpenProcess, OpenProcessToken, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
     QueryFullProcessImageNameW,
@@ -56,15 +59,15 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
     VK_LWIN, VK_MENU, VK_NEXT, VK_PRIOR, VK_RETURN, VK_RIGHT, VK_SHIFT, VK_SPACE, VK_TAB, VK_UP,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GWL_EXSTYLE, GetClassNameW, GetDesktopWindow, GetForegroundWindow,
-    GetSystemMetrics, GetWindowLongW, GetWindowRect, GetWindowTextLengthW, GetWindowTextW,
-    GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, IsZoomed, OBJID_CLIENT,
-    SM_CMONITORS, SM_CXSCREEN, SM_CXVIRTUALSCREEN, SM_CYSCREEN, SM_CYVIRTUALSCREEN,
+    EnumWindows, FindWindowExW, FindWindowW, GWL_EXSTYLE, GetClassNameW, GetDesktopWindow,
+    GetForegroundWindow, GetSystemMetrics, GetWindowLongW, GetWindowRect, GetWindowTextLengthW,
+    GetWindowTextW, GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, IsZoomed,
+    OBJID_CLIENT, SM_CMONITORS, SM_CXSCREEN, SM_CXVIRTUALSCREEN, SM_CYSCREEN, SM_CYVIRTUALSCREEN,
     SM_XVIRTUALSCREEN, SM_YVIRTUALSCREEN, SMTO_ABORTIFHUNG, SW_MAXIMIZE, SW_MINIMIZE, SW_RESTORE,
     SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SendMessageTimeoutW, SetForegroundWindow,
     SetWindowPos, ShowWindow, WM_GETOBJECT, WM_NULL, WS_EX_TOOLWINDOW,
 };
-use windows::core::{AgileReference, BSTR};
+use windows::core::{AgileReference, BSTR, PCWSTR};
 use windows_core::BOOL;
 
 use crate::action::{
@@ -825,14 +828,28 @@ impl ObservationOps for WindowsAdapter {
 
     fn list_surfaces(&self, deadline: Deadline) -> Result<Vec<SurfaceInfo>, PilotError> {
         deadline.ensure_remaining()?;
-        Ok(vec![SurfaceInfo {
+        let mut surfaces = vec![SurfaceInfo {
             id: "win32-desktop".to_owned(),
             surface: SnapshotSurface::Desktop,
             app: "windows".to_owned(),
             title: "Windows UI Automation Desktop".to_owned(),
             bounds: None,
             available: true,
-        }])
+        }];
+        for kind in [
+            SnapshotSurface::Taskbar,
+            SnapshotSurface::SystemTray,
+            SnapshotSurface::SystemTrayOverflow,
+            SnapshotSurface::StartMenu,
+            SnapshotSurface::ActionCenter,
+            SnapshotSurface::QuickSettings,
+            SnapshotSurface::NotificationCenter,
+        ] {
+            if let Some(info) = probe_windows_shell_surface(kind) {
+                surfaces.push(info);
+            }
+        }
+        Ok(surfaces)
     }
 }
 
@@ -1427,10 +1444,16 @@ impl InputOps for WindowsAdapter {
 
     fn clipboard_get(
         &self,
-        _format: ClipboardFormat,
+        format: ClipboardFormat,
         deadline: Deadline,
     ) -> Result<ClipboardContent, PilotError> {
         deadline.ensure_remaining()?;
+        use base64::Engine as _;
+        let html_fmt = register_clipboard_format("HTML Format");
+        let png_fmt = register_clipboard_format("PNG");
+        const CF_DIB_FMT: u32 = 8;
+        const CF_HDROP_FMT: u32 = 15;
+
         unsafe {
             OpenClipboard(None).map_err(|err| {
                 PilotError::new(
@@ -1439,29 +1462,79 @@ impl InputOps for WindowsAdapter {
                 )
             })?;
             let result = (|| {
-                let handle = GetClipboardData(CF_UNICODETEXT_FMT).map_err(|err| {
-                    PilotError::new(
-                        ErrorCode::ElementNotFound,
-                        format!("clipboard text empty: {err}"),
-                    )
-                })?;
-                let hmem = windows::Win32::Foundation::HGLOBAL(handle.0);
-                let ptr = GlobalLock(hmem) as *const u16;
-                if ptr.is_null() {
-                    return Err(PilotError::new(
-                        ErrorCode::ActionFailed,
-                        "GlobalLock failed",
-                    ));
+                let target = match format {
+                    ClipboardFormat::Auto => {
+                        if png_fmt != 0 && IsClipboardFormatAvailable(png_fmt).is_ok() {
+                            ClipboardFormat::Png
+                        } else if IsClipboardFormatAvailable(CF_DIB_FMT).is_ok() {
+                            ClipboardFormat::Png
+                        } else if IsClipboardFormatAvailable(CF_HDROP_FMT).is_ok() {
+                            ClipboardFormat::Files
+                        } else if html_fmt != 0 && IsClipboardFormatAvailable(html_fmt).is_ok() {
+                            ClipboardFormat::Html
+                        } else {
+                            ClipboardFormat::Text
+                        }
+                    }
+                    other => other,
+                };
+
+                match target {
+                    ClipboardFormat::Png => {
+                        if png_fmt != 0
+                            && let Ok(bytes) = read_clipboard_bytes(png_fmt)
+                            && bytes.starts_with(b"\x89PNG\r\n\x1a\n")
+                        {
+                            return Ok(ClipboardContent::Png {
+                                byte_len: bytes.len(),
+                                base64: base64::engine::general_purpose::STANDARD.encode(&bytes),
+                            });
+                        }
+                        if let Ok(dib) = read_clipboard_bytes(CF_DIB_FMT) {
+                            let png = dib_bytes_to_png(&dib)?;
+                            return Ok(ClipboardContent::Png {
+                                byte_len: png.len(),
+                                base64: base64::engine::general_purpose::STANDARD.encode(&png),
+                            });
+                        }
+                        Err(PilotError::new(
+                            ErrorCode::ElementNotFound,
+                            "clipboard has no PNG or CF_DIB image data",
+                        ))
+                    }
+                    ClipboardFormat::Files => {
+                        let raw = read_clipboard_bytes(CF_HDROP_FMT).map_err(|err| {
+                            PilotError::new(
+                                ErrorCode::ElementNotFound,
+                                format!("clipboard files empty: {err}"),
+                            )
+                        })?;
+                        let paths = parse_cf_hdrop_paths(&raw)?;
+                        Ok(ClipboardContent::Files { paths })
+                    }
+                    ClipboardFormat::Html => {
+                        if html_fmt != 0
+                            && let Ok(raw) = read_clipboard_bytes(html_fmt)
+                        {
+                            let html = extract_cf_html_fragment(&raw);
+                            let fallback_text = read_clipboard_utf16_text().ok();
+                            return Ok(ClipboardContent::Html {
+                                html,
+                                fallback_text,
+                            });
+                        }
+                        let text = read_clipboard_utf16_text()?;
+                        Ok(ClipboardContent::Text { text })
+                    }
+                    ClipboardFormat::Text | ClipboardFormat::Auto => {
+                        let text = read_clipboard_utf16_text()?;
+                        Ok(ClipboardContent::Text { text })
+                    }
                 }
-                let mut len = 0_usize;
-                while *ptr.add(len) != 0 {
-                    len += 1;
-                }
-                let text = String::from_utf16_lossy(std::slice::from_raw_parts(ptr, len));
-                let _ = GlobalUnlock(hmem);
-                Ok(ClipboardContent::Text { text })
             })();
-            let _ = CloseClipboard();
+            if let Err(err) = CloseClipboard() {
+                log::debug!("CloseClipboard warning: {err}");
+            }
             result
         }
     }
@@ -1472,18 +1545,12 @@ impl InputOps for WindowsAdapter {
         deadline: Deadline,
     ) -> Result<(), PilotError> {
         deadline.ensure_remaining()?;
-        let text = match content {
-            ClipboardContent::Text { text } => text.as_str(),
-            ClipboardContent::Html { html, .. } => html.as_str(),
-            _ => {
-                return Err(PilotError::new(
-                    ErrorCode::ActionNotSupported,
-                    "only UTF-16 text clipboard writes are enabled",
-                ));
-            }
-        };
-        let utf16: Vec<u16> = text.encode_utf16().chain(std::iter::once(0)).collect();
-        let bytes = utf16.len() * std::mem::size_of::<u16>();
+        use base64::Engine as _;
+        let html_fmt = register_clipboard_format("HTML Format");
+        let png_fmt = register_clipboard_format("PNG");
+        const CF_DIB_FMT: u32 = 8;
+        const CF_HDROP_FMT: u32 = 15;
+
         unsafe {
             OpenClipboard(None).map_err(|err| {
                 PilotError::new(
@@ -1491,29 +1558,65 @@ impl InputOps for WindowsAdapter {
                     format!("OpenClipboard failed: {err}"),
                 )
             })?;
-            let _ = EmptyClipboard();
-            if let Ok(hmem) = GlobalAlloc(GMEM_MOVEABLE, bytes) {
-                let ptr = GlobalLock(hmem) as *mut u16;
-                if !ptr.is_null() {
-                    std::ptr::copy_nonoverlapping(utf16.as_ptr(), ptr, utf16.len());
-                    let _ = GlobalUnlock(hmem);
-                    let _ = SetClipboardData(
-                        CF_UNICODETEXT_FMT,
-                        Some(windows::Win32::Foundation::HANDLE(hmem.0)),
-                    );
+            let result = (|| {
+                EmptyClipboard().map_err(|err| {
+                    PilotError::new(
+                        ErrorCode::ActionFailed,
+                        format!("EmptyClipboard failed: {err}"),
+                    )
+                })?;
+
+                match content {
+                    ClipboardContent::Text { text } => {
+                        write_clipboard_utf16_text(text)?;
+                    }
+                    ClipboardContent::Html {
+                        html,
+                        fallback_text,
+                    } => {
+                        if html_fmt != 0 {
+                            let cf_html = format_cf_html(html);
+                            write_clipboard_bytes(html_fmt, cf_html.as_bytes())?;
+                        }
+                        let fallback = fallback_text.as_deref().unwrap_or(html);
+                        write_clipboard_utf16_text(fallback)?;
+                    }
+                    ClipboardContent::Png { base64, .. } => {
+                        let png_bytes = base64::engine::general_purpose::STANDARD
+                            .decode(base64.trim())
+                            .map_err(|err| {
+                                PilotError::invalid_input(format!("invalid PNG base64: {err}"))
+                            })?;
+                        if png_fmt != 0 {
+                            write_clipboard_bytes(png_fmt, &png_bytes)?;
+                        }
+                        let dib = png_bytes_to_dib(&png_bytes)?;
+                        write_clipboard_bytes(CF_DIB_FMT, &dib)?;
+                    }
+                    ClipboardContent::Files { paths } => {
+                        let hdrop = build_cf_hdrop_bytes(paths);
+                        write_clipboard_bytes(CF_HDROP_FMT, &hdrop)?;
+                    }
                 }
+                Ok(())
+            })();
+            if let Err(err) = CloseClipboard() {
+                log::debug!("CloseClipboard warning: {err}");
             }
-            let _ = CloseClipboard();
+            result
         }
-        Ok(())
     }
 
     fn clipboard_clear(&self, deadline: Deadline) -> Result<(), PilotError> {
         deadline.ensure_remaining()?;
         unsafe {
             if OpenClipboard(None).is_ok() {
-                let _ = EmptyClipboard();
-                let _ = CloseClipboard();
+                if let Err(err) = EmptyClipboard() {
+                    log::debug!("EmptyClipboard warning: {err}");
+                }
+                if let Err(err) = CloseClipboard() {
+                    log::debug!("CloseClipboard warning: {err}");
+                }
             }
         }
         Ok(())
@@ -1778,13 +1881,19 @@ impl SystemOps for WindowsAdapter {
         deadline: Deadline,
     ) -> Result<SurfaceInfo, PilotError> {
         deadline.ensure_remaining()?;
+        if let Some(info) = probe_windows_shell_surface(surface) {
+            return Ok(info);
+        }
         Ok(SurfaceInfo {
             id: format!("windows-{}", surface.as_str()),
             surface,
             app: "windows-shell".to_owned(),
             title: format!("Windows {}", surface.as_str()),
             bounds: None,
-            available: true,
+            available: matches!(
+                surface,
+                SnapshotSurface::Desktop | SnapshotSurface::Window | SnapshotSurface::Focused
+            ),
         })
     }
 
@@ -1898,5 +2007,347 @@ fn capture_gdi_rect_rgba(x: i32, y: i32, w: i32, h: i32) -> Result<Vec<u8>, Pilo
             px[3] = 255;
         }
         Ok(pixels)
+    }
+}
+
+fn register_clipboard_format(name: &str) -> u32 {
+    let wide: Vec<u16> = name.encode_utf16().chain(std::iter::once(0)).collect();
+    unsafe { RegisterClipboardFormatW(PCWSTR(wide.as_ptr())) }
+}
+
+unsafe fn read_clipboard_bytes(format: u32) -> Result<Vec<u8>, PilotError> {
+    let handle = unsafe { GetClipboardData(format) }.map_err(|err| {
+        PilotError::new(
+            ErrorCode::ElementNotFound,
+            format!("clipboard format {format} unavailable: {err}"),
+        )
+    })?;
+    let hmem = windows::Win32::Foundation::HGLOBAL(handle.0);
+    let size = unsafe { GlobalSize(hmem) };
+    let ptr = unsafe { GlobalLock(hmem) } as *const u8;
+    if ptr.is_null() {
+        return Err(PilotError::new(
+            ErrorCode::ActionFailed,
+            "GlobalLock returned null",
+        ));
+    }
+    let bytes = unsafe { std::slice::from_raw_parts(ptr, size) }.to_vec();
+    if let Err(err) = unsafe { GlobalUnlock(hmem) } {
+        log::trace!("GlobalUnlock note: {err}");
+    }
+    Ok(bytes)
+}
+
+unsafe fn write_clipboard_bytes(format: u32, data: &[u8]) -> Result<(), PilotError> {
+    let hmem = unsafe { GlobalAlloc(GMEM_MOVEABLE, data.len().max(1)) }.map_err(|err| {
+        PilotError::new(ErrorCode::ActionFailed, format!("GlobalAlloc failed: {err}"))
+    })?;
+    let ptr = unsafe { GlobalLock(hmem) } as *mut u8;
+    if ptr.is_null() {
+        return Err(PilotError::new(
+            ErrorCode::ActionFailed,
+            "GlobalLock returned null",
+        ));
+    }
+    if !data.is_empty() {
+        unsafe { std::ptr::copy_nonoverlapping(data.as_ptr(), ptr, data.len()) };
+    }
+    if let Err(err) = unsafe { GlobalUnlock(hmem) } {
+        log::trace!("GlobalUnlock note: {err}");
+    }
+    unsafe {
+        SetClipboardData(
+            format,
+            Some(windows::Win32::Foundation::HANDLE(hmem.0)),
+        )
+    }
+    .map_err(|err| {
+        PilotError::new(
+            ErrorCode::ActionFailed,
+            format!("SetClipboardData failed: {err}"),
+        )
+    })?;
+    Ok(())
+}
+
+unsafe fn read_clipboard_utf16_text() -> Result<String, PilotError> {
+    let bytes = unsafe { read_clipboard_bytes(CF_UNICODETEXT_FMT) }?;
+    let u16_units: Vec<u16> = bytes
+        .chunks_exact(2)
+        .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
+        .take_while(|&ch| ch != 0)
+        .collect();
+    Ok(String::from_utf16_lossy(&u16_units))
+}
+
+unsafe fn write_clipboard_utf16_text(text: &str) -> Result<(), PilotError> {
+    let utf16: Vec<u16> = text.encode_utf16().chain(std::iter::once(0)).collect();
+    let mut raw = Vec::with_capacity(utf16.len() * 2);
+    for unit in utf16 {
+        raw.extend_from_slice(&unit.to_le_bytes());
+    }
+    unsafe { write_clipboard_bytes(CF_UNICODETEXT_FMT, &raw) }
+}
+
+fn dib_bytes_to_png(dib: &[u8]) -> Result<Vec<u8>, PilotError> {
+    if dib.len() < 40 {
+        return Err(PilotError::invalid_input("CF_DIB header shorter than 40 bytes"));
+    }
+    let header_size = u32::from_le_bytes([dib[0], dib[1], dib[2], dib[3]]) as usize;
+    if header_size < 40 || header_size > dib.len() {
+        return Err(PilotError::invalid_input("invalid CF_DIB header size"));
+    }
+    let width_i32 = i32::from_le_bytes([dib[4], dib[5], dib[6], dib[7]]);
+    let height_i32 = i32::from_le_bytes([dib[8], dib[9], dib[10], dib[11]]);
+    let bpp = u16::from_le_bytes([dib[14], dib[15]]);
+    let compression = u32::from_le_bytes([dib[16], dib[17], dib[18], dib[19]]);
+    if width_i32 <= 0 || height_i32 == 0 {
+        return Err(PilotError::invalid_input("invalid CF_DIB dimensions"));
+    }
+    let width = width_i32 as u32;
+    let height = height_i32.unsigned_abs();
+    let top_down = height_i32 < 0;
+    if compression != 0 && compression != 3 {
+        return Err(PilotError::new(
+            ErrorCode::ActionNotSupported,
+            format!("unsupported CF_DIB compression {compression}"),
+        ));
+    }
+    let pixel_offset = if compression == 3 && header_size == 40 {
+        header_size + 12
+    } else {
+        header_size
+    };
+    let row_bytes = match bpp {
+        24 => ((width as usize * 3) + 3) & !3,
+        32 => width as usize * 4,
+        _ => {
+            return Err(PilotError::new(
+                ErrorCode::ActionNotSupported,
+                format!("unsupported CF_DIB bit depth {bpp}"),
+            ));
+        }
+    };
+    let required = pixel_offset + row_bytes.saturating_mul(height as usize);
+    if dib.len() < required {
+        return Err(PilotError::invalid_input("CF_DIB pixel data truncated"));
+    }
+    let mut rgba = vec![255_u8; (width as usize) * (height as usize) * 4];
+    let src = &dib[pixel_offset..];
+    for row in 0..height as usize {
+        let src_row = if top_down {
+            row
+        } else {
+            (height as usize) - 1 - row
+        };
+        let row_slice = &src[src_row * row_bytes..(src_row + 1) * row_bytes];
+        for col in 0..width as usize {
+            let dst_idx = (row * width as usize + col) * 4;
+            if bpp == 32 {
+                let s = col * 4;
+                rgba[dst_idx] = row_slice[s + 2];
+                rgba[dst_idx + 1] = row_slice[s + 1];
+                rgba[dst_idx + 2] = row_slice[s];
+                rgba[dst_idx + 3] = row_slice[s + 3];
+            } else {
+                let s = col * 3;
+                rgba[dst_idx] = row_slice[s + 2];
+                rgba[dst_idx + 1] = row_slice[s + 1];
+                rgba[dst_idx + 2] = row_slice[s];
+                rgba[dst_idx + 3] = 255;
+            }
+        }
+    }
+    let mut png = Vec::new();
+    PngEncoder::new(Cursor::new(&mut png))
+        .write_image(&rgba, width, height, ColorType::Rgba8.into())
+        .map_err(|err| PilotError::new(ErrorCode::Internal, format!("encode clipboard png: {err}")))?;
+    Ok(png)
+}
+
+fn png_bytes_to_dib(png: &[u8]) -> Result<Vec<u8>, PilotError> {
+    let decoded = image::load_from_memory_with_format(png, image::ImageFormat::Png)
+        .map_err(|err| PilotError::invalid_input(format!("decode png: {err}")))?;
+    let rgba = decoded.to_rgba8();
+    let (width, height) = rgba.dimensions();
+    let header_size = 40_usize;
+    let pixels_size = (width as usize) * (height as usize) * 4;
+    let mut dib = Vec::with_capacity(header_size + pixels_size);
+    dib.extend_from_slice(&(header_size as u32).to_le_bytes());
+    dib.extend_from_slice(&(width as i32).to_le_bytes());
+    dib.extend_from_slice(&(height as i32).to_le_bytes());
+    dib.extend_from_slice(&1_u16.to_le_bytes());
+    dib.extend_from_slice(&32_u16.to_le_bytes());
+    dib.extend_from_slice(&0_u32.to_le_bytes());
+    dib.extend_from_slice(&(pixels_size as u32).to_le_bytes());
+    dib.extend_from_slice(&0_i32.to_le_bytes());
+    dib.extend_from_slice(&0_i32.to_le_bytes());
+    dib.extend_from_slice(&0_u32.to_le_bytes());
+    dib.extend_from_slice(&0_u32.to_le_bytes());
+    let raw = rgba.into_raw();
+    for row in (0..height as usize).rev() {
+        let start = row * (width as usize) * 4;
+        let row_bytes = &raw[start..start + (width as usize) * 4];
+        for px in row_bytes.chunks_exact(4) {
+            dib.extend_from_slice(&[px[2], px[1], px[0], px[3]]);
+        }
+    }
+    Ok(dib)
+}
+
+fn parse_cf_hdrop_paths(raw: &[u8]) -> Result<Vec<String>, PilotError> {
+    if raw.len() < 20 {
+        return Err(PilotError::invalid_input("CF_HDROP payload too short"));
+    }
+    let offset = u32::from_le_bytes([raw[0], raw[1], raw[2], raw[3]]) as usize;
+    let wide = u32::from_le_bytes([raw[16], raw[17], raw[18], raw[19]]) != 0;
+    if offset > raw.len() {
+        return Err(PilotError::invalid_input("CF_HDROP offset out of bounds"));
+    }
+    let tail = &raw[offset..];
+    let mut paths = Vec::new();
+    if wide {
+        let mut cursor = 0_usize;
+        let units: Vec<u16> = tail
+            .chunks_exact(2)
+            .map(|c| u16::from_le_bytes([c[0], c[1]]))
+            .collect();
+        while cursor < units.len() && units[cursor] != 0 {
+            let end = units[cursor..]
+                .iter()
+                .position(|&u| u == 0)
+                .map(|rel| cursor + rel)
+                .unwrap_or(units.len());
+            let path = String::from_utf16_lossy(&units[cursor..end]);
+            if !path.is_empty() {
+                paths.push(path);
+            }
+            cursor = end.saturating_add(1);
+        }
+    } else {
+        for segment in tail.split(|&b| b == 0) {
+            if segment.is_empty() {
+                break;
+            }
+            paths.push(String::from_utf8_lossy(segment).into_owned());
+        }
+    }
+    Ok(paths)
+}
+
+fn build_cf_hdrop_bytes(paths: &[String]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(64);
+    out.extend_from_slice(&20_u32.to_le_bytes());
+    out.extend_from_slice(&0_i32.to_le_bytes());
+    out.extend_from_slice(&0_i32.to_le_bytes());
+    out.extend_from_slice(&0_u32.to_le_bytes());
+    out.extend_from_slice(&1_u32.to_le_bytes());
+    for path in paths {
+        for unit in path.encode_utf16() {
+            out.extend_from_slice(&unit.to_le_bytes());
+        }
+        out.extend_from_slice(&0_u16.to_le_bytes());
+    }
+    out.extend_from_slice(&0_u16.to_le_bytes());
+    out
+}
+
+fn format_cf_html(html: &str) -> String {
+    let body = format!("<!--StartFragment-->{html}<!--EndFragment-->");
+    let header_len = 105_usize;
+    let start_html = header_len;
+    let start_fragment = header_len + "<!--StartFragment-->".len();
+    let end_fragment = start_fragment + html.len();
+    let end_html = header_len + body.len();
+    format!(
+        "Version:0.9\r\nStartHTML:{start_html:08}\r\nEndHTML:{end_html:08}\r\nStartFragment:{start_fragment:08}\r\nEndFragment:{end_fragment:08}\r\n{body}"
+    )
+}
+
+fn extract_cf_html_fragment(raw: &[u8]) -> String {
+    let text = String::from_utf8_lossy(raw);
+    if let (Some(start), Some(end)) = (
+        text.find("<!--StartFragment-->"),
+        text.find("<!--EndFragment-->"),
+    ) {
+        let s = start + "<!--StartFragment-->".len();
+        if s <= end {
+            return text[s..end].to_owned();
+        }
+    }
+    text.into_owned()
+}
+
+fn probe_windows_shell_surface(kind: SnapshotSurface) -> Option<SurfaceInfo> {
+    let find_class = |class_name: &str| -> Option<HWND> {
+        let wide: Vec<u16> = class_name.encode_utf16().chain(std::iter::once(0)).collect();
+        unsafe { FindWindowW(PCWSTR(wide.as_ptr()), PCWSTR::null()) }.ok()
+    };
+
+    let hwnd_opt = match kind {
+        SnapshotSurface::Taskbar => find_class("Shell_TrayWnd"),
+        SnapshotSurface::SystemTray | SnapshotSurface::Tray => {
+            find_class("Shell_TrayWnd").and_then(|tray| {
+                let child: Vec<u16> = "TrayNotifyWnd".encode_utf16().chain(std::iter::once(0)).collect();
+                unsafe { FindWindowExW(Some(tray), None, PCWSTR(child.as_ptr()), PCWSTR::null()) }.ok()
+            })
+        }
+        SnapshotSurface::SystemTrayOverflow => find_class("NotifyIconOverflowWindow"),
+        SnapshotSurface::StartMenu
+        | SnapshotSurface::ActionCenter
+        | SnapshotSurface::QuickSettings
+        | SnapshotSurface::NotificationCenter => find_class("Windows.UI.Core.CoreWindow"),
+        _ => None,
+    };
+
+    let hwnd = hwnd_opt?;
+    let mut rect = RECT::default();
+    let bounds = if unsafe { GetWindowRect(hwnd, &mut rect) }.is_ok() {
+        Some(Rect::new(
+            f64::from(rect.left),
+            f64::from(rect.top),
+            f64::from((rect.right - rect.left).max(0)),
+            f64::from((rect.bottom - rect.top).max(0)),
+        ))
+    } else {
+        None
+    };
+    Some(SurfaceInfo {
+        id: format!("windows-{}", kind.as_str()),
+        surface: kind,
+        app: "explorer.exe".to_owned(),
+        title: format!("Windows {}", kind.as_str()),
+        bounds,
+        available: unsafe { IsWindowVisible(hwnd).as_bool() },
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn windows_cf_hdrop_and_dib_png_roundtrip() {
+        let paths = vec![
+            r"C:\src\aphrody\README.md".to_owned(),
+            r"C:\src\aphrody\Cargo.toml".to_owned(),
+        ];
+        let encoded = build_cf_hdrop_bytes(&paths);
+        let decoded = parse_cf_hdrop_paths(&encoded).expect("parse hdrop");
+        assert_eq!(decoded, paths);
+
+        let cf_html = format_cf_html("<b>aphrody</b>");
+        assert_eq!(
+            extract_cf_html_fragment(cf_html.as_bytes()),
+            "<b>aphrody</b>"
+        );
+
+        let mut png_bytes = Vec::new();
+        PngEncoder::new(Cursor::new(&mut png_bytes))
+            .write_image(&[255, 0, 0, 255, 0, 255, 0, 255], 2, 1, ColorType::Rgba8.into())
+            .expect("encode 2x1 png");
+        let dib = png_bytes_to_dib(&png_bytes).expect("png to dib");
+        let back_png = dib_bytes_to_png(&dib).expect("dib to png");
+        assert!(back_png.starts_with(b"\x89PNG\r\n\x1a\n"));
     }
 }

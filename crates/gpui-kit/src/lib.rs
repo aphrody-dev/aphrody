@@ -143,6 +143,8 @@ pub use gpui_base::is_mobile;
 /// ```
 #[cfg(feature = "component")]
 pub use ::gpui_component as component;
+#[cfg(feature = "component")]
+pub use ::gpui_component::material3;
 
 #[cfg(feature = "assets")]
 pub use ::gpui_kit_assets as assets;

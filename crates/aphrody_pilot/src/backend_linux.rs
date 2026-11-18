@@ -365,14 +365,50 @@ impl ObservationOps for LinuxAdapter {
 
     fn list_surfaces(&self, deadline: Deadline) -> Result<Vec<SurfaceInfo>, PilotError> {
         deadline.ensure_remaining()?;
-        Ok(vec![SurfaceInfo {
-            id: "linux-atspi-root".to_owned(),
-            surface: SnapshotSurface::Desktop,
+        let bus_ok = Self::connect_a11y_bus().is_ok();
+        let mut surfaces = vec![
+            SurfaceInfo {
+                id: "linux-atspi-root".to_owned(),
+                surface: SnapshotSurface::Desktop,
+                app: "at-spi2".to_owned(),
+                title: "AT-SPI2 Accessibility Tree".to_owned(),
+                bounds: None,
+                available: bus_ok,
+            },
+            SurfaceInfo {
+                id: "linux-taskbar".to_owned(),
+                surface: SnapshotSurface::Taskbar,
+                app: "desktop-shell".to_owned(),
+                title: "Desktop Panel / Taskbar".to_owned(),
+                bounds: None,
+                available: bus_ok,
+            },
+            SurfaceInfo {
+                id: "linux-system-tray".to_owned(),
+                surface: SnapshotSurface::SystemTray,
+                app: "status-notifier".to_owned(),
+                title: "Status Notifier System Tray".to_owned(),
+                bounds: None,
+                available: bus_ok,
+            },
+            SurfaceInfo {
+                id: "linux-notification-center".to_owned(),
+                surface: SnapshotSurface::NotificationCenter,
+                app: "freedesktop-notifications".to_owned(),
+                title: "Notification Center".to_owned(),
+                bounds: None,
+                available: bus_ok,
+            },
+        ];
+        surfaces.push(SurfaceInfo {
+            id: "linux-focused".to_owned(),
+            surface: SnapshotSurface::Focused,
             app: "at-spi2".to_owned(),
-            title: "AT-SPI2 Accessibility Tree".to_owned(),
+            title: "Focused Application Window".to_owned(),
             bounds: None,
-            available: Self::connect_a11y_bus().is_ok(),
-        }])
+            available: bus_ok,
+        });
+        Ok(surfaces)
     }
 }
 
@@ -567,30 +603,123 @@ impl InputOps for LinuxAdapter {
 
     fn clipboard_get(
         &self,
-        _format: ClipboardFormat,
+        format: ClipboardFormat,
         deadline: Deadline,
     ) -> Result<ClipboardContent, PilotError> {
         deadline.ensure_remaining()?;
+        let candidates: &[(&str, &[&str])] = if Self::is_wayland() {
+            match format {
+                ClipboardFormat::Png => &[("wl-paste", &["--type", "image/png"])],
+                ClipboardFormat::Html => &[("wl-paste", &["--type", "text/html"])],
+                _ => &[("wl-paste", &["--no-newline"]), ("xclip", &["-o", "-selection", "clipboard"])],
+            }
+        } else {
+            match format {
+                ClipboardFormat::Png => &[("xclip", &["-o", "-selection", "clipboard", "-t", "image/png"])],
+                ClipboardFormat::Html => &[("xclip", &["-o", "-selection", "clipboard", "-t", "text/html"])],
+                _ => &[
+                    ("xclip", &["-o", "-selection", "clipboard"]),
+                    ("xsel", &["--clipboard", "--output"]),
+                ],
+            }
+        };
+
+        for (bin, args) in candidates {
+            if let Ok(output) = smol::block_on(smol::process::Command::new(bin).args(*args).output())
+                && output.status.success()
+            {
+                return match format {
+                    ClipboardFormat::Png => {
+                        use base64::Engine as _;
+                        Ok(ClipboardContent::Png {
+                            byte_len: output.stdout.len(),
+                            base64: base64::engine::general_purpose::STANDARD.encode(&output.stdout),
+                        })
+                    }
+                    ClipboardFormat::Html => Ok(ClipboardContent::Html {
+                        html: String::from_utf8_lossy(&output.stdout).into_owned(),
+                        fallback_text: None,
+                    }),
+                    _ => Ok(ClipboardContent::Text {
+                        text: String::from_utf8_lossy(&output.stdout).into_owned(),
+                    }),
+                };
+            }
+        }
+
         Err(PilotError::new(
             ErrorCode::ActionNotSupported,
-            "Linux native clipboard requires active X11/Wayland clipboard session",
+            "Linux clipboard read requires wl-paste or xclip/xsel in an active display session",
         ))
     }
 
     fn clipboard_set(
         &self,
-        _content: &ClipboardContent,
+        content: &ClipboardContent,
         deadline: Deadline,
     ) -> Result<(), PilotError> {
         deadline.ensure_remaining()?;
+        let (mime, payload): (&str, Vec<u8>) = match content {
+            ClipboardContent::Text { text } => ("text/plain", text.as_bytes().to_vec()),
+            ClipboardContent::Html { html, .. } => ("text/html", html.as_bytes().to_vec()),
+            ClipboardContent::Png { base64, .. } => {
+                use base64::Engine as _;
+                let bytes = base64::engine::general_purpose::STANDARD
+                    .decode(base64.trim())
+                    .map_err(|err| PilotError::invalid_input(format!("invalid png base64: {err}")))?;
+                ("image/png", bytes)
+            }
+            ClipboardContent::Files { paths } => ("text/plain", paths.join("\n").into_bytes()),
+        };
+
+        let candidates: Vec<(&str, Vec<&str>)> = if Self::is_wayland() {
+            vec![("wl-copy", vec!["--type", mime])]
+        } else {
+            vec![
+                ("xclip", vec!["-i", "-selection", "clipboard", "-t", mime]),
+                ("xsel", vec!["--clipboard", "--input"]),
+            ]
+        };
+
+        for (bin, args) in candidates {
+            let write_res = smol::block_on(async {
+                use smol::io::AsyncWriteExt as _;
+                let mut child = smol::process::Command::new(bin)
+                    .args(&args)
+                    .stdin(smol::process::Stdio::piped())
+                    .spawn()?;
+                if let Some(mut stdin) = child.stdin.take() {
+                    stdin.write_all(&payload).await?;
+                    drop(stdin);
+                }
+                child.status().await
+            });
+            if write_res.is_ok_and(|status| status.success()) {
+                return Ok(());
+            }
+        }
+
         Err(PilotError::new(
             ErrorCode::ActionNotSupported,
-            "Linux native clipboard set requires persistent selection owner",
+            "Linux clipboard write requires wl-copy or xclip/xsel",
         ))
     }
 
     fn clipboard_clear(&self, deadline: Deadline) -> Result<(), PilotError> {
         deadline.ensure_remaining()?;
+        if Self::is_wayland() {
+            if let Err(err) =
+                smol::block_on(smol::process::Command::new("wl-copy").arg("--clear").status())
+            {
+                log::debug!("wl-copy --clear unavailable: {err}");
+            }
+        } else if let Err(err) = smol::block_on(
+            smol::process::Command::new("xsel")
+                .args(["--clipboard", "--clear"])
+                .status(),
+        ) {
+            log::debug!("xsel --clear unavailable: {err}");
+        }
         Ok(())
     }
 }
@@ -836,13 +965,25 @@ impl SystemOps for LinuxAdapter {
         deadline: Deadline,
     ) -> Result<SurfaceInfo, PilotError> {
         deadline.ensure_remaining()?;
+        let available = Self::connect_a11y_bus().is_ok()
+            && matches!(
+                surface,
+                SnapshotSurface::Desktop
+                    | SnapshotSurface::Window
+                    | SnapshotSurface::Focused
+                    | SnapshotSurface::Taskbar
+                    | SnapshotSurface::SystemTray
+                    | SnapshotSurface::NotificationCenter
+                    | SnapshotSurface::Dock
+                    | SnapshotSurface::Menubar
+            );
         Ok(SurfaceInfo {
             id: format!("linux-{}", surface.as_str()),
             surface,
-            app: "linux".to_owned(),
-            title: surface.as_str().to_owned(),
+            app: "linux-shell".to_owned(),
+            title: format!("Linux {}", surface.as_str()),
             bounds: None,
-            available: false,
+            available,
         })
     }
 

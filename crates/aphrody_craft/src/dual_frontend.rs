@@ -10,7 +10,7 @@ use bevy_gpui::{
     render_bevy_egui_inspector, render_viewport_rgba8,
 };
 use egui_gpui::{EguiFrameStats, EguiGpuiHost};
-use gpui::{AnyElement, IntoElement, ParentElement as _, Styled as _, div, px};
+use gpui::{AnyElement, App, AppContext as _, Entity, IntoElement, ParentElement as _, Styled as _, div, px};
 use crate::catalog::CraftCatalog;
 use crate::storytold_suite::StorytoldEcosystemLedger;
 use aphrody_ui::AppearanceMode;
@@ -21,9 +21,10 @@ use web_time::Instant;
 
 use crate::craft_anything_core::CraftAnythingWorkbench;
 use crate::figcraft_core::{
-    FigCraftDocument, export_figcraft_baseline_html, export_figcraft_gpui_rust,
-    export_figcraft_nsh_tsx,
+    FigCraftDocument, export_to_gpui_kit_rs, export_to_gpui_rs, export_to_lighthouse100_html,
+    export_to_nsh_rs_tsx, m3_expressive_starter_templates,
 };
+use crate::figcraft_gpui::FigCraftStudioView;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -38,10 +39,30 @@ pub enum StudioPillar {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ParityRenderMode {
+    #[default]
     GpuiGoogleDesign,
     EguiNative037,
-    #[default]
     SplitSideBySide,
+}
+
+impl ParityRenderMode {
+    #[must_use]
+    pub const fn cycle(self) -> Self {
+        match self {
+            Self::GpuiGoogleDesign => Self::SplitSideBySide,
+            Self::SplitSideBySide => Self::EguiNative037,
+            Self::EguiNative037 => Self::GpuiGoogleDesign,
+        }
+    }
+
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::GpuiGoogleDesign => "GPUI Google Design",
+            Self::EguiNative037 => "egui 0.37 / bevy_egui",
+            Self::SplitSideBySide => "50/50 Split Parity (GPUI vs egui)",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
@@ -89,7 +110,7 @@ impl CraftStudioSession {
 
         let mut session = Self {
             active_pillar: StudioPillar::FigCraftGoogle,
-            parity_mode: ParityRenderMode::SplitSideBySide,
+            parity_mode: ParityRenderMode::GpuiGoogleDesign,
             appearance,
             active_craft_app_id: "figcraft".to_owned(),
             catalog,
@@ -110,6 +131,18 @@ impl CraftStudioSession {
     pub fn set_appearance(&mut self, mode: AppearanceMode) -> Result<()> {
         self.appearance = mode;
         self.egui_host.set_appearance(mode)?;
+        Ok(())
+    }
+
+    pub fn cycle_parity_mode(&mut self) -> Result<ParityRenderMode> {
+        self.parity_mode = self.parity_mode.cycle();
+        let _bench = self.run_parity_benchmark(640, 420)?;
+        Ok(self.parity_mode)
+    }
+
+    pub fn sync_figcraft_document(&mut self, doc: FigCraftDocument) -> Result<()> {
+        self.figcraft = doc;
+        let _bench = self.run_parity_benchmark(640, 420)?;
         Ok(())
     }
 
@@ -196,8 +229,14 @@ impl CraftStudioSession {
         let wcag_ok = theme.verify_wcag_aa().is_ok();
 
         let gpui_started = Instant::now();
-        let _tsx_preview = export_figcraft_nsh_tsx(&self.figcraft);
-        let _gpui_code = export_figcraft_gpui_rust(&self.figcraft);
+        let kit_code = export_to_gpui_kit_rs(&self.figcraft);
+        let tsx_preview = export_to_nsh_rs_tsx(&self.figcraft);
+        let gpui_code = export_to_gpui_rs(&self.figcraft);
+        let html_preview = self
+            .export_figcraft_html()
+            .unwrap_or_default();
+        let _export_bytes =
+            kit_code.len() + tsx_preview.len() + gpui_code.len() + html_preview.len();
         let gpui_us = gpui_started.elapsed().as_micros() as u64;
 
         let egui_stats = self.run_egui_equivalent(width_px, height_px)?;
@@ -227,7 +266,27 @@ impl CraftStudioSession {
     #[must_use]
     pub fn export_figcraft_html(&self) -> Option<String> {
         let doc = aphrody_design::design_md::load_bundled_root_design_md().ok()?;
-        Some(export_figcraft_baseline_html(&self.figcraft, &doc))
+        Some(export_to_lighthouse100_html(&self.figcraft, &doc))
+    }
+}
+
+/// Spawns a retained [`FigCraftStudioView`] entity seeded from an existing [`CraftStudioSession`]
+/// (or a default Google Neural Expressive document if `session` is `None`).
+pub fn spawn_figcraft_studio_view(
+    session: Option<&CraftStudioSession>,
+    cx: &mut App,
+) -> Entity<FigCraftStudioView> {
+    match session {
+        Some(sess) => {
+            let doc = sess.figcraft.clone();
+            let mode_label = sess.parity_mode.label();
+            cx.new(|cx| {
+                let mut view = FigCraftStudioView::from_document(doc, cx);
+                view.set_parity_label(mode_label, cx);
+                view
+            })
+        }
+        None => cx.new(FigCraftStudioView::new),
     }
 }
 
@@ -249,11 +308,7 @@ pub fn render_gpui_studio_panel(session: &CraftStudioSession) -> AnyElement {
         StudioPillar::StorytoldSuiteCatalog => "Storytold 82-Repo Unified Suite",
     };
 
-    let mode_label = match session.parity_mode {
-        ParityRenderMode::GpuiGoogleDesign => "GPUI Google Design",
-        ParityRenderMode::EguiNative037 => "egui 0.37 / bevy_egui",
-        ParityRenderMode::SplitSideBySide => "50/50 Split Parity (GPUI vs egui)",
-    };
+    let mode_label = session.parity_mode.label();
 
     v_flex()
         .gap_3()
@@ -299,8 +354,11 @@ pub fn render_gpui_studio_panel(session: &CraftStudioSession) -> AnyElement {
         .child(
             StarterCard::new(
                 format!(
-                    "Shared GUI Core · FigCraft ({} nodes) · Craft Anything ({} insns) · Bevy ({} actors)",
+                    "Shared GUI Core · FigCraft ({} pages, {} nodes, {}, {} M3 templates) · Craft Anything ({} insns) · Bevy ({} actors)",
+                    session.figcraft.pages.len(),
                     session.figcraft.total_node_count(),
+                    session.figcraft.active_mode.label(),
+                    m3_expressive_starter_templates().len(),
                     session.craft_anything.disasm_rows.len(),
                     session.unreal_world.actors.len()
                 ),
@@ -398,6 +456,23 @@ mod tests {
     use super::*;
 
     #[test]
+    fn default_parity_mode_is_gpui_google_design_and_cycles_cleanly() -> Result<()> {
+        assert_eq!(ParityRenderMode::default(), ParityRenderMode::GpuiGoogleDesign);
+        let mut session = CraftStudioSession::bootstrap(AppearanceMode::Dark)?;
+        assert_eq!(session.parity_mode, ParityRenderMode::GpuiGoogleDesign);
+
+        assert_eq!(session.cycle_parity_mode()?, ParityRenderMode::SplitSideBySide);
+        assert_eq!(session.cycle_parity_mode()?, ParityRenderMode::EguiNative037);
+        assert_eq!(session.cycle_parity_mode()?, ParityRenderMode::GpuiGoogleDesign);
+
+        let mut updated_doc = session.figcraft.clone();
+        let _inserted = updated_doc.insert_template_into(Some("node-root-screen"), "m3-fab");
+        session.sync_figcraft_document(updated_doc)?;
+        assert!(session.figcraft.total_node_count() >= 11);
+        Ok(())
+    }
+
+    #[test]
     fn shared_studio_drives_gpui_egui_037_bevy_ue58_figcraft_and_craft_anything() -> Result<()> {
         let mut session = CraftStudioSession::bootstrap(AppearanceMode::Dark)?;
         assert_eq!(session.storytold_ledger.total_repositories, 82);
@@ -421,7 +496,7 @@ mod tests {
         }
 
         let design_md = load_bundled_root_design_md()?;
-        let html = export_figcraft_baseline_html(&session.figcraft, &design_md);
+        let html = export_to_lighthouse100_html(&session.figcraft, &design_md);
         let lh = audit_html_standards("figcraft.html", &html, &design_md, Some(64_000));
         assert!(lh.ok, "Lighthouse/Baseline findings: {:?}", lh.findings);
         assert_eq!(lh.scores.overall, 100);

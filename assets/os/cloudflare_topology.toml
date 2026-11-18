@@ -1,0 +1,60 @@
+# Declarative Federated Cloudflare Topology (aphrody x auto)
+# Zero literal account IDs, zone IDs, D1 UUIDs, IPv4 addresses, or secrets.
+
+schema_version = 1
+zone_name = "aphrody.com"
+
+[buckets.aphrody_assets]
+name = "aphrody-assets"
+prefixes = [
+  { prefix = "v1/", owner = "aphrody-worker", purpose = "Immutable design, font, and media blobs" },
+  { prefix = "fleet/", owner = "aphrody-worker", purpose = "Live VPS load/disk telemetry snapshot" },
+  { prefix = "learn/", owner = "aphrody-learn", purpose = "Autonomous multi-agent brain/memory/skills/MCP bundle" },
+  { prefix = "auto/assets/", owner = "auto", purpose = "Company files and tenant media for Auto" },
+]
+
+[buckets.aphrody_releases]
+name = "aphrody-releases"
+prefixes = [
+  { prefix = "scripts/", owner = "aphrody-worker", purpose = "Cross-platform install.sh / install.ps1" },
+  { prefix = "channels/", owner = "aphrody-worker", purpose = "Aphrody OS release channel manifests" },
+  { prefix = "manifests/", owner = "aphrody-worker", purpose = "Per-platform artifact manifests" },
+  { prefix = "auto/releases/", owner = "auto", purpose = "Auto desktop & server release manifests" },
+]
+
+[buckets.aphrody_backups]
+name = "aphrody-backups"
+prefixes = [
+  { prefix = "auto/archives/", owner = "auto", purpose = "11-year statutory EN 16931 / Factur-X archives" },
+]
+
+[[workers]]
+name = "aphrody-worker"
+config = ".cloudflare/aphrody-worker/wrangler.toml"
+env = ""
+cron = "*/15 * * * *"
+routes = [
+  "releases.aphrody.com/*",
+  "downloads.aphrody.com/*",
+  "aphrody.com/download*",
+  "docs.aphrody.com/*",
+  "aphrody.com/github",
+  "aphrody.com/r2-assets/*",
+]
+bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET", "EVENTS"]
+
+[[workers]]
+name = "aphrody-learn"
+config = ".cloudflare/aphrody-worker/wrangler.toml"
+env = "learn"
+cron = "*/15 * * * *"
+routes = ["learn.aphrody.com/*"]
+bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET", "EVENTS"]
+
+[[workers]]
+name = "auto"
+config = "auto:wrangler.jsonc"
+env = ""
+cron = "0 6 * * *"
+routes = ["auto.aphrody.com"]
+bindings = ["DB", "COMPANY_DO", "AUTOMATION_WORKFLOW", "FILES", "BACKUPS", "RELEASES", "AI", "ASSETS"]

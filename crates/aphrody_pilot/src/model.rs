@@ -77,6 +77,23 @@ pub enum SnapshotSurface {
     Tray,
     Focused,
     Desktop,
+    Taskbar,
+    #[serde(alias = "system-tray")]
+    SystemTray,
+    #[serde(alias = "quick-settings")]
+    QuickSettings,
+    #[serde(alias = "notification-center")]
+    NotificationCenter,
+    Toolbar,
+    Spotlight,
+    #[serde(alias = "menu-bar-extras")]
+    MenuBarExtras,
+    #[serde(alias = "system-tray-overflow")]
+    SystemTrayOverflow,
+    #[serde(alias = "start-menu")]
+    StartMenu,
+    #[serde(alias = "action-center")]
+    ActionCenter,
 }
 
 impl SnapshotSurface {
@@ -90,9 +107,19 @@ impl SnapshotSurface {
             "popover" => Some(Self::Popover),
             "alert" => Some(Self::Alert),
             "dock" => Some(Self::Dock),
-            "tray" | "menu-bar-extras" => Some(Self::Tray),
+            "tray" => Some(Self::Tray),
             "focused" => Some(Self::Focused),
             "desktop" => Some(Self::Desktop),
+            "taskbar" => Some(Self::Taskbar),
+            "system_tray" | "system-tray" => Some(Self::SystemTray),
+            "quick_settings" | "quick-settings" => Some(Self::QuickSettings),
+            "notification_center" | "notification-center" => Some(Self::NotificationCenter),
+            "toolbar" => Some(Self::Toolbar),
+            "spotlight" => Some(Self::Spotlight),
+            "menu_bar_extras" | "menu-bar-extras" => Some(Self::MenuBarExtras),
+            "system_tray_overflow" | "system-tray-overflow" => Some(Self::SystemTrayOverflow),
+            "start_menu" | "start-menu" => Some(Self::StartMenu),
+            "action_center" | "action-center" => Some(Self::ActionCenter),
             _ => None,
         }
     }
@@ -110,7 +137,46 @@ impl SnapshotSurface {
             Self::Tray => "tray",
             Self::Focused => "focused",
             Self::Desktop => "desktop",
+            Self::Taskbar => "taskbar",
+            Self::SystemTray => "system-tray",
+            Self::QuickSettings => "quick-settings",
+            Self::NotificationCenter => "notification-center",
+            Self::Toolbar => "toolbar",
+            Self::Spotlight => "spotlight",
+            Self::MenuBarExtras => "menu-bar-extras",
+            Self::SystemTrayOverflow => "system-tray-overflow",
+            Self::StartMenu => "start-menu",
+            Self::ActionCenter => "action-center",
         }
+    }
+
+    #[must_use]
+    pub const fn is_window(self) -> bool {
+        matches!(self, Self::Window)
+    }
+
+    #[must_use]
+    pub fn unavailable_error(self, supported: &[Self]) -> PilotError {
+        PilotError::new(
+            if supported.is_empty() {
+                ErrorCode::PlatformNotSupported
+            } else {
+                ErrorCode::InvalidArgs
+            },
+            format!(
+                "Snapshot surface '{}' is not available on this platform",
+                self.as_str()
+            ),
+        )
+        .with_details(serde_json::json!({
+            "requested_surface": self.as_str(),
+            "supported_surfaces": supported
+                .iter()
+                .map(|surface| surface.as_str())
+                .collect::<Vec<_>>(),
+        }))
+        .with_suggestion("Choose one of the supported snapshot surfaces.")
+        .with_disposition(DeliverySemantics::not_delivered())
     }
 }
 
@@ -410,6 +476,7 @@ pub enum ErrorCode {
     InvalidArgs,
     AppUnresponsive,
     ElevationRequired,
+    PlatformNotSupported,
     Internal,
 }
 
@@ -430,6 +497,7 @@ impl ErrorCode {
             Self::InvalidArgs => "INVALID_ARGS",
             Self::AppUnresponsive => "APP_UNRESPONSIVE",
             Self::ElevationRequired => "ELEVATION_REQUIRED",
+            Self::PlatformNotSupported => "PLATFORM_NOT_SUPPORTED",
             Self::Internal => "INTERNAL",
         }
     }
@@ -456,12 +524,29 @@ pub enum RetryPolicy {
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RetryDisposition {
+    #[default]
+    Unknown,
+    Safe,
+    Unsafe,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeliverySemantics {
     pub disposition: DeliveryDisposition,
     pub retry: RetryPolicy,
 }
 
 impl DeliverySemantics {
+    #[must_use]
+    pub const fn unknown() -> Self {
+        Self {
+            disposition: DeliveryDisposition::Unknown,
+            retry: RetryPolicy::DoNotRetry,
+        }
+    }
+
     #[must_use]
     pub const fn not_delivered() -> Self {
         Self {
@@ -499,6 +584,22 @@ impl DeliverySemantics {
         Self {
             disposition: DeliveryDisposition::DeliveryUncertain,
             retry: RetryPolicy::Reobserve,
+        }
+    }
+
+    #[must_use]
+    pub const fn delivery(self) -> DeliveryDisposition {
+        self.disposition
+    }
+
+    #[must_use]
+    pub const fn retry_disposition(self) -> RetryDisposition {
+        match self.disposition {
+            DeliveryDisposition::Unknown => RetryDisposition::Unknown,
+            DeliveryDisposition::NotDelivered => RetryDisposition::Safe,
+            DeliveryDisposition::DeliveryUncertain
+            | DeliveryDisposition::DeliveredUnverified
+            | DeliveryDisposition::DeliveredVerified => RetryDisposition::Unsafe,
         }
     }
 }
@@ -548,19 +649,21 @@ impl PilotError {
     #[must_use]
     pub fn new(code: ErrorCode, message: impl Into<String>) -> Self {
         let disposition = match code {
-            ErrorCode::StaleRef | ErrorCode::ElementNotFound => DeliverySemantics::reobserve(),
+            ErrorCode::StaleRef | ErrorCode::ElementNotFound | ErrorCode::AmbiguousRef => {
+                DeliverySemantics::reobserve()
+            }
             ErrorCode::PermDenied
             | ErrorCode::AppNotFound
             | ErrorCode::WindowNotFound
             | ErrorCode::InvalidArgs
             | ErrorCode::ActionNotSupported
             | ErrorCode::ElementDisabled
-            | ErrorCode::ElevationRequired => DeliverySemantics::not_delivered(),
+            | ErrorCode::ElevationRequired
+            | ErrorCode::PlatformNotSupported
+            | ErrorCode::Internal => DeliverySemantics::not_delivered(),
             ErrorCode::Timeout | ErrorCode::ActionFailed | ErrorCode::AppUnresponsive => {
                 DeliverySemantics::uncertain()
             }
-            ErrorCode::AmbiguousRef => DeliverySemantics::reobserve(),
-            ErrorCode::Internal => DeliverySemantics::not_delivered(),
         };
         Self(Box::new(PilotErrorData {
             code,
@@ -601,6 +704,11 @@ impl PilotError {
     pub fn with_details(mut self, details: Value) -> Self {
         self.0.details = Some(details);
         self
+    }
+
+    #[must_use]
+    pub const fn retry_disposition(&self) -> RetryDisposition {
+        self.0.disposition.retry_disposition()
     }
 }
 
@@ -644,5 +752,74 @@ impl CommandEnvelope {
             data: None,
             error: Some(error),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn retry_disposition_maps_every_delivery_semantics() {
+        assert_eq!(
+            DeliverySemantics::unknown().retry_disposition(),
+            RetryDisposition::Unknown
+        );
+        assert_eq!(
+            DeliverySemantics::not_delivered().retry_disposition(),
+            RetryDisposition::Safe
+        );
+        assert_eq!(
+            DeliverySemantics::reobserve().retry_disposition(),
+            RetryDisposition::Safe
+        );
+        assert_eq!(
+            DeliverySemantics::uncertain().retry_disposition(),
+            RetryDisposition::Unsafe
+        );
+        assert_eq!(
+            DeliverySemantics::delivered_unverified().retry_disposition(),
+            RetryDisposition::Unsafe
+        );
+        assert_eq!(
+            DeliverySemantics::delivered_verified().retry_disposition(),
+            RetryDisposition::Unsafe
+        );
+
+        let err = PilotError::new(ErrorCode::PlatformNotSupported, "unsupported surface");
+        assert_eq!(err.code.as_str(), "PLATFORM_NOT_SUPPORTED");
+        assert_eq!(err.retry_disposition(), RetryDisposition::Safe);
+    }
+
+    #[test]
+    fn snapshot_surface_parses_kebab_and_snake_aliases() {
+        for (raw, expected) in [
+            ("taskbar", SnapshotSurface::Taskbar),
+            ("system_tray", SnapshotSurface::SystemTray),
+            ("system-tray", SnapshotSurface::SystemTray),
+            ("quick-settings", SnapshotSurface::QuickSettings),
+            ("notification-center", SnapshotSurface::NotificationCenter),
+            ("toolbar", SnapshotSurface::Toolbar),
+            ("spotlight", SnapshotSurface::Spotlight),
+            ("menu-bar-extras", SnapshotSurface::MenuBarExtras),
+            ("system-tray-overflow", SnapshotSurface::SystemTrayOverflow),
+            ("start-menu", SnapshotSurface::StartMenu),
+            ("action-center", SnapshotSurface::ActionCenter),
+        ] {
+            let parsed = SnapshotSurface::parse(raw);
+            assert_eq!(parsed, Some(expected), "failed to parse surface '{raw}'");
+            assert_eq!(
+                SnapshotSurface::parse(expected.as_str()),
+                Some(expected),
+                "roundtrip failed for '{raw}'"
+            );
+        }
+
+        let unsupported_none = SnapshotSurface::Spotlight.unavailable_error(&[]);
+        assert_eq!(unsupported_none.code, ErrorCode::PlatformNotSupported);
+
+        let unsupported_other =
+            SnapshotSurface::Spotlight.unavailable_error(&[SnapshotSurface::Window]);
+        assert_eq!(unsupported_other.code, ErrorCode::InvalidArgs);
     }
 }

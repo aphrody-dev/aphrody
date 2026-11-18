@@ -177,14 +177,57 @@ impl ObservationOps for MacOsAdapter {
 
     fn list_surfaces(&self, deadline: Deadline) -> Result<Vec<SurfaceInfo>, PilotError> {
         deadline.ensure_remaining()?;
-        Ok(vec![SurfaceInfo {
-            id: "macos-ax".to_owned(),
-            surface: SnapshotSurface::Window,
-            app: "macOS".to_owned(),
-            title: "AXUIElement Root".to_owned(),
-            bounds: None,
-            available: unsafe { AXIsProcessTrusted() },
-        }])
+        let ax_ok = unsafe { AXIsProcessTrusted() };
+        Ok(vec![
+            SurfaceInfo {
+                id: "macos-window".to_owned(),
+                surface: SnapshotSurface::Window,
+                app: "macOS".to_owned(),
+                title: "AXUIElement Active Window".to_owned(),
+                bounds: None,
+                available: ax_ok,
+            },
+            SurfaceInfo {
+                id: "macos-menubar".to_owned(),
+                surface: SnapshotSurface::Menubar,
+                app: "SystemUIServer".to_owned(),
+                title: "macOS Menu Bar".to_owned(),
+                bounds: None,
+                available: ax_ok,
+            },
+            SurfaceInfo {
+                id: "macos-menu-bar-extras".to_owned(),
+                surface: SnapshotSurface::MenuBarExtras,
+                app: "ControlCenter".to_owned(),
+                title: "Menu Bar Extras".to_owned(),
+                bounds: None,
+                available: ax_ok,
+            },
+            SurfaceInfo {
+                id: "macos-dock".to_owned(),
+                surface: SnapshotSurface::Dock,
+                app: "Dock".to_owned(),
+                title: "macOS Dock".to_owned(),
+                bounds: None,
+                available: ax_ok,
+            },
+            SurfaceInfo {
+                id: "macos-spotlight".to_owned(),
+                surface: SnapshotSurface::Spotlight,
+                app: "Spotlight".to_owned(),
+                title: "Spotlight Search".to_owned(),
+                bounds: None,
+                available: ax_ok,
+            },
+            SurfaceInfo {
+                id: "macos-notification-center".to_owned(),
+                surface: SnapshotSurface::NotificationCenter,
+                app: "NotificationCenter".to_owned(),
+                title: "Notification Center".to_owned(),
+                bounds: None,
+                available: ax_ok,
+            },
+        ])
     }
 }
 
@@ -281,25 +324,87 @@ impl InputOps for MacOsAdapter {
 
     fn clipboard_get(
         &self,
-        _format: ClipboardFormat,
+        format: ClipboardFormat,
         deadline: Deadline,
     ) -> Result<ClipboardContent, PilotError> {
         deadline.ensure_remaining()?;
+        if matches!(format, ClipboardFormat::Png) {
+            let output = smol::block_on(
+                smol::process::Command::new("osascript")
+                    .args(["-e", "the clipboard as «class PNGf»"])
+                    .output(),
+            );
+            if let Ok(out) = output
+                && out.status.success()
+                && !out.stdout.is_empty()
+            {
+                use base64::Engine as _;
+                return Ok(ClipboardContent::Png {
+                    byte_len: out.stdout.len(),
+                    base64: base64::engine::general_purpose::STANDARD.encode(&out.stdout),
+                });
+            }
+        }
+        let output = smol::block_on(smol::process::Command::new("pbpaste").output())
+            .map_err(|err| PilotError::new(ErrorCode::ActionFailed, format!("pbpaste failed: {err}")))?;
         Ok(ClipboardContent::Text {
-            text: String::new(),
+            text: String::from_utf8_lossy(&output.stdout).into_owned(),
         })
     }
 
     fn clipboard_set(
         &self,
-        _content: &ClipboardContent,
+        content: &ClipboardContent,
         deadline: Deadline,
     ) -> Result<(), PilotError> {
-        deadline.ensure_remaining()
+        deadline.ensure_remaining()?;
+        let text = match content {
+            ClipboardContent::Text { text } => text.clone(),
+            ClipboardContent::Html { html, .. } => html.clone(),
+            ClipboardContent::Files { paths } => paths.join("\n"),
+            ClipboardContent::Png { .. } => {
+                return Err(PilotError::new(
+                    ErrorCode::ActionNotSupported,
+                    "macOS clipboard_set png requires NSPasteboard native bridge",
+                ));
+            }
+        };
+        let status = smol::block_on(async {
+            use smol::io::AsyncWriteExt as _;
+            let mut child = smol::process::Command::new("pbcopy")
+                .stdin(smol::process::Stdio::piped())
+                .spawn()
+                .map_err(|err| {
+                    PilotError::new(
+                        ErrorCode::ActionFailed,
+                        format!("pbcopy spawn failed: {err}"),
+                    )
+                })?;
+            if let Some(mut stdin) = child.stdin.take() {
+                stdin.write_all(text.as_bytes()).await.map_err(|err| {
+                    PilotError::new(
+                        ErrorCode::ActionFailed,
+                        format!("pbcopy write failed: {err}"),
+                    )
+                })?;
+                drop(stdin);
+            }
+            child.status().await.map_err(|err| {
+                PilotError::new(ErrorCode::ActionFailed, format!("pbcopy wait failed: {err}"))
+            })
+        })?;
+        if !status.success() {
+            return Err(PilotError::new(
+                ErrorCode::ActionFailed,
+                "pbcopy exited non-zero",
+            ));
+        }
+        Ok(())
     }
 
     fn clipboard_clear(&self, deadline: Deadline) -> Result<(), PilotError> {
-        deadline.ensure_remaining()
+        deadline.ensure_remaining()?;
+        self.clipboard_set(&ClipboardContent::Text { text: String::new() }, deadline)
     }
 }
 
@@ -471,13 +576,25 @@ impl SystemOps for MacOsAdapter {
         deadline: Deadline,
     ) -> Result<SurfaceInfo, PilotError> {
         deadline.ensure_remaining()?;
+        let available = unsafe { AXIsProcessTrusted() }
+            && matches!(
+                surface,
+                SnapshotSurface::Window
+                    | SnapshotSurface::Menubar
+                    | SnapshotSurface::MenuBarExtras
+                    | SnapshotSurface::Dock
+                    | SnapshotSurface::Spotlight
+                    | SnapshotSurface::NotificationCenter
+                    | SnapshotSurface::Desktop
+                    | SnapshotSurface::Focused
+            );
         Ok(SurfaceInfo {
             id: format!("macos-{}", surface.as_str()),
             surface,
             app: "macOS".to_owned(),
-            title: surface.as_str().to_owned(),
+            title: format!("macOS {}", surface.as_str()),
             bounds: None,
-            available: true,
+            available,
         })
     }
 

@@ -6,15 +6,16 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use web_time::Instant;
 
-use crate::action::{
-    Action, ActionRequest, ActionResult, InteractionPolicy, execute_verified_action, sleep_brief,
-};
-use crate::adapter::{CommandContext, InteractionLease, PilotEngine};
+use crate::action::{Action, ActionRequest, ActionResult, InteractionPolicy, execute_verified_action, sleep_brief};
+use crate::adapter::{CommandContext, Deadline, InteractionLease, PilotEngine};
+use crate::browser::{SnapshotDiff, diff_snapshot_text};
 use crate::locator::{LocatorQuery, ObservationRequest, find_node_by_ref, resolve_unique};
-use crate::model::{ErrorCode, PilotError, SnapshotSurface};
+use crate::model::{DeliverySemantics, ErrorCode, PilotError, RetryDisposition, SnapshotSurface};
 use crate::refs::{stamp_tree_refs, validate_ref_id};
 
 const MAX_TRACE_RING: usize = 512;
+pub const MAX_BATCH_ENTRIES: usize = 256;
+pub const MAX_BATCH_OUTPUT_BYTES: usize = 1024 * 1024;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PermissionNeed {
@@ -145,12 +146,24 @@ pub struct BatchStep {
     pub args: Value,
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BatchExecutionState {
+    #[default]
+    Completed,
+    NotStarted,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BatchStepResult {
     pub index: usize,
     pub op: String,
     pub ok: bool,
     pub duration_ms: u64,
+    #[serde(default)]
+    pub execution: BatchExecutionState,
+    #[serde(default)]
+    pub retry_disposition: RetryDisposition,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub data: Option<Value>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -160,9 +173,19 @@ pub struct BatchStepResult {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BatchReport {
     pub total: usize,
+    #[serde(default)]
+    pub completed: usize,
     pub succeeded: usize,
     pub failed: usize,
+    #[serde(default)]
+    pub not_started: usize,
     pub stopped_early: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stopped_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stopped_index: Option<usize>,
+    #[serde(default)]
+    pub max_output_bytes: usize,
     pub duration_ms: u64,
     pub steps: Vec<BatchStepResult>,
 }
@@ -201,6 +224,14 @@ pub struct AiActOutcome {
     pub after_snapshot_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after_snapshot_text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub after_snapshot_diff: Option<SnapshotDiff>,
+    #[serde(default)]
+    pub retry_disposition: RetryDisposition,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verification_scope: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verification_reason: Option<String>,
     pub ref_count_delta: isize,
 }
 
@@ -340,7 +371,19 @@ fn node_satisfies_wait(node: &crate::model::AccessibilityNode, selector: &WaitSe
     true
 }
 
-pub fn ai_act_verify(
+fn extract_verification_tag(result: &ActionResult, key: &str) -> Option<String> {
+    result.steps.iter().rev().find_map(|step| {
+        let detail = step.detail.as_deref()?;
+        detail.split(';').find_map(|segment| {
+            let trimmed = segment.trim();
+            trimmed
+                .strip_prefix(&format!("{key}="))
+                .map(str::to_owned)
+        })
+    })
+}
+
+pub fn act_verify(
     engine: &mut PilotEngine,
     plan: &AiActPlan,
     ctx: &CommandContext,
@@ -367,11 +410,11 @@ pub fn ai_act_verify(
         })?
     } else {
         return Err(PilotError::invalid_input(
-            "ai_act_verify requires either `target_ref` or `locator`",
+            "act_verify requires either `target_ref` or `locator`",
         ));
     };
 
-    let deadline = crate::adapter::Deadline::from_timeout_ms(ctx.timeout_ms);
+    let deadline = Deadline::from_timeout_ms(ctx.timeout_ms);
     let handle = engine.resolve_saved_ref(&target_ref, deadline)?;
     let lease = InteractionLease::new(deadline, plan.policy);
     let req = ActionRequest {
@@ -384,6 +427,10 @@ pub fn ai_act_verify(
     };
     engine.record_action_event(&action_result);
 
+    let retry_disposition = action_result.retry_disposition();
+    let verification_scope = extract_verification_tag(&action_result, "verification_scope");
+    let verification_reason = extract_verification_tag(&action_result, "verification_reason");
+
     if !plan.include_post_snapshot {
         return Ok(AiActOutcome {
             action_result,
@@ -391,6 +438,10 @@ pub fn ai_act_verify(
             before_snapshot_id: before_tree.snapshot_id,
             after_snapshot_id: None,
             after_snapshot_text: None,
+            after_snapshot_diff: None,
+            retry_disposition,
+            verification_scope,
+            verification_reason,
             ref_count_delta: 0,
         });
     }
@@ -403,14 +454,39 @@ pub fn ai_act_verify(
         after_tree.stats.duration_ms,
     );
     let delta = after_map.len() as isize - before_count;
+    let diff = diff_snapshot_text(&before_tree.text, &after_tree.text);
     Ok(AiActOutcome {
         action_result,
         resolved_ref: target_ref,
         before_snapshot_id: before_tree.snapshot_id,
         after_snapshot_id: Some(after_tree.snapshot_id),
         after_snapshot_text: Some(after_tree.text),
+        after_snapshot_diff: Some(diff),
+        retry_disposition,
+        verification_scope,
+        verification_reason,
         ref_count_delta: delta,
     })
+}
+
+pub fn ai_act_verify(
+    engine: &mut PilotEngine,
+    plan: &AiActPlan,
+    ctx: &CommandContext,
+) -> Result<AiActOutcome, PilotError> {
+    act_verify(engine, plan, ctx)
+}
+
+fn infer_retry_from_data(data: &Value) -> RetryDisposition {
+    let disp_val = data
+        .get("disposition")
+        .or_else(|| data.get("action_result").and_then(|ar| ar.get("disposition")));
+    if let Some(val) = disp_val
+        && let Ok(semantics) = serde_json::from_value::<DeliverySemantics>(val.clone())
+    {
+        return semantics.retry_disposition();
+    }
+    RetryDisposition::Unknown
 }
 
 pub fn execute_batch(
@@ -419,49 +495,138 @@ pub fn execute_batch(
     stop_on_error: bool,
     ctx: &CommandContext,
 ) -> BatchReport {
+    execute_batch_with_limits(engine, steps, stop_on_error, ctx, MAX_BATCH_OUTPUT_BYTES)
+}
+
+pub fn execute_batch_with_limits(
+    engine: &mut PilotEngine,
+    steps: &[BatchStep],
+    stop_on_error: bool,
+    ctx: &CommandContext,
+    max_output_bytes: usize,
+) -> BatchReport {
     let started = Instant::now();
-    let mut results = Vec::with_capacity(steps.len());
+    let deadline = Deadline::from_timeout_ms(ctx.timeout_ms);
+    let total = steps.len();
+    let mut results = Vec::with_capacity(total.min(MAX_BATCH_ENTRIES));
+    let mut completed = 0_usize;
     let mut succeeded = 0_usize;
     let mut failed = 0_usize;
     let mut stopped_early = false;
+    let mut stopped_reason = None;
+    let mut stopped_index = None;
+    let mut used_bytes = 0_usize;
 
     for (index, step) in steps.iter().enumerate() {
+        if index >= MAX_BATCH_ENTRIES {
+            stopped_early = true;
+            stopped_reason = Some("entry_limit".to_owned());
+            stopped_index = Some(index);
+            break;
+        }
+        if deadline.is_expired() {
+            failed += 1;
+            let err = PilotError::new(
+                ErrorCode::Timeout,
+                format!("batch deadline elapsed before step {index} ('{}') started", step.op),
+            )
+            .with_disposition(DeliverySemantics::not_delivered());
+            results.push(BatchStepResult {
+                index,
+                op: step.op.clone(),
+                ok: false,
+                duration_ms: 0,
+                execution: BatchExecutionState::NotStarted,
+                retry_disposition: err.retry_disposition(),
+                data: None,
+                error: Some(err),
+            });
+            stopped_early = true;
+            stopped_reason = Some("deadline".to_owned());
+            stopped_index = Some(index);
+            break;
+        }
+
         let step_start = Instant::now();
-        match engine.execute_tool(&step.op, &step.args, ctx) {
+        let entry = match engine.execute_tool(&step.op, &step.args, ctx) {
             Ok(data) => {
                 succeeded += 1;
-                results.push(BatchStepResult {
+                completed += 1;
+                let retry = infer_retry_from_data(&data);
+                BatchStepResult {
                     index,
                     op: step.op.clone(),
                     ok: true,
                     duration_ms: step_start.elapsed().as_millis() as u64,
+                    execution: BatchExecutionState::Completed,
+                    retry_disposition: retry,
                     data: Some(data),
                     error: None,
-                });
+                }
             }
             Err(err) => {
                 failed += 1;
-                results.push(BatchStepResult {
+                completed += 1;
+                let retry = err.retry_disposition();
+                BatchStepResult {
                     index,
                     op: step.op.clone(),
                     ok: false,
                     duration_ms: step_start.elapsed().as_millis() as u64,
+                    execution: BatchExecutionState::Completed,
+                    retry_disposition: retry,
                     data: None,
                     error: Some(err),
-                });
-                if stop_on_error {
-                    stopped_early = true;
-                    break;
                 }
             }
+        };
+
+        let entry_bytes = serde_json::to_vec(&entry).map_or(256, |bytes| bytes.len());
+        let entry_failed = !entry.ok;
+        if used_bytes.saturating_add(entry_bytes) > max_output_bytes {
+            let truncated = BatchStepResult {
+                index: entry.index,
+                op: entry.op,
+                ok: entry.ok,
+                duration_ms: entry.duration_ms,
+                execution: entry.execution,
+                retry_disposition: entry.retry_disposition,
+                data: None,
+                error: Some(
+                    PilotError::new(
+                        ErrorCode::Internal,
+                        format!("batch step {index} output exceeded byte limit ({max_output_bytes})"),
+                    )
+                    .with_disposition(DeliverySemantics::uncertain()),
+                ),
+            };
+            results.push(truncated);
+            stopped_early = true;
+            stopped_reason = Some("output_limit".to_owned());
+            stopped_index = Some(index);
+            break;
+        }
+        used_bytes = used_bytes.saturating_add(entry_bytes);
+        results.push(entry);
+
+        if entry_failed && stop_on_error {
+            stopped_early = true;
+            stopped_reason = Some("stop_on_error".to_owned());
+            stopped_index = Some(index);
+            break;
         }
     }
 
     BatchReport {
-        total: steps.len(),
+        total,
+        completed,
         succeeded,
         failed,
+        not_started: total.saturating_sub(completed),
         stopped_early,
+        stopped_reason,
+        stopped_index,
+        max_output_bytes,
         duration_ms: started.elapsed().as_millis() as u64,
         steps: results,
     }
@@ -472,5 +637,76 @@ pub fn status_json(engine: &mut PilotEngine) -> Value {
     match engine.status() {
         Ok(report) => json!(report),
         Err(err) => json!({ "error": err }),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::adapter::TargetBackend;
+
+    #[test]
+    fn act_verify_and_batch_stop_on_error_track_retry_and_not_started() {
+        let mut engine = PilotEngine::new();
+        engine.set_target(TargetBackend::Gpui);
+        let ctx = CommandContext {
+            target: TargetBackend::Gpui,
+            ..Default::default()
+        };
+
+        let outcome = act_verify(
+            &mut engine,
+            &AiActPlan {
+                app: None,
+                window_id: None,
+                surface: SnapshotSurface::Window,
+                target_ref: None,
+                locator: Some(LocatorQuery {
+                    identity: crate::locator::IdentityPredicate {
+                        role: Some("switch".to_owned()),
+                        name: Some("Dark Appearance".to_owned()),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }),
+                action: Action::Toggle,
+                policy: InteractionPolicy::Verified,
+                include_post_snapshot: true,
+            },
+            &ctx,
+        )
+        .expect("act_verify toggle ok");
+        assert!(outcome.action_result.verified);
+        assert_eq!(outcome.retry_disposition, RetryDisposition::Unsafe);
+        assert!(outcome.after_snapshot_diff.is_some());
+
+        let batch = execute_batch(
+            &mut engine,
+            &[
+                BatchStep {
+                    op: "desktop_status".to_owned(),
+                    args: json!({}),
+                },
+                BatchStep {
+                    op: "desktop_unknown_op_for_test".to_owned(),
+                    args: json!({}),
+                },
+                BatchStep {
+                    op: "desktop_status".to_owned(),
+                    args: json!({}),
+                },
+            ],
+            true,
+            &ctx,
+        );
+        assert_eq!(batch.total, 3);
+        assert_eq!(batch.completed, 2);
+        assert_eq!(batch.succeeded, 1);
+        assert_eq!(batch.failed, 1);
+        assert_eq!(batch.not_started, 1);
+        assert!(batch.stopped_early);
+        assert_eq!(batch.stopped_reason.as_deref(), Some("stop_on_error"));
+        assert_eq!(batch.stopped_index, Some(1));
+        assert_eq!(batch.steps[1].retry_disposition, RetryDisposition::Safe);
     }
 }

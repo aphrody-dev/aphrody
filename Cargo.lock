@@ -894,6 +894,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aphrody_auto"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "aphrody_browser"
 version = "0.1.0"
 dependencies = [
@@ -1052,6 +1061,7 @@ name = "aphrody_desktop"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "aphrody_auto",
  "aphrody_browser",
  "aphrody_craft",
  "aphrody_installer",

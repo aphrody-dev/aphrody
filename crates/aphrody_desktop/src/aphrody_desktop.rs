@@ -18,6 +18,7 @@ pub mod shell;
 pub mod studio_view;
 pub mod windows;
 
+pub use aphrody_auto;
 pub use aphrody_browser::{ChromiumBrowserView, WebGpuOsRuntime};
 pub use shell::{
     CloseOverlays, CycleLayout, CycleStackTab, FocusNext, FocusPrev, OsDesktopShell,

@@ -2,14 +2,46 @@ export interface R2ObjectLike {
   body: ReadableStream | string | Uint8Array | null;
   httpEtag?: string;
   writeHttpMetadata?: (headers: Headers) => void;
+  text?: () => Promise<string>;
+  json?: <T = unknown>() => Promise<T>;
+}
+
+export interface R2ListedObjectLike {
+  key: string;
+  size?: number;
+  etag?: string;
+  uploaded?: Date | string;
+}
+
+export interface R2ObjectsLike {
+  objects: R2ListedObjectLike[];
+  truncated?: boolean;
+  cursor?: string;
 }
 
 export interface R2BucketLike {
   get(key: string): Promise<R2ObjectLike | null>;
+  put?(
+    key: string,
+    value: string | Uint8Array | ArrayBuffer | ReadableStream,
+    options?: { httpMetadata?: { contentType?: string } },
+  ): Promise<unknown>;
+  list?(options?: { prefix?: string; limit?: number; cursor?: string }): Promise<R2ObjectsLike>;
+  delete?(keys: string | string[]): Promise<void>;
 }
 
 export interface QueueLike<T = unknown> {
   send(message: T, options?: { contentType?: "json" | "text" | "bytes" | "v8" }): Promise<void>;
+}
+
+export interface ScheduledControllerLike {
+  cron?: string;
+  scheduledTime?: number;
+}
+
+export interface ExecutionContextLike {
+  waitUntil?(promise: Promise<unknown>): void;
+  passThroughOnException?(): void;
 }
 
 export interface WorkerEnv {
@@ -18,6 +50,9 @@ export interface WorkerEnv {
   OPEN_SOURCE_WEBSITE_ASSETS_BUCKET?: R2BucketLike;
   DOCS_ORIGIN_URL?: string;
   GITHUB_WEBHOOK_SECRET?: string;
+  FLEET_BEACON_TOKEN?: string;
+  LEARN_SYNC_TOKEN?: string;
+  LEARN_PUBLIC_READ?: string;
   EVENTS?: QueueLike;
 }
 

@@ -24,8 +24,17 @@ pub mod refs;
 pub mod zed_headless;
 
 pub use browser::{
-    BrowserControllerState, BrowserLaunchOptions, BrowserUrlCheck, build_chrome_launch_args,
-    validate_navigation_url,
+    AnnotatedElementBox, AnnotatedScreenshot, BrowserActionPolicy, BrowserBatchReport,
+    BrowserBatchStep, BrowserBatchStepResult, BrowserControllerState, BrowserCookie,
+    BrowserEventRingBuffer, BrowserLaunchOptions, BrowserPolicyDecision, BrowserStorageState,
+    BrowserTabSession, BrowserUrlCheck, ConsoleLogEntry, DiffLine, DiffLineKind, DomainFilter,
+    HarContentMode, HarEntry, HarRingBuffer, NetworkRoute, NetworkRouteTable, OriginStorage,
+    PageErrorEntry, RouteDisposition, RouteResponse, SemanticLocator, SemanticLocatorKind,
+    SnapshotDiff, StorageEntry, TabRef, TabSessionManager, build_annotation_overlay_js,
+    build_chrome_launch_args, cleanup_annotation_overlay_js, diff_snapshot_text,
+    filter_non_overlapping_annotations, find_ax_nodes_by_locator, full_page_clip_size,
+    matches_status_filter, normalize_ax_role, project_annotation_boxes, redact_header_map,
+    route_url_matches, snapshot_comparison_text, validate_navigation_url,
 };
 #[cfg(not(target_family = "wasm"))]
 pub use zed_headless::run_headless_mcp_stdio;
@@ -37,7 +46,7 @@ pub use zed_headless::{
 pub use action::{
     Action, ActionRequest, ActionResult, ActionStepOutcome, Direction, DragParams,
     InteractionPolicy, KeyCombo, Modifier, MouseButton, MouseEvent, MouseEventKind,
-    execute_verified_action, postcondition_satisfied,
+    PostconditionVerdict, evaluate_postcondition, execute_verified_action, postcondition_satisfied,
 };
 pub use adapter::{
     CommandContext, Deadline, HeldInputState, HudActivityItem, InteractionLease, LiveElement,
@@ -53,11 +62,14 @@ pub use model::{
     AccessibilityNode, AppInfo, ClipboardContent, ClipboardFormat, CommandEnvelope,
     DeliveryDisposition, DeliverySemantics, DisplayInfo, ENVELOPE_VERSION, ElementState, ErrorCode,
     ImageBuffer, ImageFormat, NotificationInfo, PermissionReport, PilotError, ProcessIdentity,
-    Rect, RetryPolicy, SnapshotSurface, StatusReport, SurfaceInfo, WindowFilter, WindowInfo,
+    Rect, RetryDisposition, RetryPolicy, SnapshotSurface, StatusReport, SurfaceInfo, WindowFilter,
+    WindowInfo,
 };
 pub use policy::{
-    AiActOutcome, AiActPlan, BatchReport, BatchStep, BatchStepResult, PermissionNeed, TraceEvent,
-    TraceRecorder, WaitOutcome, WaitSelector, ai_act_verify, execute_batch, wait_for_selector,
+    AiActOutcome, AiActPlan, BatchExecutionState, BatchReport, BatchStep, BatchStepResult,
+    MAX_BATCH_ENTRIES, MAX_BATCH_OUTPUT_BYTES, PermissionNeed, TraceEvent, TraceRecorder,
+    WaitOutcome, WaitSelector, act_verify, ai_act_verify, execute_batch, execute_batch_with_limits,
+    wait_for_selector,
 };
 pub use refs::{
     IdentityMatch, RefCapabilities, RefEntry, RefEntryIdentity, RefMap, RefScope, RefStore,
@@ -451,6 +463,11 @@ pub fn builtin_pilot_tools() -> Vec<PilotToolDescriptor> {
             input_schema: empty_obj(),
         },
         PilotToolDescriptor {
+            name: "desktop_act_verify",
+            description: "One-shot observe -> locate -> act -> readback-verify -> diff-snapshot transaction with retry disposition.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
             name: "desktop_ai_act_verify",
             description: "One-shot observe -> locate -> act -> post-verify -> diff-snapshot transaction for AI computer use.",
             input_schema: empty_obj(),
@@ -481,6 +498,16 @@ pub fn builtin_pilot_tools() -> Vec<PilotToolDescriptor> {
             input_schema: empty_obj(),
         },
         PilotToolDescriptor {
+            name: "browser_snapshot_diff",
+            description: "Compute line-level SnapshotDiff against the previous browser snapshot baseline.",
+            input_schema: json!({"type": "object", "properties": {"after": {"type": "string"}, "before": {"type": "string"}}, "required": ["after"], "additionalProperties": true}),
+        },
+        PilotToolDescriptor {
+            name: "browser_find",
+            description: "Resolve semantic locators (role, text, label, placeholder, testid, xpath, nth) against CDP AX/DOM trees.",
+            input_schema: json!({"type": "object", "properties": {"by": {"type": "string"}, "query": {"type": "string"}, "name": {"type": "string"}, "exact": {"type": "boolean"}, "nth": {"type": "integer"}}, "required": ["query"], "additionalProperties": true}),
+        },
+        PilotToolDescriptor {
             name: "browser_eval",
             description: "Evaluate JavaScript inside active CDP page context.",
             input_schema: json!({"type": "object", "properties": {"expression": {"type": "string"}}, "required": ["expression"], "additionalProperties": true}),
@@ -488,6 +515,91 @@ pub fn builtin_pilot_tools() -> Vec<PilotToolDescriptor> {
         PilotToolDescriptor {
             name: "browser_screenshot",
             description: "Capture PNG screenshot via CDP Page.captureScreenshot.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_screenshot_annotated",
+            description: "Filter/generate non-overlapping AnnotatedElementBox overlay metadata and script.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_route",
+            description: "Register a URL glob route intercept rule (fulfill, abort, continue).",
+            input_schema: json!({"type": "object", "properties": {"pattern": {"type": "string"}, "disposition": {"type": "string"}}, "required": ["pattern"], "additionalProperties": true}),
+        },
+        PilotToolDescriptor {
+            name: "browser_unroute",
+            description: "Remove matching browser network route intercepts.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_har_start",
+            description: "Start bounded HAR 1.2 network capture ringbuffer.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_har_stop",
+            description: "Stop HAR capture and export redacted HAR 1.2 JSON.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_console",
+            description: "Inspect buffered browser console log entries.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_errors",
+            description: "Inspect buffered browser page error entries.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_state_save",
+            description: "Serialize browser cookies and origin storage state to JSON or path.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_state_load",
+            description: "Load serialized browser cookies and origin storage state.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_cookies",
+            description: "List, set, or clear browser cookies in controller storage.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_storage",
+            description: "Read or update origin-scoped browser storage entries.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_tab_list",
+            description: "List managed browser tabs with t<N> refs and active index.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_tab_new",
+            description: "Open and focus a managed browser tab after URL policy validation.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_tab_switch",
+            description: "Switch active managed browser tab by t<N> ref, label, target_id, or index.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_tab_close",
+            description: "Close a managed browser tab.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_policy_check",
+            description: "Load and evaluate fail-closed browser action policy rules and confirmation tokens.",
+            input_schema: empty_obj(),
+        },
+        PilotToolDescriptor {
+            name: "browser_batch",
+            description: "Execute sequential browser tool steps with stop-on-error and policy gating.",
             input_schema: empty_obj(),
         },
     ]
@@ -681,5 +793,38 @@ mod tests {
             .execute_tool("desktop_list_displays", &json!({}), &ctx)
             .expect("native displays ok");
         assert!(!displays["displays"].as_array().expect("array").is_empty());
+    }
+
+    #[test]
+    fn act_verify_and_fused_browser_tools_dispatch_through_engine() {
+        let mut engine = PilotEngine::new();
+        engine.set_target(TargetBackend::Gpui);
+        let ctx = CommandContext::default();
+
+        let act = engine
+            .execute_tool(
+                "desktop_act_verify",
+                &json!({
+                    "locator": { "role": "switch", "label": "Dark Appearance" },
+                    "action": { "kind": "toggle" },
+                    "include_post_snapshot": true
+                }),
+                &ctx,
+            )
+            .expect("desktop_act_verify succeeds");
+        assert_eq!(act["action_result"]["verified"], true);
+        assert_eq!(act["retry_disposition"], "unsafe");
+        assert!(act["after_snapshot_diff"].is_object());
+
+        let diff = engine
+            .execute_tool(
+                "browser_snapshot_diff",
+                &json!({ "before": "a\nb", "after": "a\nc" }),
+                &ctx,
+            )
+            .expect("browser_snapshot_diff succeeds");
+        assert_eq!(diff["changed"], true);
+        assert_eq!(diff["additions"], 1);
+        assert_eq!(diff["removals"], 1);
     }
 }

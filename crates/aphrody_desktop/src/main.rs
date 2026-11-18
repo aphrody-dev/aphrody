@@ -71,16 +71,31 @@ enum Command {
         #[arg(long)]
         addr: Option<String>,
     },
-    /// Execute an AI OS Pilot computer-use step (`status`, `snapshot`, `click`, `type`, `ai_act_verify`, etc.) returning JSON envelope 2.6.
+    /// Execute an AI OS Pilot computer-use step (`status`, `snapshot`, `click`, `type`, `act_verify`, `batch`, `browser_*`) returning JSON envelope 2.6.
     Pilot {
-        /// Pilot operation name (`status`, `permissions`, `snapshot`, `find`, `click`, `type`, `windows`, `displays`, `screenshot`, `wait`, `batch`, `ai_act_verify`).
+        /// Pilot operation name (`status`, `permissions`, `snapshot`, `find`, `click`, `type`, `windows`, `displays`, `screenshot`, `wait`, `batch`, `act_verify`, `browser_*`).
         op: String,
-        /// JSON object arguments for the pilot operation.
+        /// JSON object arguments for the pilot operation (pass `-` to read from stdin).
         #[arg(long, default_value = "{}")]
         args: String,
         /// Target backend (`auto`, `gpui`, `native`).
         #[arg(long, default_value = "auto")]
         target: String,
+        /// Optional pilot session scope identifier.
+        #[arg(long)]
+        session: Option<String>,
+        /// Optional operation deadline in milliseconds.
+        #[arg(long)]
+        timeout_ms: Option<u64>,
+        /// Optional target application name filter.
+        #[arg(long)]
+        app: Option<String>,
+        /// Optional target window identifier.
+        #[arg(long)]
+        window_id: Option<String>,
+        /// Stop batch execution on the first failing step (`batch` / `browser_batch`).
+        #[arg(long)]
+        stop_on_error: Option<bool>,
     },
 }
 
@@ -211,17 +226,34 @@ fn main() -> anyhow::Result<()> {
             let state = Arc::new(Mutex::new(McpServerState::bootstrap()?));
             serve_http(state, addr.as_deref())?;
         }
-        Some(Command::Pilot { op, args, target }) => {
-            let parsed_args: serde_json::Value = serde_json::from_str(&args)?;
-            let mut engine = aphrody_pilot::PilotEngine::new();
-            let ctx = aphrody_pilot::CommandContext {
-                target: aphrody_pilot::TargetBackend::parse(Some(&target)),
-                ..Default::default()
+        Some(Command::Pilot {
+            op,
+            args,
+            target,
+            session,
+            timeout_ms,
+            app,
+            window_id,
+            stop_on_error,
+        }) => {
+            let raw_args = if args.trim() == "-" {
+                use std::io::Read as _;
+                let mut stdin_buf = String::new();
+                std::io::stdin().read_to_string(&mut stdin_buf)?;
+                stdin_buf
+            } else {
+                args
             };
-            let envelope = match engine.execute_tool(&op, &parsed_args, &ctx) {
-                Ok(data) => aphrody_pilot::CommandEnvelope::ok(op, data),
-                Err(err) => aphrody_pilot::CommandEnvelope::err(op, err),
-            };
+            let envelope = run_pilot_cli_command(
+                &op,
+                &raw_args,
+                &target,
+                session.as_deref(),
+                timeout_ms,
+                app,
+                window_id,
+                stop_on_error,
+            )?;
             println!("{}", serde_json::to_string_pretty(&envelope)?);
             if !envelope.ok {
                 std::process::exit(1);
@@ -229,4 +261,95 @@ fn main() -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_pilot_cli_command(
+    op: &str,
+    raw_args: &str,
+    target: &str,
+    session: Option<&str>,
+    timeout_ms: Option<u64>,
+    app: Option<String>,
+    window_id: Option<String>,
+    stop_on_error: Option<bool>,
+) -> anyhow::Result<aphrody_pilot::CommandEnvelope> {
+    let mut parsed_args: serde_json::Value = serde_json::from_str(raw_args)?;
+    if let (Some(stop), Some(obj)) = (stop_on_error, parsed_args.as_object_mut()) {
+        obj.entry("stop_on_error")
+            .or_insert(serde_json::Value::Bool(stop));
+    }
+    let mut engine = aphrody_pilot::PilotEngine::new();
+    if let Some(session_id) = session
+        && let Err(err) = engine.set_session(session_id)
+    {
+        return Ok(aphrody_pilot::CommandEnvelope::err(op, err));
+    }
+    let ctx = aphrody_pilot::CommandContext {
+        target: aphrody_pilot::TargetBackend::parse(Some(target)),
+        timeout_ms,
+        app,
+        window_id,
+        ..Default::default()
+    };
+    Ok(match engine.execute_tool(op, &parsed_args, &ctx) {
+        Ok(data) => aphrody_pilot::CommandEnvelope::ok(op, data),
+        Err(err) => aphrody_pilot::CommandEnvelope::err(op, err),
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pilot_cli_parses_flags_and_executes_batch_stop_on_error() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-os",
+            "pilot",
+            "desktop_batch",
+            "--target",
+            "gpui",
+            "--session",
+            "agent-session-1",
+            "--timeout-ms",
+            "5000",
+            "--stop-on-error",
+            "true",
+            "--args",
+            r#"{"steps":[{"op":"desktop_status","args":{}},{"op":"desktop_bad_step","args":{}},{"op":"desktop_status","args":{}}]}"#,
+        ])
+        .expect("cli parse succeeds");
+
+        let Some(Command::Pilot {
+            op,
+            args,
+            target,
+            session,
+            timeout_ms,
+            app,
+            window_id,
+            stop_on_error,
+        }) = parsed.command
+        else {
+            panic!("expected Pilot subcommand");
+        };
+
+        let envelope = run_pilot_cli_command(
+            &op,
+            &args,
+            &target,
+            session.as_deref(),
+            timeout_ms,
+            app,
+            window_id,
+            stop_on_error,
+        )
+        .expect("cli execution ok");
+        assert!(envelope.ok);
+        assert_eq!(envelope.version, aphrody_pilot::ENVELOPE_VERSION);
+        let data = envelope.data.expect("batch report present");
+        assert_eq!(data["stopped_early"], true);
+        assert_eq!(data["not_started"], 1);
+    }
 }

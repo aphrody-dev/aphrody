@@ -213,6 +213,49 @@ export async function handleReleasesRequest(request: Request, env: WorkerEnv): P
       { headers: { "Cache-Control": "public, max-age=60" } },
     );
   }
+  if (path === "/api/releases/auto/latest") {
+    const obj = await bucket?.get("auto/releases/manifest.json");
+    if (obj) {
+      return new Response(obj.body, { headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=60" } });
+    }
+    return Response.json(
+      {
+        ok: true,
+        product: "auto",
+        status: "federated",
+        app_url: "https://auto.aphrody.com",
+        manifest_url: "https://auto.aphrody.com/releases/manifest.json",
+        bucket: "aphrody-releases",
+        prefix: "auto/releases/",
+      },
+      { headers: { "Cache-Control": "public, max-age=60" } },
+    );
+  }
+  if (path === "/api/releases" || path === "/api/releases/") {
+    const channels = await Promise.all(
+      [...VALID_CHANNELS].map(async (channel) => {
+        const obj = await bucket?.get(`channels/${channel}/latest.json`);
+        if (obj) {
+          try {
+            const parsed = JSON.parse(await new Response(obj.body).text()) as Record<string, unknown>;
+            return { channel, status: "available", ...parsed };
+          } catch {
+            return { channel, status: "available" };
+          }
+        }
+        return {
+          channel,
+          status: "pending_release",
+          latest_endpoint: `/api/releases/${channel}/latest`,
+          download_url: `https://releases.aphrody.com/download?channel=${channel}`,
+        };
+      }),
+    );
+    return Response.json(
+      { ok: true, service: "aphrody-releases", channels },
+      { headers: { "Cache-Control": "public, max-age=60" } },
+    );
+  }
   if (path === "/api/design") {
     return Response.json(
       {
@@ -266,7 +309,18 @@ export async function handleReleasesRequest(request: Request, env: WorkerEnv): P
     const obj = await bucket?.get(`channels/${channel}/latest.json`);
     return obj
       ? new Response(obj.body, { headers: { "Content-Type": "application/json; charset=utf-8" } })
-      : new Response("Channel manifest not found", { status: 404 });
+      : Response.json(
+          {
+            ok: true,
+            channel,
+            version: null,
+            status: "pending_release",
+            download_url: `https://releases.aphrody.com/download?channel=${channel}`,
+            install_sh: "https://releases.aphrody.com/install.sh",
+            install_ps1: "https://releases.aphrody.com/install.ps1",
+          },
+          { headers: { "Cache-Control": "public, max-age=60" } },
+        );
   }
 
   if (path.startsWith("/assets/")) {

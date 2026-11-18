@@ -6,7 +6,8 @@
 use std::path::PathBuf;
 
 use aphrody_craft::{
-    CraftStudioSession, ParityRenderMode, StudioPillar, render_gpui_studio_panel,
+    CraftStudioSession, FigCraftStudioEvent, FigCraftStudioView, ParityRenderMode, StudioPillar,
+    render_gpui_studio_panel, spawn_figcraft_studio_view,
 };
 use aphrody_design::design_md::{
     DesignMdDocument, DesignMdLintReport, export_css_variables, export_shadcn_tailwind_css,
@@ -25,9 +26,9 @@ use aphrody_design::stitch_client::{
 use aphrody_design::web_standards::{LighthouseAuditReport, audit_html_standards};
 use gpui_ui::ActiveTheme as _;
 use gpui_ui::gpui::{
-    self, AnyElement, App, AppContext as _, Context, EventEmitter, FocusHandle, Focusable,
+    self, AnyElement, App, AppContext as _, Context, Entity, EventEmitter, FocusHandle, Focusable,
     IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement as _, Styled,
-    Window, actions, div,
+    Subscription, Window, actions, div, px,
 };
 use gpui_ui::ui::{
     FluentBuilder as _, Icon, IconName, InteractiveElement as _, Label, LabelCommon as _, h_flex,
@@ -96,11 +97,13 @@ pub struct DesignStitchStudioItem {
     lighthouse_report: Option<LighthouseAuditReport>,
     parity_matrix: Option<SubmoduleParityMatrix>,
     craft_session: Option<CraftStudioSession>,
+    figcraft_view: Option<Entity<FigCraftStudioView>>,
     status_message: SharedString,
     last_capture: Option<PathBuf>,
     is_busy: bool,
     gallery: ReferenceGalleryState,
     gallery_accents: Option<MirrorAccentPalette>,
+    _subscriptions: Vec<Subscription>,
 }
 
 impl DesignStitchStudioItem {
@@ -150,6 +153,60 @@ impl DesignStitchStudioItem {
             }
         }
 
+        let mut subscriptions = Vec::new();
+        let figcraft_view = if mode == StudioMode::GoogleFigCraftStudio {
+            let view = spawn_figcraft_studio_view(craft_session.as_ref(), cx);
+            let sub = cx.subscribe(
+                &view,
+                |this: &mut Self, view: Entity<FigCraftStudioView>, event: &FigCraftStudioEvent, cx| {
+                    match event {
+                        FigCraftStudioEvent::DocumentMutated {
+                            title,
+                            node_count,
+                            page_count,
+                        } => {
+                            let updated_doc = view.read(cx).document().clone();
+                            if let Some(ref mut session) = this.craft_session
+                                && let Err(err) = session.sync_figcraft_document(updated_doc)
+                            {
+                                log::warn!("FigCraft session sync warning: {err}");
+                            }
+                            this.status_message = SharedString::from(format!(
+                                "{title}: {page_count} pages · {node_count} nodes"
+                            ));
+                            cx.notify();
+                        }
+                        FigCraftStudioEvent::ModeChanged(mode) => {
+                            if let Some(ref mut session) = this.craft_session
+                                && let Err(err) = session.set_appearance(mode.appearance_mode())
+                            {
+                                log::warn!("FigCraft appearance sync warning: {err}");
+                            }
+                            this.status_message = SharedString::from(format!(
+                                "FigCraft M3 theme: {}",
+                                mode.label()
+                            ));
+                            cx.notify();
+                        }
+                        FigCraftStudioEvent::ExportCopied { target, bytes } => {
+                            this.status_message = SharedString::from(format!(
+                                "Copied {} ({bytes} B)",
+                                target.label()
+                            ));
+                            cx.notify();
+                        }
+                        FigCraftStudioEvent::ParityToggleRequested => {
+                            this.cycle_parity_mode(cx);
+                        }
+                    }
+                },
+            );
+            subscriptions.push(sub);
+            Some(view)
+        } else {
+            None
+        };
+
         let status_message = SharedString::from(format!(
             "Synced from {} ({} sitemap routes, WCAG {})",
             brand::DESIGN_SOURCE_OF_TRUTH,
@@ -172,6 +229,7 @@ impl DesignStitchStudioItem {
             lighthouse_report,
             parity_matrix,
             craft_session,
+            figcraft_view,
             status_message,
             last_capture: None,
             is_busy: false,
@@ -183,6 +241,27 @@ impl DesignStitchStudioItem {
                     None
                 }
             },
+            _subscriptions: subscriptions,
+        }
+    }
+
+    pub fn cycle_parity_mode(&mut self, cx: &mut Context<Self>) {
+        if let Some(ref mut session) = self.craft_session {
+            match session.cycle_parity_mode() {
+                Ok(next_mode) => {
+                    if let Some(ref view) = self.figcraft_view {
+                        view.update(cx, |view, cx| {
+                            view.set_parity_label(next_mode.label(), cx);
+                        });
+                    }
+                    self.status_message =
+                        SharedString::from(format!("Studio parity mode: {}", next_mode.label()));
+                    cx.notify();
+                }
+                Err(err) => {
+                    log::warn!("Parity benchmark refresh warning: {err}");
+                }
+            }
         }
     }
 
@@ -368,17 +447,7 @@ impl DesignStitchStudioItem {
                 && let Some(studio) = active.act_as::<Self>(cx)
             {
                 studio.update(cx, |studio, cx| {
-                    if let Some(ref mut session) = studio.craft_session {
-                        session.parity_mode = match session.parity_mode {
-                            ParityRenderMode::GpuiGoogleDesign => ParityRenderMode::EguiNative037,
-                            ParityRenderMode::EguiNative037 => ParityRenderMode::SplitSideBySide,
-                            ParityRenderMode::SplitSideBySide => ParityRenderMode::GpuiGoogleDesign,
-                        };
-                        if let Err(err) = session.run_parity_benchmark(640, 420) {
-                            log::warn!("Parity benchmark refresh warning: {err}");
-                        }
-                        cx.notify();
-                    }
+                    studio.cycle_parity_mode(cx);
                 });
             }
         });
@@ -415,10 +484,129 @@ impl DesignStitchStudioItem {
                 .into_any_element(),
         )
     }
+    fn render_figcraft_workspace(&self, cx: &mut Context<Self>) -> AnyElement {
+        let colors = cx.theme().colors();
+        let parity_mode = self
+            .craft_session
+            .as_ref()
+            .map_or(ParityRenderMode::GpuiGoogleDesign, |session| session.parity_mode);
+
+        v_flex()
+            .id("google-figcraft-studio-workspace")
+            .size_full()
+            .bg(colors.editor_background)
+            .child(
+                h_flex()
+                    .w_full()
+                    .px_3()
+                    .py_1p5()
+                    .justify_between()
+                    .items_center()
+                    .gap_2()
+                    .bg(colors.toolbar_background)
+                    .border_b_1()
+                    .border_color(colors.border)
+                    .child(
+                        h_flex()
+                            .gap_2()
+                            .items_center()
+                            .child(Label::new("Google FigCraft + Stitch Studio"))
+                            .child(
+                                Label::new(self.status_message.clone())
+                                    .size(gpui_ui::ui::LabelSize::Small),
+                            ),
+                    )
+                    .child(
+                        h_flex()
+                            .gap_2()
+                            .items_center()
+                            .child(
+                                div()
+                                    .id("figcraft-workspace-toggle-parity")
+                                    .px_3()
+                                    .py_1()
+                                    .rounded_md()
+                                    .bg(colors.element_background)
+                                    .border_1()
+                                    .border_color(colors.border)
+                                    .cursor_pointer()
+                                    .child(
+                                        Label::new(format!("Parity: {}", parity_mode.label()))
+                                            .size(gpui_ui::ui::LabelSize::Small),
+                                    )
+                                    .on_click(cx.listener(|this, _, _, cx| {
+                                        this.cycle_parity_mode(cx);
+                                    })),
+                            )
+                            .child(
+                                div()
+                                    .id("figcraft-workspace-capture-png")
+                                    .px_3()
+                                    .py_1()
+                                    .rounded_md()
+                                    .bg(colors.element_background)
+                                    .cursor_pointer()
+                                    .child(
+                                        Label::new("Capture PNG")
+                                            .size(gpui_ui::ui::LabelSize::Small),
+                                    )
+                                    .on_click(cx.listener(|this, _, _, cx| this.capture_png(cx))),
+                            ),
+                    ),
+            )
+            .child(match parity_mode {
+                ParityRenderMode::GpuiGoogleDesign => div()
+                    .flex_1()
+                    .min_h_0()
+                    .w_full()
+                    .when_some(self.figcraft_view.clone(), |pane, view| pane.child(view))
+                    .into_any_element(),
+                ParityRenderMode::SplitSideBySide => h_flex()
+                    .flex_1()
+                    .min_h_0()
+                    .w_full()
+                    .child(
+                        div()
+                            .flex_1()
+                            .min_w_0()
+                            .h_full()
+                            .when_some(self.figcraft_view.clone(), |pane, view| pane.child(view)),
+                    )
+                    .child(
+                        div()
+                            .id("figcraft-split-parity-hud")
+                            .w(px(380.0))
+                            .h_full()
+                            .overflow_y_scroll()
+                            .p_3()
+                            .border_l_1()
+                            .border_color(colors.border)
+                            .when_some(self.craft_session.as_ref(), |pane, session| {
+                                pane.child(render_gpui_studio_panel(session))
+                            }),
+                    )
+                    .into_any_element(),
+                ParityRenderMode::EguiNative037 => div()
+                    .id("figcraft-egui-parity-only")
+                    .flex_1()
+                    .min_h_0()
+                    .w_full()
+                    .overflow_y_scroll()
+                    .p_4()
+                    .when_some(self.craft_session.as_ref(), |pane, session| {
+                        pane.child(render_gpui_studio_panel(session))
+                    })
+                    .into_any_element(),
+            })
+            .into_any_element()
+    }
 }
 
 impl Focusable for DesignStitchStudioItem {
-    fn focus_handle(&self, _cx: &App) -> FocusHandle {
+    fn focus_handle(&self, cx: &App) -> FocusHandle {
+        if let Some(ref view) = self.figcraft_view {
+            return view.read(cx).focus_handle(cx);
+        }
         self.focus_handle.clone()
     }
 }
@@ -427,6 +615,9 @@ impl EventEmitter<ItemEvent> for DesignStitchStudioItem {}
 
 impl Render for DesignStitchStudioItem {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        if self.mode == StudioMode::GoogleFigCraftStudio {
+            return self.render_figcraft_workspace(cx);
+        }
         let mode_title = match self.mode {
             StudioMode::GoogleDesignMirror => "Google Design Live Mirror (design.google)",
             StudioMode::StitchStudio => "Google Stitch & DESIGN.md Studio",
@@ -692,6 +883,7 @@ impl Render for DesignStitchStudioItem {
                         ),
                 )
             })
+            .into_any_element()
     }
 }
 
@@ -703,14 +895,7 @@ impl Item for DesignStitchStudioItem {
     }
 
     fn tab_content_text(&self, _detail: usize, _cx: &App) -> SharedString {
-        match self.mode {
-            StudioMode::GoogleDesignMirror => SharedString::from("Google Design Mirror"),
-            StudioMode::StitchStudio => SharedString::from("Stitch DESIGN.md Studio"),
-            StudioMode::GpuiStarterPack => SharedString::from("GPUI Starter Pack"),
-            StudioMode::GoogleFigCraftStudio => SharedString::from("Google FigCraft Studio"),
-            StudioMode::GoogleCraftAnythingStudio => SharedString::from("Google Craft Anything"),
-            StudioMode::UnrealBevyStudio => SharedString::from("Unreal Bevy 5.8"),
-        }
+        SharedString::from(studio_mode_tab_title(self.mode))
     }
 
     fn telemetry_event_text(&self) -> Option<&'static str> {
@@ -719,5 +904,57 @@ impl Item for DesignStitchStudioItem {
 
     fn to_item_events(event: &Self::Event, f: &mut dyn FnMut(ItemEvent)) {
         f(*event);
+    }
+}
+
+pub(crate) fn studio_mode_tab_title(mode: StudioMode) -> &'static str {
+    match mode {
+        StudioMode::GoogleDesignMirror => "Google Design Mirror",
+        StudioMode::StitchStudio => "Stitch DESIGN.md Studio",
+        StudioMode::GpuiStarterPack => "GPUI Starter Pack",
+        StudioMode::GoogleFigCraftStudio => "Google FigCraft Studio",
+        StudioMode::GoogleCraftAnythingStudio => "Google Craft Anything",
+        StudioMode::UnrealBevyStudio => "Unreal Bevy 5.8",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use aphrody_craft::{
+        CraftStudioSession, FigCraftDesignMode, FigCraftDocument, ParityRenderMode,
+    };
+
+    #[test]
+    fn google_figcraft_studio_mode_and_session_default_to_gpui_google_design() -> anyhow::Result<()> {
+        assert_eq!(
+            studio_mode_tab_title(StudioMode::GoogleFigCraftStudio),
+            "Google FigCraft Studio"
+        );
+        assert_eq!(
+            studio_mode_tab_title(StudioMode::StitchStudio),
+            "Stitch DESIGN.md Studio"
+        );
+
+        let mut session = CraftStudioSession::bootstrap(AppearanceMode::Dark)?;
+        assert_eq!(session.parity_mode, ParityRenderMode::GpuiGoogleDesign);
+        assert_eq!(
+            session.cycle_parity_mode()?,
+            ParityRenderMode::SplitSideBySide
+        );
+        assert_eq!(session.cycle_parity_mode()?, ParityRenderMode::EguiNative037);
+        assert_eq!(
+            session.cycle_parity_mode()?,
+            ParityRenderMode::GpuiGoogleDesign
+        );
+
+        let mut doc = FigCraftDocument::google_expressive_default()?;
+        doc.set_design_mode(FigCraftDesignMode::NeuralObsidian);
+        session.sync_figcraft_document(doc)?;
+        assert_eq!(
+            session.figcraft.active_mode,
+            FigCraftDesignMode::NeuralObsidian
+        );
+        Ok(())
     }
 }

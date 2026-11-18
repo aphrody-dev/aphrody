@@ -14,6 +14,7 @@ members = [
     "crates/ai_onboarding",
     "crates/anthropic",
     "crates/aphrody",
+    "crates/aphrody_auto",
     "crates/aphrody_browser",
     "crates/aphrody_cli",
     "crates/aphrody_craft",
@@ -409,6 +410,7 @@ agent_ui = { path = "crates/agent_ui" }
 ai_onboarding = { path = "crates/ai_onboarding" }
 anthropic = { path = "crates/anthropic" }
 aphrody = { path = "crates/aphrody", default-features = false }
+aphrody_auto = { path = "crates/aphrody_auto" }
 askpass = { path = "crates/askpass" }
 assets = { path = "crates/assets" }
 audio = { path = "crates/audio" }

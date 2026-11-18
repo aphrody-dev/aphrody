@@ -1,0 +1,183 @@
+name: aphrody Fleet Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Orchestration action (audit, probe, schedule, beacon, rebalance)
+        required: true
+        default: audit
+        type: choice
+        options:
+          - audit
+          - probe
+          - schedule
+          - beacon
+          - rebalance
+      job_kind:
+        description: Job profile for schedule/rebalance scoring
+        required: false
+        default: native_rust
+        type: choice
+        options:
+          - native_rust
+          - wasm
+          - edge_proxy
+          - verify
+          - release
+      hosts:
+        description: Optional comma-separated SSH hosts override (defaults to ~/.ssh/config discovery)
+        required: false
+        default: ''
+      dry_run:
+        description: Run without publishing live Cloudflare telemetry or remote mutations
+        required: false
+        default: true
+        type: boolean
+  schedule:
+    - cron: '*/15 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - assets/os/fleet_cluster.toml
+      - tooling/bun/fleet-lb.ts
+      - tooling/bun/fleet-lb.test.ts
+      - .cloudflare/aphrody-worker/**
+      - .github/workflows/aphrody-fleet-orchestrator.yml
+  repository_dispatch:
+    types:
+      - fleet_rebalance
+      - push_main
+      - cloudflare_webhook
+
+concurrency:
+  group: aphrody-fleet-orchestrator-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate-cross-platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+      - name: Validate declarative fleet_cluster.toml and workflow YAML
+        shell: bash
+        run: |
+          bun -e '
+            import { readFileSync } from "node:fs";
+            const tomlRaw = readFileSync("assets/os/fleet_cluster.toml", "utf8");
+            if (/\b\d{1,3}(?:\.\d{1,3}){3}\b/.test(tomlRaw)) {
+              throw new Error("assets/os/fleet_cluster.toml must not contain hardcoded IPv4 addresses");
+            }
+            const manifest = Bun.TOML.parse(tomlRaw) as {
+              schema_version: number;
+              capabilities?: { supported?: string[] };
+              nodes?: Array<{ alias: string }>;
+            };
+            if (manifest.schema_version !== 1 || !manifest.nodes?.length) {
+              throw new Error("Invalid fleet_cluster.toml schema_version or nodes");
+            }
+            Bun.YAML.parse(readFileSync(".github/workflows/aphrody-fleet-orchestrator.yml", "utf8"));
+            console.log(`Validated fleet_cluster.toml (${manifest.nodes.length} declared nodes, ${(manifest.capabilities?.supported ?? []).length} capabilities)`);
+          '
+      - name: Run fleet-lb, Cloudflare Worker, learn-cloud, and fleet deploy tests
+        shell: bash
+        run: bun test tooling/bun/fleet-lb.test.ts ./.cloudflare/aphrody-worker/src/index.test.ts tooling/bun/fleet-deploy.test.ts tooling/bun/cloudflare-releases.test.ts tooling/bun/learn-cloud.test.ts
+      - name: Verify cross-platform fleet:lb CLI (probe, schedule, beacon dry-run)
+        shell: bash
+        run: |
+          bun run fleet:lb probe --local --json
+          bun run fleet:lb schedule --local --job "${{ github.event.inputs.job_kind || 'native_rust' }}" --shards 2 --json
+          bun run fleet:lb beacon --local --dry-run --json
+      - name: Audit consolidated Cloudflare Worker
+        if: matrix.os == 'ubuntu-latest'
+        run: bun tooling/bun/cloudflare-deploy.ts audit --dry-run
+
+  fleet-rebalance-and-beacon:
+    needs: validate-cross-platform
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+      - name: Probe multi-VPS fleet (if SSH secrets exist) and sync Cloudflare beacon
+        shell: bash
+        env:
+          FLEET_SSH_CONFIG_B64: ${{ secrets.FLEET_SSH_CONFIG_B64 }}
+          FLEET_SSH_KEY: ${{ secrets.FLEET_SSH_KEY }}
+          FLEET_BEACON_TOKEN: ${{ secrets.FLEET_BEACON_TOKEN }}
+          APHRODY_WORKER_URL: ${{ secrets.APHRODY_WORKER_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          INPUT_ACTION: ${{ github.event.inputs.action || 'audit' }}
+          INPUT_JOB_KIND: ${{ github.event.inputs.job_kind || 'native_rust' }}
+          INPUT_HOSTS: ${{ github.event.inputs.hosts || '' }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          set -euo pipefail
+          TARGET_ARGS="--local"
+          if [ -n "$FLEET_SSH_CONFIG_B64" ] && [ -n "$FLEET_SSH_KEY" ]; then
+            SSH_DIR="$RUNNER_TEMP/fleet_ssh"
+            mkdir -p "$SSH_DIR"
+            chmod 700 "$SSH_DIR"
+            printf '%s\n' "$FLEET_SSH_KEY" > "$SSH_DIR/id_fleet"
+            chmod 600 "$SSH_DIR/id_fleet"
+            printf '%s' "$FLEET_SSH_CONFIG_B64" | base64 -d > "$SSH_DIR/config"
+            chmod 600 "$SSH_DIR/config"
+            export APHRODY_SSH_CONFIG="$SSH_DIR/config"
+            if [ -n "$INPUT_HOSTS" ]; then
+              TARGET_ARGS="--hosts $INPUT_HOSTS"
+            else
+              TARGET_ARGS="--all"
+            fi
+          elif [ -n "$INPUT_HOSTS" ]; then
+            echo "SSH secrets absent; falling back cleanly from requested hosts ($INPUT_HOSTS) to --local."
+          fi
+
+          # shellcheck disable=SC2086
+          bun run fleet:lb probe $TARGET_ARGS --json
+          # shellcheck disable=SC2086
+          bun run fleet:lb schedule $TARGET_ARGS --job "$INPUT_JOB_KIND" --shards 2 --json || true
+
+          LIVE_BEACON=false
+          if [ -n "$FLEET_BEACON_TOKEN" ] && [ "$INPUT_DRY_RUN" != "true" ] && [ "$INPUT_ACTION" != "audit" ]; then
+            LIVE_BEACON=true
+          fi
+
+          if [ "$LIVE_BEACON" = "true" ]; then
+            # shellcheck disable=SC2086
+            bun run fleet:lb beacon $TARGET_ARGS --json
+            WORKER_BASE="${APHRODY_WORKER_URL:-https://releases.aphrody.com}"
+            curl -fsS "${WORKER_BASE%/}/api/fleet/status" | bun -e 'const d = JSON.parse(await Bun.stdin.text()); console.log(JSON.stringify({ ok: d.ok, healthyNodes: d.healthyNodes, totalNodes: d.totalNodes }));'
+            curl -fsS "${WORKER_BASE%/}/api/fleet/route?job=${INPUT_JOB_KIND}&shards=2" | bun -e 'const d = JSON.parse(await Bun.stdin.text()); console.log(JSON.stringify({ ok: d.ok, selected: d.selected?.alias ?? null, fallbackChain: d.fallbackChain }));'
+          else
+            # shellcheck disable=SC2086
+            bun run fleet:lb beacon $TARGET_ARGS --dry-run --json
+          fi
+
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ "$INPUT_ACTION" = "rebalance" ] && [ "$INPUT_DRY_RUN" != "true" ]; then
+            bun tooling/bun/cloudflare-deploy.ts deploy
+          else
+            bun tooling/bun/cloudflare-deploy.ts audit --dry-run
+          fi
+
+          LEARN_BASE="${APHRODY_LEARN_URL:-https://learn.aphrody.com}"
+          curl -fsS "${LEARN_BASE%/}/api/learn/status" | bun -e 'const d = JSON.parse(await Bun.stdin.text()); console.log(JSON.stringify({ ok: d.ok, revision: d.revision, counts: d.counts ?? null }));' || true
+      - name: Cleanup ephemeral SSH credentials
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/fleet_ssh"

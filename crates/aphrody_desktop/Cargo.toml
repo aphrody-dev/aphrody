@@ -33,6 +33,7 @@ vpn = ["shell-module", "dep:aphrody_vpn"]
 
 [dependencies]
 anyhow.workspace = true
+aphrody_auto.workspace = true
 assets.workspace = true
 brand.workspace = true
 clap = { workspace = true, optional = true }

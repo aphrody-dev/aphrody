@@ -18,11 +18,12 @@ use crate::locator::{
 };
 use crate::model::{
     AccessibilityNode, AppInfo, ClipboardContent, ClipboardFormat, DEFAULT_TIMEOUT_MS, DisplayInfo,
-    ElementState, ErrorCode, ImageBuffer, MAX_TIMEOUT_MS, NotificationInfo, PermissionReport,
-    PilotError, Rect, SnapshotSurface, StatusReport, SurfaceInfo, WindowFilter, WindowInfo,
+    ElementState, ErrorCode, ImageBuffer, MAX_PNG_INPUT_BYTES, MAX_TIMEOUT_MS, NotificationInfo,
+    PermissionReport, PilotError, Rect, SnapshotSurface, StatusReport, SurfaceInfo, WindowFilter,
+    WindowInfo,
 };
 use crate::policy::{
-    AiActPlan, BatchStep, TraceEvent, TraceRecorder, WaitSelector, ai_act_verify, execute_batch,
+    AiActPlan, BatchStep, TraceEvent, TraceRecorder, WaitSelector, act_verify, execute_batch,
     wait_for_selector,
 };
 use crate::refs::{
@@ -425,10 +426,23 @@ impl PilotEngine {
                 SnapshotSurface::Window,
                 SnapshotSurface::Menu,
                 SnapshotSurface::Menubar,
+                SnapshotSurface::Sheet,
+                SnapshotSurface::Popover,
+                SnapshotSurface::Alert,
                 SnapshotSurface::Dock,
                 SnapshotSurface::Tray,
                 SnapshotSurface::Focused,
                 SnapshotSurface::Desktop,
+                SnapshotSurface::Taskbar,
+                SnapshotSurface::SystemTray,
+                SnapshotSurface::QuickSettings,
+                SnapshotSurface::NotificationCenter,
+                SnapshotSurface::Toolbar,
+                SnapshotSurface::Spotlight,
+                SnapshotSurface::MenuBarExtras,
+                SnapshotSurface::SystemTrayOverflow,
+                SnapshotSurface::StartMenu,
+                SnapshotSurface::ActionCenter,
             ],
             active_window_count: windows.len(),
             display_count: displays.len(),
@@ -603,9 +617,10 @@ impl PilotEngine {
             self.set_target(TargetBackend::parse(Some(target_arg)));
         }
 
-        let res = if tool_name.trim().starts_with("browser_") {
+        let normalized = tool_name.trim().replace('-', "_");
+        let res = if normalized.starts_with("browser_") {
             self.browser
-                .execute_tool(tool_name.trim(), args)
+                .execute_tool(&normalized, args)
                 .map_err(|err| PilotError::new(ErrorCode::Internal, err.to_string()))
         } else {
             self.dispatch_op(&op, args, ctx, deadline)
@@ -896,7 +911,12 @@ impl PilotEngine {
                 ))
             }
             "clipboard_get" => {
-                let fmt = match args.get("format").and_then(Value::as_str) {
+                let fmt = match args
+                    .get("format")
+                    .and_then(Value::as_str)
+                    .map(str::to_ascii_lowercase)
+                    .as_deref()
+                {
                     Some("text") => ClipboardFormat::Text,
                     Some("html") => ClipboardFormat::Html,
                     Some("png") => ClipboardFormat::Png,
@@ -906,8 +926,7 @@ impl PilotEngine {
                 Ok(json!(self.adapter_for(ctx).clipboard_get(fmt, deadline)?))
             }
             "clipboard_set" => {
-                let text = req_str(args, "text")?.to_owned();
-                let content = ClipboardContent::Text { text };
+                let content = parse_clipboard_content_from_args(args)?;
                 self.adapter_for(ctx).clipboard_set(&content, deadline)?;
                 Ok(json!({ "ok": true }))
             }
@@ -978,7 +997,11 @@ impl PilotEngine {
                     .get("stop_on_error")
                     .and_then(Value::as_bool)
                     .unwrap_or(true);
-                Ok(json!(execute_batch(self, &steps, stop_on_error, ctx)))
+                let mut batch_ctx = ctx.clone();
+                if let Some(timeout_ms) = args.get("timeout_ms").and_then(Value::as_u64) {
+                    batch_ctx.timeout_ms = Some(timeout_ms);
+                }
+                Ok(json!(execute_batch(self, &steps, stop_on_error, &batch_ctx)))
             }
             "session" => {
                 if let Some(id) = args.get("id").and_then(Value::as_str) {
@@ -1011,11 +1034,11 @@ impl PilotEngine {
                     "events": self.trace.snapshot(limit),
                 }))
             }
-            "ai_act_verify" => {
+            "act_verify" | "ai_act_verify" => {
                 let plan: AiActPlan = serde_json::from_value(args.clone()).map_err(|err| {
-                    PilotError::invalid_input(format!("invalid ai_act_verify plan: {err}"))
+                    PilotError::invalid_input(format!("invalid act_verify plan: {err}"))
                 })?;
-                Ok(json!(ai_act_verify(self, &plan, ctx)?))
+                Ok(json!(act_verify(self, &plan, ctx)?))
             }
             other => Err(PilotError::invalid_input(format!(
                 "unknown pilot operation '{other}'"
@@ -1084,7 +1107,98 @@ fn parse_window_filter(args: &Value, ctx: &CommandContext) -> WindowFilter {
     }
 }
 
+fn parse_clipboard_content_from_args(args: &Value) -> Result<ClipboardContent, PilotError> {
+    let explicit_format = args
+        .get("format")
+        .and_then(Value::as_str)
+        .map(str::to_ascii_lowercase);
+    match explicit_format.as_deref() {
+        Some("html") => {
+            let html = req_str(args, "html")?.to_owned();
+            let fallback_text = args
+                .get("fallback_text")
+                .or_else(|| args.get("text"))
+                .and_then(Value::as_str)
+                .map(str::to_owned);
+            Ok(ClipboardContent::Html {
+                html,
+                fallback_text,
+            })
+        }
+        Some("png") => {
+            let b64 = args
+                .get("base64")
+                .or_else(|| args.get("png_base64"))
+                .and_then(Value::as_str)
+                .ok_or_else(|| {
+                    PilotError::invalid_input("clipboard_set png format requires `base64`")
+                })?;
+            use base64::Engine as _;
+            let decoded = base64::engine::general_purpose::STANDARD
+                .decode(b64.trim())
+                .map_err(|err| PilotError::invalid_input(format!("invalid png base64: {err}")))?;
+            if decoded.len() > MAX_PNG_INPUT_BYTES {
+                return Err(PilotError::invalid_input(format!(
+                    "clipboard png payload exceeds {} byte limit",
+                    MAX_PNG_INPUT_BYTES
+                )));
+            }
+            if !decoded.starts_with(b"\x89PNG\r\n\x1a\n") {
+                return Err(PilotError::invalid_input(
+                    "clipboard png payload missing PNG signature",
+                ));
+            }
+            Ok(ClipboardContent::Png {
+                base64: b64.trim().to_owned(),
+                byte_len: decoded.len(),
+            })
+        }
+        Some("files") => {
+            let paths = args
+                .get("paths")
+                .or_else(|| args.get("files"))
+                .and_then(Value::as_array)
+                .ok_or_else(|| {
+                    PilotError::invalid_input("clipboard_set files format requires `paths` array")
+                })?
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect::<Vec<_>>();
+            if paths.is_empty() {
+                return Err(PilotError::invalid_input(
+                    "clipboard_set files requires at least one path",
+                ));
+            }
+            Ok(ClipboardContent::Files { paths })
+        }
+        _ => {
+            if let Some(html) = args.get("html").and_then(Value::as_str) {
+                return Ok(ClipboardContent::Html {
+                    html: html.to_owned(),
+                    fallback_text: args.get("text").and_then(Value::as_str).map(str::to_owned),
+                });
+            }
+            if let Some(paths_val) = args.get("paths").or_else(|| args.get("files")).and_then(Value::as_array) {
+                let paths: Vec<String> = paths_val
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_owned)
+                    .collect();
+                if !paths.is_empty() {
+                    return Ok(ClipboardContent::Files { paths });
+                }
+            }
+            let text = req_str(args, "text")?.to_owned();
+            Ok(ClipboardContent::Text { text })
+        }
+    }
+}
+
 fn parse_locator_from_args(args: &Value) -> LocatorQuery {
+    let raw_nth = args.get("nth").and_then(Value::as_i64);
+    let nth = raw_nth.and_then(|n| (n >= 0).then_some(n as usize));
+    let nth_signed = raw_nth.map(|n| n as isize);
     LocatorQuery {
         identity: crate::locator::IdentityPredicate {
             role: args.get("role").and_then(Value::as_str).map(str::to_owned),
@@ -1101,6 +1215,14 @@ fn parse_locator_from_args(args: &Value) -> LocatorQuery {
                 .get("value_contains")
                 .and_then(Value::as_str)
                 .map(str::to_owned),
+            label: args.get("label").and_then(Value::as_str).map(str::to_owned),
+            placeholder: args
+                .get("placeholder")
+                .and_then(Value::as_str)
+                .map(str::to_owned),
+            testid: args.get("testid").and_then(Value::as_str).map(str::to_owned),
+            xpath: args.get("xpath").and_then(Value::as_str).map(str::to_owned),
+            exact: args.get("exact").and_then(Value::as_bool),
         },
         state: crate::locator::StatePredicate {
             enabled: args.get("enabled").and_then(Value::as_bool),
@@ -1116,7 +1238,8 @@ fn parse_locator_from_args(args: &Value) -> LocatorQuery {
         containment: crate::locator::ContainmentPredicate {
             within_ref: args.get("in").and_then(Value::as_str).map(str::to_owned),
         },
-        nth: args.get("nth").and_then(Value::as_u64).map(|n| n as usize),
+        nth,
+        nth_signed,
         all: args.get("all").and_then(Value::as_bool).unwrap_or(false),
     }
 }

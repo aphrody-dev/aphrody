@@ -7,11 +7,24 @@
 //! - Absorbed `anomalyco/browse` real-browser extension pairing (`127.0.0.1:19988`), `@e1` ARIA snapshots, and WebMCP,
 //! - Full WebGPU OS (`webgpu_os`) uniting `ai-os` + `cloudflare-os` (Gadgets/Gatekeepers/Workshop) + `nysh` (`nsh` + `aysh`).
 
+pub mod agent_browser_core;
 pub mod webgpu_os;
 
 #[cfg(feature = "gpui-views")]
 pub mod chromium_gpui;
 
+pub use agent_browser_core::{
+    AgentBrowserCore, AnnotatedElementBox, AnnotatedScreenshot, BrowserActionPolicy,
+    BrowserBatchReport, BrowserBatchStep, BrowserBatchStepResult, BrowserControllerState,
+    BrowserCookie, BrowserEventRingBuffer, BrowserLaunchOptions, BrowserPolicyDecision,
+    BrowserStorageState, BrowserTabSession, BrowserUrlCheck, ConsoleLogEntry, DiffLine,
+    DiffLineKind, DomainFilter, HarContentMode, HarEntry, HarRingBuffer, NetworkRoute,
+    NetworkRouteTable, OriginStorage, PageErrorEntry, RouteDisposition, RouteResponse,
+    SemanticLocator, SemanticLocatorKind, SnapshotDiff, StorageEntry, TabRef, TabSessionManager,
+    diff_snapshot_text, filter_non_overlapping_annotations, find_ax_nodes_by_locator,
+    project_annotation_boxes, redact_header_map, route_url_matches, snapshot_comparison_text,
+    validate_navigation_url,
+};
 pub use browser_browse as browse;
 pub use browser_detect as detect;
 pub use browser_engine as engine;

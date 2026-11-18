@@ -12,6 +12,18 @@
 
 #[cfg(feature = "studio")]
 pub mod design_stitch_studio;
+pub mod material3_kit;
+
+pub use gpui_ui::nsh::{
+    M3_ACCENTS, M3_SHAPES, M3_SPRINGS, M3_STATE_LAYERS, M3Mode, M3RolePalette, M3ShapeTokens,
+    M3SpringPreset, M3SpringSpec, m3_theme,
+};
+pub use material3_kit::{
+    M3AuraBadge, M3CardVariant, M3NavItem, M3NshTsxKit, M3SearchOmnibar, M3SegmentItem,
+    M3SurfaceLevel, M3TopAppBar, export_m3_nsh_tsx_kit, m3_aura_badge, m3_card, m3_chip, m3_fab,
+    m3_filled_button, m3_navigation_rail, m3_search_omnibar, m3_segmented_tabs, m3_surface,
+    m3_switch, m3_tonal_button, m3_top_app_bar,
+};
 
 use std::rc::Rc;
 use std::sync::Arc;

@@ -1,0 +1,155 @@
+# Declarative Multi-VPS Fleet, Cloudflare Edge & GitHub Orchestration Manifest for Aphrody.
+# Zero hardcoding: SSH endpoints, users, and keys resolve dynamically via ~/.ssh/config (`ssh -G`),
+# environment overrides (`APHRODY_FLEET_HOSTS`, `APHRODY_SSH_CONFIG`, `APHRODY_WORKER_URL`),
+# and `product.toml`.
+
+schema_version = 1
+product_manifest = "product.toml"
+host_profiles_manifest = "assets/os/ci_host_profiles.toml"
+r2_manifest = "assets/os/r2_assets_manifest.toml"
+
+[discovery]
+ssh_config_path = "~/.ssh/config"
+ssh_batch_mode = true
+ssh_connect_timeout_sec = 4
+ssh_probe_timeout_ms = 8000
+ignore_host_patterns = ["*", "git", "github.com", "*.github.com", "localhost"]
+env_hosts_override = "APHRODY_FLEET_HOSTS"
+env_ssh_config_override = "APHRODY_SSH_CONFIG"
+include_local_fallback = true
+
+[capabilities]
+supported = ["xfs_reflink", "btrfs_reflink", "wasm", "native_rust", "edge_proxy"]
+
+[scoring]
+# Dynamic node score in [0, 100] (higher is healthier and lighter):
+#   load_ratio   = load1 / max(1, cpus)
+#   mem_free_pct = mem_available_gb / max(1, mem_total_gb)
+#   disk_ratio   = min(1, work_avail_gb / min_work_avail_gb)
+#   score = clamp(
+#     100
+#     - clamp(load_ratio, 0, load_ratio_cap) * load_penalty_weight
+#     - (1 - clamp(mem_free_pct, 0, 1)) * memory_penalty_weight
+#     - (1 - clamp(disk_ratio, 0, 1)) * disk_penalty_weight
+#     - active_jobs * active_job_penalty
+#     - clamp(rtt_ms / rtt_scale_ms, 0, 1) * latency_penalty_weight
+#     + role_affinity_bonus
+#     + region_affinity_bonus
+#     + priority_bias,
+#     0, 100
+#   )
+load_penalty_weight = 42.0
+load_ratio_cap = 1.5
+memory_penalty_weight = 25.0
+disk_penalty_weight = 18.0
+min_work_avail_gb = 25.0
+active_job_penalty = 8.0
+latency_penalty_weight = 7.0
+rtt_scale_ms = 3000.0
+max_load_per_cpu = 1.35
+min_free_mem_gb = 2.0
+min_free_disk_gb = 10.0
+role_affinity_bonus = 10.0
+region_affinity_bonus = 4.0
+stale_telemetry_ttl_sec = 300
+work_stealing_max_retries = 2
+
+[jobs.native_rust]
+required_capabilities = ["native_rust"]
+preferred_capabilities = ["xfs_reflink"]
+default_shards = 2
+min_free_mem_gb = 8.0
+min_free_disk_gb = 25.0
+
+[jobs.wasm]
+required_capabilities = ["wasm"]
+preferred_capabilities = ["xfs_reflink", "native_rust"]
+default_shards = 2
+min_free_mem_gb = 4.0
+min_free_disk_gb = 15.0
+
+[jobs.edge_proxy]
+required_capabilities = ["edge_proxy"]
+preferred_capabilities = ["btrfs_reflink"]
+default_shards = 1
+min_free_mem_gb = 2.0
+min_free_disk_gb = 10.0
+
+[jobs.verify]
+required_capabilities = ["native_rust"]
+preferred_capabilities = ["wasm", "xfs_reflink"]
+default_shards = 2
+min_free_mem_gb = 4.0
+min_free_disk_gb = 15.0
+
+[jobs.release]
+required_capabilities = ["native_rust"]
+preferred_capabilities = ["xfs_reflink", "wasm"]
+default_shards = 3
+min_free_mem_gb = 8.0
+min_free_disk_gb = 30.0
+
+[cloudflare]
+worker_name = "aphrody-worker"
+worker_dir = ".cloudflare/aphrody-worker"
+wrangler_config = ".cloudflare/aphrody-worker/wrangler.toml"
+queue_binding = "EVENTS"
+queue_name = "github-events"
+telemetry_r2_key = "fleet/telemetry.json"
+beacon_token_env = "FLEET_BEACON_TOKEN"
+worker_url_env = "APHRODY_WORKER_URL"
+
+[cloudflare.r2_buckets]
+releases = "aphrody-releases"
+assets = "aphrody-assets"
+
+[cloudflare.endpoints]
+releases_base = "https://releases.aphrody.com"
+docs_base = "https://docs.aphrody.com"
+assets_base = "https://assets.aphrody.app"
+health = "/healthz"
+fleet_status = "/api/fleet/status"
+fleet_route = "/api/fleet/route"
+fleet_beacon = "/api/fleet/beacon"
+github_webhook = "/github"
+
+[github]
+repository_from_product = "urls.repository"
+default_branch = "main"
+
+[github.workflows]
+ci = ".github/workflows/aphrody-ci.yml"
+release = ".github/workflows/aphrody-release.yml"
+orchestrator = ".github/workflows/aphrody-fleet-orchestrator.yml"
+upstream_sync = ".github/workflows/aphrody-upstream-sync.yml"
+auto_merge = ".github/workflows/aphrody-auto-merge.yml"
+
+[[nodes]]
+alias = "fr1"
+ssh_aliases = ["fr1", "f1p", "vps"]
+region = "eu-west"
+tier = "builder"
+priority_bias = 4.0
+work_dir = "/srv/xbuild"
+capabilities = ["xfs_reflink", "native_rust", "wasm"]
+labels = ["primary-builder", "xfs", "linux-x86_64"]
+
+[[nodes]]
+alias = "fr2"
+ssh_aliases = ["fr2", "f2p", "cdn"]
+region = "eu-west"
+tier = "verifier"
+priority_bias = 2.0
+work_dir = "/srv/xbuild"
+capabilities = ["xfs_reflink", "wasm", "native_rust"]
+labels = ["secondary-verifier", "wasm-webgpu", "linux-x86_64"]
+
+[[nodes]]
+alias = "prd"
+ssh_aliases = ["prd", "usp"]
+region = "us-edge"
+tier = "edge"
+priority_bias = 0.0
+work_dir = "/srv/xbuild"
+capabilities = ["btrfs_reflink", "edge_proxy", "wasm"]
+labels = ["edge-proxy", "btrfs", "cloudflare-origin"]

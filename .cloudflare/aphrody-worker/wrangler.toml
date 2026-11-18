@@ -7,6 +7,9 @@ preview_urls = false
 [limits]
 cpu_ms = 50
 
+[triggers]
+crons = ["*/15 * * * *"]
+
 [observability]
 enabled = true
 
@@ -39,6 +42,10 @@ zone_name = "aphrody.com"
 pattern = "aphrody.com/github"
 zone_name = "aphrody.com"
 
+[[routes]]
+pattern = "aphrody.com/r2-assets/*"
+zone_name = "aphrody.com"
+
 [[r2_buckets]]
 binding = "RELEASES_BUCKET"
 bucket_name = "aphrody-releases"
@@ -48,5 +55,45 @@ binding = "ASSETS_BUCKET"
 bucket_name = "aphrody-assets"
 
 [[queues.producers]]
+binding = "EVENTS"
+queue = "github-events"
+
+[env.learn]
+name = "aphrody-learn"
+compatibility_date = "2026-11-18"
+workers_dev = false
+preview_urls = false
+
+[env.learn.limits]
+cpu_ms = 50
+
+[env.learn.triggers]
+crons = ["*/15 * * * *"]
+
+[env.learn.observability]
+enabled = true
+
+[env.learn.observability.logs]
+enabled = true
+head_sampling_rate = 0.1
+invocation_logs = true
+
+[env.learn.observability.traces]
+enabled = true
+head_sampling_rate = 0.05
+
+[[env.learn.routes]]
+pattern = "learn.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[env.learn.r2_buckets]]
+binding = "RELEASES_BUCKET"
+bucket_name = "aphrody-releases"
+
+[[env.learn.r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "aphrody-assets"
+
+[[env.learn.queues.producers]]
 binding = "EVENTS"
 queue = "github-events"

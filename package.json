@@ -25,6 +25,8 @@
     "fleet:verify": "bun tooling/bun/fleet-sync.ts verify --host fr1 --pull-shots",
     "fleet:parallel": "bun tooling/bun/fleet-sync.ts parallel-build --all",
     "fleet:deploy": "bun tooling/bun/fleet-sync.ts deploy --host fr1 --edge-host prd",
+    "fleet:lb": "bun tooling/bun/fleet-lb.ts",
+    "learn:sync": "bun tooling/bun/learn-cloud.ts",
     "host:audit": "bun tooling/bun/ci-host-optimize.ts audit --host fr1",
     "host:audit:all": "bun tooling/bun/ci-host-optimize.ts audit --all",
     "host:apply": "bun tooling/bun/ci-host-optimize.ts apply --host fr1 --offload-cold",

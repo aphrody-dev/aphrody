@@ -45,6 +45,7 @@ mod keys;
 mod link;
 mod link_hint;
 mod listbox;
+pub mod material3;
 mod mdast_tree;
 mod menu;
 mod menu_button;

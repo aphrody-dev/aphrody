@@ -1,0 +1,19 @@
+[package]
+name = "aphrody_auto"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Native Aphrody OS integration bridge for Auto (Factur-X EN 16931, CompanyDO serverless sync, shared Cloudflare R2 topology, and GPUI Kit 0.10.0 launcher surface)."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_auto.rs"
+doctest = false
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true

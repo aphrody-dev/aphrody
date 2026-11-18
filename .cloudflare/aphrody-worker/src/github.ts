@@ -128,7 +128,20 @@ export function classify(event: string, delivery: string, raw: unknown): GithubE
 }
 
 export async function handleGithubRequest(request: Request, env: WorkerEnv): Promise<Response> {
-  if (request.method !== "POST") return new Response(null, { status: 405, headers: { allow: "POST" } });
+  if (request.method === "GET" || request.method === "HEAD") {
+    return Response.json(
+      {
+        ok: true,
+        service: "aphrody-worker",
+        endpoint: "/github",
+        accepts: "POST",
+        owners: [...OWNERS],
+        eventsBound: !!env.EVENTS,
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  }
+  if (request.method !== "POST") return new Response(null, { status: 405, headers: { allow: "GET, HEAD, POST" } });
 
   const body = await request.arrayBuffer();
   if (!(await verify(env.GITHUB_WEBHOOK_SECRET, body, request.headers.get("x-hub-signature-256")))) {

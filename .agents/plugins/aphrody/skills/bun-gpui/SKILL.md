@@ -17,6 +17,7 @@ description: Bun integration in aphrody via the `vendor/bun` submodule (aphrody-
    - Bundler & universal plugins: `vendor/bun/docs/bundler/index.mdx`, `vendor/bun/docs/bundler/plugins.mdx`
    - Native FFI (`bun:ffi`): `vendor/bun/docs/runtime/ffi.mdx`
 3. **Root ignore configuration**: `bunfig.toml` at the repository root excludes `vendor/`, `target/`, and `**/.nsh/` from `bun fmt` and `bun lint`.
+4. **Dot-directory test discovery (`bun test`)**: Pass explicit `./`-prefixed paths for test files inside hidden directories (e.g., `bun test tooling/bun ./.cloudflare/aphrody-worker/src/index.test.ts`); bare `.cloudflare/...` arguments are silently skipped by `bun test`.
 
 ## 2. Unified NSH × Bun Commands
 
