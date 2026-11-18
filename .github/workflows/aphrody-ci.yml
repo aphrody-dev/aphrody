@@ -138,7 +138,7 @@ jobs:
           submodules: false
       - uses: ./.github/actions/vendor-submodules
       - name: Install Linux fontconfig dependencies
-        run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev pkg-config libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libasound2-dev libvulkan-dev libxcb1-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: oven-sh/setup-bun@v2
       - name: Read toolchain and pinned wasm-bindgen version
         id: cfg
@@ -227,7 +227,7 @@ jobs:
           submodules: false
       - uses: ./.github/actions/vendor-submodules
       - name: Install Linux fontconfig dependencies
-        run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig-dev pkg-config libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libasound2-dev libvulkan-dev libxcb1-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: oven-sh/setup-bun@v2
       - name: Validate Cloudflare Workers and fleet deploy manifests
         run: bun tooling/bun/cloudflare-deploy.ts audit --dry-run
