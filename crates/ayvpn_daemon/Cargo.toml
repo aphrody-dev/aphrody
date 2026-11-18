@@ -1,0 +1,22 @@
+[package]
+name = "ayvpn-daemon"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "The Aphrody VPN daemon: Mullvad's daemon embedded in one process, a client for its management IPC, and C ABI v1 bindings."
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "ayvpn"
+path = "src/main.rs"
+
+[dependencies]
+mullvad-api.workspace = true
+mullvad-daemon.workspace = true
+mullvad-management-interface.workspace = true
+mullvad-paths.workspace = true
+mullvad-types.workspace = true
+tokio.workspace = true

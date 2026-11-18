@@ -82,9 +82,9 @@
 	path = vendor/smithay
 	url = ../../aphrody-labs/smithay.git
 	branch = master
-[submodule "vendor/ayvpn"]
-	path = vendor/ayvpn
-	url = ../ayvpn.git
+[submodule "vendor/mullvad"]
+	path = vendor/mullvad
+	url = ../../aphrody-labs/mullvadvpn-app.git
 	branch = main
 [submodule "vendor/new-cli-installer"]
 	path = vendor/new-cli-installer

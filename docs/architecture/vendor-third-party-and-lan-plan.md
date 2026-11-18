@@ -19,8 +19,8 @@ Single source of truth for Zed contributor conformity, split licensing, vendor/t
 
 ## 3. Vendor & Nested Submodule Remediation
 
-- Top-level `.gitmodules` ([.gitmodules](../../.gitmodules)) declares 38 submodules (20 referenced directly by `Cargo.toml`, plus runtime/OS tooling submodules including `vendor/bun` and `vendor/ayvpn` tracking `branch = main`).
-- Nested submodules required by vendored Cargo manifests (`vendor/libcosmic/iced` and `vendor/ayvpn/mullvad/mullvadvpn-app`) are automatically discovered via `listNestedReferencedPaths` in [submodules.ts](../../tooling/bun/submodules.ts) and initialized across:
+- Top-level `.gitmodules` ([.gitmodules](../../.gitmodules)) declares 24 fork submodules (`vendor/mullvad`, `vendor/browser`, `vendor/bun`, `vendor/wgpu`, `vendor/taffy`, `vendor/dioxus`, `vendor/blitz`, `vendor/libcosmic`, etc.).
+- Nested submodules required by vendored Cargo manifests (`vendor/libcosmic/iced`) are automatically discovered via `listNestedReferencedPaths` in [submodules.ts](../../tooling/bun/submodules.ts) and initialized across:
   - CI action: [.github/actions/vendor-submodules/action.yml](../../.github/actions/vendor-submodules/action.yml)
   - Remote Linux hosts: [fleet-sync.ts](../../tooling/bun/fleet-sync.ts)
   - `[patch.crates-io]` overrides in [Cargo.toml](../../Cargo.toml) (`taffy`, `cosmic-text`, `wgpu*`, `naga`, `accesskit*`, plus Zed's upstream patches).

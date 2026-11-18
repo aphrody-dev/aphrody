@@ -6,10 +6,10 @@
 
 | Metric | Live Count | Notes |
 | --- | ---: | --- |
-| Total repositories audited | 967 | Retrieved live from GitHub `aphrody-labs` API |
-| Already archived on GitHub | 21 | Superseded mirrors/experiments marked `isArchived: true` |
-| Active upstream forks | 894 | Relative-URL submodules (`vendor/*`, `37` pinned in [`.gitmodules`](../../.gitmodules)) + monorepo mirrors |
-| Active original repositories | 52 | Flagship monorepos (`aphrody`, `ai-os`, `ay`, `ANU`, `open`, `auto`, `shenron`, `nie`, `.github`) + candidates for archiving |
+| Total repositories (`aphrody-dev` + `aphrody-labs` + `rose-griffon`) | 1,180 | Deduplicated live (35 duplicate forks, `-1` suffixes & dead slice archives deleted; 23 superseded repos archived) |
+| Archived repositories | 25 | `legacy`, `bun-os`, `bun-distribution`, `ayvpn`, `ay-tools`, `yolo*`, `wii-os`, `google-bun`, `gemini-super-app` |
+| Active upstream forks & mirrors | 1,132 | Canonical `<upstream>` / `<owner>-<name>` forks (`24` pinned in [`.gitmodules`](../../.gitmodules), `38` in `ay/submodules.toml`) |
+| Active original repositories | 23 | Flagship products (`aphrody`, `ay`, `anu`, `ai-os`, `aydroid`, `aynt`, `aysh`, `bun`, `browser`, `nie`, `shenron`, `open`, `auto`, `aphrody-m3`, `aphrody-git`, `rust-mono`, `r2b`, `msys`, `.github`) |
 
 ## 2. Canonical Monorepo Owners
 
@@ -37,9 +37,8 @@
 | `bun-runtime-and-pkgs` | 6 | Consolidate active forks via [`.gitmodules`](../../.gitmodules) & archive superseded 0-ahead copies |
 | `tauri-webview-stack` | 5 | Consolidate active forks via [`.gitmodules`](../../.gitmodules) & archive superseded 0-ahead copies |
 
-## 4. High-Confidence Archive Candidates Verified
+## 4. Deduplication & Consolidation Actions Executed
 
-- `aphrody-labs/agent-desktop`: 100% migrated into [`crates/aphrody_pilot`](../../crates/aphrody_pilot/src/aphrody_pilot.rs), [`crates/aphrody_craft`](../../crates/aphrody_craft/src/aphrody_craft.rs), and [`crates/aphrody_desktop`](../../crates/aphrody_desktop/src/aphrody_desktop.rs) (see [`agent-desktop-ai-os.md`](./agent-desktop-ai-os.md)).
-- `aphrody-labs/browse`, `aphrody-labs/opentui`, `aphrody-labs/opentunnel`, `aphrody-labs/models.dev`: absorbed into `aphrody-labs/open` (0 custom commits ahead).
-- Standalone legacy `artcraft`, `artcraftx`, `anicraft`, `autocraft`, `brandcraft`, `cadcraft`: consolidated into `vendor/craft-anything`, `vendor/craft-libs`, and `crates/aphrody_craft`.
-- Standalone `apify-client-*`, `apify-sdk-*` unreferenced 0-ahead forks: consolidated via `aphrody-labs/open` / npm on `bun`.
+- **Duplicate forks eliminated (`DELETE`)**: `anomalyco-browse` (synced into `aphrody-labs/browse`), `cloudflare-boringtun`, `cloudflare-pingora`, `mullvad-gotatun`, `mullvad-mullvadvpn-app`, `base-ui-1`, `tailwindcss-1`, `next.js-1`, `LiberNT` (commits preserved in `aphrody-dev/aynt`), `storytold-winit`, `storytold-wgpu`, `gfw-build-extra`, `gfw-MINGW-packages`, detached `antigravity-sdk-python` (replaced by canonical fork), and archived `longbridge-nsh` (active fork renamed to `aphrody-labs/longbridge-nsh`).
+- **Dead slice & cross-org collision archives eliminated (`DELETE`)**: `aphrody-labs/ai-os`, `agent-desktop`, `dioxus-monorepo`, `carbon`, `yolo-bun`, `yolo-hub`, `bench`, `depot`, `env-kit`, `gamescope-rs`, `gaming`, `infra`, `nt`, `ring3-agent`, `rust-stack`, `steam-depot`, `unix`, `wayland`, `wck`, `xtask` (`bun-os` and `bun-distribution` preserved for `crates.io` tarballs).
+- **Thin/duplicate products absorbed & archived (`PATCH archived=true`)**: `aphrody-dev/ayvpn` -> [`crates/ayvpn_daemon`](../../crates/ayvpn_daemon/src/lib.rs) + [`crates/aphrody_vpn`](../../crates/aphrody_vpn/src/aphrody_vpn.rs) + `browser-vpn`; `aphrody-dev/ay-tools` -> `ay/crates/ay-deps`; `aphrody-labs/legacy`, `yolo` + 16 `yolo-*` monorepos, `wii-os`, `google-bun`, and `gemini-super-app`.

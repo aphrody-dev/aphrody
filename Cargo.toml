@@ -33,6 +33,7 @@ members = [
     "crates/auto_update_helper",
     "crates/auto_update_ui",
     "crates/aws_http_client",
+    "crates/ayvpn_daemon",
     "crates/bedrock",
     "crates/bench_metrics",
     "crates/benchmarks",
@@ -327,7 +328,6 @@ members = [
 ]
 exclude = [
     "vendor/accesskit",
-    "vendor/ayvpn",
     "vendor/anyrender",
     "vendor/blitz",
     "vendor/browser",
@@ -340,6 +340,7 @@ exclude = [
     "vendor/egui",
     "vendor/iced",
     "vendor/libcosmic",
+    "vendor/mullvad",
     "vendor/new-cli-installer",
     "vendor/smithay",
     "vendor/softbuffer",
@@ -671,7 +672,12 @@ ztracing_macro = { path = "crates/ztracing_macro" }
 # External crates
 #
 
-ayvpn-daemon = { path = "vendor/ayvpn/crates/ayvpn-daemon" }
+ayvpn-daemon = { path = "crates/ayvpn_daemon" }
+mullvad-api = { path = "vendor/mullvad/mullvad-api" }
+mullvad-daemon = { path = "vendor/mullvad/mullvad-daemon", default-features = false, features = ["embedded"] }
+mullvad-management-interface = { path = "vendor/mullvad/mullvad-management-interface" }
+mullvad-paths = { path = "vendor/mullvad/mullvad-paths" }
+mullvad-types = { path = "vendor/mullvad/mullvad-types" }
 browser-browse = { path = "vendor/browser/components/browser-browse" }
 browser-detect = { path = "vendor/browser/components/browser-detect", default-features = false }
 browser-engine = { path = "vendor/browser/components/browser-engine" }

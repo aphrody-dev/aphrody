@@ -59,7 +59,7 @@ incremental = true
     expect(report.ok).toBe(true);
     expect(report.vendor.missingPatchPaths).toEqual([]);
     expect(report.vendor.declaredSubmodules).toBeGreaterThanOrEqual(24);
-    expect(report.vendor.nestedCargoSubmodules.length).toBeGreaterThanOrEqual(2);
+    expect(report.vendor.nestedCargoSubmodules.length).toBeGreaterThanOrEqual(1);
     expect(report.vendor.nestedCargoSubmodules.every((n) => n.manifestPresent)).toBe(true);
   });
 });

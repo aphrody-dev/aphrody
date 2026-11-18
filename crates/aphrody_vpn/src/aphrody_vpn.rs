@@ -1,7 +1,7 @@
 //! A native GPUI client for the Aphrody VPN daemon.
 //!
 //! [`VpnModule`] adds a dock panel, a pane item and their actions to any `gpui_app_shell`
-//! application. The daemon is reached through `ayvpn-daemon` (the `vendor/ayvpn` submodule); the
+//! application. The daemon is reached through `ayvpn-daemon` (`crates/ayvpn_daemon` + `vendor/mullvad`); the
 //! view only knows the [`VpnBackend`] trait, so tests drive it with a fake.
 
 mod backend;

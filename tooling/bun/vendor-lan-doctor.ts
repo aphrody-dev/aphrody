@@ -3,8 +3,7 @@
  * Vendor, Third-Party Supply-Chain, and WireGuard LAN Doctor for Aphrody.
  *
  * Audits:
- *   1. All `.gitmodules` entries + Cargo-referenced nested submodules (`vendor/libcosmic/iced`,
- *      `vendor/ayvpn/mullvad/mullvadvpn-app`)
+ *   1. All `.gitmodules` entries + Cargo-referenced nested submodules (`vendor/libcosmic/iced`)
  *   2. Root `Cargo.toml` `[patch.crates-io]` path & git consistency
  *   3. `deny.toml` policy readiness (`[licenses]`, `[sources]`, `unknown-git`)
  *   4. Companion workspace repos in parent directory (`../<repo>/.gitmodules`) without mutating them
