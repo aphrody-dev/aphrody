@@ -1,0 +1,50 @@
+[package]
+name = "ay-open"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "open: the one framework of the workspace. Re-exports the surfaces (browse, crawl, tunnel, tui, ui, router, engines, C ABI) and ships the `open` command"
+
+build = "build.rs"
+
+[lib]
+name = "open"
+
+[[bin]]
+name = "open"
+path = "src/main.rs"
+
+[features]
+default = ["engines", "crawl", "browse", "tunnel", "router"]
+engines = ["dep:ay-open-browser-engines"]
+crawl = ["engines", "dep:ay-open-crawl"]
+browse = ["engines", "dep:ay-open-browse"]
+tunnel = ["dep:ay-open-tunnel"]
+router = ["dep:ay-open-ai-router"]
+# OpenTUI's native library must be present (scripts/opentui-native.ts).
+tui = ["router", "dep:ay-open-tui"]
+# Rune: the native GPU UI framework of anomalyco, pinned by git revision.
+ui = ["dep:rune", "dep:rune-kit", "dep:rune-motion"]
+c-abi = ["dep:ay-open-c-abi"]
+
+[dependencies]
+ay-open-ai-router = { workspace = true, optional = true }
+ay-open-browse = { workspace = true, optional = true }
+ay-open-browser-engines = { workspace = true, optional = true }
+ay-open-c-abi = { workspace = true, optional = true }
+ay-open-crawl = { workspace = true, optional = true }
+rune = { workspace = true, optional = true }
+rune-kit = { workspace = true, optional = true }
+rune-motion = { workspace = true, optional = true }
+ay-open-tui = { workspace = true, optional = true }
+ay-open-tunnel = { workspace = true, optional = true }
+
+anyhow.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+url.workspace = true
+
+[lints]
+workspace = true

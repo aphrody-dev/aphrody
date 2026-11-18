@@ -1,0 +1,24 @@
+[package]
+name = "ay-open-browse"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Browse for open: agents drive a real browser, either over CDP directly (any Chromium, the Aphrody browser) or through the browse relay and the Chrome extension (MV3)"
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+browse-capture.workspace = true
+browse-core.workspace = true
+browse-page.workspace = true
+browse-relay.workspace = true
+browse-script.workspace = true
+ay-open-browser-engines.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true

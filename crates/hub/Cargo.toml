@@ -1,0 +1,20 @@
+[package]
+name = "ay-open-hub"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Hugging Face Hub compatible repository service: info, tree, resolve with client headers, content-addressed storage, mirror mode"
+publish = false
+
+[dependencies]
+base64 = "0.22"
+serde = { workspace = true }
+sha2 = "0.10"
+serde_json.workspace = true
+tiny_http = "0.12.0"
+ureq = { version = "3.5.2", features = ["json"] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"

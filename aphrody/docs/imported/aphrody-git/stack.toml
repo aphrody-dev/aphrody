@@ -1,0 +1,69 @@
+# The Git stack: every repository is a fork owned by this repository's owner (read from `origin`),
+# checked out as a submodule at `path` through a relative URL (`../<name>.git`), so a fork of this
+# repository finds its own forks. `bun scripts/stack.ts` applies this file; nothing else lists them.
+#
+# Keys: name (fork name, the upstream's), upstream (owner/repo), path, branch (default: the
+# upstream's default branch, read live), lineage (other upstreams of the same fork network, added as
+# remotes), update ("checkout", or "none" to register without checking out), role.
+
+[[repo]]
+name = "git"
+upstream = "microsoft/git"
+lineage = ["git/git", "git-for-windows/git"]
+path = "git"
+role = "Git itself: git/git, the Git for Windows patches on it, and Microsoft's VFS and Scalar on those (one fork network, so one fork)"
+
+[[repo]]
+name = "cli"
+upstream = "cli/cli"
+path = "gh"
+role = "gh, the GitHub CLI (Go)"
+
+[[repo]]
+name = "git-sdk-64"
+upstream = "git-for-windows/git-sdk-64"
+path = "windows/git-sdk-64"
+update = "none"
+role = "Git for Windows SDK (MSYS2 toolchain that builds Git for Windows); tens of GB, checked out on demand"
+
+[[repo]]
+name = "gitoxide"
+upstream = "GitoxideLabs/gitoxide"
+path = "rust/gitoxide"
+role = "gix: Git in pure Rust (library and CLI)"
+
+[[repo]]
+name = "git2-rs"
+upstream = "rust-lang/git2-rs"
+path = "rust/git2-rs"
+role = "git2: Rust bindings to libgit2"
+
+[[repo]]
+name = "libgit2"
+upstream = "libgit2/libgit2"
+path = "c/libgit2"
+role = "libgit2: Git as a C library"
+
+[[repo]]
+name = "go-git"
+upstream = "go-git/go-git"
+path = "go/go-git"
+role = "go-git: Git in pure Go"
+
+[[repo]]
+name = "isomorphic-git"
+upstream = "isomorphic-git/isomorphic-git"
+path = "ts/isomorphic-git"
+role = "isomorphic-git: Git in pure JavaScript/TypeScript"
+
+[[repo]]
+name = "gitingest"
+upstream = "coderamp-labs/gitingest"
+path = "ingest/gitingest"
+role = "gitingest: a repository as an LLM-ready digest (Python)"
+
+[[repo]]
+name = "gitx"
+upstream = "gitx/gitx"
+path = "gui/gitx"
+role = "GitX: Git GUI for macOS"

@@ -1,0 +1,16 @@
+{
+  "description": "Tools installed globally on every host (PC and VPS) for the benchmark. Versions are resolved at install time (latest release or latest package); nothing is pinned here.",
+  "bin": "~/.local/bin",
+  "tools": [
+    { "name": "tree-sitter", "github": "tree-sitter/tree-sitter", "asset": { "windows-x64": "windows-x64\\.(zip|gz)$", "linux-x64": "linux-x64\\.(zip|gz)$", "linux-arm64": "linux-arm64\\.(zip|gz)$", "macos-arm64": "macos-arm64\\.(zip|gz)$" }, "verify": ["tree-sitter", "--version"] },
+    { "name": "hx", "github": "helix-editor/helix", "asset": { "windows-x64": "x86_64-windows\\.zip$", "linux-x64": "x86_64-linux\\.tar\\.xz$", "linux-arm64": "aarch64-linux\\.tar\\.xz$", "macos-arm64": "aarch64-macos\\.tar\\.xz$" }, "keepDir": true, "verify": ["hx", "--version"] },
+    { "name": "magika", "github": "google/magika", "tagPrefix": "cli/", "asset": { "windows-x64": "x86_64-pc-windows-msvc\\.(zip|tar\\.(xz|gz))$", "linux-x64": "x86_64-unknown-linux-(gnu|musl)\\.tar\\.(xz|gz)$", "linux-arm64": "aarch64-unknown-linux-(gnu|musl)\\.tar\\.(xz|gz)$", "macos-arm64": "aarch64-apple-darwin\\.tar\\.(xz|gz)$" }, "verify": ["magika", "--version"] },
+    { "name": "obscura", "github": "h4ckf0r0day/obscura", "asset": { "windows-x64": "x86_64-windows\\.(zip|tar\\.gz)$", "linux-x64": "x86_64-linux\\.tar\\.gz$", "linux-arm64": "aarch64-linux\\.tar\\.gz$", "macos-arm64": "aarch64-macos\\.tar\\.gz$" }, "verify": ["obscura", "--version"] },
+    { "name": "lightpanda", "github": "lightpanda-io/browser", "asset": { "linux-x64": "^lightpanda-x86_64-linux$", "linux-arm64": "^lightpanda-aarch64-linux$", "macos-arm64": "^lightpanda-aarch64-macos$" }, "unsupported": { "windows-x64": "no Windows build upstream; run it under WSL or build it from source with Zig" }, "verify": ["lightpanda", "version"] },
+    { "name": "hyperfine", "github": "sharkdp/hyperfine", "fork": "aphrody-labs/hyperfine", "asset": { "windows-x64": "x86_64-pc-windows-msvc\\.zip$", "linux-x64": "x86_64-unknown-linux-musl\\.tar\\.gz$", "linux-arm64": "aarch64-unknown-linux-gnu\\.tar\\.gz$", "macos-arm64": "aarch64-apple-darwin\\.tar\\.gz$" }, "verify": ["hyperfine", "--version"] },
+    { "name": "cloudflared", "github": "cloudflare/cloudflared", "asset": { "windows-x64": "windows-amd64\\.exe$", "linux-x64": "^cloudflared-linux-amd64$", "linux-arm64": "^cloudflared-linux-arm64$", "macos-arm64": "darwin-arm64\\.tgz$" }, "verify": ["cloudflared", "--version"] },
+    { "name": "markitdown", "uv": "markitdown[all]", "verify": ["markitdown", "--version"] },
+    { "name": "crawlee-python", "uv": "crawlee[cli]", "bin": "crawlee", "verify": ["crawlee", "--help"] },
+    { "name": "apify", "bun": "apify-cli", "verify": ["apify", "--version"] }
+  ]
+}

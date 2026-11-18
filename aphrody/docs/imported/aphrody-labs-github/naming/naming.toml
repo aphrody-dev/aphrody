@@ -1,0 +1,416 @@
+# Aphrody naming scheme, machine-readable. Prose and rationale: NAMING.md (same version).
+# Consumers: naming/check.ts (per repository), naming/repos.ts (org audit).
+# Nothing here is a secret. A repository never reads another repository's names: each one declares its own in its root naming.toml
+# (id, kind, org, optional family, optional legacy prefixes); this file only supplies the rules that every declaration is checked against.
+
+[meta]
+version = "1.0.0"
+date = "2026-11-17"
+doc = "NAMING.md"
+# GitHub accounts whose repositories are "ours". Anything under these is another repository of the family when it is not the checked one.
+orgs = ["aphrody-dev", "aphrody-labs", "rose-griffon", "rosegriffon"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Per-org defaults. A repository may override any value in its own naming.toml [names].
+# --------------------------------------------------------------------------------------------------------------
+[orgs.aphrody-dev]
+role = "products: the OS and the toolkits every other repository may consume through registries"
+npm_scope = "@aphrody"
+ghcr = "ghcr.io/aphrody-dev"
+
+[orgs.aphrody-labs]
+role = "applications, runtime, crafts, configuration, and forks or mirrors of upstreams"
+npm_scope = "@aphrody"
+ghcr = "ghcr.io/aphrody-labs"
+
+[orgs.rose-griffon]
+role = "Rose Griffon: separate organisation, separate brand, same rules"
+npm_scope = "@rosegriffon"
+ghcr = "ghcr.io/rose-griffon"
+
+# Alias: the former GitHub handle of rose-griffon resolves to the same rules.
+[orgs.rosegriffon]
+role = "alias of rose-griffon"
+npm_scope = "@rosegriffon"
+ghcr = "ghcr.io/rose-griffon"
+
+# --------------------------------------------------------------------------------------------------------------
+# Name templates. {id} = repository id (defaults to the repository name), {short} = id without a leading "aphrody-",
+# {ID} = id upper-cased with "-" as "_", {Short} = short in PascalCase, {unit} = the package or binary inside the repository,
+# {scope} = npm scope of the org, {org} and {repo} = GitHub slug parts. A bare repository id (no unit) names the main package.
+# --------------------------------------------------------------------------------------------------------------
+[templates]
+repo = "{id}"                              # GitHub repository: kebab-case, lowercase, [a-z0-9-]
+crate = "{id}-{unit}"                      # crates.io and Cargo workspaces: hyphens only
+npm = "{scope}/{short}-{unit}"             # main package "{scope}/{short}"; the OS repository (short empty) uses "{scope}/{unit}"
+pypi = "{id}-{unit}"                       # distribution name; the import package is the snake_case form
+nuget = "Aphrody.{Short}.{Unit}"           # PascalCase; the OS repository uses "Aphrody.{Unit}"
+go = "github.com/{org}/{repo}/{unit}"      # the module path is the repository URL, always
+docker = "{ghcr}/{repo}-{unit}"            # GHCR only; no registry-less or Docker Hub names
+binary = "{id}-{unit}"                     # main binary "{id}"
+env = "{ID}_{NAME}"
+cloudflare = "{id}-{unit}-{stage}"         # workers, pages, d1, r2, kv, queues; stage in [stages]
+
+[stages]
+names = ["prod", "stg", "dev"]
+
+# Environment variable prefixes that belong to somebody else and never count as coupling: platform, toolchain and upstream runtimes.
+[env]
+# Repository ids that are also ordinary words: their prefix (OPEN_AI_API_KEY, AUTO_UPDATE) is never taken as ownership.
+generic = ["open", "auto", "browser", "claude", "legacy", "bun"]
+neutral = [
+  "PATH", "HOME", "USER", "USERNAME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "TMPDIR", "SHELL", "TERM", "LANG", "LC",
+  "PWD", "OLDPWD", "HOSTNAME", "CI", "NODE", "NPM", "BUN", "CARGO", "RUST", "RUSTC", "RUSTUP", "RUSTFLAGS", "GITHUB", "GH", "GIT", "RUNNER",
+  "DEBUG", "NO", "FORCE", "XDG", "WSL", "MSYS", "MINGW", "CC", "CXX", "CFLAGS", "LDFLAGS", "LLVM", "CLANG", "ZIG", "GO", "GOPATH", "PYTHON",
+  "UV", "DOTNET", "NUGET", "DOCKER", "CLOUDFLARE", "CF", "WRANGLER", "ANTHROPIC", "CLAUDE", "OPENAI", "GEMINI", "GOOGLE", "GCLOUD", "AWS",
+  "VERCEL", "SSH", "EDITOR", "PAGER", "OS", "PROCESSOR", "NUMBER", "SYSTEMROOT", "WINDIR", "PROGRAMFILES", "COMSPEC", "PATHEXT",
+]
+
+# --------------------------------------------------------------------------------------------------------------
+# Kinds. name = rule for the repository name; orgs = where the kind may live; publishes = registries the kind uses.
+# "upstream" means the name is the upstream project's own, byte for byte (so `git remote upstream` and packages keep resolving).
+# --------------------------------------------------------------------------------------------------------------
+[kinds.os]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "the single repository named aphrody"
+pattern = "^aphrody$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "own-id"
+
+[kinds.sdk]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "short product id, 2 to 12 characters"
+pattern = "^[a-z][a-z0-9-]{1,11}$"
+publishes = ["crates", "npm", "pypi", "nuget", "go", "ghcr"]
+prefix = "own-id"
+
+[kinds.unix]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "short product id (anu)"
+pattern = "^[a-z][a-z0-9-]{1,11}$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "own-id"
+
+[kinds.android]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "short product id (aydroid)"
+pattern = "^[a-z][a-z0-9-]{1,11}$"
+publishes = ["ghcr"]
+prefix = "own-id"
+
+[kinds.nt]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "short product id (aynt)"
+pattern = "^[a-z][a-z0-9-]{1,11}$"
+publishes = ["ghcr"]
+prefix = "own-id"
+
+[kinds.ai]
+orgs = ["aphrody-dev"]
+name = "kebab-case product id (ai-os)"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "pypi", "ghcr"]
+prefix = "own-id"
+
+[kinds.tool]
+orgs = ["aphrody-dev", "aphrody-labs"]
+name = "short product id of a single-binary tool (aysh)"
+pattern = "^[a-z][a-z0-9-]{1,11}$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "own-id"
+
+[kinds.runtime]
+orgs = ["aphrody-labs"]
+name = "the upstream runtime's name (bun)"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "upstream"
+
+[kinds.craft]
+orgs = ["aphrody-labs"]
+name = "kebab-case product id (craft-anything, nie)"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "own-id"
+
+[kinds.game]
+orgs = ["aphrody-labs"]
+name = "kebab-case game or engine id"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "own-id"
+
+[kinds.app]
+orgs = ["aphrody-labs", "rose-griffon", "rosegriffon"]
+name = "kebab-case product id (shenron, auto, open, rosegriffon)"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "pypi", "ghcr"]
+prefix = "own-id"
+
+[kinds.browser]
+orgs = ["aphrody-labs"]
+name = "kebab-case product id (browser)"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "ghcr"]
+prefix = "own-id"
+
+[kinds.design]
+orgs = ["aphrody-labs"]
+name = "aphrody-<short> (aphrody-m3)"
+pattern = "^aphrody-[a-z0-9]+(-[a-z0-9]+)*$"
+publishes = ["crates", "npm"]
+prefix = "own-id"
+
+[kinds.research]
+orgs = ["aphrody-labs"]
+name = "kebab-case id, or <family>-<unit> inside a declared family (msys, r2b, yolo-re)"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "pypi"]
+prefix = "own-id"
+
+[kinds.family]
+orgs = ["aphrody-labs"]
+name = "<family>-<unit>: the family root repository is named <family>, members add a unit"
+pattern = "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+publishes = ["crates", "npm", "pypi"]
+prefix = "family"
+
+[kinds.config]
+orgs = ["aphrody-labs", "aphrody-dev", "rose-griffon"]
+name = ".github, claude, gemini, <tool>-local (private owner data), or <id>-config"
+pattern = "^(\\.github|claude|gemini|(claude|gemini)-local|aphrody-dev|[a-z][a-z0-9]*(-[a-z0-9]+)*-config)$"
+publishes = ["npm"]
+prefix = "own-id"
+
+[kinds.fork]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "upstream"
+pattern = "upstream"
+publishes = []
+prefix = "upstream"
+
+[kinds.mirror]
+orgs = ["aphrody-labs"]
+name = "upstream"
+pattern = "upstream"
+publishes = []
+prefix = "upstream"
+
+[kinds.archive]
+orgs = ["aphrody-labs", "aphrody-dev"]
+name = "frozen as it was; never renamed, never published from"
+pattern = "any"
+publishes = []
+prefix = "none"
+
+# --------------------------------------------------------------------------------------------------------------
+# Forks and mirrors keep the upstream repository name. On a collision the name becomes <upstream-owner>-<name>, or <alias>-<name> for
+# the aliases below (alias = short prefix, value = upstream owner). Numeric suffixes (-1, -2) are not allowed.
+# --------------------------------------------------------------------------------------------------------------
+[forks.aliases]
+gfw = "git-for-windows"
+
+# --------------------------------------------------------------------------------------------------------------
+# Families: one prefix shared by a root repository and its members. Members still declare their own id and kind = "family".
+# A family is declared by its root repository's naming.toml ([family] section); this registry only lets the org audit know them.
+# --------------------------------------------------------------------------------------------------------------
+[families.yolo]
+root = "yolo"
+members = ["yolo-ai", "yolo-backend", "yolo-cloudflare", "yolo-cross", "yolo-engine", "yolo-os", "yolo-plugins", "yolo-re", "yolo-rs", "yolo-stack", "yolo-standards", "yolo-ui", "yolo-vendor", "yolo-vps", "yolo-web", "yolo-zig"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Registry of the original (non-fork) repositories, used by the org audit and to recognise "another repository of the family".
+# The authority for a repository's own names stays its own naming.toml; a mismatch is reported, never auto-corrected.
+# --------------------------------------------------------------------------------------------------------------
+[repos]
+"aphrody-labs/aphrody" = "os"
+"aphrody-labs/ay" = "sdk"
+"aphrody-dev/anu" = "archive"
+"aphrody-dev/ai-os" = "archive"
+"aphrody-dev/aydroid" = "archive"
+"aphrody-labs/aynt" = "nt"
+"aphrody-dev/aysh" = "archive"
+"aphrody-dev/ay-tools" = "archive"
+"aphrody-dev/ayvpn" = "archive"
+"aphrody-dev/aphrody-dev" = "config"
+"aphrody-labs/ay-cf" = "app"
+"aphrody-labs/ay-media" = "app"
+"aphrody-labs/bun" = "runtime"
+"aphrody-labs/nie" = "game"
+"aphrody-labs/shenron" = "app"
+"aphrody-labs/shenron-config" = "config"
+"aphrody-labs/auto" = "app"
+"aphrody-labs/open" = "app"
+"aphrody-labs/browser" = "browser"
+"aphrody-labs/aphrody-m3" = "design"
+"aphrody-labs/aphrody-git" = "app"
+"aphrody-labs/claude" = "config"
+"aphrody-labs/.github" = "config"
+"aphrody-labs/msys" = "research"
+"aphrody-labs/r2b" = "research"
+"aphrody-labs/tao" = "fork"
+"aphrody-labs/scap" = "fork"
+"aphrody-labs/tauri-action" = "fork"
+"aphrody-labs/yolo" = "archive"
+"aphrody-labs/yolo-ai" = "archive"
+"aphrody-labs/yolo-backend" = "archive"
+"aphrody-labs/yolo-cloudflare" = "archive"
+"aphrody-labs/yolo-cross" = "archive"
+"aphrody-labs/yolo-engine" = "archive"
+"aphrody-labs/yolo-os" = "archive"
+"aphrody-labs/yolo-plugins" = "archive"
+"aphrody-labs/yolo-re" = "archive"
+"aphrody-labs/yolo-rs" = "archive"
+"aphrody-labs/yolo-stack" = "archive"
+"aphrody-labs/yolo-standards" = "archive"
+"aphrody-labs/yolo-ui" = "archive"
+"aphrody-labs/yolo-vendor" = "archive"
+"aphrody-labs/yolo-vps" = "archive"
+"aphrody-labs/yolo-web" = "archive"
+"aphrody-labs/yolo-zig" = "archive"
+"aphrody-labs/google-bun" = "archive"
+"aphrody-labs/gemini-super-app" = "archive"
+"aphrody-labs/wii-os" = "archive"
+"aphrody-labs/cours-ia" = "research"
+"aphrody-labs/fairy-tail-archive" = "research"
+"aphrody-labs/legacy" = "archive"
+"aphrody-labs/rust-mono" = "tool"
+"aphrody-labs/gemini" = "config"
+"aphrody-labs/gemini-local" = "config"
+"aphrody-labs/claude-local" = "config"
+"aphrody-labs/depot_tools" = "mirror"
+"aphrody-labs/wayland-c" = "mirror"
+"aphrody-labs/steam-runtime-tools" = "mirror"
+"aphrody-labs/steamos-manager" = "mirror"
+"aphrody-labs/zig" = "mirror"
+"aphrody-labs/binutils-gdb" = "mirror"
+"aphrody-labs/dash" = "mirror"
+"aphrody-labs/readline" = "mirror"
+"aphrody-labs/make" = "mirror"
+"aphrody-labs/gnu-findutils" = "mirror"
+"aphrody-labs/gnu-sed" = "mirror"
+"aphrody-labs/gawk" = "mirror"
+"aphrody-labs/bash" = "mirror"
+"aphrody-labs/bun-distribution" = "archive"
+"aphrody-labs/bun-os" = "archive"
+"rose-griffon/rosegriffon" = "app"
+
+# --------------------------------------------------------------------------------------------------------------
+# Legacy names mapped to the scheme. status: renamed (done, redirect kept), pending (rename blocked, reason given), frozen (stays: registry name is immutable).
+# kind = repo | crate-prefix | npm | env | path. Registries never free a published name: crates and npm names stay and are deprecated, the new name is the one new code uses.
+# --------------------------------------------------------------------------------------------------------------
+[[legacy]]
+kind = "repo"
+old = "aphrody-dev/ANU"
+new = "aphrody-dev/anu"
+status = "renamed"
+why = "uppercase repository name; the identity file, binaries and the local checkout already say anu"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-dev/ayNT"
+new = "aphrody-dev/aynt"
+status = "renamed"
+why = "mixed-case repository name"
+
+[[legacy]]
+kind = "crate-prefix"
+old = "bun_browser_"
+new = "browser-"
+owner = "aphrody-labs/browser"
+status = "frozen"
+why = "published on crates.io with underscores under the runtime's name; new crates of the browser repository use the browser- prefix"
+
+[[legacy]]
+kind = "crate-prefix"
+old = "bun-os-"
+new = "aphrody-"
+owner = "aphrody-labs/aphrody"
+status = "frozen"
+why = "published; OS units belong to the OS repository's prefix"
+
+[[legacy]]
+kind = "crate-prefix"
+old = "bunos-"
+new = "aphrody-"
+owner = "aphrody-labs/aphrody"
+status = "frozen"
+why = "published; OS units belong to the OS repository's prefix"
+
+[[legacy]]
+kind = "crate-prefix"
+old = "aphrody-"
+new = "ay-"
+owner = "aphrody-labs/ay"
+status = "frozen"
+why = "aphrody-* is reserved for ay and aphrody (absorbed features); standalone workspaces use ay-*"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/egui-1"
+new = "aphrody-labs/emilk-egui"
+status = "renamed"
+why = "fork with a numeric suffix"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/skills-4"
+new = "aphrody-labs/trailofbits-skills"
+status = "renamed"
+why = "fork with a numeric suffix"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/skills-1"
+new = "aphrody-labs/openai-skills"
+status = "renamed"
+why = "fork with a numeric suffix"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/coreutils-1"
+new = "aphrody-labs/coreutils-coreutils"
+status = "renamed"
+why = "fork with a numeric suffix"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/ai-2"
+new = "aphrody-labs/cloudflare-ai"
+status = "renamed"
+why = "fork with a numeric suffix"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/headless_chrome"
+new = "aphrody-labs/rust-headless-chrome"
+status = "renamed"
+why = "fork renamed to match upstream repository name"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/lightpanda"
+new = "aphrody-labs/lightpanda-io-browser"
+status = "renamed"
+why = "fork colliding with aphrody-labs/browser uses <upstream-owner>-<name>"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/native-shell"
+new = "aphrody-labs/longbridge-nsh"
+status = "renamed"
+why = "fork colliding with aphrody-labs/nsh uses canonical <upstream-owner>-<name> after deleting archived duplicate"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/antigravity-sdk-python-upstream"
+new = "aphrody-labs/antigravity-sdk-python"
+status = "renamed"
+why = "real upstream fork replaced the detached mirror under the canonical upstream name"
+
+[[legacy]]
+kind = "repo"
+old = "aphrody-labs/anomalyco-browse"
+new = "aphrody-labs/browse"
+status = "renamed"
+why = "duplicate fork consolidated into canonical aphrody-labs/browse"

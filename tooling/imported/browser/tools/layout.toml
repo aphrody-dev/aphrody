@@ -1,0 +1,39 @@
+# Where everything lives, on the Chromium model. `tools/layout.ts`, `tools/import.py` and `tools/flatten.py` read this file;
+# nothing else knows a directory name.
+#
+#   third_party/bun/      the Bun runtime: a git submodule of our fork (relative URL in .gitmodules), a workspace and a build of its own
+#   components/<crate>    first-party crates, written in this repository (//components in Chromium)
+#   third_party/<name>/   one directory per upstream project: its crates as <crate> subdirectories, its other files
+#                         (CI, docs, resources, tests, licences) beside them; README.chromium describes it
+#   build/  testing/  tools/  styleguide/  docs/   build configuration, test infrastructure, developer tools, style, documentation
+
+[bun]
+dir = "third_party/bun"
+
+[kitesurf]
+dir = "third_party/kitesurf"
+crates_dir = "third_party/kitesurf/crates"
+commit = "0e080e0988aaecd62ccdde88d4c67d8ac8acfd2f"
+
+[browse]
+dir = "third_party/browse"
+commit = "be5528ff2194c8defab74d41e13abb7cb149548e"
+
+[mullvad]
+dir = "third_party/mullvad"
+commit = "9f48572ea0f5223591fcdd15d15059b9cc59a227"
+
+[first_party]
+dir = "components"
+
+[third_party]
+dir = "third_party"
+# Checkouts managed on the build host and never committed (gclient or git): listed in .gitignore.
+external = ["chromium"]
+
+# JavaScript and TypeScript: native Bun only. PRESUBMIT.ts enforces this on `first_party`; the rules of the native linter
+# are in bunfig.toml, the reasoning with its proof (docs of the Bun fork) in styleguide/bun/README.md.
+[javascript]
+first_party = ["tools", "testing", "package.json"]
+forbidden_files = ["package-lock.json", "yarn.lock", "pnpm-lock.yaml", "pnpm-workspace.yaml", ".node-version", ".nvmrc"]
+forbidden_script_words = ["npm", "npx", "pnpm", "yarn", "node", "tsx", "ts-node", "nodemon", "jest", "vitest", "mocha", "eslint", "prettier", "tsc"]

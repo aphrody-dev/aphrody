@@ -1,0 +1,203 @@
+# Machine-readable configuration of i18n/check.ts. Rules and their rationale: I18N.md.
+# A repository overrides any key of [config] with an i18n.toml at its root;
+# exclude_extra and exclude_content_extra append to the lists below (vendored trees, deliberate fixtures).
+
+[config]
+default_lang = "en"        # source language baseline; override per project
+default_dir = "ltr"
+# Never scanned: vendored, generated, build output, deliberate fixtures.
+exclude = [
+  "**/.git/**", "**/node_modules/**", "**/third_party/**", "**/upstream/**", "**/vendor/**", "**/vendored/**",
+  "**/dist/**", "**/build/**", "**/target/**", "**/.next/**", "**/.turbo/**", "**/coverage/**",
+  "**/fixtures/**", "**/fixture/**", "**/testdata/**", "**/__snapshots__/**", "**/snapshots/**",
+  "**/*.min.*", "**/*.map", "**/*.snap", "**/*.lock", "**/package-lock.json", "**/bun.lock",
+  "**/pnpm-lock.yaml", "**/yarn.lock", "**/Cargo.lock", "**/go.sum", "**/*.pb.go", "**/*.generated.*",
+]
+# Encoding and line-ending rules run on these; content rules (HTML lang/dir/charset, locale, UI strings, OpenAPI) do not.
+exclude_content = [
+  "**/test/**", "**/tests/**", "**/__tests__/**", "**/*.test.*", "**/*.spec.*", "**/*.stories.*",
+  "**/docs/**", "**/examples/**", "**/scripts/**", "**/benches/**",
+]
+# Extensions that are never text.
+binary_ext = [
+  "png", "jpg", "jpeg", "gif", "webp", "avif", "ico", "icns", "bmp", "tif", "tiff", "psd", "heic",
+  "woff", "woff2", "ttf", "otf", "eot", "pdf", "zip", "gz", "tgz", "bz2", "xz", "zst", "7z", "rar", "tar",
+  "exe", "dll", "so", "dylib", "a", "lib", "o", "obj", "pdb", "wasm", "node", "bin", "dat", "class", "jar",
+  "mp3", "mp4", "m4a", "mov", "webm", "ogg", "wav", "flac", "avi", "mkv", "db", "sqlite", "sqlite3", "pak",
+  "rlib", "rmeta", "pyc", "pickle", "onnx", "gguf", "safetensors", "npy", "parquet", "icc", "mo", "xcf",
+]
+# CRLF is the platform format here; .gitattributes marks them eol=crlf.
+crlf_allowed = ["**/*.bat", "**/*.cmd"]
+# Windows PowerShell 5.1 reads BOM-less scripts as the ANSI code page.
+bom_allowed = ["**/*.ps1", "**/*.psm1", "**/*.psd1"]
+max_bytes = 8388608        # larger files are skipped
+max_content_bytes = 2097152 # larger files skip the line-pattern rules
+max_findings_per_rule_per_file = 20
+
+# Files that may contain markup with <html>.
+html_ext = ["html", "htm", "xhtml", "tsx", "jsx", "astro", "vue", "svelte", "hbs", "ejs", "njk", "liquid", "php", "cshtml", "razor", "erb", "j2", "jinja", "jinja2"]
+code_ext = ["ts", "tsx", "js", "jsx", "mjs", "cjs", "vue", "svelte", "astro", "rs", "py", "go", "cs", "kt", "kts", "java", "swift", "dart", "c", "cc", "cpp", "h", "hpp", "rb", "php", "lua"]
+ui_ext = ["tsx", "jsx", "vue", "svelte", "astro", "dart", "kt"]
+
+# Catalog locations: UI literals inside them are the catalog, not a violation.
+catalogs = [
+  "**/locales/**", "**/locale/**", "**/i18n/**", "**/l10n/**", "**/messages/**", "**/translations/**",
+  "**/*.arb", "**/*.po", "**/*.pot", "**/*.ftl", "**/*.xlf", "**/*.xliff", "**/*.resx", "**/strings.xml",
+  "**/*.mf2", "**/*.properties",
+]
+# Substrings of manifests (package.json, pubspec.yaml, Cargo.toml, go.mod, *.csproj) that signal an i18n library.
+i18n_libraries = [
+  "i18next", "react-intl", "@formatjs", "intl-messageformat", "messageformat", "@lingui", "@inlang/paraglide",
+  "paraglide", "@fluent", "fluent-bundle", "svelte-i18n", "vue-i18n", "next-intl", "@angular/localize",
+  "@ngx-translate", "typesafe-i18n", "gettext", "flutter_localizations", "easy_localization", "intl:",
+  "rust-i18n", "fluent", "leptos_i18n", "go-i18n", "Microsoft.Extensions.Localization",
+]
+
+[rules.utf8-invalid]
+severity = "error"
+summary = "Text file is not valid UTF-8 (W3C Character Model: use UTF-8, never guess an encoding)."
+fix = "re-encode from the BOM-declared UTF-16 or windows-1252"
+
+[rules.utf16]
+severity = "error"
+summary = "Text file is UTF-16 (BOM FF FE / FE FF); the Web and these repos use UTF-8 only."
+fix = "re-encode to UTF-8"
+
+[rules.bom]
+severity = "error"
+summary = "UTF-8 BOM (EF BB BF); not needed, breaks concatenation, shebangs, JSON and CSS @charset."
+fix = "strip the BOM"
+
+[rules.crlf]
+severity = "error"
+summary = "CRLF line endings where LF is required; one LF everywhere, eol set by .gitattributes."
+fix = "convert to LF"
+
+[rules.editorconfig-charset]
+severity = "error"
+summary = ".editorconfig missing, or no [*] section with charset = utf-8, or a section sets another charset."
+fix = "create or complete .editorconfig"
+
+[rules.editorconfig-eol]
+severity = "warn"
+summary = ".editorconfig [*] has no end_of_line = lf."
+fix = "add end_of_line = lf"
+
+[rules.gitattributes-eol]
+severity = "error"
+summary = ".gitattributes missing the `* text=auto eol=lf` rule."
+fix = "create or prepend the rule"
+
+[rules.git-commit-encoding]
+severity = "error"
+summary = "i18n.commitEncoding is not utf-8 or a commit carries a non-UTF-8 encoding header."
+
+[rules.html-lang]
+severity = "error"
+summary = "<html> without lang; the default text language belongs on the root element, not body."
+fix = "add lang from default_lang"
+
+[rules.html-lang-malformed]
+severity = "error"
+summary = "lang value is not a well-formed BCP 47 tag (underscore, empty subtag, legacy form)."
+
+[rules.html-dir]
+severity = "warn"
+summary = "<html> without dir; declare ltr, rtl or auto on the root element."
+fix = "add dir derived from the lang script, auto if unknown"
+
+[rules.html-charset]
+severity = "error"
+summary = "Document declares a charset other than UTF-8 (meta, @charset, XML declaration)."
+
+[rules.html-charset-missing]
+severity = "warn"
+summary = "HTML document without <meta charset=\"utf-8\"> in the first 1024 bytes of <head>."
+fix = "insert the meta element"
+
+[rules.html-meta-content-language]
+severity = "warn"
+summary = "<meta http-equiv=content-language> declares text language; use lang (the header is audience metadata)."
+
+[rules.bidi-control]
+severity = "warn"
+summary = "Unicode bidi control (U+202A-202E, U+2066-2069) inside source code (Trojan Source); isolates belong in user text only."
+
+[rules.locale-hardcode]
+severity = "warn"
+summary = "Hardcoded locale, date or number format; resolve the locale at runtime and format through Intl/CLDR/ICU."
+
+[rules.ui-string-literal]
+severity = "warn"
+summary = "User-facing string literal outside an i18n catalog."
+
+[rules.no-i18n-catalog]
+severity = "warn"
+summary = "UI code with literal strings and no i18n library or catalog in the repository."
+
+[rules.openapi-negotiation]
+severity = "error"
+summary = "OpenAPI spec without Accept-Language request and Content-Language response header."
+
+[rules.openapi-string-meta]
+severity = "warn"
+summary = "OpenAPI spec with natural-language fields and no language/direction metadata (W3C string-meta Localizable)."
+
+# Line patterns of locale-hardcode. `re` is a JavaScript regular expression source (flags: g).
+# A line containing `i18n-ignore` is skipped.
+[[patterns.locale]]
+id = "js-literal-locale"
+exts = ["ts", "tsx", "js", "jsx", "mjs", "cjs", "vue", "svelte", "astro"]
+re = "\\.toLocale(?:Date|Time)?String\\(\\s*['\"`][A-Za-z]{2,3}(?:-[A-Za-z0-9]+)*['\"`]|Intl\\.(?:DateTimeFormat|NumberFormat|RelativeTimeFormat|ListFormat|PluralRules|Collator)\\(\\s*['\"`][A-Za-z]{2,3}(?:-[A-Za-z0-9]+)*['\"`]"
+message = "literal locale passed to Intl/toLocale*String; take the locale from the request, user setting or document lang"
+
+[[patterns.locale]]
+id = "date-format-literal"
+exts = ["ts", "tsx", "js", "jsx", "mjs", "cjs", "vue", "svelte", "astro", "py", "go", "cs", "kt", "java", "swift", "dart", "rb", "php", "rs"]
+re = "['\"`](?:MM[/.-]dd?[/.-]y{2,4}|dd?[/.-]MM[/.-]y{2,4}|MM[/.-]DD[/.-]YYYY|DD[/.-]MM[/.-]YYYY|%m/%d/%Y|%d/%m/%Y|%d\\.%m\\.%Y|%-?m/%-?d/%y)['\"`]"
+message = "numeric day-month-year order is locale-specific; store ISO 8601 / RFC 3339, display through Intl/CLDR"
+
+[[patterns.locale]]
+id = "native-literal-locale"
+exts = ["py", "c", "cc", "cpp", "h", "hpp", "cs", "java", "kt", "swift", "go", "rb", "php", "lua"]
+re = "setlocale\\([^)]*['\"][a-z]{2}_[A-Z]{2}|new\\s+Locale\\(\\s*\"[a-z]{2}\"|Locale\\.(?:US|UK|ENGLISH|FRANCE|FRENCH|GERMANY|GERMAN)\\b|new\\s+CultureInfo\\(\\s*\"[a-z]{2}-[A-Z]{2}\"|CultureInfo\\.GetCultureInfo\\(\\s*\"[a-z]{2}-[A-Z]{2}\"|Locale\\(identifier:\\s*\"[a-z]{2}_[A-Z]{2}\"|locale\\.setlocale\\([^)]*['\"][a-z]{2}_[A-Z]{2}"
+message = "literal locale; use the user or request locale (invariant culture only for machine formats)"
+
+[[patterns.locale]]
+id = "currency-concat"
+exts = ["ts", "tsx", "js", "jsx", "mjs", "vue", "svelte", "astro"]
+re = "['\"`][$€£¥₹]['\"`]\\s*\\+\\s*[\\w.()]+(?:\\.toFixed\\(\\d\\))?|[\\w.()]+\\.toFixed\\(\\d\\)\\s*\\+\\s*['\"`]\\s?[$€£¥₹]['\"`]"
+message = "currency symbol concatenated to a number; use Intl.NumberFormat with style currency (ISO 4217)"
+
+# UI literal patterns: group 1 is the literal.
+[[patterns.ui]]
+id = "jsx-text"
+exts = ["tsx", "jsx", "vue", "svelte", "astro"]
+re = ">\\s*([A-Z][A-Za-z'’,.!?-]*(?:\\s+[A-Za-z'’,.!?-]+)+)\\s*</"
+message = "text node outside a catalog"
+
+[[patterns.ui]]
+id = "jsx-attr"
+exts = ["tsx", "jsx", "vue", "svelte", "astro"]
+re = "\\b(?:placeholder|title|aria-label|aria-description|alt|tooltip)=\"([^\"{}$]*(?:[A-Z][a-z]{3,}|\\s[A-Za-z]{2,})[^\"{}$]*)\""
+message = "user-facing attribute outside a catalog"
+
+[[patterns.ui]]
+id = "dart-text"
+exts = ["dart"]
+re = "\\b(?:Text|SelectableText|Tooltip\\(message:|SnackBar\\(content: Text)\\(\\s*'([^'$\\\\]*[A-Za-z]{3,}[^'$\\\\]*)'"
+message = "Text widget literal; use AppLocalizations / ARB"
+
+[[patterns.ui]]
+id = "compose-text"
+exts = ["kt"]
+re = "\\bText\\(\\s*(?:text\\s*=\\s*)?\"([^\"$\\\\]*[A-Za-z]{3,}[^\"$\\\\]*)\""
+message = "Compose Text literal; use stringResource"
+
+# OpenAPI string-meta heuristics.
+[openapi]
+negotiation_headers = ["Accept-Language", "Content-Language"]
+natural_language_properties = ["title", "description", "summary", "name", "label", "message", "text", "body", "content", "caption", "displayName", "display_name", "detail"]
+language_properties = ["lang", "language", "locale"]
+direction_properties = ["dir", "direction"]
+localizable_schemas = ["Localizable", "LanguageMap", "LocalizedString", "LocalizedText"]
