@@ -1,6 +1,9 @@
-# Aphrody Labs Consolidation into `aphrody` and `ay`
+# Aphrody Labs Consolidation into `aphrody` (Final Product) and `ay` (SDK / libc)
 
 Canonical consolidation map eliminating duplication across `aphrody-labs/*` repositories while keeping `rosegriffon`, `nie`, and `shenron` isolated.
+
+- **`aphrody`** (`aphrody-dev/aphrody`): **Final Product** (IDE, OS, GPUI, NSH, Craft, Desktop, Web).
+- **`ay`** (`aphrody-dev/ay`): **SDK / libc** (low-level runtime primitives, Cloudflare/edge, media, Next/Turbopack, automation).
 
 ## 1. Consolidated into `aphrody` (`aphrody-dev/aphrody`)
 
