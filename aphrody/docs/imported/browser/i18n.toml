@@ -1,3 +1,0 @@
-[config]
-# Vendored upstream trees keep their own bytes.
-exclude_extra = ["third_party/**"]
