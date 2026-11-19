@@ -240,7 +240,6 @@ fn slot(device: &wgpu::Device, width: u32, height: u32) -> Option<Slot> {
                 height,
                 depth: 1,
             },
-            None,
         )
     };
     // SAFETY: the descriptor says what `hal_texture` is.
@@ -263,8 +262,6 @@ fn slot(device: &wgpu::Device, width: u32, height: u32) -> Option<Slot> {
                     | wgpu::TextureUsages::COPY_SRC,
                 view_formats: &[],
             },
-            wgpu::TextureUses::UNINITIALIZED,
-            false,
         )
     };
     Some(Slot {

@@ -1,4 +1,3 @@
-#[path = "common/helpers.rs"]
 mod common;
 use gpui_kit::test::{TestSupportExt, TestWindowExt};
 use gpui_kit::{

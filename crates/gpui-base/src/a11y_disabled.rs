@@ -60,6 +60,15 @@ impl<E: Element<PrepaintState = Option<gpui::Hitbox>> + InteractiveElement> A11y
     }
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl<E: Element> IntoElement for A11yDisabled<E> {
+    type Element = Self;
+
+    fn into_element(self) -> Self {
+        self
+    }
+}
+
 impl<E: InteractiveElement> InteractiveElement for A11yDisabled<E> {
     fn interactivity(&mut self) -> &mut Interactivity {
         self.inner.interactivity()

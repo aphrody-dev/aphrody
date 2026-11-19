@@ -1351,16 +1351,15 @@ impl ShaderView {
                 continue;
             }
             if i == newest && r.serial > self.frame.serial {
-                if let Ok(data) = r.buffer.slice(..).get_mapped_range() {
-                    self.frame.pixels.clear();
-                    self.frame.pixels.extend_from_slice(&data);
-                    drop(data);
-                    self.frame.width = target.width;
-                    self.frame.height = target.height;
-                    self.frame.stride = target.stride;
-                    self.frame.serial = r.serial;
-                    changed = true;
-                }
+                let data = r.buffer.slice(..).get_mapped_range();
+                self.frame.pixels.clear();
+                self.frame.pixels.extend_from_slice(&data);
+                drop(data);
+                self.frame.width = target.width;
+                self.frame.height = target.height;
+                self.frame.stride = target.stride;
+                self.frame.serial = r.serial;
+                changed = true;
             }
             r.buffer.unmap();
             r.state.store(state::IDLE, Ordering::Release);

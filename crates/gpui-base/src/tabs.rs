@@ -298,6 +298,15 @@ impl TabListScope {
     }
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl IntoElement for TabListScope {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 impl Element for TabListScope {
     type RequestLayoutState = ();
     type PrepaintState = ();

@@ -2,9 +2,6 @@ use gpui::{App, Div, Entity, InteractiveElement as _, IntoElement, RenderOnce, S
 
 use super::{EditorMode, InputBaseState, InputModeKind};
 
-pub(crate) mod display_map;
-pub(crate) mod lsp;
-
 /// State for source-code editing.
 ///
 /// This is the shared editing engine in its code-editor kind. Languages, line

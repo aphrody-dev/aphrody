@@ -19,10 +19,9 @@ doctest = false
 
 
 [features]
-default = ["gpui-fast"]
 gpui-fast = []
 decimal = ["dep:rust_decimal"]
-test-support = ["gpui/test-support"]
+test-support = ["gpui/test-support", "dep:image"]
 inspector = ["gpui_macros/inspector", "gpui/inspector"]
 
 [dependencies]
@@ -31,13 +30,14 @@ aho-corasick.workspace = true
 data-url.workspace = true
 futures.workspace = true
 gpui.workspace = true
+image = { version = "0.25", optional = true }
 gpui_macros.workspace = true
 instant.workspace = true
 itertools.workspace = true
 jiff.workspace = true
-lsp_types_kit.workspace = true
+lsp-types.workspace = true
 markdown-rs.workspace = true
-html5ever.workspace = true
+html5ever = "0.27"
 markup5ever_rcdom.workspace = true
 num-traits.workspace = true
 ropey_kit.workspace = true
@@ -50,7 +50,6 @@ smallvec.workspace = true
 sum_tree.workspace = true
 log.workspace = true
 sys-locale.workspace = true
-tracing.workspace = true
 unicode-bidi.workspace = true
 unicode-linebreak.workspace = true
 unicode-segmentation.workspace = true
@@ -60,12 +59,13 @@ smol.workspace = true
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 async-channel.workspace = true
+# Read the current date from the browser, as `CalendarState::new` does.
+jiff.workspace = true
 [target.'cfg(target_os = "macos")'.dependencies]
 raw-window-handle.workspace = true
 objc2.workspace = true
-objc2-app-kit = { workspace = true, features = ["NSAccessibility", "NSView", "NSWindow", "NSWorkspace"] }
-objc2-foundation = { workspace = true, features = ["NSGeometry", "NSString"] }
-
+objc2-app-kit.workspace = true
+objc2-foundation.workspace = true
 [target.'cfg(target_os = "windows")'.dependencies]
 # The reduced-motion preference (SystemParametersInfoW).
 windows = { workspace = true, features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }
@@ -73,14 +73,15 @@ windows = { workspace = true, features = ["Win32_Foundation", "Win32_UI_WindowsA
 [target.'cfg(target_os = "linux")'.dependencies]
 # The reduced-motion preference, through the XDG desktop portal's Settings
 # interface. The same version and features `gpui-pre-linux` already pulls in.
-ashpd = { workspace = true, features = ["async-io", "settings"] }
-
+ashpd.workspace = true
 [dev-dependencies]
 criterion.workspace = true
-gpui-base = { workspace = true, features = ["test-support"] }
+gpui-base = { path = ".", features = ["test-support"] }
 gpui = { workspace = true, features = ["test-support", "bench-support"] }
 gpui_platform = { workspace = true, features = ["bench-support"] }
-
+# Same minor version as `gpui`'s own, so the crate is shared instead of
+# compiled twice: the test-support image helpers build `Frame`s.
+image = "0.25"
 indoc.workspace = true
 reqwest_client.workspace = true
 

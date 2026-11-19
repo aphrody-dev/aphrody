@@ -168,11 +168,11 @@ mod platform {
 #[cfg(target_os = "windows")]
 mod platform {
     use gpui::App;
-    use windows::{
-        Win32::UI::WindowsAndMessaging::{
+    use windows::Win32::{
+        Foundation::BOOL,
+        UI::WindowsAndMessaging::{
             SPI_GETCLIENTAREAANIMATION, SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS, SystemParametersInfoW,
         },
-        core::BOOL,
     };
 
     pub(super) fn read() -> Option<bool> {
@@ -196,12 +196,9 @@ mod platform {
 
 #[cfg(target_os = "linux")]
 mod platform {
-    use ashpd::desktop::settings::Settings;
+    use ashpd::desktop::settings::{ReducedMotion, Settings};
     use futures::StreamExt as _;
     use gpui::App;
-
-    const APPEARANCE_NAMESPACE: &str = "org.freedesktop.appearance";
-    const REDUCED_MOTION_KEY: &str = "reduced-motion";
 
     /// The portal answers asynchronously; [`follow`] applies the first reading.
     pub(super) fn read() -> Option<bool> {
@@ -211,21 +208,19 @@ mod platform {
     pub(super) fn follow(cx: &mut App) {
         cx.spawn(async move |cx| {
             let settings = Settings::new().await.ok()?;
-            let current = settings
-                .read::<u32>(APPEARANCE_NAMESPACE, REDUCED_MOTION_KEY)
-                .await
-                .ok()?;
-            cx.update(|cx| super::apply_preference(Some(current == 1), cx));
-            let mut changes = settings
-                .receive_setting_changed_with_args::<u32>(APPEARANCE_NAMESPACE, REDUCED_MOTION_KEY)
-                .await
-                .ok()?;
-            while let Some(Ok(preference)) = changes.next().await {
-                cx.update(|cx| super::apply_preference(Some(preference == 1), cx));
+            let current = settings.reduced_motion().await.ok()?;
+            cx.update(|cx| super::apply_preference(Some(reduces(current)), cx));
+            let mut changes = settings.receive_reduced_motion_changed().await.ok()?;
+            while let Some(preference) = changes.next().await {
+                cx.update(|cx| super::apply_preference(Some(reduces(preference)), cx));
             }
             Some(())
         })
         .detach();
+    }
+
+    fn reduces(preference: ReducedMotion) -> bool {
+        matches!(preference, ReducedMotion::ReducedMotion)
     }
 }
 

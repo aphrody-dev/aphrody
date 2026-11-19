@@ -314,8 +314,8 @@ mod tests {
 
     #[test]
     fn every_base_dock_export_is_reachable_from_here() {
-        let base = include_str!("../../gpui-base/src/dock.rs");
-        let skin = include_str!("dock.rs");
+        let base = include_str!("../../base/src/dock/mod.rs");
+        let skin = include_str!("dock/mod.rs");
 
         let exported = exported_names(base, "pub use ");
         assert!(

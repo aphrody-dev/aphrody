@@ -1010,5 +1010,5 @@ fn bench_first_web_global() {
     println!("first web global: {:?}", total / n);
 }
 
-#[path = "standard.rs"]
+#[path = "standard/mod.rs"]
 mod standard;

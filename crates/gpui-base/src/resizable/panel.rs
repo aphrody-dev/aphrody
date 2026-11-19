@@ -419,6 +419,15 @@ struct ResizePanelGroupElement {
     axis: Axis,
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl IntoElement for ResizePanelGroupElement {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 impl Element for ResizePanelGroupElement {
     type RequestLayoutState = ();
     type PrepaintState = ();

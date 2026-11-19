@@ -142,3 +142,12 @@ impl Element for CaretAnchoredPopup {
         }
     }
 }
+
+#[cfg(not(feature = "gpui-fast"))]
+impl gpui::IntoElement for CaretAnchoredPopup {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}

@@ -441,7 +441,7 @@ impl<C> LayoutTree<C> {
     }
 
     /// Sets `node`'s unrounded layout; a changed one makes it stale.
-    fn set_unrounded(&mut self, node: NodeId, layout: Layout) {
+    pub(crate) fn set_unrounded(&mut self, node: NodeId, layout: Layout) {
         let n = &mut self.nodes[key(node)];
         if n.unrounded != layout {
             n.unrounded = layout;
@@ -1095,7 +1095,7 @@ impl<C, M> CacheTree for View<'_, C, M>
 where
     M: FnMut(LayoutInput, NodeId, Option<&mut C>, &Style, Aligned) -> LayoutOutput,
 {
-    fn cache_get(&self, node: NodeId, input: &LayoutInput) -> Option<LayoutOutput> {
+    fn cache_get(&mut self, node: NodeId, input: &LayoutInput) -> Option<LayoutOutput> {
         self.tree.nodes[key(node)].cache.get(input)
     }
 

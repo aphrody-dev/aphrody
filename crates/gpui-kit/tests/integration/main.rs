@@ -11,13 +11,11 @@
 //! the testing guide shows and tells a reader to copy as a `tests/ui.rs` of
 //! their own, beside `tests/common/mod.rs`, so it stays in that shape.
 
-extern crate lsp_types_kit as lsp_types;
-
 #[cfg(feature = "test-support")]
-#[path = "../common/helpers.rs"]
+#[path = "../common/mod.rs"]
 mod common;
 
-#[cfg(feature = "test-support")]
+#[cfg(all(feature = "test-support", feature = "gpui-fast"))]
 mod a11y_text;
 
 mod assets;
@@ -60,7 +58,7 @@ mod menu;
 mod overlays;
 #[cfg(all(feature = "test-support", feature = "component"))]
 mod painted_text;
-#[cfg(all(feature = "test-support", feature = "component"))]
+#[cfg(all(feature = "test-support", feature = "gpui-fast", feature = "component"))]
 mod popover_a11y;
 #[cfg(feature = "test-support")]
 mod query_helpers;

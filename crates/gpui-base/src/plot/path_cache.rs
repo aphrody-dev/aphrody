@@ -41,9 +41,15 @@ impl PathCache {
     }
 }
 
-/// `path` moved by `offset`.
+/// `path` moved by `offset`. A finished path is only its bounds and vertices;
+/// the builder cursor it keeps is not read again.
 fn translated(path: &Path<Pixels>, offset: Point<Pixels>) -> Path<Pixels> {
-    path.translate(offset)
+    let mut path = path.clone();
+    path.bounds.origin = path.bounds.origin + offset;
+    for vertex in &mut path.vertices {
+        vertex.xy_position = vertex.xy_position + offset;
+    }
+    path
 }
 
 /// The [`PathCache`]s of a plot that is rebuilt on every render, kept in the

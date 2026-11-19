@@ -1,5 +1,3 @@
-extern crate lsp_types_kit as lsp_types;
-extern crate markdown_rs as markdown;
 extern crate ropey_kit as ropey;
 
 
@@ -61,7 +59,6 @@ pub mod label;
 pub mod link;
 pub mod list;
 pub mod marker;
-pub mod material3;
 pub mod menu;
 pub mod message;
 pub mod message_scroller;
@@ -120,10 +117,6 @@ pub use resizable::{
 };
 pub use styled::*;
 pub use theme::*;
-pub use material3::{
-    M3ActiveTheme, M3AppearanceMode, M3SpringToken, active_m3_theme, apply_m3_theme,
-    m3_theme_config,
-};
 pub use time::{calendar, date_picker, time_field};
 pub use title_bar::*;
 pub use virtual_list::{VirtualList, VirtualListScrollHandle, h_virtual_list, v_virtual_list};
@@ -137,7 +130,6 @@ rust_i18n::i18n!("locales", fallback = "en");
 /// You must initialize the components at your application's entry point.
 pub fn init(cx: &mut App) {
     theme::init(cx);
-    material3::init(cx);
     global_state::init(cx);
     #[cfg(any(feature = "inspector", debug_assertions))]
     inspector::init(cx);
@@ -187,3 +179,4 @@ pub(crate) fn test_redraw(window: &mut gpui::Window, cx: &mut gpui::App) {
     window.refresh();
     window.draw(cx).clear(cx);
 }
+pub mod material3;

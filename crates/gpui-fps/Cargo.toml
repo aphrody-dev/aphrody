@@ -29,18 +29,11 @@ sysinfo.workspace = true
 [target.'cfg(target_os = "macos")'.dependencies]
 core-graphics.workspace = true
 libc.workspace = true
-objc2-core-foundation = { workspace = true, features = [
-    "CFArray",
-    "CFDictionary",
-    "CFNumber",
-    "CFString",
-] }
+objc2-core-foundation.workspace = true
 objc2-io-kit.workspace = true
-
 [target.'cfg(target_os = "linux")'.dependencies]
-uuid = { workspace = true, features = ["v5"] }
+uuid.workspace = true
 wayland-client.workspace = true
-
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { workspace = true, features = [
     "Win32_Graphics_Gdi",

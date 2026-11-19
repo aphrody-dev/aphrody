@@ -1,6 +1,8 @@
 //! Content drawn on the theme's `accent` fill takes `accent_foreground`, the
 //! color the theme pairs with that fill, rather than the page `foreground`.
 
+#[cfg(feature = "gpui-fast")]
+extern crate gpui_fast as gpui;
 
 use std::{cell::Cell, rc::Rc};
 

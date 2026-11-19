@@ -1,12 +1,10 @@
 //! Behavior and infrastructure foundations for GPUI applications.
+extern crate ropey_kit as ropey;
+
 //!
 //! Primitives deliberately avoid presentation styles. Layout, positioning,
 //! colors, sizing, and motion belong to applications or the
 //! `gpui-component` façade.
-
-extern crate lsp_types_kit as lsp_types;
-extern crate markdown_rs as markdown;
-extern crate ropey_kit as ropey;
 
 
 mod a11y_disabled;

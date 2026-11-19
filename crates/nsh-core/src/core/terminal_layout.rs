@@ -2030,17 +2030,14 @@ pub(crate) fn compute(
         }
     }
     tree.set_framed(outer_framed);
-    let overflow = taffy::ScrollableOverflow::new(
-        Rect {
-            left: 0.0,
-            top: 0.0,
-            // From the padding box's origin to the children's ends, as
-            // Taffy's (the core adds the trailing padding).
-            right: grid.x(padding.l + content.w).max(0.0),
-            bottom: grid.y(padding.t + content.h).max(0.0),
-        },
-        taffy::Point { x: false, y: false },
-    );
+    let overflow = Rect {
+        left: 0.0,
+        top: 0.0,
+        // From the padding box's origin to the children's ends, as
+        // Taffy's (the core adds the trailing padding).
+        right: grid.x(padding.l + content.w),
+        bottom: grid.y(padding.t + content.h),
+    };
     LayoutOutput::from_sizes(grid.size(size), overflow)
 }
 

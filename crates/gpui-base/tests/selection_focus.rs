@@ -1,5 +1,7 @@
 //! Selection controls keep their place in the focus path when disabled by a
 //! controlled update, so native Tab can still leave them in either direction.
+#[cfg(feature = "gpui-fast")]
+extern crate gpui_fast as gpui;
 
 use gpui::{
     AppContext as _, Context, FocusHandle, InteractiveElement as _, IntoElement, KeyDownEvent,

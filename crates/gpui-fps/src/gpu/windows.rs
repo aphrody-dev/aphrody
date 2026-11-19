@@ -7,9 +7,8 @@ use std::collections::HashMap;
 
 use windows::{
     Win32::System::Performance::{
-        PDH_FMT_COUNTERVALUE_ITEM_W, PDH_FMT_DOUBLE, PDH_HCOUNTER, PDH_HQUERY, PDH_MORE_DATA,
-        PdhAddEnglishCounterW, PdhCloseQuery, PdhCollectQueryData, PdhGetFormattedCounterArrayW,
-        PdhOpenQueryW,
+        PDH_FMT_COUNTERVALUE_ITEM_W, PDH_FMT_DOUBLE, PDH_MORE_DATA, PdhAddEnglishCounterW,
+        PdhCloseQuery, PdhCollectQueryData, PdhGetFormattedCounterArrayW, PdhOpenQueryW,
     },
     core::w,
 };
@@ -43,16 +42,8 @@ pub(super) struct Probe {
 }
 
 impl Probe {
-    fn pdh_query(&self) -> PDH_HQUERY {
-        PDH_HQUERY(self.query as *mut _)
-    }
-
-    fn pdh_counter(&self) -> PDH_HCOUNTER {
-        PDH_HCOUNTER(self.counter as *mut _)
-    }
-
     pub(super) fn new() -> Option<Self> {
-        let mut query = PDH_HQUERY::default();
+        let mut query = 0;
         // SAFETY: both handles are live out parameters, and the counter path is
         // a static wide string.
         let opened = unsafe { PdhOpenQueryW(None, 0, &mut query) };
@@ -60,11 +51,16 @@ impl Probe {
             return None;
         }
 
-        let mut counter = PDH_HCOUNTER::default();
+        let mut probe = Self {
+            query,
+            counter: 0,
+            owner: format!("pid_{}_", std::process::id()),
+            buffer: Vec::new(),
+        };
         // SAFETY: the query was just opened, and is closed by `Drop` either way.
-        let added = unsafe { PdhAddEnglishCounterW(query, COUNTER_PATH, 0, &mut counter) };
+        let added =
+            unsafe { PdhAddEnglishCounterW(probe.query, COUNTER_PATH, 0, &mut probe.counter) };
         if added != PDH_SUCCESS {
-            unsafe { PdhCloseQuery(query) };
             return None;
         }
 
@@ -73,13 +69,8 @@ impl Probe {
         // from; without it that sample would read zero.
         //
         // SAFETY: the query is live.
-        unsafe { PdhCollectQueryData(query) };
-        Some(Self {
-            query: query.0 as isize,
-            counter: counter.0 as isize,
-            owner: format!("pid_{}_", std::process::id()),
-            buffer: Vec::new(),
-        })
+        unsafe { PdhCollectQueryData(probe.query) };
+        Some(probe)
     }
 
     /// The busiest engine *type* this process is using, not the sum over all of
@@ -88,7 +79,7 @@ impl Probe {
     /// process' engines are summed, since it can be on several at once.
     pub(super) fn sample(&mut self) -> Option<f32> {
         // SAFETY: the query is live until `Drop`.
-        if unsafe { PdhCollectQueryData(self.pdh_query()) } != PDH_SUCCESS {
+        if unsafe { PdhCollectQueryData(self.query) } != PDH_SUCCESS {
             return None;
         }
 
@@ -117,13 +108,7 @@ impl Probe {
         // SAFETY: passing no buffer asks for the required size, which PDH
         // reports through `PDH_MORE_DATA`.
         let sized = unsafe {
-            PdhGetFormattedCounterArrayW(
-                self.pdh_counter(),
-                PDH_FMT_DOUBLE,
-                &mut bytes,
-                &mut count,
-                None,
-            )
+            PdhGetFormattedCounterArrayW(self.counter, PDH_FMT_DOUBLE, &mut bytes, &mut count, None)
         };
         if sized != PDH_MORE_DATA || bytes == 0 {
             return None;
@@ -143,7 +128,7 @@ impl Probe {
         // can write both the array and the names that follow it.
         let read = unsafe {
             PdhGetFormattedCounterArrayW(
-                self.pdh_counter(),
+                self.counter,
                 PDH_FMT_DOUBLE,
                 &mut bytes,
                 &mut count,
@@ -180,6 +165,6 @@ impl Drop for Probe {
     fn drop(&mut self) {
         // SAFETY: the query was opened in `new` and is closed exactly once.
         // Closing it also releases the counter added to it.
-        unsafe { PdhCloseQuery(self.pdh_query()) };
+        unsafe { PdhCloseQuery(self.query) };
     }
 }

@@ -3067,6 +3067,15 @@ struct KeepTextSelection {
     id: ElementId,
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl IntoElement for KeepTextSelection {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 impl Element for KeepTextSelection {
     type RequestLayoutState = ();
     type PrepaintState = ();
@@ -3142,6 +3151,15 @@ struct TextSelectionScopeMarker<E> {
     element: E,
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl<E: Element> IntoElement for TextSelectionScopeMarker<E> {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 impl<E: Element> Element for TextSelectionScopeMarker<E> {
     type RequestLayoutState = E::RequestLayoutState;
     type PrepaintState = E::PrepaintState;
@@ -3210,6 +3228,15 @@ impl<E: Element> Element for TextSelectionScopeMarker<E> {
 
 #[doc(hidden)]
 pub struct TextSelectionLayerPrepaintState(Entity<WindowSelectionState>);
+
+#[cfg(not(feature = "gpui-fast"))]
+impl IntoElement for TextSelectionLayer {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
 
 impl Element for TextSelectionLayer {
     type RequestLayoutState = ();
@@ -3665,6 +3692,7 @@ pub(crate) fn clear_window_text_selection(window_id: gpui::WindowId, cx: &mut Ap
 mod tests {
     use super::*;
     use crate::ElementExt as _;
+    #[cfg(feature = "gpui-fast")]
     use gpui::StatefulInteractiveElement as _;
     use gpui::{
         Bounds, ContentMask, Context, Hitbox, HitboxBehavior, HitboxId, InteractiveElement as _,
@@ -5192,12 +5220,14 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "gpui-fast")]
     struct RetainedScrollingSelectionRoot {
         text: Entity<RetainedSelectionText>,
         unrelated: Entity<RetainedSelectionText>,
         scroll: gpui::ScrollHandle,
     }
 
+    #[cfg(feature = "gpui-fast")]
     impl Render for RetainedScrollingSelectionRoot {
         fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
             div()
@@ -5278,6 +5308,7 @@ mod tests {
 
     /// Uses only the original public TextView/selection APIs and real retained
     /// views, so this also runs against the implementation before this fix.
+    #[cfg(feature = "gpui-fast")]
     #[gpui::test]
     fn active_selection_keeps_unrelated_text_views_retained(cx: &mut TestAppContext) {
         cx.update(crate::init);
@@ -5370,6 +5401,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "gpui-fast")]
     #[gpui::test]
     fn scrolling_selected_text_does_not_rebuild_unrelated_document_order(cx: &mut TestAppContext) {
         cx.update(crate::init);
@@ -5433,6 +5465,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "gpui-fast")]
     #[gpui::test]
     fn ancestor_scrolling_keeps_unrelated_text_views_retained(cx: &mut TestAppContext) {
         for selected in [false, true] {
@@ -5541,6 +5574,7 @@ mod tests {
             words(cx.update(|window, cx| TextSelection::selected_text(window, cx))),
             ["alpha", "bravo", "delta", "charlie"]
         );
+        #[cfg(feature = "gpui-fast")]
         {
             let renders = texts[0].read_with(cx, |text, _| text.renders.clone());
             let before = renders.get();
@@ -5574,10 +5608,12 @@ mod tests {
 
     /// A view reading the window's selection state, beside selectable text,
     /// counting its renders.
+    #[cfg(feature = "gpui-fast")]
     struct SelectionStateReader {
         renders: Rc<Cell<usize>>,
     }
 
+    #[cfg(feature = "gpui-fast")]
     impl Render for SelectionStateReader {
         fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
             self.renders.set(self.renders.get() + 1);
@@ -5590,11 +5626,13 @@ mod tests {
 
     /// The selectable text of a [`ToggleSelectionElementView`] beside a
     /// [`SelectionStateReader`].
+    #[cfg(feature = "gpui-fast")]
     struct ReaderBesideSelectionView {
         text: gpui::Entity<ToggleSelectionElementView>,
         reader: gpui::Entity<SelectionStateReader>,
     }
 
+    #[cfg(feature = "gpui-fast")]
     impl Render for ReaderBesideSelectionView {
         fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
             div()
@@ -5607,6 +5645,7 @@ mod tests {
     /// Selectable text drawn again, nothing about its selection changed,
     /// writes neither the window's selection state nor its own: a view
     /// reading them is retained, as it would not be had they changed.
+    #[cfg(feature = "gpui-fast")]
     #[gpui::test]
     fn redrawing_selectable_text_leaves_its_readers_retained(cx: &mut TestAppContext) {
         let renders = Rc::new(Cell::new(0));

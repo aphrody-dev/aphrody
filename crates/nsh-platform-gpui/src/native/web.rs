@@ -821,16 +821,20 @@ mod imp {
 
         use std::{cell::Cell, rc::Rc, time::Duration};
 
-        use gpui::{App, Window};
+        use gpui::{App, Bounds, DevicePixels, Window, point, size};
         use nsh_core::{EventKind, EventPayload, PayloadValue};
         use wry::{
             WebViewExtUnix as _,
+            dpi::{PhysicalPosition, PhysicalSize},
             raw_window_handle::{
                 HandleError, HasWindowHandle, RawWindowHandle, WindowHandle, XlibWindowHandle,
             },
         };
 
         use crate::native::{Emitter, Geometry};
+
+        /// How long a web view's surface outlives the web view.
+        const RELEASE_DELAY: Duration = Duration::from_millis(500);
 
         /// How often pending GTK events are dispatched between GPUI's.
         const GTK_POLL: Duration = Duration::from_millis(16);
@@ -979,39 +983,107 @@ mod imp {
             let _ = webview.zoom(f64::from(scale) / f64::from(gdk));
         }
 
-        /// Fallback composition surface handle; falls back to direct X11 child window embedding
-        /// when GPUI window composition is not enabled in the unified core.
-        pub(super) struct NativeSurface;
+        /// A GPUI Fast composition surface holding a web view: an X11 child
+        /// window of GPUI's.
+        pub(super) struct NativeSurface {
+            surface: gpui::WindowCompositionSurface,
+            window: gpui::AnyWindowHandle,
+            cx: gpui::AsyncApp,
+        }
 
         impl NativeSurface {
-            fn new(_window: &Window, _cx: &App) -> anyhow::Result<Self> {
-                Err(anyhow::anyhow!(
-                    "window composition is disabled; using X11 child window embedding"
-                ))
+            fn new(window: &Window, cx: &App) -> anyhow::Result<Self> {
+                let surface = window
+                    .enable_window_composition()?
+                    .create_native_surface()?;
+                Ok(NativeSurface {
+                    surface,
+                    window: window.window_handle(),
+                    cx: cx.to_async(),
+                })
             }
 
-            /// Returns an X11 parent error so `build` falls back to `window`'s X11 parent handle.
+            /// Its X11 window, as the parent wry builds the web view in.
             fn parent(&self) -> Result<X11Parent, String> {
-                Err("window composition surface unavailable".to_owned())
+                let handle = self
+                    .surface
+                    .platform_surface()
+                    .and_then(|s| s.platform_handle())
+                    .map_err(|e| e.to_string())?;
+                handle
+                    .downcast::<RawWindowHandle>()
+                    .ok()
+                    .and_then(|h| X11Parent::from_raw(*h))
+                    .ok_or_else(|| "the composition surface is not an X11 window".to_owned())
             }
 
-            /// No-op when `NativeSurface` is inactive.
+            /// The surface over `g`'s visible part, the page at its whole
+            /// box inside it.
             pub(super) fn place(
                 &self,
-                _webview: &wry::WebView,
-                _g: Geometry,
-                _scale: f32,
+                webview: &wry::WebView,
+                g: Geometry,
+                scale: f32,
             ) -> anyhow::Result<()> {
+                let device = |v: gpui::Pixels| (f32::from(v) * scale).round() as i32;
+                let v = g.visible;
+                let platform = self.surface.platform_surface()?;
+                platform.set_bounds(Bounds::new(
+                    point(
+                        DevicePixels(device(v.origin.x)),
+                        DevicePixels(device(v.origin.y)),
+                    ),
+                    size(
+                        DevicePixels(device(v.size.width)),
+                        DevicePixels(device(v.size.height)),
+                    ),
+                ))?;
+                // wry scales bounds by GDK's factor, not GPUI's: device
+                // pixels.
+                let d = g.document;
+                webview.set_bounds(wry::Rect {
+                    position: PhysicalPosition::new(
+                        device(d.origin.x) - device(v.origin.x),
+                        device(d.origin.y) - device(v.origin.y),
+                    )
+                    .into(),
+                    size: PhysicalSize::new(device(d.size.width), device(d.size.height)).into(),
+                })?;
+                platform.set_visible(true)?;
                 Ok(())
             }
 
-            pub(super) fn set_visible(&self, _visible: bool) -> anyhow::Result<()> {
-                Ok(())
+            pub(super) fn set_visible(&self, visible: bool) -> anyhow::Result<()> {
+                self.surface.platform_surface()?.set_visible(visible)
             }
 
-            /// Drops the web view cleanly when falling back to X11 child window embedding.
+            /// Removes the surface, after the web view's own windows went
+            /// (later: a view may go while GPUI's app is borrowed).
             pub(super) fn release(self, webview: Rc<wry::WebView>) {
-                drop(webview);
+                self.cx
+                    .clone()
+                    .spawn(async move |cx| {
+                        drop(webview);
+                        // GTK destroys the web view's X windows from its
+                        // loop: let it, before their parent goes (an X
+                        // error on a destroyed window aborts GTK).
+                        while gtk::events_pending() {
+                            gtk::main_iteration_do(false);
+                        }
+                        cx.background_executor().timer(RELEASE_DELAY).await;
+                        while gtk::events_pending() {
+                            gtk::main_iteration_do(false);
+                        }
+                        let removed = self.window.update(cx, |_, window, _| {
+                            window
+                                .enable_window_composition()?
+                                .remove_surface(self.surface.id())
+                        });
+                        if let Ok(Err(err)) = removed {
+                            log::warn!("web view: cannot remove its surface: {err:#}");
+                        }
+                    })
+                    .detach();
             }
         }
     }

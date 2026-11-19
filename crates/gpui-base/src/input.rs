@@ -23,7 +23,8 @@ mod cursor;
 mod decorations;
 #[path = "input/editor/diagnostics.rs"]
 mod diagnostics;
-pub(crate) use editor::display_map;
+#[path = "input/editor/display_map/mod.rs"]
+mod display_map;
 mod editor;
 #[path = "input/base/element.rs"]
 mod element;
@@ -52,7 +53,8 @@ mod language;
 pub mod language_config;
 #[path = "input/base/layout.rs"]
 mod layout;
-pub(crate) use editor::lsp;
+#[path = "input/editor/lsp/mod.rs"]
+mod lsp;
 #[path = "input/base/mask_pattern.rs"]
 mod mask_pattern;
 #[path = "input/base/mode.rs"]

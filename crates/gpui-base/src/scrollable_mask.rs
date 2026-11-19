@@ -169,6 +169,15 @@ impl RoundedFrameCover {
     }
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl IntoElement for RoundedFrameCover {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 impl Element for RoundedFrameCover {
     type RequestLayoutState = ();
     type PrepaintState = Bounds<Pixels>;
@@ -392,6 +401,15 @@ impl<H: ScrollbarHandle + Clone> ScrollableMask<H> {
     #[allow(dead_code)]
     pub fn debug(mut self) -> Self {
         self.debug = Some(gpui::yellow());
+        self
+    }
+}
+
+#[cfg(not(feature = "gpui-fast"))]
+impl<H: ScrollbarHandle + Clone> IntoElement for ScrollableMask<H> {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
         self
     }
 }

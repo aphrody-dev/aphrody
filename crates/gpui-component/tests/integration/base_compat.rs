@@ -1,3 +1,5 @@
+#[cfg(feature = "gpui-fast")]
+extern crate gpui_fast as gpui;
 
 use gpui::{
     Axis, Div, InteractiveElement as _, Length, ParentElement as _, Pixels, Stateful,

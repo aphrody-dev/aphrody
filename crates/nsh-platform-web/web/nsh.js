@@ -94,6 +94,10 @@ function setAriaAttribute(el, name, value) {
   else el.setAttribute(name, next);
 }
 
+/** Elements a browser's Tab stops at without a `tabindex` (`elementTag`'s
+ * links and `web={{ element }}` values). */
+const NATIVE_STOPS = "a[href], button, input, select, textarea, summary, [contenteditable]";
+
 /**
  * The HTML element a view or text is drawn as, from what its props say it
  * is: a heading (`role="header"`, `h1` to `h6` by `accessibilityLevel`,
@@ -2044,7 +2048,7 @@ class Player {
     this.frame = requestAnimationFrame((now) => {
       this.frame = 0;
       this.frameAt = performance.now();
-      this.call((w) => w.nsh_frame(this.frameTime(now)));
+      this.call((w) => w.nsh_frame(this.frameTime(now), 1));
     });
   }
 
@@ -2104,7 +2108,7 @@ class Player {
       this.keeper = null;
       if (!(this.frameAt >= at)) {
         this.frameAt = performance.now();
-        this.call((w) => w.nsh_frame(this.frameAt));
+        this.call((w) => w.nsh_frame(this.frameAt, 0));
       }
       this.keepDeadline();
     }, Math.max(0, at + LATE_MS - now));
@@ -2542,11 +2546,22 @@ class Player {
     // Appended children stay under a border drawn over them.
     const last = host._borderOver && host._border?.parentNode === host ? host._border : null;
     this.placeChild(host, child, before && before.parentNode === host ? before : last);
+    if (this.leftPlaying?.size) this.videosBack(child);
     this.showHosted(child);
     this.readingChanged(host);
     if (parent._kind === "stack") {
       this.changedStacks.add(parent);
       this.stackChanged(parent, child);
+    }
+  }
+
+  /** `<Video>`s the browser paused as they left the document, back with
+   * `el`: those the app has not paused since play on. */
+  videosBack(el) {
+    for (const v of this.leftPlaying) {
+      if (!el.contains(v)) continue;
+      this.leftPlaying.delete(v);
+      if (v._paused === false && v._src && v._video.paused && v.isConnected) this.playVideo(v, v._video);
     }
   }
 
@@ -2642,6 +2657,7 @@ class Player {
     this.wheelTracked.delete(id);
     if (el._shader) this.dropShader(el);
     if (el._video) {
+      this.leftPlaying?.delete(el);
       // A removed media element keeps playing until it is collected.
       clearInterval(el._progressTimer);
       el._video.pause();
@@ -2685,11 +2701,16 @@ class Player {
     // A stack laid out at no size (`display: none`: a tab not selected) or
     // at one again changes whether it shows (`stackShown`).
     const emptied = el._kind === "stack" && el._frame && !(el._frame[2] > 0 && el._frame[3] > 0) !== !(w > 0 && h > 0);
+    const seen = this.seenByKeys(el);
     el._frame = [x, y, w, h];
     if (resized && el._kind === "scroll") this.scrollFits(el);
     // No size: nothing of its own shows (`.nsh-empty`).
     el.classList.toggle("nsh-empty", !(w > 0 && h > 0));
     if (emptied) this.syncHistorySoon();
+    if (seen !== this.seenByKeys(el)) {
+      if (el._pressable || el._props?.focusable || el.matches?.(NATIVE_STOPS)) this.updateFocusable(el);
+      if (el._field) this.fieldStop(el);
+    }
     this.placeFrame(el);
     this.readingChanged(el.parentNode);
     if (resized && el._corners) this.placeCorners(el);
@@ -3201,14 +3222,17 @@ class Player {
   /** The stops of the keyboard focus (Tab), as `ViewProps::focus_stop`
    * decides: pressables (Enter and Space press them) unless `focusable`
    * false, and any `focusable` view, pressable or not (its keys reach it
-   * through the app's keymap); never disabled ones or those hidden from
-   * assistive technologies. */
+   * through the app's keymap); never disabled ones, those hidden from
+   * assistive technologies or those with no area (`seenByKeys`). */
   updateFocusable(el) {
     const p = el._props;
-    const focusable = (p?.focusable ?? !!el._pressable) && !p?.disabled && !p?.hidden;
+    const seen = this.seenByKeys(el);
+    const focusable = (p?.focusable ?? !!el._pressable) && !p?.disabled && !p?.hidden && seen;
     if (focusable) el.tabIndex = 0;
-    // Programmatic focus only for what screen-reader focus moved to.
-    else if (el._a11yFocus) el.tabIndex = -1;
+    // Programmatic focus only for what screen-reader focus moved to; an
+    // element Tab reaches without a `tabindex` (a link, `web={{ element }}`)
+    // keeps none while it has no area.
+    else if (el._a11yFocus || (!seen && el.matches?.(NATIVE_STOPS))) el.tabIndex = -1;
     else if (el.hasAttribute("tabindex")) el.removeAttribute("tabindex");
     // No longer a stop with the focus on it: it leaves, as on macOS (browsers
     // move it without a `blur`, which would leave `focus:` on).
@@ -3229,6 +3253,31 @@ class Player {
       });
     }
     this.updateAria(el);
+  }
+
+  /** Whether the keyboard reaches view `el` (a Tab stop, an input's
+   * field): it has an area. The core lays out each view of a
+   * `display: none` subtree at no size, which hides nothing in a browser,
+   * so Tab would stop at what it holds; macOS keeps the same rule
+   * (`NshView::seen_by_keys`), and browsers already pass by
+   * `visibility: hidden`. A view before its first frame counts: its props
+   * come first, and the frame then decides. */
+  seenByKeys(el) {
+    const f = el._frame;
+    return !f || (f[2] > 0 && f[3] > 0);
+  }
+
+  /** Input `el`'s field is a Tab stop while its view and its content box
+   * have an area (`seenByKeys`); one that hides with the focus in it gives
+   * the focus up, as a hidden Tab stop does. */
+  fieldStop(el) {
+    const field = el._field;
+    if (!field) return;
+    const c = el._content;
+    const seen = this.seenByKeys(el) && (!c || (c[2] > 0 && c[3] > 0));
+    if (seen) field.removeAttribute("tabindex");
+    else field.tabIndex = -1;
+    if (!seen && document.activeElement === field) field.blur();
   }
 
   /** The name, description and states of input view `el` go on its `field`:
@@ -5574,6 +5623,7 @@ class Player {
       el._field = field;
       el.append(field);
       if (el._content) this.placeContent(el);
+      else this.fieldStop(el);
     }
     swapClass(field, "_class", this.styleClass(css));
     this.fieldAria(el, field);
@@ -5867,6 +5917,7 @@ class Player {
     field.style.top = `${y}px`;
     field.style.width = `${w}px`;
     field.style.height = `${h}px`;
+    this.fieldStop(el);
     // Its text may wrap elsewhere now.
     this.caretMoved(el, field);
   }
@@ -7025,6 +7076,11 @@ class Player {
     const video = el?._video;
     if (!video) return;
     const url = src ? this.asset(src) : "";
+    // `paused` is acted on when it changes (or for a new source): `play()`
+    // on a video that ended starts it over, and one its controls paused
+    // would play on, whenever another prop (the volume, say) changed.
+    const toggled = url !== el._src || paused !== el._paused;
+    el._paused = paused;
     if (url !== el._src) {
       el._src = url;
       if (url) video.src = url;
@@ -7037,16 +7093,24 @@ class Player {
     video.loop = repeat;
     video.controls = controls;
     video.className = `nsh-fill nsh-fit-${fit}`;
+    if (!toggled) return;
     if (paused) video.pause();
-    else if (url && video.paused) {
-      video.play().catch((err) => {
-        // Browsers only start sound on their own after a user gesture.
-        if (err?.name === "NotAllowedError" && !el._autoplayWarned) {
-          el._autoplayWarned = true;
-          console.warn("[nsh] the browser did not let the video play before a user gesture (muted videos can)");
-        }
-      });
-    }
+    else if (url && video.paused) this.playVideo(el, video);
+  }
+
+  /** Plays `<Video>` `el`'s media element `video`, as its props say. */
+  playVideo(el, video) {
+    const src = el._src;
+    video.play().catch((err) => {
+      if (err?.name !== "NotAllowedError") return;
+      // Browsers only start sound on their own after a user gesture: the
+      // next update tries again, though `paused` did not change.
+      if (el._src === src && el._paused === false) el._paused = null;
+      if (!el._autoplayWarned) {
+        el._autoplayWarned = true;
+        console.warn("[nsh] the browser did not let the video play before a user gesture (muted videos can)");
+      }
+    });
   }
 
   /** `<Video>`'s events from the media element's. */
@@ -7076,6 +7140,9 @@ class Player {
     video.addEventListener("pause", () => {
       stopProgress();
       progress();
+      // Out of the document, the browser paused it: one the app has not
+      // paused plays on when it is back (`op_i`).
+      if (!video.isConnected && el._paused === false) (this.leftPlaying ??= new Set()).add(el);
     });
     video.addEventListener("waiting", () => buffer(true));
     video.addEventListener("canplay", () => buffer(false));
@@ -7171,7 +7238,16 @@ class Player {
           console.warn(`[nsh] web view: ${name} only reaches HTML sources (a page of another site is the browser's own)`);
         }
         break;
-      case "seek": if (el?._video) el._video.currentTime = args[0]; break;
+      case "seek": {
+        const video = el?._video;
+        if (!video) break;
+        const ended = video.ended;
+        video.currentTime = args[0];
+        // The browser paused it at its end: one the app has not paused
+        // plays on from where it was sought, as on the other platforms.
+        if (ended && el._paused === false && !video.loop) this.playVideo(el, video);
+        break;
+      }
       case "notificationPermission": this.notificationPermission(args[0], args[1]); break;
       case "showNotification": this.showNotification(args[0], args[1], args[2], args[3], args[4]); break;
       case "closeNotification": this.notifications?.get(args[0])?.close(); break;
@@ -8934,10 +9010,16 @@ class Player {
 
   /** The view that holds the keyboard focus in this player, when it is a
    * view of the app's and not a native field, page or video, which keeps
-   * its own keys. */
+   * its own keys. With nothing focused (the page's body, or the root),
+   * the window's root hears the keys, as `document.body` does: the newest
+   * modal's root while one is presented. A system dialog keeps its keys. */
   keyFocusView() {
     const focus = document.activeElement;
-    if (!focus || focus === document.body || !this.root.contains(focus)) return null;
+    if (!focus || focus === document.body || focus === this.root) {
+      if (this.dialogs?.length) return null;
+      return this.topModal() ?? this.root;
+    }
+    if (!this.root.contains(focus)) return null;
     if (focus.isContentEditable || focus.closest?.(".nsh-field, [contenteditable], iframe, video")) return null;
     return this.viewOf(focus);
   }
@@ -9051,7 +9133,7 @@ class Player {
     // (`nsh_key_event`), as a browser delivers the release to whatever has
     // the focus now.
     let captured = false;
-    if (this.wasm && !e.isComposing && e.keyCode !== 229) {
+    if (this.wasm && !e.isComposing && e.keyCode !== 229 && this.takesKeys()) {
       const keyView = this.keyFocusView();
       if (keyView && this.keyInterest(keyView)) captured = this.rawKey(keyView, false, e, keyCode(e));
     }

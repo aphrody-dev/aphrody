@@ -82,8 +82,6 @@ A floor, not a substitute for the guides.
   reader methods.
 - **Spell `Context` out.** `cx` is GPUI's; name anything else after what it
   holds.
-- **Retention hygiene (`gpui-fast` enabled by default).** Keep `render`/`prepaint`/`paint` pure of per-frame global writes or `cx.notify()`; use `window.refresh()` in unit tests needing forced full rebuilds.
-- **Cross-crate unification seam.** `crates/gpui` provides `Path<T = Pixels>`, blanket `IntoElement`, and 1-arg `Window::paint_layer(|w| ...)`; `gpui-base`/`gpui-component` alias `lsp_types_kit` (`0.97`, `proposed`) and declare nested modules (`display_map`, `lsp`) directly from directory parents without `mod.rs`.
 
 ## Documentation
 

@@ -1,4 +1,6 @@
 //! `nsh/base`: the behavior and infrastructure foundation of NSH apps' UI,
+
+extern crate markdown_rs as markdown;
 //! written in Rust, with no look of its own (as `gpui-base` is GPUI Kit's):
 //! controls (`Button`, a link (`Link`), `Checkbox`, avatars (`Avatar`, `AvatarGroup`), a carousel (`Carousel` and its parts), a color picker: `ColorPicker` and its parts, `NumberInput`, `Radio` in a
 //! `RadioGroup`, `Slider`, `Switch`, `Toggle` in a `ToggleGroup`, a bar of them and of buttons and links (`Toolbar`, `ToolbarGroup`, `ToolbarSeparator`), a scroll bar of the app's own look (`Scrollbar`), `Tab` in `Tabs`, `Select`, `Combobox`, a command palette (`Command`), an emoji picker (`EmojiPicker`), a one-time code: `OtpInput`), the pages of a set (`Pagination`), items that hold items (`Tree`), a progress bar (`Progress`), disclosure (`Collapsible`, `Accordion` and its parts),
@@ -15,8 +17,6 @@
 //! its own crate. Its JS face (the `nsh/base` export and its TypeScript
 //! declarations) is generated from the components' props and events and the
 //! modules' functions. Every host serves it.
-
-extern crate markdown_rs as markdown;
 
 mod accordion;
 mod alert_dialog;
@@ -45,7 +45,6 @@ mod keys;
 mod link;
 mod link_hint;
 mod listbox;
-pub mod material3;
 mod mdast_tree;
 mod menu;
 mod menu_button;
@@ -79,6 +78,8 @@ mod tabs;
 mod term;
 pub mod terminal;
 pub mod text_view;
+#[cfg(not(target_arch = "wasm32"))]
+mod updater_prompt;
 
 /// `EmojiPicker`'s emoji (`emoji_picker/emoji.tsv`): the native runtimes
 /// embed them; `nsh` publishes them next to a web runtime, which fetches
@@ -516,6 +517,10 @@ pub mod parts {
     /// `TextView`: Markdown and HTML documents.
     pub fn text_view(registry: &mut Registry) {
         registry.register::<TextView>().module::<TextView>();
+        // The window of `promptForUpdate`, which shows the notes in a
+        // `TextView`. Apps on the web do not update.
+        #[cfg(not(target_arch = "wasm32"))]
+        registry.setup(crate::updater_prompt::install);
     }
 
     /// The `Editor`: a code editor.
@@ -778,3 +783,4 @@ mod tests {
         assert_eq!(super::plot::registry().undocumented(), Vec::<String>::new());
     }
 }
+pub mod material3;

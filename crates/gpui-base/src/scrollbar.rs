@@ -10,8 +10,8 @@ use crate::{
 use gpui::{
     Anchor, App, Axis, Background, BorderStyle, Bounds, ContentMask, CursorStyle, Edges, Element,
     ElementId, EntityId, GlobalElementId, Hitbox, HitboxBehavior, Hsla, InspectorElementId, IsZero,
-    LayoutId, ListState, MouseDownEvent, MouseMoveEvent, MouseUpEvent, PaintQuad, Pixels, Point,
-    Position, ScrollEvent, ScrollHandle, Size, Style, TouchDragEvent, TouchPhase,
+    LayoutId, ListState, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, PaintQuad,
+    Pixels, Point, Position, ScrollEvent, ScrollHandle, Size, Style, TouchDragEvent, TouchPhase,
     UniformListScrollHandle, Window, fill, point, prelude::FluentBuilder, px, relative, size,
 };
 use schemars::JsonSchema;
@@ -1164,6 +1164,15 @@ impl Scrollbar {
     }
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl gpui::IntoElement for Scrollbar {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 #[doc(hidden)]
 pub struct PrepaintState {
     hitbox: Hitbox,
@@ -1617,7 +1626,7 @@ impl Element for Scrollbar {
 
                     window.set_cursor_style(CursorStyle::default(), &state.bar_hitbox);
 
-                    window.paint_layer(|cx| {
+                    window.paint_layer(hitbox_bounds, |cx| {
                         cx.paint_quad(fill(painted_bounds, painted_track_bg));
 
                         cx.paint_quad(PaintQuad {
@@ -1728,7 +1737,10 @@ impl Element for Scrollbar {
                             let scroll_handle = self.scroll_handle.clone();
 
                             move |event: &MouseDownEvent, phase, window, cx| {
-                                if phase.bubble() && bar_hitbox.is_hovered(window) {
+                                if phase.bubble()
+                                    && event.button == MouseButton::Left
+                                    && bar_hitbox.is_hovered(window)
+                                {
                                     cx.stop_propagation();
 
                                     if thumb_bounds.contains(&event.position) {
@@ -1841,7 +1853,10 @@ impl Element for Scrollbar {
                         let scroll_handle = self.scroll_handle.clone();
 
                         move |event: &MouseUpEvent, phase, _, cx| {
-                            if phase.bubble() && state.get().dragged_axis == Some(axis) {
+                            if phase.bubble()
+                                && event.button == MouseButton::Left
+                                && state.get().dragged_axis == Some(axis)
+                            {
                                 scroll_handle.set_offset(active_geometry.drag_offset(
                                     axis,
                                     event.position,
@@ -2778,6 +2793,13 @@ mod tests {
             scrollbar: Scrollbar,
             painted: Rc<Cell<Bounds<Pixels>>>,
         }
+        #[cfg(not(feature = "gpui-fast"))]
+        impl gpui::IntoElement for Probe {
+            type Element = Self;
+            fn into_element(self) -> Self {
+                self
+            }
+        }
         impl Element for Probe {
             type RequestLayoutState = ();
             type PrepaintState = PrepaintState;
@@ -3028,6 +3050,44 @@ mod tests {
         );
 
         assert_eq!(handle.drag_starts.get(), 1);
+        assert_eq!(handle.drag_ends.get(), 1);
+    }
+
+    #[gpui::test]
+    fn only_the_primary_button_drags_or_jumps(cx: &mut TestAppContext) {
+        let (cx, handle) = harness(
+            cx,
+            ScrollbarAxis::Vertical,
+            ScrollbarMode::Always,
+            size(px(100.), px(500.)),
+        );
+        for button in [MouseButton::Right, MouseButton::Middle] {
+            // Thumb press, then the track.
+            for y in [px(20.), px(80.)] {
+                cx.simulate_mouse_down(point(px(95.), y), button, Modifiers::default());
+                cx.simulate_mouse_up(point(px(95.), y), button, Modifiers::default());
+            }
+        }
+        assert_eq!(handle.drag_starts.get(), 0);
+        assert_eq!(handle.offset(), Point::default());
+
+        // A secondary release does not end a primary drag.
+        cx.simulate_mouse_down(
+            point(px(95.), px(20.)),
+            MouseButton::Left,
+            Modifiers::default(),
+        );
+        cx.simulate_mouse_up(
+            point(px(95.), px(20.)),
+            MouseButton::Right,
+            Modifiers::default(),
+        );
+        assert_eq!(handle.drag_ends.get(), 0);
+        cx.simulate_mouse_up(
+            point(px(95.), px(20.)),
+            MouseButton::Left,
+            Modifiers::default(),
+        );
         assert_eq!(handle.drag_ends.get(), 1);
     }
 }

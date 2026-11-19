@@ -1239,6 +1239,7 @@ mod tests {
     }
 
     /// A page holding a select under retained views.
+    #[cfg(feature = "gpui-fast")]
     mod retained {
         use std::{cell::Cell, rc::Rc};
 

@@ -67,7 +67,7 @@ jni.workspace = true
 # The WebSocket client's system trust store (feature `websocket`), which
 # needs the app's Context over JNI; the verifier speaks jni 0.22.
 rustls-platform-verifier = { workspace = true, optional = true }
-jni-verifier = { workspace = true, optional = true }
+jni-verifier = { package = "jni", version = "0.22", optional = true }
 nsh-core.workspace = true
 nsh-engine.workspace = true
 nsh-base.workspace = true

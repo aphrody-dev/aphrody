@@ -1,9 +1,9 @@
 # Consolidated Upstream Sync Lockfile (Zed + NSH + GPUI-Kit + Bun + WGPU + agent-browser + agent-desktop).
 # Updated automatically by tooling/bun/upstream-sync.ts
-synced_at = "2026-11-18T13:42:13.047Z"
-zed_sha = "1043f4a86ab911a381d9bfe45cf6b36d3cdcc89a"
-nsh_sha = "bc05657b7f742cbfdf6f1e1c977de9a75f37d9dd"
-gpui_kit_sha = "67c329149eeeee52d79587e76ae80e9400df9fea"
-agent_browser_sha = "9f62847e89712164a6d5ea823e8c700d5fd911cd"
+synced_at = "2026-11-19T12:30:33.408Z"
+zed_sha = "b51ffab0153f3372b71d1bd565d48d5203fefe6a"
+nsh_sha = "e2cd5f49ea63189acecdcf5a4c6df5a0aa612fa0"
+gpui_kit_sha = "390a485aba2e8ab92754a23b84eecedf4155b562"
+agent_browser_sha = "deda8eff5e29bcc3b4a9f10aafd1412dbe91745a"
 agent_desktop_sha = "e8934a5e95e1d212c74ead95cd3e4701c04eca31"
-sha256_stamp = "7ae68bff5fef7ead9d206cbda4b3a5811394ecd387649cf44093ad9888916b2d"
+sha256_stamp = "74a158abca9ffdf1696dcf6a5725f9835aa4a22b19776e52e3e7623a91327c4e"

@@ -843,6 +843,14 @@ mod tests {
         sink: Option<Rc<dyn EditorSink>>,
     }
 
+    #[cfg(not(feature = "gpui-fast"))]
+    impl IntoElement for Probe {
+        type Element = Self;
+        fn into_element(self) -> Self::Element {
+            self
+        }
+    }
+
     impl Element for Probe {
         type RequestLayoutState = AnyElement;
         type PrepaintState = ();

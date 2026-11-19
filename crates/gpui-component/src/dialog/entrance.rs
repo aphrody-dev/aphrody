@@ -46,6 +46,15 @@ impl EntranceSurface {
     }
 }
 
+#[cfg(not(feature = "gpui-fast"))]
+impl gpui::IntoElement for EntranceSurface {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
 impl Element for EntranceSurface {
     type RequestLayoutState = ();
     type PrepaintState = ();

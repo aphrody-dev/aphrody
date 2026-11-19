@@ -44,8 +44,8 @@ anyhow = { workspace = true, optional = true }
 oxc.workspace = true
 rolldown = { workspace = true, optional = true }
 rolldown_common = { workspace = true, optional = true }
-rolldown_error = { workspace = true, optional = true }
-rolldown_sourcemap = { workspace = true, optional = true }
+rolldown_error = { version = "=1.2.13", optional = true }
+rolldown_sourcemap = { version = "=1.2.13", optional = true }
 string_wizard = { workspace = true, optional = true }
 oxc_sourcemap.workspace = true
 imagesize = { workspace = true, optional = true }

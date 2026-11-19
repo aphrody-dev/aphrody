@@ -406,8 +406,6 @@ fn slot(device: &wgpu::Device, raw: &ID3D12Device, width: u32, height: u32) -> O
                     | wgpu::TextureUsages::COPY_SRC,
                 view_formats: &[],
             },
-            wgpu::TextureUses::UNINITIALIZED,
-            false,
         )
     };
     Some(Slot {

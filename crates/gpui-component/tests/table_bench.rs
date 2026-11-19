@@ -12,6 +12,8 @@
 //! This binary installs a counting global allocator, so it is kept apart from
 //! the integration test binary.
 
+#[cfg(feature = "gpui-fast")]
+extern crate gpui_fast as gpui;
 
 use std::{
     alloc::{GlobalAlloc, Layout, System},
