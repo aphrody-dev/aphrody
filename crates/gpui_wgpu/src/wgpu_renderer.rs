@@ -20,29 +20,43 @@ const MAX_INSTANCE_BUFFER_SIZE: u64 = 256 * 1024 * 1024;
 
 const INSTANCE_TEXTURE_TEXEL_SIZE: u64 = 16;
 
-/// Shader variant for backends with storage buffer support: the shared shader
-/// logic plus the storage-buffer instance transport.
-const STORAGE_BUFFER_SHADERS: &str = concat!(
-    include_str!("shaders.wgsl"),
-    include_str!("shaders_storage.wgsl"),
-);
+/// Shared WGSL shader core embedded once in `.rodata` instead of duplicated across
+/// storage-buffer, WebGL2, and dual-source subpixel shader variants (saves ~116 KiB in Wasm).
+const BASE_SHADERS: &str = include_str!("shaders.wgsl");
+const STORAGE_BUFFER_SHADERS_SUFFIX: &str = include_str!("shaders_storage.wgsl");
+const SUBPIXEL_SHADERS_SUFFIX: &str = include_str!("shaders_subpixel.wgsl");
+#[cfg(any(not(target_family = "wasm"), feature = "webgl-fallback"))]
+const WEBGL_SHADERS_SUFFIX: &str = include_str!("shaders_webgl.wgsl");
 
-/// Shader variant for WebGL2, which has no storage buffers: the shared shader
-/// logic plus the texture-based instance transport.
-const WEBGL_SHADERS: &str = concat!(
-    include_str!("shaders.wgsl"),
-    include_str!("shaders_webgl.wgsl"),
-);
+fn build_storage_buffer_shaders() -> String {
+    let mut source = String::with_capacity(BASE_SHADERS.len() + STORAGE_BUFFER_SHADERS_SUFFIX.len());
+    source.push_str(BASE_SHADERS);
+    source.push_str(STORAGE_BUFFER_SHADERS_SUFFIX);
+    source
+}
 
-/// Subpixel text rendering requires dual-source blending, which WebGL2 lacks, so
-/// this variant only ever runs with the storage-buffer transport. The `enable`
-/// directive must precede all declarations.
-const SUBPIXEL_SHADERS: &str = concat!(
-    "enable dual_source_blending;\n",
-    include_str!("shaders.wgsl"),
-    include_str!("shaders_storage.wgsl"),
-    include_str!("shaders_subpixel.wgsl"),
-);
+#[cfg(any(not(target_family = "wasm"), feature = "webgl-fallback"))]
+fn build_webgl_shaders() -> String {
+    let mut source = String::with_capacity(BASE_SHADERS.len() + WEBGL_SHADERS_SUFFIX.len());
+    source.push_str(BASE_SHADERS);
+    source.push_str(WEBGL_SHADERS_SUFFIX);
+    source
+}
+
+fn build_subpixel_shaders() -> String {
+    const ENABLE_DIRECTIVE: &str = "enable dual_source_blending;\n";
+    let mut source = String::with_capacity(
+        ENABLE_DIRECTIVE.len()
+            + BASE_SHADERS.len()
+            + STORAGE_BUFFER_SHADERS_SUFFIX.len()
+            + SUBPIXEL_SHADERS_SUFFIX.len(),
+    );
+    source.push_str(ENABLE_DIRECTIVE);
+    source.push_str(BASE_SHADERS);
+    source.push_str(STORAGE_BUFFER_SHADERS_SUFFIX);
+    source.push_str(SUBPIXEL_SHADERS_SUFFIX);
+    source
+}
 
 fn least_common_multiple(left: u64, right: u64) -> u64 {
     let mut first = left;
@@ -474,7 +488,9 @@ impl WgpuRenderer {
             width: clamped_width.max(1),
             height: clamped_height.max(1),
             present_mode,
-            desired_maximum_frame_latency: 2,
+            // Browser WebGPU compositors already pace canvas presentation via rAF; keeping latency
+            // at 1 frame eliminates an extra queued frame (~16.6 ms at 60 Hz) on wasm32.
+            desired_maximum_frame_latency: if cfg!(target_family = "wasm") { 1 } else { 2 },
             alpha_mode,
             view_formats: vec![],
         };
@@ -792,9 +808,16 @@ impl WgpuRendererCore {
             dual_source_blending && device_has_feature && !uses_webgl_instance_data;
 
         let shader_source = if uses_webgl_instance_data {
-            WEBGL_SHADERS
+            #[cfg(any(not(target_family = "wasm"), feature = "webgl-fallback"))]
+            {
+                build_webgl_shaders()
+            }
+            #[cfg(all(target_family = "wasm", not(feature = "webgl-fallback")))]
+            {
+                build_storage_buffer_shaders()
+            }
         } else {
-            STORAGE_BUFFER_SHADERS
+            build_storage_buffer_shaders()
         };
         let shader_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("gpui_shaders"),
@@ -804,7 +827,7 @@ impl WgpuRendererCore {
         let subpixel_shader_module = if dual_source_blending {
             Some(device.create_shader_module(wgpu::ShaderModuleDescriptor {
                 label: Some("gpui_subpixel_shaders"),
-                source: wgpu::ShaderSource::Wgsl(SUBPIXEL_SHADERS.into()),
+                source: wgpu::ShaderSource::Wgsl(build_subpixel_shaders().into()),
             }))
         } else {
             None
@@ -2775,19 +2798,22 @@ mod tests {
 
     #[test]
     fn webgl_shader_is_valid_wgsl_without_storage_buffers() {
-        assert!(!WEBGL_SHADERS.contains("var<storage"));
-        validate_wgsl(WEBGL_SHADERS, naga::valid::Capabilities::empty());
+        let webgl = build_webgl_shaders();
+        assert!(!webgl.contains("var<storage"));
+        validate_wgsl(&webgl, naga::valid::Capabilities::empty());
     }
 
     #[test]
     fn storage_buffer_shader_is_valid_wgsl() {
-        validate_wgsl(STORAGE_BUFFER_SHADERS, naga::valid::Capabilities::empty());
+        let storage = build_storage_buffer_shaders();
+        validate_wgsl(&storage, naga::valid::Capabilities::empty());
     }
 
     #[test]
     fn subpixel_shader_is_valid_wgsl() {
+        let subpixel = build_subpixel_shaders();
         validate_wgsl(
-            SUBPIXEL_SHADERS,
+            &subpixel,
             naga::valid::Capabilities::DUAL_SOURCE_BLENDING,
         );
     }

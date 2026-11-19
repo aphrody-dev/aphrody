@@ -1882,7 +1882,8 @@ opt-level = "z"
 lto = "thin"
 codegen-units = 1
 debug = false
-strip = true
+# Keep `target_features` custom section intact for wasm-bindgen; wasm-opt strips producers & debuginfo.
+strip = "debuginfo"
 panic = "abort"
 
 [profile.web-lto]

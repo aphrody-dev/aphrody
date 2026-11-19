@@ -56,8 +56,12 @@ const targetDir =
     ? (JSON.parse(new TextDecoder().decode(metaRes.stdout)) as { target_directory: string }).target_directory
     : join(repoRoot, "target");
 
-const distDir = resolve(opt("--out-dir") ?? join(targetDir, "web-dist"));
-const shotOut = resolve(opt("--shot") ?? join(targetDir, "web-screenshots", `${pkg}.png`));
+const repoDistDir = resolve(repoRoot, "target", "web-dist");
+const distDir = resolve(
+  opt("--out-dir") ??
+    (existsSync(join(repoDistDir, "index.html")) ? repoDistDir : join(targetDir, "web-dist")),
+);
+const shotOut = resolve(opt("--shot") ?? join(repoRoot, "target", "web-screenshots", `${pkg}.png`));
 if (!existsSync(join(distDir, "index.html"))) {
   throw new Error(`Missing ${join(distDir, "index.html")}; run \`bun tooling/bun/web-build.ts build --package ${pkg} --opt\` first.`);
 }

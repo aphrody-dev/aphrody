@@ -10,7 +10,7 @@ description: >-
 
 # wasm-bindgen Ecosystem & Browser FFI (`aphrody`)
 
-Aphrody pins `wasm-bindgen` at **`0.2.129`** (`Cargo.lock` == `wasm-bindgen` CLI `0.2.129`, `wasm-bindgen-futures 0.4.79`, `js-sys 0.3.106`, `web-sys 0.3.106`) and optimizes release browser binaries with **`v133`** via [`tooling/bun/web-build.ts`](../../../../../tooling/bun/web-build.ts).
+Aphrody pins `wasm-bindgen` at **`0.2.130`** (`Cargo.lock` == `wasm-bindgen` CLI `0.2.130`, `wasm-bindgen-futures 0.4.80`, `js-sys 0.3.107`, `web-sys 0.3.107`) and optimizes release browser binaries with **`v133`** via [`tooling/bun/web-build.ts`](../../../../../tooling/bun/web-build.ts).
 
 ## Progressive Disclosure References
 
@@ -28,7 +28,7 @@ Resolve all paths relative to `.agents/plugins/aphrody/skills/wasm-bindgen/`:
 ## Non-Negotiable Engineering Rules
 
 1. **Exact CLI <-> `Cargo.lock` Lockstep**:
-   `wasm-bindgen` CLI version MUST equal `Cargo.lock` (`0.2.129`). Never mix CLI and crate versions — `web-build.ts` aborts on mismatch because `__wbindgen_placeholder__` intrinsics and JS glue evolve across patch releases.
+   `wasm-bindgen` CLI version MUST equal `Cargo.lock` (`0.2.130`). Never mix CLI and crate versions — `web-build.ts` aborts on mismatch because `__wbindgen_placeholder__` intrinsics and JS glue evolve across patch releases.
 2. **Never Leak `Closure`s Unless Process-Lifetime**:
    - Repeating DOM listeners (`window`, `document`, `ResizeObserver`, `MediaQueryList`): wrap in `EventListenerHandle` (`Drop` calls `remove_event_listener_with_callback`, see [`crates/gpui_web/src/events.rs`](../../../../../crates/gpui_web/src/events.rs)) or store the `Closure` on the owning struct (`WebWindow`).
    - One-shot callbacks (`setTimeout`, `queueMicrotask`, `requestIdleCallback`): prefer `Closure::once_into_js`; never call `.forget()` in per-event or per-frame loops.

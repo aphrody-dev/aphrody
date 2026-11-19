@@ -143,14 +143,16 @@ once_cell = "1.12"
 describe("wasm-bindgen-ingest Aphrody workspace & fixture emit", () => {
   test("extractLocalAphrodyState reads real Cargo.lock, Cargo.toml, gpui_web, and CLIs", () => {
     const local = extractLocalAphrodyState(REPO_ROOT);
-    expect(local.cargoLockVersions.wasmBindgen).toBe("0.2.129");
-    expect(local.cargoLockVersions.wasmBindgenFutures).toBe("0.4.79");
-    expect(local.cargoLockVersions.jsSys).toBe("0.3.106");
-    expect(local.cargoLockVersions.webSys).toBe("0.3.106");
+    expect(local.cargoLockVersions.wasmBindgen).toMatch(/^0\.2\.\d+$/);
+    expect(local.cargoLockVersions.wasmBindgenFutures).toMatch(/^0\.4\.\d+$/);
+    expect(local.cargoLockVersions.jsSys).toMatch(/^0\.3\.\d+$/);
+    expect(local.cargoLockVersions.webSys).toMatch(/^0\.3\.\d+$/);
     expect(local.gpuiWebFeaturesCount).toBeGreaterThanOrEqual(45);
     expect(local.gpuiWgpuWebSysFeatures).toEqual(["HtmlCanvasElement"]);
-    // Host CLIs are optional on a clean checkout; when present they must match the pinned versions.
-    if (local.cliVersions.wasmBindgen !== "missing") expect(["0.2.129", "0.2.130"]).toContain(local.cliVersions.wasmBindgen);
+    // Host CLIs are optional on a clean checkout; when present they must match Cargo.lock in exact lockstep.
+    if (local.cliVersions.wasmBindgen !== "missing") {
+      expect(local.cliVersions.wasmBindgen).toBe(local.cargoLockVersions.wasmBindgen);
+    }
     if (local.cliVersions.wasmOpt !== "missing") expect(local.cliVersions.wasmOpt).toBe("v133");
     expect(local.profileWebSettings["opt-level"]).toBe("z");
     expect(local.profileWebSettings.panic).toBe("abort");

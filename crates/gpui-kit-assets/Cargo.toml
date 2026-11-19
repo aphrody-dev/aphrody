@@ -28,8 +28,9 @@ gpui_platform.workspace = true
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 rust-embed.workspace = true
 [target.'cfg(target_family = "wasm")'.dependencies]
-reqwest.workspace = true
+js-sys.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
+web-sys = { workspace = true, features = ["Response", "Window"] }
 [features]
 gpui-fast = []

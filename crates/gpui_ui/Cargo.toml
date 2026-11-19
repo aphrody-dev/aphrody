@@ -26,7 +26,6 @@ desktop = [
 inspector = ["gpui/inspector", "gpui_platform/inspector"]
 hot-reload = ["gpui/hot-reload"]
 kit = [
-    "desktop",
     "dep:gpui-kit",
     "dep:gpui-base",
     "dep:gpui-component",
@@ -34,6 +33,7 @@ kit = [
     "dep:gpui-fps",
 ]
 material3 = ["kit"]
+web = []
 nsh = [
     "desktop",
     "dep:nsh-core",

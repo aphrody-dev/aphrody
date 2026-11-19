@@ -10,7 +10,7 @@ Generated deterministically by `bun run m3:convert` from:
 - `src/main.rs` — Native GPUI Kit app launching `M3ParametricPrototyperView` with `M3ExpressiveThemeScope`
 - `nsh-m3-kit.tsx` — NSH TSX library with Compose M3 `1.5.0` components, 35 `MATERIAL_SHAPES_35`, and 4-mode palettes
 - `m3-tokens.css` — 4-mode CSS custom property token sheet (`light`, `dark`, `neural_obsidian`, `oled_pitch`)
-- `shaders/m3_expressive.wgsl` — Pure WebGPU / Naga v30 WGSL shader (35 MaterialShapes SDF morphing, wavy progress, inset focus rings, progressive blur)
+- `../../assets/shaders/m3_expressive.wgsl` — Canonical pure WebGPU / Naga v30 WGSL shader (35 MaterialShapes SDF morphing, wavy progress, inset focus rings, progressive blur; single source of truth, never duplicated)
 - `m3-parametric-preset.json` — Parametric Prototyping preset synced with Figma Design Kit `1035203688168086460`
 
 ## Commands

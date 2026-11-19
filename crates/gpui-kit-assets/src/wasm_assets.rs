@@ -3,7 +3,28 @@ use gpui::{AssetSource, Result, SharedString};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
-use wasm_bindgen_futures::spawn_local;
+use wasm_bindgen::JsCast as _;
+use wasm_bindgen_futures::{JsFuture, spawn_local};
+
+async fn fetch_asset_bytes(url: &str) -> std::result::Result<Vec<u8>, String> {
+    let window = web_sys::window().ok_or_else(|| "browser window unavailable".to_owned())?;
+    let resp_value = JsFuture::from(window.fetch_with_str(url))
+        .await
+        .map_err(|err| format!("{err:?}"))?;
+    let resp: web_sys::Response = resp_value
+        .dyn_into()
+        .map_err(|err| format!("invalid fetch Response: {err:?}"))?;
+    if !resp.ok() {
+        return Err(format!("HTTP {}", resp.status()));
+    }
+    let buf_promise = resp
+        .array_buffer()
+        .map_err(|err| format!("array_buffer failed: {err:?}"))?;
+    let buf_value = JsFuture::from(buf_promise)
+        .await
+        .map_err(|err| format!("array_buffer await failed: {err:?}"))?;
+    Ok(js_sys::Uint8Array::new(&buf_value).to_vec())
+}
 
 /// WASM implementation - download assets on-demand
 pub struct Assets {
@@ -61,25 +82,10 @@ impl AssetSource for Assets {
                 let pending = self.pending.clone();
 
                 spawn_local(async move {
-                    match reqwest::get(&url).await {
-                        Ok(response) => {
-                            if response.status().is_success() {
-                                match response.bytes().await {
-                                    Ok(bytes) => {
-                                        if let Ok(mut cache) = cache.write() {
-                                            cache.insert(path_clone.clone(), bytes.to_vec());
-                                        }
-                                    }
-                                    Err(e) => {
-                                        log::warn!("Failed to read icon {}: {}", path_clone, e);
-                                    }
-                                }
-                            } else {
-                                log::warn!(
-                                    "Failed to download icon {}: HTTP {}",
-                                    path_clone,
-                                    response.status()
-                                );
+                    match fetch_asset_bytes(&url).await {
+                        Ok(bytes) => {
+                            if let Ok(mut cache) = cache.write() {
+                                cache.insert(path_clone.clone(), bytes);
                             }
                         }
                         Err(e) => {

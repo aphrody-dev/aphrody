@@ -98,7 +98,7 @@ jobs:
         shell: bash
         run: |
           bun run fleet:lb probe --local --json
-          bun run fleet:lb schedule --local --job "${{ github.event.inputs.job_kind || 'native_rust' }}" --shards 2 --json
+          bun run fleet:lb schedule --local --job "${{ github.event.inputs.job_kind || 'verify' }}" --shards 2 --json
           bun run fleet:lb beacon --local --dry-run --json
       - name: Audit consolidated Cloudflare Worker
         if: matrix.os == 'ubuntu-latest'

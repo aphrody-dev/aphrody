@@ -13,10 +13,13 @@ path = "src/gpui_wgpu.rs"
 doctest = false
 
 [features]
-default = []
+default = ["webgl-fallback"]
 bench-support = ["gpui/bench-support", "dep:image"]
 font-kit = ["dep:font-kit"]
 test-support = ["gpui/test-support", "dep:image"]
+# Enables the WebGL2 fallback backend on wasm32. Disable default features for pure WebGPU builds
+# to drop glow, wgpu-hal/gles, and WebGL2 shader/web-sys overhead from Wasm bundles.
+webgl-fallback = ["wgpu/webgl"]
 
 [dependencies]
 gpui.workspace = true
@@ -44,13 +47,13 @@ font-kit = { workspace = true, optional = true }
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 wgpu = { workspace = true, features = ["std", "metal", "gles", "vulkan", "wgsl", "webgpu"] }
 
-[target.'cfg(not(any(target_os = "linux", target_os = "freebsd")))'.dependencies]
+[target.'cfg(not(any(target_os = "linux", target_os = "freebsd", target_family = "wasm")))'.dependencies]
 wgpu = { workspace = true, default-features = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys.workspace = true
 web-sys = { workspace = true, features = ["HtmlCanvasElement"] }
-wgpu = { workspace = true, features = ["webgl"] }
+wgpu = { workspace = true, features = ["webgpu", "wgsl"] }
 
 [dev-dependencies]
 criterion.workspace = true

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import {
   checkVpnAllowLan,
   inspectDenyPolicy,
@@ -8,7 +10,6 @@ import {
   repoRoot,
   runAudit,
 } from "./vendor-lan-doctor.ts";
-import { join } from "node:path";
 
 describe("vendor-lan-doctor", () => {
   test("parses [patch.crates-io] path and git entries", () => {
@@ -56,9 +57,14 @@ incremental = true
     expect(checkVpnAllowLan(repoRoot)).toBe(true);
 
     const report = runAudit(repoRoot, true);
-    expect(report.ok).toBe(true);
-    expect(report.vendor.missingPatchPaths).toEqual([]);
     expect(report.vendor.declaredSubmodules).toBe(10);
-    expect(report.vendor.nestedCargoSubmodules.every((n) => n.manifestPresent)).toBe(true);
+    // In shallow `submodules: false` CI jobs (e.g. `plugin-and-config`), vendor working trees
+    // are intentionally not checked out; validate disk manifests only when initialized.
+    const submodulesInitialized = existsSync(join(repoRoot, "vendor/wgpu/Cargo.toml"));
+    if (submodulesInitialized) {
+      expect(report.ok).toBe(true);
+      expect(report.vendor.missingPatchPaths).toEqual([]);
+      expect(report.vendor.nestedCargoSubmodules.every((n) => n.manifestPresent)).toBe(true);
+    }
   });
 });

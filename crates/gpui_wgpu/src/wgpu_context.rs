@@ -382,10 +382,22 @@ impl WgpuContext {
         canvas: &web_sys::HtmlCanvasElement,
         preference: WebBackendPreference,
     ) -> anyhow::Result<PreparedWebGraphics> {
+        #[cfg(feature = "webgl-fallback")]
         let backends = match preference {
             WebBackendPreference::Auto => wgpu::Backends::BROWSER_WEBGPU | wgpu::Backends::GL,
             WebBackendPreference::WebGpu => wgpu::Backends::BROWSER_WEBGPU,
             WebBackendPreference::WebGl => wgpu::Backends::GL,
+        };
+        #[cfg(not(feature = "webgl-fallback"))]
+        let backends = match preference {
+            WebBackendPreference::Auto | WebBackendPreference::WebGpu => {
+                wgpu::Backends::BROWSER_WEBGPU
+            }
+            WebBackendPreference::WebGl => {
+                anyhow::bail!(
+                    "WebGL fallback requested, but `gpui_wgpu` was compiled without the `webgl-fallback` feature"
+                );
+            }
         };
         let descriptor = wgpu::InstanceDescriptor {
             backends,
@@ -394,11 +406,14 @@ impl WgpuContext {
             memory_budget_thresholds: wgpu::MemoryBudgetThresholds::default(),
             display: Some(Box::new(WebDisplaySource)),
         };
+        #[cfg(feature = "webgl-fallback")]
         let instance = if preference == WebBackendPreference::Auto {
             wgpu::util::new_instance_with_webgpu_detection(descriptor).await
         } else {
             wgpu::Instance::new(descriptor)
         };
+        #[cfg(not(feature = "webgl-fallback"))]
+        let instance = wgpu::Instance::new(descriptor);
         let surface = instance
             .create_surface(wgpu::SurfaceTarget::Canvas(canvas.clone()))
             .map_err(|error| {

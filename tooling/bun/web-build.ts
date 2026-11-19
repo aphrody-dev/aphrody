@@ -80,6 +80,16 @@ const FRAMEWORK_SPECS: FrameworkWebSpec[] = [
     coiRequired: false,
   },
   {
+    id: "gpui_kit",
+    label: "GPUI Kit + Material 3 1.5.0 + Parametric Studio",
+    manifest: "crates/gpui-kit/Cargo.toml",
+    packageName: "gpui-kit",
+    features: ["component", "assets", "gpui-fast"],
+    legacyTooling: "Unified (web-build.ts + zero-reqwest native fetch)",
+    wasmBackend: "WebGPU (single-copy WGSL + 1-frame latency) + opt-in WebGL2",
+    coiRequired: false,
+  },
+  {
     id: "nsh",
     label: "NSH Web Runtime",
     manifest: "crates/nsh-platform-web/Cargo.toml",
@@ -163,6 +173,7 @@ function runCargoWasm(
   const env = { ...process.env };
   // Override ~/.cargo/config.toml rustc-wrapper so Windows never overflows CreateProcess argv on web-sys.
   env.RUSTC_WRAPPER = "";
+  env.CARGO_BUILD_RUSTC_WRAPPER = "";
   env.RUSTC_BOOTSTRAP = "1";
   if (rustflags.length > 0) {
     const existing = env.CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS ?? "";
@@ -172,6 +183,8 @@ function runCargoWasm(
   const cmd = [
     "cargo",
     subcommand,
+    "--config",
+    'build.rustc-wrapper=""',
     "--target",
     "wasm32-unknown-unknown",
     ...pkgs.flatMap((pkg) => ["-p", pkg]),
@@ -274,6 +287,10 @@ function maybeOptimizeWasm(wasmFile: string, cohortName: string) {
   const argsList = [
     wasmFile,
     "-Oz",
+    "--strip-producers",
+    "--low-memory-unused",
+    "--vacuum",
+    "--dce",
     "--enable-bulk-memory",
     "--enable-bulk-memory-opt",
     "--enable-nontrapping-float-to-int",
@@ -386,15 +403,35 @@ function generateCohortHtml(pkg: string, entryName: string, wgVersion: string, c
 `;
 }
 
+function resolveCargoTargetDir(): string {
+  if (process.env.CARGO_TARGET_DIR && process.env.CARGO_TARGET_DIR.trim().length > 0) {
+    return resolve(process.env.CARGO_TARGET_DIR);
+  }
+  const res = Bun.spawnSync(["cargo", "metadata", "--no-deps", "--format-version", "1"], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (res.exitCode === 0) {
+    try {
+      const meta = JSON.parse(new TextDecoder().decode(res.stdout)) as { target_directory?: string };
+      if (meta.target_directory) return meta.target_directory;
+    } catch {
+      // Fallback to workspace-relative target dir
+    }
+  }
+  return resolve(repoRoot, "target");
+}
+
 function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditReport> } {
   const wgVersion = verifyBindgenVersion();
   const entryName = targetPkg === "aphrody_desktop" ? "web_os" : targetPkg;
   const cargoArgs = targetPkg === "aphrody_desktop" ? ["--example", "web_os"] : [];
   const features = targetPkg === "gpui_web" ? [] : ["web"];
   const profileDir = useLto ? "web-lto" : release ? "web" : "debug";
+  const cargoTargetDir = resolveCargoTargetDir();
   const wasmSrc = targetPkg === "aphrody_desktop"
-    ? join("target", "wasm32-unknown-unknown", profileDir, "examples", `${entryName}.wasm`)
-    : join("target", "wasm32-unknown-unknown", profileDir, `${entryName}.wasm`);
+    ? join(cargoTargetDir, "wasm32-unknown-unknown", profileDir, "examples", `${entryName}.wasm`)
+    : join(cargoTargetDir, "wasm32-unknown-unknown", profileDir, `${entryName}.wasm`);
 
   mkdirSync(outRoot, { recursive: true });
   const reports: Record<string, WasmAuditReport> = {};
@@ -546,12 +583,13 @@ if (command === "matrix" || command === "audit") {
   const wgVersion = verifyBindgenVersion();
   console.log(`Verified wasm-bindgen ${wgVersion} == Cargo.lock`);
   runCargoWasm(
-    ["gpui", "gpui_web", "gpui_wgpu", "gpui_platform", "gpui_ui", "gpui_code", "aphrody_session", "aphrody_craft", "aphrody_ui", "nsh-core", "nsh-platform-web"],
+    ["gpui", "gpui_web", "gpui_wgpu", "gpui_platform", "gpui_ui", "gpui_code", "gpui-base", "gpui-kit-assets", "gpui-component", "gpui-kit", "aphrody_session", "aphrody_craft", "aphrody_ui", "nsh-core", "nsh-platform-web"],
     [],
     [],
     "",
     "check",
   );
+  runCargoWasm(["gpui_ui"], ["material3"], [], "", "check");
   runCargoWasm(["aphrody_desktop"], ["web"], ["--example", "web_os"], "", "check");
   if (existsSync(resolve(repoRoot, "crates/aphrody_store/Cargo.toml"))) {
     runCargoWasm(["aphrody_store"], ["web"], [], "", "check");
