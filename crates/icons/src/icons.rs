@@ -128,6 +128,7 @@ pub enum IconName {
     EyeOff,
     FastForward,
     FastForwardOff,
+    FastForwardUltrafast,
     Figma,
     File,
     FileCode,
