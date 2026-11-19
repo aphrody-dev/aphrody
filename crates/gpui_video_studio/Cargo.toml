@@ -1,0 +1,27 @@
+[package]
+name = "gpui_video_studio"
+version = "0.1.0"
+publish.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+description = "Headless video studio for agents: GPUI views rendered offscreen with wgpu, encoded to H.264 MP4 with FilmCraft's pure-Rust craft-video and craft-media, then checked frame by frame against the encoder's reconstruction."
+
+[lib]
+doctest = false
+
+[[bin]]
+name = "gpui-video"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+gpui.workspace = true
+gpui_wgpu = { workspace = true, features = ["test-support"] }
+craft-media = { workspace = true, features = ["isobmff"] }
+craft-video = { workspace = true, features = ["h264", "threads"] }
+rayon.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+
+[lints]
+workspace = true
