@@ -4982,6 +4982,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-media"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "craft-mesh"
 version = "0.1.0"
 dependencies = [
@@ -5200,6 +5207,16 @@ dependencies = [
  "flate2",
  "serde",
  "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "craft-video"
+version = "0.1.0"
+dependencies = [
+ "craft-media",
+ "rav1e",
+ "rayon",
  "thiserror 2.0.21",
 ]
 
@@ -10497,6 +10514,20 @@ dependencies = [
  "anyhow",
  "log",
  "which 8.0.5",
+]
+
+[[package]]
+name = "gpui_video_studio"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "craft-media",
+ "craft-video",
+ "gpui",
+ "gpui_wgpu",
+ "rayon",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -30796,7 +30827,7 @@ dependencies = [
 
 [[package]]
 name = "zed"
-version = "1.30.0"
+version = "1.31.0"
 dependencies = [
  "acp_thread",
  "acp_tools",

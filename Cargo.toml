@@ -103,6 +103,7 @@ members = [
     "crates/gpui_shared_string",
     "crates/gpui_tokio",
     "crates/gpui_util",
+    "crates/gpui_video_studio",
     "crates/gpui_web",
     "crates/gpui_wgpu",
     "crates/gpui_windows",
@@ -1406,6 +1407,7 @@ craft-macho = { path = "vendor/craft-libs/crates/macho" }
 craft-materialx = { path = "vendor/craft-libs/crates/materialx" }
 craft-math = { path = "vendor/craft-libs/crates/math" }
 craft-mcmat = { path = "vendor/craft-libs/crates/mcmat" }
+craft-media = { path = "vendor/craft-libs/crates/media", default-features = false }
 craft-mesh = { path = "vendor/craft-libs/crates/mesh" }
 craft-midi = { path = "vendor/craft-libs/crates/midi" }
 craft-ora = { path = "vendor/craft-libs/crates/ora" }
@@ -1425,6 +1427,7 @@ craft-tga = { path = "vendor/craft-libs/crates/tga" }
 craft-timeline = { path = "vendor/craft-libs/crates/timeline" }
 craft-usd = { path = "vendor/craft-libs/crates/usd" }
 craft-vectorcraft-format = { path = "vendor/craft-libs/crates/vectorcraft-format" }
+craft-video = { path = "vendor/craft-libs/crates/video" }
 craft-wordmodel = { path = "vendor/craft-libs/crates/wordmodel" }
 craft-xcf = { path = "vendor/craft-libs/crates/xcf" }
 craft-xlsx = { path = "vendor/craft-libs/crates/xlsx" }
