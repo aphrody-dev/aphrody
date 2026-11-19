@@ -1,5 +1,5 @@
 ---
-name: modern-web-guidance
+name: aphrody-web-guidance
 description: GoogleChrome/modern-web-guidance-src Baseline web standards, Coherence Auditor, and modern CSS/WebGPU/Wasm checks for Aphrody web & NSH applications.
 ---
 
