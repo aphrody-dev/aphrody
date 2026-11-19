@@ -1,0 +1,73 @@
+name: Aphrody Material 3 Compose Tracker & Converter
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run tracker and converter verification without opening a PR"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: aphrody-m3-compose-tracker
+  cancel-in-progress: true
+
+jobs:
+  track-and-convert:
+    name: Track Compose M3 + Convert GPU/GPUI-Kit/NSH
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Track upstream Compose Material 3 Maven & Figma Design Kit metadata
+        run: bun tooling/bun/m3-compose-tracker.ts track --json
+
+      - name: Convert canonical tokens & specs to GPU WGSL, GPUI Kit, NSH TSX, and Figma DTCG
+        run: bun tooling/bun/m3-compose-tracker.ts convert --json
+
+      - name: Verify converted outputs & repo hygiene
+        run: |
+          bun tooling/bun/m3-compose-tracker.ts prove --skip-cargo --json
+          bun tooling/bun/repo-hygiene.ts
+
+      - name: Check for updates
+        id: diff
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open automatic Material 3 sync PR
+        if: steps.diff.outputs.changed == 'true' && inputs.dry_run != true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="sync/m3-compose-auto"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add assets/os/m3_compose_tracker_lock.toml assets/os/m3_compose_catalog.json aphrody/docs/design/kits/figma-m3-1035203688168086460-dtcg.json templates/m3-gpui-nsh
+          git commit -m "chore(m3): track upstream Compose Material 3 and regenerate GPU/GPUI-Kit/NSH targets"
+          git push -f origin "$BRANCH"
+          gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number' | grep -q . || \
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "Material 3 Compose automatic tracker & GPU/GPUI-Kit/NSH sync" \
+              --label "upstream-sync,auto-merge" \
+              --body "Automated Material 3 Compose tracker sync and deterministic GPU WGSL / GPUI Kit / NSH TSX / Figma DTCG regeneration.\n\nRelease Notes:\n\n- Improved Material 3 Compose tracker lockfile and generated GPU/GPUI-Kit/NSH starter kits."

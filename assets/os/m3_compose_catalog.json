@@ -1,0 +1,249 @@
+{
+  "schema": "aphrody.m3.compose_converter_catalog.v1",
+  "tracker": {
+    "material3Stable": "1.5.0",
+    "material3Latest": "1.6.0-alpha01",
+    "material3RippleStable": "1.5.0",
+    "composeBom": "2026.11.01",
+    "jetbrainsComposeM3": "1.13.0-rc01",
+    "sha256Stamp": "fbb8e2d603015b5c483c0ae47292f274c05fbf9933c432fb8f42feedc4b12a43"
+  },
+  "sources": {
+    "composeBlog": "https://m3.material.io/blog/compose-material-3-is-stable",
+    "parametricBlog": "https://m3.material.io/blog/enhance-your-component-designs-with-parametric-prototyping",
+    "releaseNotes": "https://developer.android.com/jetpack/androidx/releases/compose-material3",
+    "figmaKitFileId": "1035203688168086460",
+    "figmaKitUrl": "https://www.figma.com/community/file/1035203688168086460/material-3-design-kit",
+    "mavenMaterial3": "https://dl.google.com/dl/android/maven2/androidx/compose/material3/material3/maven-metadata.xml",
+    "mavenRipple": "https://dl.google.com/dl/android/maven2/androidx/compose/material3/material3-ripple/maven-metadata.xml",
+    "mavenBom": "https://dl.google.com/dl/android/maven2/androidx/compose/compose-bom/maven-metadata.xml",
+    "mavenWindowSize": "https://dl.google.com/dl/android/maven2/androidx/compose/material3/material3-window-size-class/maven-metadata.xml",
+    "mavenJetBrainsM3": "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/material3/material3/maven-metadata.xml"
+  },
+  "materialShapes35": [
+    "Circle",
+    "Square",
+    "Slanted",
+    "Arch",
+    "Fan",
+    "Arrow",
+    "SemiCircle",
+    "Oval",
+    "Pill",
+    "Triangle",
+    "Diamond",
+    "ClamShell",
+    "Pentagon",
+    "Gem",
+    "Sunny",
+    "VerySunny",
+    "Cookie4Sided",
+    "Cookie6Sided",
+    "Cookie7Sided",
+    "Cookie9Sided",
+    "Cookie12Sided",
+    "Ghostish",
+    "Clover4Leaf",
+    "Clover8Leaf",
+    "Burst",
+    "SoftBurst",
+    "Boom",
+    "SoftBoom",
+    "Flower",
+    "Puffy",
+    "PuffyDiamond",
+    "PixelCircle",
+    "PixelTriangle",
+    "Bun",
+    "Heart"
+  ],
+  "motionSchemes": {
+    "standard": {
+      "spatialFast": {
+        "stiffness": 1400,
+        "dampingRatio": 0.9
+      },
+      "spatialDefault": {
+        "stiffness": 700,
+        "dampingRatio": 0.9
+      },
+      "spatialSlow": {
+        "stiffness": 300,
+        "dampingRatio": 0.9
+      },
+      "effectsFast": {
+        "stiffness": 3800,
+        "dampingRatio": 1
+      },
+      "effectsDefault": {
+        "stiffness": 1600,
+        "dampingRatio": 1
+      },
+      "effectsSlow": {
+        "stiffness": 800,
+        "dampingRatio": 1
+      }
+    },
+    "expressive": {
+      "spatialFast": {
+        "stiffness": 800,
+        "dampingRatio": 0.6
+      },
+      "spatialDefault": {
+        "stiffness": 380,
+        "dampingRatio": 0.6
+      },
+      "spatialSlow": {
+        "stiffness": 200,
+        "dampingRatio": 0.6
+      },
+      "effectsFast": {
+        "stiffness": 3800,
+        "dampingRatio": 1
+      },
+      "effectsDefault": {
+        "stiffness": 1600,
+        "dampingRatio": 1
+      },
+      "effectsSlow": {
+        "stiffness": 800,
+        "dampingRatio": 1
+      }
+    }
+  },
+  "modes": [
+    "light",
+    "dark",
+    "neural_obsidian",
+    "oled_pitch"
+  ],
+  "shapesPx": {
+    "none_px": 0,
+    "extra_small_px": 4,
+    "small_px": 8,
+    "medium_px": 12,
+    "large_px": 16,
+    "large_increased_px": 20,
+    "extra_large_px": 28,
+    "full_px": 9999
+  },
+  "wgsl": {
+    "path": "assets/shaders/m3_expressive.wgsl",
+    "bytes": 7127,
+    "sha256": "cf49e9abed4ef84c2209aed5c05b0a3f07826d1025bf1bb396651e0900c78523"
+  },
+  "components": [
+    {
+      "compose": "MaterialExpressiveTheme",
+      "gpuWgsl": "ViewportUniform + M3Instance",
+      "gpuiKit": "M3ExpressiveThemeScope",
+      "nshTsx": "M3ExpressiveProvider",
+      "figmaGroup": "02_Sys/Color+Motion"
+    },
+    {
+      "compose": "material3-ripple:1.5.0 (Inset Focus Rings)",
+      "gpuWgsl": "fs_main flags bit0 inset ring",
+      "gpuiKit": "M3RippleThemeConfig",
+      "nshTsx": "M3FocusRing",
+      "figmaGroup": "02_Sys/State"
+    },
+    {
+      "compose": "ToggleButton / Elevated / FilledTonal / Outlined",
+      "gpuWgsl": "widget_meta.x=1 morph",
+      "gpuiKit": "M3ToggleButton",
+      "nshTsx": "M3ToggleButton",
+      "figmaGroup": "Components/Buttons"
+    },
+    {
+      "compose": "SplitButton",
+      "gpuWgsl": "widget_meta.x=5",
+      "gpuiKit": "M3SplitButton",
+      "nshTsx": "M3SplitButton",
+      "figmaGroup": "Components/Buttons"
+    },
+    {
+      "compose": "ButtonGroup (animateWidth compressionLimit)",
+      "gpuWgsl": "widget_meta.x=5",
+      "gpuiKit": "M3ButtonGroup",
+      "nshTsx": "M3ButtonGroup",
+      "figmaGroup": "Components/Buttons"
+    },
+    {
+      "compose": "FloatingToolbar / HorizontalFloatingToolbar",
+      "gpuWgsl": "widget_meta.x=0 elevated pill",
+      "gpuiKit": "M3FloatingToolbar",
+      "nshTsx": "M3FloatingToolbar",
+      "figmaGroup": "Components/Toolbars"
+    },
+    {
+      "compose": "WavyLinearProgressIndicator",
+      "gpuWgsl": "sdf_wavy_linear (kind=2)",
+      "gpuiKit": "M3WavyLinearProgressIndicator",
+      "nshTsx": "M3WavyLinearProgress",
+      "figmaGroup": "Components/Progress"
+    },
+    {
+      "compose": "WavyCircularProgressIndicator",
+      "gpuWgsl": "sdf_wavy_circular (kind=3)",
+      "gpuiKit": "M3WavyCircularProgressIndicator",
+      "nshTsx": "M3WavyCircularProgress",
+      "figmaGroup": "Components/Progress"
+    },
+    {
+      "compose": "Segmented ListItem / InteractiveListItem",
+      "gpuWgsl": "widget_meta.x=0 segmented",
+      "gpuiKit": "M3SegmentedListItem",
+      "nshTsx": "M3SegmentedListItem",
+      "figmaGroup": "Components/Lists"
+    },
+    {
+      "compose": "Slider(SliderState) / RangeSlider(RangeSliderState)",
+      "gpuWgsl": "widget_meta.x=4",
+      "gpuiKit": "M3StatefulSlider / M3StatefulRangeSlider",
+      "nshTsx": "M3StatefulSlider",
+      "figmaGroup": "Components/Sliders"
+    },
+    {
+      "compose": "TextField / OutlinedTextField / SecureTextField(System)",
+      "gpuWgsl": "widget_meta.x=0 cutout",
+      "gpuiKit": "M3ExpressiveTextField",
+      "nshTsx": "M3ExpressiveTextField",
+      "figmaGroup": "Components/TextFields"
+    },
+    {
+      "compose": "SelectableDropdownMenuItem / CheckableDropdownMenuItem",
+      "gpuWgsl": "widget_meta.x=0",
+      "gpuiKit": "M3ExpressiveMenuItem",
+      "nshTsx": "M3ExpressiveMenuItem",
+      "figmaGroup": "Components/Menus"
+    },
+    {
+      "compose": "Scrim + Deterministic BottomSheet anchors",
+      "gpuWgsl": "widget_meta.x=6 blur/scrim",
+      "gpuiKit": "M3Scrim + M3BottomSheetAnchor",
+      "nshTsx": "M3Scrim",
+      "figmaGroup": "Components/Sheets"
+    },
+    {
+      "compose": "VibrantTimePickerDialog + ScrollField",
+      "gpuWgsl": "widget_meta.x=0+1",
+      "gpuiKit": "M3VibrantTimePicker + M3ScrollField",
+      "nshTsx": "M3VibrantTimePicker",
+      "figmaGroup": "Components/Pickers"
+    },
+    {
+      "compose": "MaterialShapes (35) + LoadingIndicator",
+      "gpuWgsl": "sdf_material_polygon (kind=1)",
+      "gpuiKit": "M3MaterialShape::ALL_35 + M3LoadingIndicator",
+      "nshTsx": "M3LoadingIndicator",
+      "figmaGroup": "02_Sys/Shape"
+    },
+    {
+      "compose": "Parametric Prototyping (6 Strategies)",
+      "gpuWgsl": "uniform live params",
+      "gpuiKit": "M3ParametricPrototyperView",
+      "nshTsx": "M3ParametricPrototyper",
+      "figmaGroup": "Variables/Presets"
+    }
+  ]
+}

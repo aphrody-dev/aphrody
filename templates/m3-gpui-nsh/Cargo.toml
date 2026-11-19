@@ -1,0 +1,8 @@
+[package]
+name = "m3-gpui-nsh-starter"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+gpui_ui = { path = "../../crates/gpui_ui", features = ["material3", "nsh"] }

@@ -23,8 +23,29 @@ pub use gpui_component::material3::{
     M3OutlinedCard, M3SearchBar, M3SegmentItem, M3SegmentedButtonBar, M3ShapeTokens, M3SpringSpec,
     M3SpringToken, M3StateLayerTokens, M3TonalButton, M3TopAppBar, M3TopAppBarVariant,
     M3TypographyScale, M3WindowSizeClass, active_m3_theme, apply_m3_theme,
+    compose15::{
+        self, COMPOSE_BOM_VERSION, COMPOSE_M3_BLOG_URL, COMPOSE_M3_VERSION, COMPOSE_VERSION,
+        FIGMA_M3_DESIGN_KIT_FILE_ID, FIGMA_M3_DESIGN_KIT_URL, M3_EXPRESSIVE_WGSL,
+        M3_PARAMETRIC_BLOG_URL, M3BottomSheetAnchor, M3ButtonGroup, M3ButtonGroupItem,
+        M3ButtonSize, M3Compose15Catalog, M3ComposeParityEntry, M3ExpressiveMenuItem,
+        M3ExpressiveRuntimeConfig, M3ExpressiveTextField, M3ExpressiveThemeScope,
+        M3FloatingToolbar, M3FloatingToolbarColor, M3LabelPosition, M3ListVerticalAlignment,
+        M3LoadingIndicator, M3MaterialShape, M3MenuItemSelectionKind, M3MotionScheme,
+        M3PopupAnchor, M3RangeSliderState, M3RippleThemeConfig, M3Scrim, M3ScrollField,
+        M3SegmentPosition, M3SegmentedListItem, M3SliderState, M3SplitButton,
+        M3StatefulRangeSlider, M3StatefulSlider, M3TextObfuscationMode, M3TimePickerDisplayMode,
+        M3ToggleButton, M3ToggleButtonVariant, M3VibrantTimePicker,
+        M3WavyCircularProgressIndicator, M3WavyLinearProgressIndicator,
+        active_m3_expressive_config, apply_m3_expressive_theme,
+        m3_typography_with_default_font_family,
+    },
     m3_accessible_foreground, m3_contrast_ratio, m3_hsla_to_hex, m3_manifest_metadata,
     m3_meets_wcag_aa, m3_motion_tokens, m3_theme_config, m3_verify_mode_contrast,
+    parametric::{
+        self, M3ParamPreset, M3ParamTarget, M3ParamTetherRules, M3ParametricPrototyperView,
+        M3ParametricState, M3ParametricVariables, M3SpecOverlayConfig, M3SweetSpotCell,
+        M3SweetSpotGrid, M3SweetSpotVerdict,
+    },
 };
 pub use gpui_fps;
 pub use gpui_kit;
@@ -720,5 +741,41 @@ mod tests {
         assert!(cx.debug_bounds("outlined-card").is_some());
         assert!(cx.debug_bounds("rail").is_some());
         assert!(cx.debug_bounds("nav-bar").is_some());
+    }
+
+    #[gpui::test]
+    fn kit_proves_compose15_and_parametric_prototyper_end_to_end(cx: &mut TestAppContext) {
+        let scope = M3ExpressiveThemeScope::new(M3AppearanceMode::NeuralObsidian)
+            .motion_scheme(M3MotionScheme::Expressive)
+            .default_font_family("Google Sans Flex");
+
+        cx.update(|cx| {
+            theme::init(LoadThemes::JustBase, cx);
+            gpui_component::init(cx);
+            apply_m3_expressive_theme(&scope, cx);
+            apply_kit_m3_theme(M3AppearanceMode::NeuralObsidian, cx);
+
+            let catalog = M3Compose15Catalog::canonical();
+            assert_eq!(catalog.material3_version, "1.5.0");
+            assert_eq!(catalog.compose_bom, "2026.11.01");
+            assert_eq!(catalog.figma_kit_file_id, "1035203688168086460");
+            assert_eq!(catalog.material_shapes_count, 35);
+            assert!(M3_EXPRESSIVE_WGSL.contains("fn sdf_material_polygon"));
+            assert_eq!(
+                active_m3_expressive_config(cx).motion_scheme,
+                M3MotionScheme::Expressive
+            );
+            assert!(active_m3_expressive_config(cx).ripple.inset_focus_ring_enabled);
+        });
+
+        let (view, cx) = cx.add_window_view(|_, cx| M3ParametricPrototyperView::new(cx));
+        cx.update(|window, cx| {
+            window.draw(cx).clear(cx);
+        });
+        assert!(cx.debug_bounds("m3-parametric-prototyper").is_some());
+        let dtcg = view
+            .read_with(cx, |v, _| v.state().export_figma_dtcg_json())
+            .expect("Figma DTCG export must succeed");
+        assert!(dtcg.contains("1035203688168086460"));
     }
 }

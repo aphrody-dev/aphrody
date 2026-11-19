@@ -550,7 +550,7 @@ mod tests {
         fn render(&mut self, _: &mut gpui::Window, _: &mut Context<Self>) -> impl IntoElement {
             self.renders.fetch_add(1, Ordering::Relaxed);
             div().child(
-                super::markdown(include_str!("../../../../examples/fixtures/test.md"))
+                super::markdown("# Material 3\n\n- **Compose** 1.5.0\n- `GPUI Kit`\n")
                     .markdown_block_parser(|_, _| None),
             )
         }

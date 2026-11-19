@@ -498,3 +498,34 @@ economy_paper_opacity = 0.96
 rim_width_dp = 1.5
 card_radius_px = 28
 pill_radius_px = 9999
+
+[compose_m3]
+version = "1.5.0"
+compose_version = "1.13.0"
+compose_bom = "2026.11.01"
+published_date = "2026-11-18"
+blog_url = "https://m3.material.io/blog/compose-material-3-is-stable"
+release_notes_url = "https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0"
+experimental_annotations_before = 120
+experimental_annotations_after = 58
+material2_deprecated = true
+material_shapes_count = 35
+ripple_artifact = "androidx.compose.material3:material3-ripple:1.5.0"
+inset_focus_ring_enabled = true
+inset_focus_ring_inset_px = 2.0
+inset_focus_ring_thickness_px = 3.0
+wavy_wavelength_px = 24.0
+wavy_amplitude_px = 3.5
+wgsl_shader_path = "assets/shaders/m3_expressive.wgsl"
+
+[figma_design_kit]
+file_id = "1035203688168086460"
+name = "Material 3 Design Kit"
+url = "https://www.figma.com/community/file/1035203688168086460/material-3-design-kit"
+dtcg_kit_path = "aphrody/docs/design/kits/figma-design-kit.json"
+
+[parametric_prototyping]
+published_date = "2026-11-16"
+blog_url = "https://m3.material.io/blog/enhance-your-component-designs-with-parametric-prototyping"
+strategies = ["map_sweet_spots", "fine_tune_parameters", "group_and_tether_parameters", "spec_overlays", "presets_and_json_export", "seeded_randomize"]
+flagship_targets = ["vibrant_time_picker", "scroll_field", "toggle_button", "split_button", "floating_toolbar", "segmented_list_item", "wavy_progress"]

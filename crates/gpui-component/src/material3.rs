@@ -35,6 +35,9 @@ use crate::{
     v_flex,
 };
 
+pub mod compose15;
+pub mod parametric;
+
 /// Authoritative URL for Google Design / Material 3 Expressive tokens.
 pub const M3_DESIGN_SOURCE_OF_TRUTH: &str = brand::design::SOURCE_OF_TRUTH;
 

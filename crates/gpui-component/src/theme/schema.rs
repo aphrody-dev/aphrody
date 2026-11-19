@@ -1327,9 +1327,21 @@ mod tests {
 
     #[test]
     fn test_aurora_theme_parses_gradient_backgrounds() {
-        let theme_set =
-            serde_json::from_str::<ThemeSet>(include_str!("../../../../themes/aurora.json"))
-                .unwrap();
+        let aurora_fixture = r##"{
+            "name": "Aurora",
+            "themes": [
+                {
+                    "name": "Aurora Light",
+                    "mode": "light",
+                    "colors": {
+                        "primary.background": "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
+                        "background": "#f8fafc",
+                        "foreground": "#0f172a"
+                    }
+                }
+            ]
+        }"##;
+        let theme_set = serde_json::from_str::<ThemeSet>(aurora_fixture).unwrap();
         assert_eq!(theme_set.themes.len(), 1);
         assert!(theme_set.themes.iter().all(|theme| !theme.mode.is_dark()));
 

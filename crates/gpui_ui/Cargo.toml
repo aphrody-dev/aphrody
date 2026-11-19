@@ -33,6 +33,7 @@ kit = [
     "dep:gpui-kit-assets",
     "dep:gpui-fps",
 ]
+material3 = ["kit"]
 nsh = [
     "desktop",
     "dep:nsh-core",

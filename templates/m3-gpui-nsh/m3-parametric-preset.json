@@ -1,0 +1,33 @@
+{
+  "schema": "aphrody.m3.parametric_preset.v1",
+  "compose_m3_version": "1.5.0",
+  "compose_bom": "2026.11.01",
+  "figma_design_kit_file_id": "1035203688168086460",
+  "figma_design_kit_url": "https://www.figma.com/community/file/1035203688168086460/material-3-design-kit",
+  "preset_id": "expressive_time_picker",
+  "target": "vibrant_time_picker",
+  "variables": {
+    "corner_radius_px": 20,
+    "padding_px": 18,
+    "container_height_px": 48,
+    "type_size_px": 14,
+    "wave_amplitude_px": 3.5,
+    "wave_wavelength_px": 24,
+    "progress": 0.68,
+    "shape_index": 19,
+    "mode": "neural_obsidian",
+    "motion_scheme": "expressive",
+    "time_picker_mode": "scroll"
+  },
+  "tethers": {
+    "clamp_radius_to_half_height": true,
+    "tether_padding_to_height": true,
+    "enforce_wcag_aa": true
+  },
+  "overlays": {
+    "show_keylines": false,
+    "show_color_tokens": true,
+    "show_measurements": true,
+    "show_sweet_spot_grid": false
+  }
+}

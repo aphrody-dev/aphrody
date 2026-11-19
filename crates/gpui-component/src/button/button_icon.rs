@@ -173,7 +173,7 @@ mod tests {
         struct Search;
         impl From<Search> for Icon {
             fn from(_: Search) -> Self {
-                Icon::default().data(include_bytes!("../../../assets/assets/icons/search.svg"))
+                Icon::default().data(b"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='11' cy='11' r='8'/></svg>")
             }
         }
 

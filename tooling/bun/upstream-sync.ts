@@ -369,6 +369,7 @@ export function normalizeGpuiKitManifest(rawToml: string, crateDirName: string):
     .replace(/\bsum-tree\.workspace\s*=\s*true\b/g, "sum_tree.workspace = true")
     .replace(/\bropey\.workspace\s*=\s*true\b/g, "ropey_kit.workspace = true")
     .replace(/\bmarkdown\.workspace\s*=\s*true\b/g, "markdown-rs.workspace = true")
+    .replace(/\blsp-types\.workspace\s*=\s*true\b/g, "lsp_types_kit.workspace = true")
     .replace(/^markdown\s*=\s*\{[^\n]*\}\s*$/gm, "markdown-rs.workspace = true")
     .replace(/\breqwest\s*=\s*\{\s*workspace\s*=\s*true\s*\}/g, "reqwest.workspace = true")
     .replace(/\btracing\.workspace\s*=\s*true\b/g, "log.workspace = true")
@@ -490,6 +491,11 @@ export function normalizeGpuiKitManifest(rawToml: string, crateDirName: string):
     out = out.replace(/\[\[bench\]\][\s\S]*?(?=\r?\n\[|$)/g, "");
   }
 
+  // Ensure gpui-component keeps `brand.workspace = true` for Material 3 design tokens
+  if (crateDirName === "component" && !/^\s*brand\.workspace\s*=\s*true\s*$/m.test(out)) {
+    out = out.replace(/^(\[dependencies\]\r?\n)/m, "$1brand.workspace = true\n");
+  }
+
   return out;
 }
 
@@ -509,10 +515,16 @@ export function normalizeGpuiKitSource(rawRust: string, relFile: string): string
       }
     }
   }
-  if (relFile === "src/lib.rs" && (out.includes("markdown::") || out.includes("use markdown")) && !out.includes("extern crate markdown_rs as markdown")) {
+  if (relFile === "src/lib.rs" && (out.includes("markdown::") || out.includes("use markdown") || out.includes("pub mod text")) && !out.includes("extern crate markdown_rs as markdown")) {
     out = out.replace(/(#!(?:\[[^\]]+\])[\s\S]*?\r?\n\r?\n|(?:^\/\/!.*\r?\n)+)/, "$1extern crate markdown_rs as markdown;\n\n");
     if (!out.includes("extern crate markdown_rs as markdown;")) {
       out = `extern crate markdown_rs as markdown;\n\n${out}`;
+    }
+  }
+  if (relFile === "src/lib.rs" && (out.includes("pub mod input") || out.includes("lsp_types")) && !out.includes("extern crate lsp_types_kit as lsp_types")) {
+    out = out.replace(/(#!(?:\[[^\]]+\])[\s\S]*?\r?\n\r?\n|(?:^\/\/!.*\r?\n)+)/, "$1extern crate lsp_types_kit as lsp_types;\n\n");
+    if (!out.includes("extern crate lsp_types_kit as lsp_types;")) {
+      out = `extern crate lsp_types_kit as lsp_types;\n\n${out}`;
     }
   }
   return out;
@@ -543,9 +555,18 @@ export function syncGpuiKitFromClone(root: string, cloneDir: string, dryRun = fa
       continue;
     }
 
-    // Preserve Aphrody-authored native material3 files if present
+    // Preserve Aphrody-authored native material3 files and sibling submodule directory if present
     const preservedM3File = join(dst, "src", "material3.rs");
+    const preservedM3Dir = join(dst, "src", "material3");
     const preservedM3Content = existsSync(preservedM3File) ? readFileSync(preservedM3File, "utf8") : null;
+    const preservedM3Subfiles: Array<[string, string]> = [];
+    if (existsSync(preservedM3Dir)) {
+      for (const entry of readdirSync(preservedM3Dir, { withFileTypes: true })) {
+        if (entry.isFile() && entry.name.endsWith(".rs")) {
+          preservedM3Subfiles.push([entry.name, readFileSync(join(preservedM3Dir, entry.name), "utf8")]);
+        }
+      }
+    }
 
     rmSync(dst, { recursive: true, force: true });
     mkdirSync(dst, { recursive: true });
@@ -579,12 +600,27 @@ export function syncGpuiKitFromClone(root: string, cloneDir: string, dryRun = fa
 
     if (preservedM3Content !== null) {
       writeFileSync(preservedM3File, preservedM3Content, "utf8");
+      if (preservedM3Subfiles.length > 0) {
+        mkdirSync(preservedM3Dir, { recursive: true });
+        for (const [name, content] of preservedM3Subfiles) {
+          writeFileSync(join(preservedM3Dir, name), content, "utf8");
+        }
+      }
       const libPath = join(dst, "src", "lib.rs");
       if (existsSync(libPath)) {
-        const lib = readFileSync(libPath, "utf8");
+        let lib = readFileSync(libPath, "utf8");
         if (!lib.includes("pub mod material3;")) {
-          writeFileSync(libPath, `${lib.trimEnd()}\npub mod material3;\n`, "utf8");
+          lib = `${lib.trimEnd()}\npub mod material3;\n`;
         }
+        if (dstRel === "crates/gpui-component") {
+          if (!lib.includes("material3::init(cx);")) {
+            lib = lib.replace(/theme::init\(cx\);/, "theme::init(cx);\n    material3::init(cx);");
+          }
+          if (!lib.includes("pub use material3::{")) {
+            lib = `${lib.trimEnd()}\npub use material3::{\n    M3ActiveTheme, M3AppearanceMode, M3SpringToken, active_m3_theme, apply_m3_theme,\n    m3_theme_config,\n};\n`;
+          }
+        }
+        writeFileSync(libPath, lib, "utf8");
       }
     }
 
@@ -694,6 +730,9 @@ export function syncNshFromClone(root: string, cloneDir: string, dryRun = false)
       if (oldCargo && oldCargo.includes("publish.workspace = true")) {
         toml = toml.replace(/^publish\s*=\s*false\s*$/m, "publish.workspace = true");
       }
+      if (dst.endsWith("nsh-base") && !/^\s*brand\.workspace\s*=\s*true\s*$/m.test(toml)) {
+        toml = toml.replace(/^(\[dependencies\]\r?\n)/m, "$1brand.workspace = true\n");
+      }
       if (!/\[lints\]\s*\r?\nworkspace\s*=\s*true/.test(toml)) {
         toml = toml.replace(/(\[package\][\s\S]*?)(\r?\n\[)/, "$1\n\n[lints]\nworkspace = true\n$2");
       }
@@ -740,14 +779,10 @@ export function syncNshFromClone(root: string, cloneDir: string, dryRun = false)
   copyOne(join(cloneDir, "crates", "gpui", "nsh-gpui-host"), join(root, "crates", "nsh-gpui-host"));
 
   if (!dryRun) {
-    const cfg = readProductUpstreamConfig(root);
     const docsSrc = join(cloneDir, "docs");
-    if (existsSync(docsSrc)) {
-      mkdirSync(join(root, "docs", "nsh"), { recursive: true });
-      cpSync(docsSrc, join(root, "docs", "nsh"), { recursive: true });
-      const pluginDocs = join(root, ".agents", "plugins", cfg.pluginName, "docs", "nsh");
-      mkdirSync(pluginDocs, { recursive: true });
-      cpSync(docsSrc, pluginDocs, { recursive: true });
+    const canonicalNshDocs = join(root, "aphrody", "docs", "nsh");
+    if (existsSync(docsSrc) && existsSync(canonicalNshDocs)) {
+      cpSync(docsSrc, canonicalNshDocs, { recursive: true });
     }
   }
 

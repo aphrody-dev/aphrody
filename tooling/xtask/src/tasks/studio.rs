@@ -66,6 +66,11 @@ pub struct StudioStatusReport {
 
 const CONSOLIDATED_CRATES: &[(&str, &str, Option<&str>)] = &[
     ("aphrody_ui", "crates/aphrody_ui/Cargo.toml", None),
+    (
+        "gpui_ui",
+        "crates/gpui_ui/Cargo.toml",
+        Some("crates/gpui_ui/examples/m3_compose15_showcase.rs"),
+    ),
     ("aphrody_craft", "crates/aphrody_craft/Cargo.toml", None),
     (
         "aphrody_design",
