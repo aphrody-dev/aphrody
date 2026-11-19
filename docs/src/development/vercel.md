@@ -4,7 +4,7 @@ Aphrody documents official [`github.com/vercel/vercel-plugin`](https://github.co
 
 ## Official Skills & MCP
 
-- Core Vercel deployment skills (`deploy-to-vercel`, `vercel-cli`, `vercel-cli-with-tokens`, `deployments-cicd`, `env-vars`, `vercel-optimize`, `web-design-guidelines`) are synced in `.agents/skills/` and `.agents/plugins/aphrody/skills/`, with full 47-skill + knowledge-graph digests in `~/.gemini/plugins/vercel/` and `~/.gemini/brain/vercel/`.
+- Core Vercel deployment skills (`deploy-to-vercel`, `vercel-cli`, `vercel-cli-with-tokens`, `deployments-cicd`, `env-vars`, `vercel-optimize`, `web-design-guidelines`) are owned by `aphrody-labs/ay-vercel` (`skills/`, upstream `skill-repos/vercel-plugin`) and are not vendored here; the `vercel-brain` digests live in `~/.gemini/plugins/vercel/` and `~/.gemini/brain/vercel/`.
 - Local offline Vercel auditor MCP (`vercel-brain` in `.agents/plugins/aphrody/mcp_config.json`) exposes `vercel_brain_search`, `vercel_graph_lookup`, `vercel_skills_list`, `vercel_project_audit`, and `vercel_cli_info`.
 - Official OAuth remote Vercel MCP (`https://mcp.vercel.com`) connects via `bun x vercel mcp`, and live markdown docs are searchable via `bun x vercel docs search "<query>"` and `https://vercel.com/llms.txt`.
 

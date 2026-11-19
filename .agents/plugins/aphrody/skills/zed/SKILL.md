@@ -43,8 +43,8 @@ description: >-
 
 ## References
 
-- [Zed Architecture & Dev Docs](../../docs/zed/SUMMARY.md)
+- [Zed Architecture & Dev Docs](../../../../../docs/src/SUMMARY.md)
 - [UI Checklist](../../docs/zed/development/ui-checklist.md)
-- [Extension Development](../../docs/zed/extensions.md)
-- [Brand Conformance](../../docs/conventions/CONVENTIONS.md)
+- [Extension Development](../../../../../docs/src/extensions.md)
+- [Brand Conformance](../../../../../docs/.conventions/CONVENTIONS.md)
 - Also see sibling skills: `zed-cherry-pick`, `aphrody-brand`, `gpui`, `gpui-test`, `gpui-bench`, `lint-creator`.

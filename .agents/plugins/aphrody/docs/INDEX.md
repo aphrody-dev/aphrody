@@ -15,11 +15,11 @@ Central reference hub for the `aphrody` plugin (`.agents/plugins/aphrody/`).
 | **Hardware IHV & SIMD** | [`nvidia`](../skills/nvidia/SKILL.md), [`amd`](../skills/amd/SKILL.md), [`intel`](../skills/intel/SKILL.md) | NVIDIA Ada `sm_89`/CUDA 13/NVTX3, AMD RDNA 3-4/AGS SDK/RGA, Intel Arc Xe/AVX-512/Level Zero/OpenCL/ISPC |
 | **Brand & GitHub Ops** | [`aphrody-brand`](../skills/aphrody-brand/SKILL.md), [`github-ops`](../skills/github-ops/SKILL.md) | `product.toml` -> `crates/brand` + `xtask brand`, GitHub Wiki, upstream sync, auto-merge |
 
-## Bundled Reference Trees (`docs/`)
+## Reference Trees
 
-- **Zed Development & Extensions**: [`docs/zed/SUMMARY.md`](zed/SUMMARY.md), [`docs/zed/development/ui-checklist.md`](zed/development/ui-checklist.md), [`docs/zed/extensions.md`](zed/extensions.md), [`docs/conventions/CONVENTIONS.md`](conventions/CONVENTIONS.md)
-- **WGPU & Naga v30 (`llms.txt` / `llms-full.txt`)**: [`docs/wgpu/llms.txt`](wgpu/llms.txt), [`docs/wgpu/llms-full.txt`](wgpu/llms-full.txt)
-- **Native Shell (NSH)**: [`docs/nsh/README.md`](nsh/README.md), [`docs/nsh/CONTEXT.md`](nsh/CONTEXT.md), [`docs/nsh/dev/`](nsh/dev)
+- **Zed Development & Extensions**: [`docs/src/SUMMARY.md`](../../../../docs/src/SUMMARY.md), [`docs/zed/development/ui-checklist.md`](zed/development/ui-checklist.md) (Aphrody checklist), [`docs/src/extensions.md`](../../../../docs/src/extensions.md), [`docs/.conventions/CONVENTIONS.md`](../../../../docs/.conventions/CONVENTIONS.md)
+- **WGPU & Naga v30 (`llms.txt` / `llms-full.txt`)**: [`aphrody/docs/wgpu/llms.txt`](../../../../aphrody/docs/wgpu/llms.txt), [`aphrody/docs/wgpu/llms-full.txt`](../../../../aphrody/docs/wgpu/llms-full.txt)
+- **Native Shell (NSH)**: [`aphrody/docs/nsh/README.md`](../../../../aphrody/docs/nsh/README.md), [`aphrody/docs/nsh/CONTEXT.md`](../../../../aphrody/docs/nsh/CONTEXT.md), [`aphrody/docs/nsh/dev/`](../../../../aphrody/docs/nsh/dev)
 - **GPUI Kit (`longbridge/gpui-component`)**: [`docs/gpui-kit/README.md`](gpui-kit/README.md), [`docs/gpui-kit/ARCHITECTURE.md`](gpui-kit/ARCHITECTURE.md), [`docs/gpui-kit/STYLING-AND-MOTION.md`](gpui-kit/STYLING-AND-MOTION.md), [`docs/gpui-kit/gpui-shell.md`](gpui-kit/gpui-shell.md)
 - **GPU Backend Specs & Examples**: [`aphrody/docs/gpu/`](../../../../aphrody/docs/gpu) (`vulkan`, `directx`, `webgpu`, `nvidia`, `amd`, `intel`) + [`../../examples/gpu/`](../../../../examples/gpu)
 - **Aphrody GPUI OS Crates & Manifests**: [`aphrody_session`](../../../../crates/aphrody_session/src/aphrody_session.rs), [`aphrody_ui`](../../../../crates/aphrody_ui/src/aphrody_ui.rs), [`aphrody_craft`](../../../../crates/aphrody_craft/src/aphrody_craft.rs), [`aphrody_desktop`](../../../../crates/aphrody_desktop/src/aphrody_desktop.rs), [`assets/os/`](../../../../assets/os)
