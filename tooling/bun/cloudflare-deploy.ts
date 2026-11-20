@@ -401,7 +401,7 @@ function deployWorkers(
 ): Array<{ worker: string; env: string; exitCode: number }> {
   const wrangler = resolveWranglerCmd();
   const dirs = [".cloudflare/aphrody-worker"];
-  const envs = onlyEnv !== undefined ? [onlyEnv] : allWorkers ? ["", "learn", "web"] : [""];
+  const envs = onlyEnv !== undefined ? [onlyEnv] : allWorkers ? ["", "web"] : [""];
   const results: Array<{ worker: string; env: string; exitCode: number }> = [];
   for (const rel of dirs) {
     for (const envName of envs) {

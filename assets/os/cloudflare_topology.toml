@@ -34,14 +34,7 @@ name = "aphrody-worker"
 config = ".cloudflare/aphrody-worker/wrangler.toml"
 env = ""
 cron = "*/15 * * * *"
-routes = [
-  "releases.aphrody.com/*",
-  "downloads.aphrody.com/*",
-  "aphrody.com/download*",
-  "docs.aphrody.com/*",
-  "aphrody.com/github",
-  "aphrody.com/r2-assets/*",
-]
+routes = []  # releases, downloads, docs, github, r2-assets and learn are ay-edge routes (aphrody-labs/ay ADR-0014)
 bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET", "EVENTS"]
 
 [[workers]]
@@ -50,14 +43,6 @@ config = ".cloudflare/aphrody-worker/wrangler.toml"
 env = "web"
 routes = ["web.aphrody.com/*", "aphrody.com/web*"]
 bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET"]
-
-[[workers]]
-name = "aphrody-learn"
-config = ".cloudflare/aphrody-worker/wrangler.toml"
-env = "learn"
-cron = "*/15 * * * *"
-routes = ["learn.aphrody.com/*"]
-bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET", "EVENTS"]
 
 [[workers]]
 name = "auto"
