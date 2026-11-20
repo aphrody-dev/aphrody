@@ -24,6 +24,7 @@ on:
           - preview
           - canary
           - nightly
+          - dev
       version:
         description: 'Override semver (defaults to tag or yyyy.mm.dd-sha)'
         required: false
