@@ -346,7 +346,7 @@ pub(crate) fn run_dev(cmd: DevSubcommand) -> Result<()> {
                 "facade_crate": "aphrody",
                 "ui_backends": ["gpui", "iced_gpui", "egui_gpui", "bevy_gpui", "tauri_gpui", "cosmic_gpui", "nsh"],
                 "storytold_repos": ledger.total_repositories,
-                "craft_libs_crates": ledger.craft_libs_crates_on_disk,
+                "craft_libs_crates": ledger.craft_libs_pinned_crates,
                 "cosmic_components": COSMIC_EPOCH_COMPONENTS.len(),
                 "store_targets": StoreTarget::ALL.len(),
             });

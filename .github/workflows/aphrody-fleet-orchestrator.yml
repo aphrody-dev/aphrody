@@ -98,7 +98,10 @@ jobs:
         shell: bash
         run: |
           bun run fleet:lb probe --local --json
-          bun run fleet:lb schedule --local --job "${{ github.event.inputs.job_kind || 'verify' }}" --shards 2 --json
+          # A runner below the job's min_free_mem_gb is rejected (exit 1); the smoke test asserts the plan shape, not runner capacity.
+          plan=$(bun run fleet:lb schedule --local --job "${{ github.event.inputs.job_kind || 'verify' }}" --shards 2 --json || true)
+          echo "$plan"
+          PLAN="$plan" bun -e 'const p = JSON.parse(process.env.PLAN ?? ""); if (!p.job || !Array.isArray(p.rankedCandidates) || !Array.isArray(p.rejected)) throw new Error("fleet:lb schedule returned a malformed plan");'
           bun run fleet:lb beacon --local --dry-run --json
       - name: Audit consolidated Cloudflare Worker
         if: matrix.os == 'ubuntu-latest'

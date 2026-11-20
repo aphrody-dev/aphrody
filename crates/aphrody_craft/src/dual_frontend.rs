@@ -384,7 +384,7 @@ pub fn render_gpui_studio_panel(session: &CraftStudioSession) -> AnyElement {
                     .child(
                         Label::new(format!(
                             "craft-libs crates: {} | GPUI build: {} us | egui tessellate: {} us | Bevy viewport: {} us",
-                            session.storytold_ledger.craft_libs_crates_on_disk,
+                            session.storytold_ledger.craft_libs_pinned_crates,
                             b.gpui_tree_build_us,
                             b.egui_tessellate_us,
                             b.bevy_viewport_us,

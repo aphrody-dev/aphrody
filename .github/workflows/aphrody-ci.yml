@@ -208,6 +208,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Brand check & Windows compilation
         shell: bash
+        env:
+          # Short CARGO_HOME keeps mullvadvpn-app git checkouts under MAX_PATH (path > 259 chars otherwise).
+          CARGO_HOME: C:\ch
         run: |
           cargo xtask brand check
           cargo test -j 4 -p brand
