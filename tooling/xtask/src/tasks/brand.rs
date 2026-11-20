@@ -1061,7 +1061,7 @@ mod tests {
                 stitch_url: "https://stitch.withgoogle.com/".into(),
                 sans_flex_family: "Google Sans Flex".into(),
                 design_md: "DESIGN.md".into(),
-                tokens_manifest: "assets/os/google_design_tokens.toml".into(),
+                tokens_manifest: "../fw/crates/fw-m3/tokens/google_design_tokens.toml".into(),
                 themes_manifest: "assets/os/themes.json".into(),
                 seed_hex: "#135B82".into(),
                 variant: "expressive".into(),

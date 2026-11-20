@@ -10,19 +10,19 @@
       "light": {
         "background": {
           "$type": "color",
-          "$value": "#F7F9FF"
+          "$value": "#FAF9F9"
         },
         "on_background": {
           "$type": "color",
-          "$value": "#161C24"
+          "$value": "#1F1F1F"
         },
         "surface": {
           "$type": "color",
-          "$value": "#F7F9FF"
+          "$value": "#FAF9F9"
         },
         "surface_dim": {
           "$type": "color",
-          "$value": "#D5DBE4"
+          "$value": "#DADADA"
         },
         "surface_bright": {
           "$type": "color",
@@ -34,39 +34,39 @@
         },
         "surface_container_low": {
           "$type": "color",
-          "$value": "#EEF3FA"
+          "$value": "#F2F2F2"
         },
         "surface_container": {
           "$type": "color",
-          "$value": "#E7EDF6"
+          "$value": "#ECECEC"
         },
         "surface_container_high": {
           "$type": "color",
-          "$value": "#E0E7F1"
+          "$value": "#E6E6E6"
         },
         "surface_container_highest": {
           "$type": "color",
-          "$value": "#D9E1EC"
+          "$value": "#E0E0E0"
         },
         "on_surface": {
           "$type": "color",
-          "$value": "#161C24"
+          "$value": "#1F1F1F"
         },
         "on_surface_variant": {
           "$type": "color",
-          "$value": "#3D4754"
+          "$value": "#464646"
         },
         "outline": {
           "$type": "color",
-          "$value": "#6E7886"
+          "$value": "#777777"
         },
         "outline_variant": {
           "$type": "color",
-          "$value": "#BEC7D4"
+          "$value": "#C6C6C6"
         },
         "primary": {
           "$type": "color",
-          "$value": "#006399"
+          "$value": "#1A73E8"
         },
         "on_primary": {
           "$type": "color",
@@ -132,63 +132,63 @@
       "dark": {
         "background": {
           "$type": "color",
-          "$value": "#0E141B"
+          "$value": "#0F0F0F"
         },
         "on_background": {
           "$type": "color",
-          "$value": "#E0E6F0"
+          "$value": "#E3E3E3"
         },
         "surface": {
           "$type": "color",
-          "$value": "#0E141B"
+          "$value": "#131314"
         },
         "surface_dim": {
           "$type": "color",
-          "$value": "#0B1016"
+          "$value": "#0F0F0F"
         },
         "surface_bright": {
           "$type": "color",
-          "$value": "#343B44"
+          "$value": "#3A3A3A"
         },
         "surface_container_lowest": {
           "$type": "color",
-          "$value": "#080D13"
+          "$value": "#0C0C0C"
         },
         "surface_container_low": {
           "$type": "color",
-          "$value": "#161D25"
+          "$value": "#1C1C1C"
         },
         "surface_container": {
           "$type": "color",
-          "$value": "#1B222B"
+          "$value": "#1E1F20"
         },
         "surface_container_high": {
           "$type": "color",
-          "$value": "#252C36"
+          "$value": "#282A2C"
         },
         "surface_container_highest": {
           "$type": "color",
-          "$value": "#303843"
+          "$value": "#333537"
         },
         "on_surface": {
           "$type": "color",
-          "$value": "#E0E6F0"
+          "$value": "#E3E3E3"
         },
         "on_surface_variant": {
           "$type": "color",
-          "$value": "#C0CAD7"
+          "$value": "#C4C7C5"
         },
         "outline": {
           "$type": "color",
-          "$value": "#8A94A2"
+          "$value": "#8E918F"
         },
         "outline_variant": {
           "$type": "color",
-          "$value": "#404956"
+          "$value": "#444746"
         },
         "primary": {
           "$type": "color",
-          "$value": "#8FD0FF"
+          "$value": "#A8C7FA"
         },
         "on_primary": {
           "$type": "color",
@@ -204,7 +204,7 @@
         },
         "secondary": {
           "$type": "color",
-          "$value": "#B4C9E5"
+          "$value": "#7FCFFF"
         },
         "on_secondary": {
           "$type": "color",
@@ -254,63 +254,63 @@
       "neural_obsidian": {
         "background": {
           "$type": "color",
-          "$value": "#0B0E14"
+          "$value": "#0E0E0E"
         },
         "on_background": {
           "$type": "color",
-          "$value": "#E4EAF4"
+          "$value": "#E9E9E9"
         },
         "surface": {
           "$type": "color",
-          "$value": "#0B0E14"
+          "$value": "#0E0E0E"
         },
         "surface_dim": {
           "$type": "color",
-          "$value": "#07090E"
+          "$value": "#090909"
         },
         "surface_bright": {
           "$type": "color",
-          "$value": "#2B3140"
+          "$value": "#313131"
         },
         "surface_container_lowest": {
           "$type": "color",
-          "$value": "#06080C"
+          "$value": "#080808"
         },
         "surface_container_low": {
           "$type": "color",
-          "$value": "#13161F"
+          "$value": "#161616"
         },
         "surface_container": {
           "$type": "color",
-          "$value": "#181C26"
+          "$value": "#1C1C1C"
         },
         "surface_container_high": {
           "$type": "color",
-          "$value": "#1C202B"
+          "$value": "#202020"
         },
         "surface_container_highest": {
           "$type": "color",
-          "$value": "#262C3A"
+          "$value": "#2C2C2C"
         },
         "on_surface": {
           "$type": "color",
-          "$value": "#E4EAF4"
+          "$value": "#E9E9E9"
         },
         "on_surface_variant": {
           "$type": "color",
-          "$value": "#BAC4D6"
+          "$value": "#C3C3C3"
         },
         "outline": {
           "$type": "color",
-          "$value": "#8792A6"
+          "$value": "#919191"
         },
         "outline_variant": {
           "$type": "color",
-          "$value": "#384152"
+          "$value": "#404040"
         },
         "primary": {
           "$type": "color",
-          "$value": "#8FD0FF"
+          "$value": "#A8C7FA"
         },
         "on_primary": {
           "$type": "color",
@@ -380,7 +380,7 @@
         },
         "on_background": {
           "$type": "color",
-          "$value": "#EDF2FA"
+          "$value": "#F2F2F2"
         },
         "surface": {
           "$type": "color",
@@ -392,7 +392,7 @@
         },
         "surface_bright": {
           "$type": "color",
-          "$value": "#222834"
+          "$value": "#282828"
         },
         "surface_container_lowest": {
           "$type": "color",
@@ -400,39 +400,39 @@
         },
         "surface_container_low": {
           "$type": "color",
-          "$value": "#0A0E14"
+          "$value": "#0E0E0E"
         },
         "surface_container": {
           "$type": "color",
-          "$value": "#121720"
+          "$value": "#171717"
         },
         "surface_container_high": {
           "$type": "color",
-          "$value": "#1B222E"
+          "$value": "#212121"
         },
         "surface_container_highest": {
           "$type": "color",
-          "$value": "#252E3D"
+          "$value": "#2D2D2D"
         },
         "on_surface": {
           "$type": "color",
-          "$value": "#EDF2FA"
+          "$value": "#F2F2F2"
         },
         "on_surface_variant": {
           "$type": "color",
-          "$value": "#C2CCDC"
+          "$value": "#CBCBCB"
         },
         "outline": {
           "$type": "color",
-          "$value": "#8C96A8"
+          "$value": "#959595"
         },
         "outline_variant": {
           "$type": "color",
-          "$value": "#2B3545"
+          "$value": "#343434"
         },
         "primary": {
           "$type": "color",
-          "$value": "#8FD0FF"
+          "$value": "#A8C7FA"
         },
         "on_primary": {
           "$type": "color",

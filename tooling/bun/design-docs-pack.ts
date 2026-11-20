@@ -958,7 +958,7 @@ source: "https://design.google/library/code-is-a-design-material"
 
 In Aphrody, live Rust GPUI entities (\`crates/aphrody_ui\`, \`crates/aphrody_craft\`), NSH TSX signals (\`examples/nsh/agy-session-studio\`), migrated \`egui 0.37\` surfaces (\`crates/egui_gpui\`), and Naga v30 WGSL shaders (\`crates/bevy_gpui\`) operate directly on one shared token graph rather than static handoff mocks.
 
-- **Single Token Source**: \`assets/os/google_design_tokens.toml\` -> \`DESIGN.md\` -> \`docs/aphrody/design/stylesheet.css\` -> \`ShadcnGpuiTheme\` & \`egui::Visuals\`.
+- **Single Token Source**: \`fw/crates/fw-m3/tokens/google_design_tokens.toml\` -> \`DESIGN.md\` -> \`docs/aphrody/design/stylesheet.css\` -> \`ShadcnGpuiTheme\` & \`egui::Visuals\`.
 - **Dual-Engine Verification**: Every Craft Studio screen renders both in **GPUI Google Design** and **\`egui 0.37\`** side-by-side to validate layout ergonomics, AccessKit node parity, and sub-millisecond tessellation budgets.
 `,
   },

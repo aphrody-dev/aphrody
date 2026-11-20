@@ -13,7 +13,7 @@ use crate::cosmic_theme::{AppearanceMode, contrast_ratio};
 /// Authoritative URL for Aphrody's visual design system.
 pub const DESIGN_SOURCE_OF_TRUTH: &str = brand::DESIGN_SOURCE_OF_TRUTH;
 
-/// Embedded 3-tier Material 3 Expressive + Google Sans Flex token manifest (`assets/os/google_design_tokens.toml`).
+/// Embedded 3-tier Material 3 Expressive + Google Sans Flex token manifest (`fw/crates/fw-m3/tokens/google_design_tokens.toml`).
 pub use brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;
 
 /// Responsive Material 3 window size class unified directly onto [`brand::design::WindowSizeTier`].

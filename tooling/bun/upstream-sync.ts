@@ -648,7 +648,7 @@ export function syncGpuiKitFromClone(root: string, cloneDir: string, dryRun = fa
           if (!cur.includes("google_design_tokens.toml")) {
             writeFileSync(
               oldSkillPath,
-              `${cur.trimEnd()}\n- **Google Design Source of Truth (\`https://design.google/\`)**: Anchor semantic color roles, Material 3 Expressive springs, corner radii, and typescale to \`assets/os/google_design_tokens.toml\`.\n`,
+              `${cur.trimEnd()}\n- **Google Design Source of Truth (\`https://design.google/\`)**: Anchor semantic color roles, Material 3 Expressive springs, corner radii, and typescale to \`fw/crates/fw-m3/tokens/google_design_tokens.toml\`.\n`,
               "utf8",
             );
           }

@@ -23,7 +23,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
-export const TOKENS_TOML_REL = "assets/os/google_design_tokens.toml";
+export const TOKENS_TOML_REL = "../fw/crates/fw-m3/tokens/google_design_tokens.toml";
 export const TRACKER_LOCK_REL = "assets/os/m3_compose_tracker_lock.toml";
 export const CATALOG_JSON_REL = "assets/os/m3_compose_catalog.json";
 export const FIGMA_DTCG_REL = "docs/aphrody/design/kits/figma-m3-1035203688168086460-dtcg.json";

@@ -749,7 +749,7 @@ export function renderAgentLlmsTxt(rows: FrameworkParityRow[]): string {
     "",
     "## Standards & Design Contracts",
     "- Design source of truth: https://design.google/ (Material 3 Expressive + Google Sans Flex)",
-    "- Workspace token spec: DESIGN.md + assets/os/google_design_tokens.toml",
+    "- Workspace token spec: DESIGN.md + fw/crates/fw-m3/tokens/google_design_tokens.toml",
     "- Web standards & Lighthouse auditor: crates/aphrody_design/src/web_standards.rs",
     "- Pure-Rust GPUI starter pack (shadcn / Base UI / Tailwind v4): crates/aphrody_ui/src/starter_pack.rs",
     "- NSH workspace studio actions: OpenGoogleDesignMirror, OpenStitchStudio, OpenGpuiStarterPack",

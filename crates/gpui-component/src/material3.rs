@@ -1,6 +1,6 @@
 //! Native Google Design Material 3 Expressive + Neural Expressive theme system and component kit.
 //!
-//! Derived directly from `assets/os/google_design_tokens.toml` (`https://design.google/`),
+//! Derived directly from `fw/crates/fw-m3/tokens/google_design_tokens.toml` (`https://design.google/`),
 //! supporting all 4 appearance modes (`Light`, `Dark`, `NeuralObsidian`, `OledPitch`),
 //! Google Sans Flex variable axes (`opsz`, `wght`, `wdth`, `GRAD`, `slnt`, `ROND`) +
 //! `JetBrains Mono`, Spatial (`0.9` damping) / Effects (`1.0` damping) spring presets,
@@ -47,7 +47,7 @@ pub const M3_WCAG_AA_MIN_CONTRAST: f32 = brand::design::WCAG_AA_MIN_CONTRAST;
 /// Minimum WCAG 2.2 AA contrast ratio for large display text (`>= 18pt` or `14pt` bold) and UI graphics.
 pub const M3_WCAG_AA_LARGE_CONTRAST: f32 = brand::design::WCAG_AA_LARGE_CONTRAST;
 
-/// Embedded 3-tier Material 3 Expressive + Google Sans Flex manifest (`assets/os/google_design_tokens.toml`).
+/// Embedded 3-tier Material 3 Expressive + Google Sans Flex manifest (`fw/crates/fw-m3/tokens/google_design_tokens.toml`).
 pub use brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;
 
 type ClickHandler = Rc<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>;
@@ -211,7 +211,7 @@ impl M3GoogleSansFlexAxes {
         }
     }
 
-    /// Clamps all 6 variable axes to the authoritative bounds in `assets/os/google_design_tokens.toml`.
+    /// Clamps all 6 variable axes to the authoritative bounds in `fw/crates/fw-m3/tokens/google_design_tokens.toml`.
     #[must_use]
     pub fn clamped(self) -> Self {
         Self {
@@ -357,7 +357,7 @@ impl Default for M3TypographyScale {
 }
 
 impl M3TypographyScale {
-    /// Resolves the typography scale from `assets/os/google_design_tokens.toml` via `brand::design`.
+    /// Resolves the typography scale from `fw/crates/fw-m3/tokens/google_design_tokens.toml` via `brand::design`.
     pub fn try_bundled() -> Result<Self> {
         Ok(Self::bundled_or_default())
     }
@@ -609,7 +609,7 @@ impl M3SpringToken {
         Self::EffectsSlow,
     ];
 
-    /// All 11 spring presets defined in `assets/os/google_design_tokens.toml`.
+    /// All 11 spring presets defined in `fw/crates/fw-m3/tokens/google_design_tokens.toml`.
     pub const ALL: [Self; 11] = [
         Self::SpatialFast,
         Self::SpatialDefault,
@@ -889,7 +889,7 @@ impl Default for M3ActiveTheme {
 }
 
 impl M3ActiveTheme {
-    /// Constructs a full [`M3ActiveTheme`] for `mode` from `assets/os/google_design_tokens.toml`.
+    /// Constructs a full [`M3ActiveTheme`] for `mode` from `fw/crates/fw-m3/tokens/google_design_tokens.toml`.
     #[must_use]
     pub fn for_mode(mode: M3AppearanceMode) -> Self {
         Self {
@@ -1052,7 +1052,7 @@ pub fn m3_manifest_metadata() -> Result<(&'static str, &'static str, &'static st
     ))
 }
 
-/// Builds a `gpui-component` [`ThemeConfig`] derived from `assets/os/google_design_tokens.toml` for `mode`.
+/// Builds a `gpui-component` [`ThemeConfig`] derived from `fw/crates/fw-m3/tokens/google_design_tokens.toml` for `mode`.
 pub fn try_m3_theme_config(mode: M3AppearanceMode) -> Result<ThemeConfig> {
     let roles = M3ColorRoles::for_mode(mode);
     let shape = M3ShapeTokens::bundled_or_default();

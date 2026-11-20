@@ -3,7 +3,7 @@
 //! `NeuralObsidian`, `OledPitch`), physics spring presets (Spatial `0.9` damping
 //! and Effects `1.0` damping), and shape/corner tokens for `nsh_base`.
 //!
-//! All values match `assets/os/google_design_tokens.toml` and maintain
+//! All values match `fw/crates/fw-m3/tokens/google_design_tokens.toml` and maintain
 //! WCAG 2.2 AA contrast (`>= 4.5:1`) across all surface and action foregrounds.
 
 use nsh_core::{
@@ -31,7 +31,7 @@ pub const M3_FONT_MONO: &str = "JetBrains Mono";
 /// Minimum WCAG 2.2 AA normal-text contrast ratio.
 pub const WCAG_AA_MIN_CONTRAST: f32 = brand::design::WCAG_AA_MIN_CONTRAST;
 
-/// Four Material 3 Expressive surface modes synchronized with `assets/os/google_design_tokens.toml`,
+/// Four Material 3 Expressive surface modes synchronized with `fw/crates/fw-m3/tokens/google_design_tokens.toml`,
 /// unified directly onto [`brand::design::ThemeModeSlug`].
 pub use brand::design::ThemeModeSlug as M3Mode;
 

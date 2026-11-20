@@ -1,5 +1,5 @@
 //! Composable Native Shell (`nsh`) Material 3 Expressive UI Kit anchored to
-//! `nsh_base::material3` (`assets/os/google_design_tokens.toml` / `https://design.google/`).
+//! `nsh_base::material3` (`fw/crates/fw-m3/tokens/google_design_tokens.toml` / `https://design.google/`).
 //!
 //! Provides:
 //! - 12 composable NSH M3 Expressive UI builders (`m3_surface`, `m3_filled_button`,

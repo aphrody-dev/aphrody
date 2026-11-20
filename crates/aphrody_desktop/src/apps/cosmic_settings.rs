@@ -309,7 +309,7 @@ pub fn render_cosmic_settings_window(
                 )
                 .child(KeyValueRow::new(
                     "Active Token Source",
-                    "material-colors 0.5 Spec2025 + assets/os/google_design_tokens.toml",
+                    "material-colors 0.5 Spec2025 + fw/crates/fw-m3/tokens/google_design_tokens.toml",
                 ))
         }
         SettingsPage::DesktopTiling => {
