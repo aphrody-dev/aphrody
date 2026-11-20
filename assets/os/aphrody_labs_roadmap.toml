@@ -82,8 +82,8 @@ summary = "Live CDP browser control, OpenTUI terminal UI, encrypted tunnels, and
 
 [[domains]]
 id = "auto"
-org = "aphrody-labs"
-repo = "aphrody-labs/auto"
+org = "aphrody-dev"
+repo = "aphrody-dev/ay"
 category = "Autonomous Workflows & Productivity"
 surfaces = ["Website", "Desktop", "Mobile"]
 owner_paths = ["tooling/bun/prod-standards-starterpack.ts", ".cloudflare"]
