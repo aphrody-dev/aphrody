@@ -86,17 +86,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu.2.28
+          # Native builds: the GPUI/Zed system libraries (fontconfig, wayland, alsa, ...) come from script/linux, which a zig cross build cannot link.
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
             platform_os: linux
             arch: x86_64
-            driver: zigbuild
+            driver: cargo
             asset: aphrody-x86_64.tar.gz
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu.2.28
+          - os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
             platform_os: linux
             arch: aarch64
-            driver: zigbuild
+            driver: cargo
             asset: aphrody-aarch64.tar.gz
           - os: windows-latest
             target: x86_64-pc-windows-msvc
@@ -122,6 +123,10 @@ jobs:
         with:
           tool: cargo-zigbuild
       - uses: oven-sh/setup-bun@v2
+
+      - name: Linux system libraries
+        if: matrix.platform_os == 'linux'
+        run: ./script/linux
 
       - name: Install Rust target
         run: |
@@ -186,8 +191,30 @@ jobs:
           name: release-${{ matrix.platform_os }}-${{ matrix.arch }}
           path: dist/
 
+  # Checksums, release manifest, provenance, GitHub Release and the R2 layout served by the edge Worker (docs/release.md of the ay SDK repository).
+  # A tag publishes only when every target built; a manual or scheduled run publishes the targets that did build.
   publish:
     needs: [resolve-metadata, build]
+    if: ${{ !cancelled() && needs.resolve-metadata.result == 'success' && (needs.build.result == 'success' || !startsWith(github.ref, 'refs/tags/')) }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    uses: aphrody-labs/ay/.github/workflows/release.yml@main
+    with:
+      product: aphrody
+      version: ${{ needs.resolve-metadata.outputs.version }}
+      channel: ${{ needs.resolve-metadata.outputs.channel }}
+      tag: ${{ needs.resolve-metadata.outputs.tag }}
+      commit: ${{ github.sha }}
+      artifacts-pattern: release-*
+      tools-repository: aphrody-labs/ay
+    secrets: inherit
+
+  # The channels/ and manifests/ objects and the install scripts that the edge Worker still reads from the releases bucket (legacy layout of this pipeline).
+  legacy-r2:
+    needs: [resolve-metadata, publish]
+    if: ${{ !cancelled() && needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -195,30 +222,9 @@ jobs:
         with:
           path: artifacts
           merge-multiple: true
-
-      - name: Create or update GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.resolve-metadata.outputs.tag }}
-          CHANNEL: ${{ needs.resolve-metadata.outputs.channel }}
-          VERSION: ${{ needs.resolve-metadata.outputs.version }}
-        run: |
-          PRERELEASE=""
-          if [ "$CHANNEL" = "preview" ] || [ "$CHANNEL" = "canary" ] || [ "$CHANNEL" = "nightly" ]; then
-            PRERELEASE="--prerelease"
-          fi
-          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" \
-            --title "Aphrody $VERSION ($CHANNEL)" \
-            --notes "Automated 24/7 release on channel **$CHANNEL**." \
-            $PRERELEASE
-          shopt -s nullglob
-          ASSETS=(artifacts/*.exe artifacts/*.dmg artifacts/*.tar.gz artifacts/*.sha256)
-          gh release upload "$TAG" "${ASSETS[@]}" --clobber
-        shell: bash
-
+          pattern: release-*
       - uses: oven-sh/setup-bun@v2
-
-      - name: Sync artifacts and manifests to Cloudflare R2 bucket
+      - name: Mirror the channel pointers and install scripts into the releases bucket
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -226,7 +232,7 @@ jobs:
           VERSION: ${{ needs.resolve-metadata.outputs.version }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "Cloudflare R2 credentials not configured; skipping R2 mirror."
+            echo "::warning::Cloudflare credentials are not configured; skipping the legacy R2 mirror."
             exit 0
           fi
           set -e
@@ -246,4 +252,3 @@ jobs:
             bunx wrangler r2 object put "aphrody-releases/channels/$CHANNEL/latest.json" --file artifacts/manifests/linux-x86_64.json --content-type application/json
           fi
           bun tooling/bun/cloudflare-deploy.ts publish-scripts
-          bun tooling/bun/cloudflare-deploy.ts deploy
