@@ -63,25 +63,25 @@ pub fn integrated_auto_capabilities() -> Vec<AutoCapabilitySpec> {
         AutoCapabilitySpec {
             id: "facturx",
             title: "Factur-X / ZUGFeRD",
-            crate_name: "auto-facturx",
+            crate_name: "aphrody-auto/facturx",
             compliance_standard: "EN 16931 / PDF/A-3B",
         },
         AutoCapabilitySpec {
             id: "sheets",
             title: "Ledgers & Invoices",
-            crate_name: "auto-sheets",
+            crate_name: "aphrody-auto/sheets",
             compliance_standard: "Multi-currency ERP",
         },
         AutoCapabilitySpec {
             id: "docs",
             title: "Business Documents",
-            crate_name: "auto-docs",
+            crate_name: "aphrody-auto/docs",
             compliance_standard: "Craft PDF/DOCX/ODS",
         },
         AutoCapabilitySpec {
             id: "sync",
             title: "CompanyDO Local-First Sync",
-            crate_name: "auto-client",
+            crate_name: "aphrody-auto/client",
             compliance_standard: "Cloudflare D1 + DO SQLite",
         },
     ]
