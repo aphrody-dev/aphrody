@@ -9,7 +9,7 @@
 Declared declaratively in [`aphrody_labs_roadmap.toml`](../../../assets/os/aphrody_labs_roadmap.toml) alongside [`aphrody-labs-deduplication.md`](./aphrody-labs-deduplication.md) and [`product.toml`](../../../product.toml):
 
 - **Core Thesis (*Code Is a Design Material*)**: Live Rust GPUI entities, NSH TSX signals, `egui 0.37` inspectors, Bevy 0.20 / Unreal 5.8 Naga WGSL shaders, and Cloudflare Worker edge HTML share **one strongly-typed design token graph** anchored to `https://design.google/`.
-- **Zero-Compromise Stack**: `120 FPS` GPU-native rendering (`gpui` + `vendor/wgpu` v30), **WebAssembly Core 2.0 / WASI Preview 2 AOT**, `vendor/bun` 1.4+ runtime, **$0 Vercel** Cloudflare Workers/R2 + XFS bare-metal fleet (`fr1` / `fr2` / `prd`), and **100% Zed ecosystem compatibility**.
+- **Zero-Compromise Stack**: `120 FPS` GPU-native rendering (`gpui` + pinned `aphrody-labs/wgpu` v30), **WebAssembly Core 2.0 / WASI Preview 2 AOT**, `aphrody-labs/bun` 1.4+ runtime (its own repository), **$0 Vercel** Cloudflare Workers/R2 + XFS bare-metal fleet (`fr1` / `fr2` / `prd`), and **100% Zed ecosystem compatibility**.
 
 ```mermaid
 flowchart TD

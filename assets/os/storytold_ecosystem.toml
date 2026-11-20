@@ -3,9 +3,9 @@
 schema_version = 1
 org_url = "https://github.com/orgs/storytold/repositories"
 total_repositories = 82
-craft_libs_crates_on_disk = 165
-craft_anything_crates_on_disk = 13
-egui_crates_on_disk = 15
+craft_libs_pinned_crates = 77
+craft_anything_pinned_crates = 5
+egui_pinned_crates = 7
 gpui_egui_bridge_crate = "crates/egui_gpui"
 bevy_unreal_engine_crate = "crates/bevy_gpui"
 shared_dual_gui_studio_crate = "crates/aphrody_craft"
@@ -13,25 +13,25 @@ shared_dual_gui_studio_crate = "crates/aphrody_craft"
 [[deduplication_rules]]
 family = "wgpu_v30_and_naga"
 crates = ["wgpu", "wgpu-core", "wgpu-hal", "wgpu-types", "naga"]
-canonical_source = "vendor/wgpu (v30.0.0 with Metal #742 probe)"
-eliminates_splits_from = ["zed-industries/zed git wgpu", "emilk/egui 30.0", "bevy 0.20 wgpu 30", "bevy_egui 30.0.1", "craft-anything vendor/wgpu-hal"]
+canonical_source = "pinned wgpu (v30.0.0 with Metal #742 probe)"
+eliminates_splits_from = ["zed-industries/zed git wgpu", "emilk/egui 30.0", "bevy 0.20 wgpu 30", "bevy_egui 30.0.1", "craft-anything bundled wgpu-hal"]
 
 [[deduplication_rules]]
 family = "egui_037_immediate_gui"
 crates = ["ecolor", "emath", "epaint", "epaint_default_fonts", "egui", "egui-wgpu", "egui-winit", "egui_extras", "egui_kittest", "eframe"]
-canonical_source = "vendor/egui (0.37.0) + crates/egui_gpui"
+canonical_source = "pinned egui (0.37.0) + crates/egui_gpui"
 eliminates_splits_from = ["storytold/egui@6d518fc", "craft-anything egui 0.36", "bevy_egui 0.43.2 egui 0.36", "figcraft egui 0.37"]
 
 [[deduplication_rules]]
 family = "layout_and_accessibility"
 crates = ["taffy", "accesskit", "accesskit_consumer"]
-canonical_source = "vendor/taffy (0.15.1) + vendor/accesskit (0.25.2)"
+canonical_source = "pinned taffy (0.15.1) + pinned accesskit (0.25.2)"
 eliminates_splits_from = ["gpui 0.2.2", "bevy_ui 0.20", "egui 0.37", "blitz"]
 
 [[deduplication_rules]]
 family = "storytold_craft_libs_and_pdf"
 crates = ["craft-fig", "craft-sketch", "craft-penpot", "craft-materialx", "craft-usd", "craft-ui", "krilla", "hayro", "linesweeper"]
-canonical_source = "vendor/craft-libs (165 crates) + [patch.'https://github.com/storytold/craft-libs']"
+canonical_source = "pinned craft-libs + [patch.'https://github.com/storytold/craft-libs']"
 eliminates_splits_from = ["craft-anything git craft-libs pins", "figcraft multi-rev git craft-libs pins"]
 
 [[deduplication_rules]]
@@ -47,7 +47,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/anicraft-format"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/anicraft-format"
 studio_app_id = "anicraft"
 role = "2D cel & skeletal vector animation editor"
 
@@ -58,7 +58,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{dwg,dxf,gcode,shx}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{dwg,dxf,gcode,shx}"
 studio_app_id = "cadcraft"
 role = "2D/3D parametric CAD drafting & CAM G-code"
 
@@ -69,7 +69,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-anything"
+aphrody_owner = "crates/aphrody_craft + pinned craft-anything"
 studio_app_id = "craft-anything"
 role = "Clean-room binary, Wasm, JS (oxc) & disassembly workbench"
 
@@ -80,7 +80,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{deckcraft-format,pptx}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{deckcraft-format,pptx}"
 studio_app_id = "deckcraft"
 role = "Slide presentation editor & PPTX engine"
 
@@ -91,7 +91,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{designcraft-format,idml}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{designcraft-format,idml}"
 studio_app_id = "designcraft"
 role = "Multi-page layout & CMYK prepress studio"
 
@@ -102,7 +102,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/ecproj-format"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/ecproj-format"
 studio_app_id = "effectcraft"
 role = "Node-based WGSL motion graphics & compositing"
 
@@ -113,7 +113,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + crates/aphrody_design + vendor/craft-libs/crates/{fig,figcraft-format,figma-rest,sketch,penpot}"
+aphrody_owner = "crates/aphrody_craft + crates/aphrody_design + pinned craft-libs/crates/{fig,figcraft-format,figma-rest,sketch,penpot}"
 studio_app_id = "figcraft"
 role = "Interface design, .fig/Sketch/Penpot & DESIGN.md Stitch round-trip studio"
 
@@ -124,7 +124,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{fcproj-format,video,aaf}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{fcproj-format,video,aaf}"
 studio_app_id = "filmcraft"
 role = "Nonlinear multi-track video editor & EXR grading"
 
@@ -135,7 +135,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{gridcraft-format,sheet,xlsx,csv}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{gridcraft-format,sheet,xlsx,csv}"
 studio_app_id = "gridcraft"
 role = "Spreadsheet formula & XLSX/ODS/CSV engine"
 
@@ -146,7 +146,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{raw,exr,hdr,crs}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{raw,exr,hdr,crs}"
 studio_app_id = "lightcraft"
 role = "Non-destructive RAW photography & HDR catalog"
 
@@ -157,7 +157,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/bevy_gpui + vendor/craft-libs/crates/{materialx,mcmat,usd}"
+aphrody_owner = "crates/bevy_gpui + pinned craft-libs/crates/{materialx,mcmat,usd}"
 studio_app_id = "materialcraft"
 role = "Node-based MaterialX OpenPBR -> Naga v30 WGSL shader designer"
 
@@ -168,7 +168,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/pdf"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/pdf"
 studio_app_id = "pdfcraft"
 role = "PDF reader, object stream inspector & krilla/hayro renderer"
 
@@ -179,7 +179,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{psd,pcraft-format,kra,ora,xcf}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{psd,pcraft-format,kra,ora,xcf}"
 studio_app_id = "photocraft"
 role = "Layered raster photo editor (PSD/KRA/ORA/XCF)"
 
@@ -190,7 +190,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{scraft-format,audio,midi,sf2}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{scraft-format,audio,midi,sf2}"
 studio_app_id = "soundcraft"
 role = "Digital audio workstation, MIDI & SoundFont2 synth"
 
@@ -201,7 +201,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/bevy_gpui + vendor/craft-libs/crates/{tcraft,texture,dds,tga}"
+aphrody_owner = "crates/bevy_gpui + pinned craft-libs/crates/{tcraft,texture,dds,tga}"
 studio_app_id = "texturecraft"
 role = "3D procedural PBR texture painting & DDS/KTX2 pipeline"
 
@@ -212,7 +212,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{vectorcraft-format,svg,eps}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{vectorcraft-format,svg,eps}"
 studio_app_id = "vectorcraft"
 role = "Bezier vector illustration, boolean pathops & SVG/EPS mastering"
 
@@ -223,7 +223,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-libs/crates/{wordmodel,docx,rtf,markdown}"
+aphrody_owner = "crates/aphrody_craft + pinned craft-libs/crates/{wordmodel,docx,rtf,markdown}"
 studio_app_id = "wordcraft"
 role = "Clean-room word processor & DOCX/RTF/Markdown engine"
 
@@ -256,7 +256,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_craft + vendor/craft-anything"
+aphrody_owner = "crates/aphrody_craft + pinned craft-anything"
 studio_app_id = "craft-anything"
 role = "Next-gen clean-room studio architecture absorbed into aphrody_craft"
 
@@ -267,7 +267,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/ai-core + crates/agent"
+aphrody_owner = "pinned craft-libs/crates/ai-core + crates/agent"
 studio_app_id = "craft-anything"
 role = "AI provider client & widget layer unified with Zed agent & craft-ai-core"
 
@@ -289,7 +289,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/{font-catalog,font-store,fonts-build} + crates/assets"
+aphrody_owner = "pinned craft-libs/crates/{font-catalog,font-store,fonts-build} + crates/assets"
 studio_app_id = "designcraft"
 role = "Google Fonts & Noto checksummed font store + Google Sans Flex"
 
@@ -300,7 +300,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/i18n + crates/aphrody_ui/src/i18n.rs"
+aphrody_owner = "pinned craft-libs/crates/i18n + crates/aphrody_ui/src/i18n.rs"
 studio_app_id = "wordcraft"
 role = "ICU4X & TSV localization catalogs unified with W3C i18n"
 
@@ -322,7 +322,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs (165 crates)"
+aphrody_owner = "pinned craft-libs (165 crates)"
 studio_app_id = "craft-anything"
 role = "Authoritative 165-crate format, media, UI, font & protocol foundation"
 
@@ -355,7 +355,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/audio"
+aphrody_owner = "pinned craft-libs/crates/audio"
 studio_app_id = "soundcraft"
 role = "Audio stream recasting utility absorbed into craft-audio"
 
@@ -366,7 +366,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/{indd,idml}"
+aphrody_owner = "pinned craft-libs/crates/{indd,idml}"
 studio_app_id = "designcraft"
 role = "InDesign .indd binary reader & IDML converter"
 
@@ -509,7 +509,7 @@ language = "C++"
 license = "MIT"
 archived = false
 fork = true
-aphrody_owner = "vendor/craft-libs/crates/audio + crates/audio"
+aphrody_owner = "pinned craft-libs/crates/audio + crates/audio"
 studio_app_id = "soundcraft"
 role = "UE runtime audio decoding replaced by pure-Rust symphonia/craft-audio"
 
@@ -553,7 +553,7 @@ language = "C++"
 license = "MIT"
 archived = true
 fork = true
-aphrody_owner = "vendor/craft-libs/crates/{midi,control-protocol}"
+aphrody_owner = "pinned craft-libs/crates/{midi,control-protocol}"
 studio_app_id = "soundcraft"
 role = "Archived UE4 OSC Blueprint plugin superseded by craft-control-protocol"
 
@@ -564,7 +564,7 @@ language = "C#"
 license = "MIT"
 archived = false
 fork = true
-aphrody_owner = "vendor/craft-libs/crates/{ipc,jsonrpc}"
+aphrody_owner = "pinned craft-libs/crates/{ipc,jsonrpc}"
 studio_app_id = "unrealcraft"
 role = "UE4 ZeroMQ socket bridge superseded by craft-ipc & MCP"
 
@@ -586,7 +586,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = true
-aphrody_owner = "vendor/egui + crates/egui_gpui"
+aphrody_owner = "pinned egui + crates/egui_gpui"
 studio_app_id = "figcraft"
 role = "egui 0.37 + IME serde wire support unified onto GPUI & WGPU v30"
 
@@ -597,7 +597,7 @@ language = "C++"
 license = "MIT"
 archived = false
 fork = true
-aphrody_owner = "harfrust + vendor/cosmic-text (100% pure Rust)"
+aphrody_owner = "harfrust + pinned cosmic-text (100% pure Rust)"
 studio_app_id = "designcraft"
 role = "Legacy C++ HarfBuzz fork superseded by pure-Rust harfrust & cosmic-text"
 
@@ -608,7 +608,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = true
-aphrody_owner = "vendor/wgpu (v30.0.0 + Metal #742 probe)"
+aphrody_owner = "pinned wgpu (v30.0.0 + Metal #742 probe)"
 studio_app_id = "effectcraft"
 role = "Unified single-source WebGPU/Vulkan/DX12/Metal HAL & Naga v30"
 
@@ -619,7 +619,7 @@ language = "Rust"
 license = "Apache-2.0"
 archived = false
 fork = true
-aphrody_owner = "crates/gpui_platform + vendor/winit"
+aphrody_owner = "crates/gpui_platform + upstream winit"
 studio_app_id = "figcraft"
 role = "Windowing superseded inside Zed by native GPUI platform backends"
 
@@ -630,7 +630,7 @@ language = "Rust"
 license = "BSD-3-Clause"
 archived = false
 fork = true
-aphrody_owner = "vendor/craft-libs/crates/{print,prepress}"
+aphrody_owner = "pinned craft-libs/crates/{print,prepress}"
 studio_app_id = "pdfcraft"
 role = "Windows GDI/XPS print spooler adapter for PdfCraft & DesignCraft"
 
@@ -641,7 +641,7 @@ language = "TypeScript"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_pilot + .agents/plugins/aphrody/skills/ai-os-pilot"
+aphrody_owner = "crates/aphrody_pilot + fw: plugins/aphrody/skills/ai-os-pilot"
 studio_app_id = "craft-anything"
 role = "Autonomous UI pilot heuristics unified into aphrody_pilot & AccessKit MCP"
 
@@ -652,7 +652,7 @@ language = "Shell"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/{dxf,dwg,gcode}"
+aphrody_owner = "pinned craft-libs/crates/{dxf,dwg,gcode}"
 studio_app_id = "cadcraft"
 role = "CAD DWG/DXF conformance test drawings"
 
@@ -674,7 +674,7 @@ language = "Markdown"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "docs/architecture + CONTRIBUTING.md"
+aphrody_owner = "docs/aphrody/architecture + CONTRIBUTING.md"
 studio_app_id = "craft-anything"
 role = "RFCs (RFC-0012 CLI, zero-crash policy) integrated into Aphrody rules"
 
@@ -685,7 +685,7 @@ language = "Assets"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "docs/design + assets/os/craft_catalog.toml"
+aphrody_owner = "docs/aphrody/design + assets/os/craft_catalog.toml"
 studio_app_id = "figcraft"
 role = "Launcher showcase previews superseded by live Stitch & GPUI renders"
 
@@ -707,7 +707,7 @@ language = "JavaScript"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "docs/architecture + docs/design/guidelines"
+aphrody_owner = "docs/aphrody/architecture + docs/aphrody/design/guidelines"
 studio_app_id = "wordcraft"
 role = "ArtCraft & Craft Apps documentation wiki unified in repo docs"
 
@@ -729,7 +729,7 @@ language = "JavaScript"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/ecproj-format"
+aphrody_owner = "pinned craft-libs/crates/ecproj-format"
 studio_app_id = "effectcraft"
 role = "EffectCraft motion project & shader fixtures"
 
@@ -740,9 +740,9 @@ language = "Media"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "docs/design"
+aphrody_owner = "docs/aphrody/design"
 studio_app_id = "filmcraft"
-role = "Showcase media assets cataloged under docs/design"
+role = "Showcase media assets cataloged under docs/aphrody/design"
 
 [[repositories]]
 name = "hanashi-graphics-demo"
@@ -762,7 +762,7 @@ language = "JavaScript"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/{psd,media-testkit}"
+aphrody_owner = "pinned craft-libs/crates/{psd,media-testkit}"
 studio_app_id = "photocraft"
 role = "PSD/raster layer & blend-mode conformance fixtures"
 
@@ -817,7 +817,7 @@ language = "Python"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/ai-core"
+aphrody_owner = "pinned craft-libs/crates/ai-core"
 studio_app_id = "craft-anything"
 role = "Model conditioning experiment superseded by cloud/local AI providers"
 
@@ -828,7 +828,7 @@ language = "C++"
 license = "Apache-2.0"
 archived = false
 fork = false
-aphrody_owner = "crates/aphrody_ui/src/google_design.rs + vendor/craft-libs/crates/font-catalog"
+aphrody_owner = "crates/aphrody_ui/src/google_design.rs + pinned craft-libs/crates/font-catalog"
 studio_app_id = "designcraft"
 role = "C++ font preview server replaced by native GPUI & skrifa preview"
 
@@ -872,7 +872,7 @@ language = "Python"
 license = "MIT"
 archived = true
 fork = false
-aphrody_owner = "crates/audio + vendor/craft-libs/crates/audio"
+aphrody_owner = "crates/audio + pinned craft-libs/crates/audio"
 studio_app_id = "soundcraft"
 role = "Archived Python voice stream superseded by native Rust audio pipeline"
 
@@ -894,7 +894,7 @@ language = "Jupyter Notebook"
 license = "MIT"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/ai-core"
+aphrody_owner = "pinned craft-libs/crates/ai-core"
 studio_app_id = "soundcraft"
 role = "Legacy Tacotron speech synthesis notebooks"
 
@@ -916,7 +916,7 @@ language = "Python"
 license = "MIT"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/ai-core"
+aphrody_owner = "pinned craft-libs/crates/ai-core"
 studio_app_id = "craft-anything"
 role = "Legacy TorchScript export scripts"
 
@@ -927,7 +927,7 @@ language = "Python"
 license = "MIT"
 archived = false
 fork = false
-aphrody_owner = "vendor/craft-libs/crates/audio"
+aphrody_owner = "pinned craft-libs/crates/audio"
 studio_app_id = "soundcraft"
 role = "Legacy VITS audio model training fork"
 

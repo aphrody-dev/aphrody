@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Live GitHub `orgs/WebAssembly` Ecosystem Ingest, Classification, TOML Registry,
- * Architecture Digest, `llms.txt`, and Skill Generator for Aphrody.
+ * Architecture Digest and `llms.txt` Generator for Aphrody.
  *
  * Fetches `https://api.github.com/orgs/WebAssembly/repos?per_page=100` sorted
  * descending by stars (with deterministic fallback snapshot when offline/rate-limited).
@@ -17,10 +17,6 @@ export const repoRoot = resolve(import.meta.dir, "../..");
 export const DEFAULT_TOML_OUT = join(repoRoot, "assets/os/webassembly_ecosystem.toml");
 export const DEFAULT_MD_OUT = join(repoRoot, "docs/aphrody/architecture/webassembly-org-ecosystem.md");
 export const DEFAULT_LLMS_OUT = join(repoRoot, "docs/aphrody/architecture/webassembly-org-llms.txt");
-export const DEFAULT_SKILL_OUT = join(
-  repoRoot,
-  ".agents/plugins/aphrody/skills/webassembly/SKILL.md",
-);
 
 export type WasmRepoCategory =
   | "toolchain-optimizer"
@@ -275,7 +271,7 @@ ${rows}
 
 - Registry manifest: [webassembly_ecosystem.toml](../../../assets/os/webassembly_ecosystem.toml)
 - Compact agent index: [webassembly-org-llms.txt](./webassembly-org-llms.txt)
-- Toolchain skill: [.agents/plugins/aphrody/skills/webassembly/SKILL.md](../../../.agents/plugins/aphrody/skills/webassembly/SKILL.md)
+- Toolchain skill: \`fw: plugins/aphrody/skills/webassembly\`
 `;
 }
 
@@ -290,24 +286,6 @@ function renderLlmsTxt(cat: WasmEcosystemCatalog): string {
   }
   lines.push("");
   return lines.join("\n");
-}
-
-function renderSkillMd(cat: WasmEcosystemCatalog): string {
-  return `---
-name: webassembly
-description: Authoritative github.com/orgs/WebAssembly ecosystem reference (Binaryen, WABT, WASI P2, Component Model, Wasm Spec) mapped onto Aphrody LTO/AOT crates and gpui-wgpu CLIs.
----
-
-# \`orgs/WebAssembly\` Unified Toolchain & Spec Guide
-
-Aphrody mirrors the top ${cat.total_repos} \`WebAssembly/*\` repositories directly into its native Rust/Bun Wasm toolchain ([webassembly_ecosystem.toml](../../../../../assets/os/webassembly_ecosystem.toml)).
-
-## Core Workflows
-
-- **LTO Browser Bundles (\`[profile.web-lto]\`)**: \`bun tooling/bun/web-build.ts build --lto\` compiles with fat LTO + \`codegen-units = 1\` and optimizes with Binaryen \`wasm-opt -Oz --enable-simd --enable-bulk-memory\`.
-- **WASI P2 + Wasmtime AOT (\`[profile.aot]\`)**: Build \`--target wasm32-wasip2 --profile aot\`, compile to native \`.cwasm\` via \`gpui-wgpu wasm aot\`, and run under \`wasmtime run --allow-precompiled\`.
-- **Pure-Rust Inspection & Stripping**: \`gpui-wgpu wasm inspect\`, \`validate\`, \`strip\`, \`compose\`, \`doctor --json\`.
-`;
 }
 
 export async function runIngest(offline = false): Promise<WasmEcosystemCatalog> {
@@ -345,13 +323,12 @@ export async function runIngest(offline = false): Promise<WasmEcosystemCatalog> 
   }
 
   const catalog = buildWasmEcosystemCatalog(rawRepos as Parameters<typeof buildWasmEcosystemCatalog>[0]);
-  for (const out of [DEFAULT_TOML_OUT, DEFAULT_MD_OUT, DEFAULT_LLMS_OUT, DEFAULT_SKILL_OUT]) {
+  for (const out of [DEFAULT_TOML_OUT, DEFAULT_MD_OUT, DEFAULT_LLMS_OUT]) {
     mkdirSync(resolve(out, ".."), { recursive: true });
   }
   writeFileSync(DEFAULT_TOML_OUT, serializeWasmEcosystemToml(catalog), "utf8");
   writeFileSync(DEFAULT_MD_OUT, renderMarkdownDoc(catalog), "utf8");
   writeFileSync(DEFAULT_LLMS_OUT, renderLlmsTxt(catalog), "utf8");
-  writeFileSync(DEFAULT_SKILL_OUT, renderSkillMd(catalog), "utf8");
   return catalog;
 }
 
@@ -363,8 +340,7 @@ if (import.meta.main) {
     const ok =
       existsSync(DEFAULT_TOML_OUT) &&
       existsSync(DEFAULT_MD_OUT) &&
-      existsSync(DEFAULT_LLMS_OUT) &&
-      existsSync(DEFAULT_SKILL_OUT);
+      existsSync(DEFAULT_LLMS_OUT);
     console.log(JSON.stringify({ ok, toml: DEFAULT_TOML_OUT }));
     if (!ok) process.exit(1);
   } else {

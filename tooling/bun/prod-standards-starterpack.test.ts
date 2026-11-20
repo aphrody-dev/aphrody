@@ -33,7 +33,7 @@ describe("prod-standards-starterpack", () => {
     expect(toml).toContain("[[frameworks]]");
     const md = renderArchitectureMarkdown(matrix, benches, audit);
     expect(md).toContain("Core Web Vitals & GPUI Frame Budgets");
-    expect(md).toContain("Fork Submodule Parity Matrix");
+    expect(md).toContain("Fork Parity Matrix (pinned git dependencies)");
     expect(audit.tsCompileErrors).toBe(0);
     expect(audit.rustModRsViolations).toBe(0);
     expect(audit.machinePathLeaks).toBe(0);

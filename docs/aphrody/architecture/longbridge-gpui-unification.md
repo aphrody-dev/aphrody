@@ -49,11 +49,11 @@ flowchart LR
     PUR["longbridge/purview<br/>GPUI MCP Inspection"]
   end
 
-  subgraph Submodules["Centralized Git Submodules (vendor/*)"]
-    TAFFY["vendor/taffy"]
-    WGPU["vendor/wgpu"]
-    WRY["vendor/tauri/wry"]
-    CEF["vendor/tauri/cef-rs"]
+  subgraph Forks["Pinned Fork Git Dependencies (Cargo.toml)"]
+    TAFFY["aphrody-labs/taffy"]
+    WGPU["aphrody-labs/wgpu"]
+    WRY["aphrody-labs/wry"]
+    CEF["aphrody-labs/cef-rs (reference)"]
   end
 
   subgraph Core["Aphrody Flattened Workspace (Cargo.toml)"]
@@ -98,18 +98,18 @@ flowchart LR
 | **Single Unified GPUI Core** (`zed-industries/zed` + `gpui-fast` retained invariants) | [`crates/gpui/Cargo.toml`](../../../crates/gpui/Cargo.toml), [`crates/gpui/src/gpui.rs`](../../../crates/gpui/src/gpui.rs), [`path_builder.rs`](../../../crates/gpui/src/path_builder.rs), [`window.rs`](../../../crates/gpui/src/window.rs), [`taffy.rs`](../../../crates/gpui/src/taffy.rs) | Single workspace `gpui` (`0.2.2`) with `Path<T = Pixels>` (`Path::translate`), 1-arg `Window::paint_layer`, and retained-mode invariants. Compatibility `default = ["gpui-fast"]` guards live in `gpui-base`/`gpui-component`/`gpui-kit` with `GPUI_FAST: bool = false` in [`crates/gpui-kit/src/lib.rs`](../../../crates/gpui-kit/src/lib.rs). |
 | **Longbridge NSH `0.6.0` + M3 Kit** (`longbridge/nsh`, `native-shell-v1`) | [`crates/nsh-core/Cargo.toml`](../../../crates/nsh-core/Cargo.toml), [`crates/nsh-base/src/material3.rs`](../../../crates/nsh-base/src/material3.rs), [`crates/gpui_ui/src/nsh.rs`](../../../crates/gpui_ui/src/nsh.rs), [`crates/aphrody_nsh/src/material3_kit.rs`](../../../crates/aphrody_nsh/src/material3_kit.rs) | Flattened `crates/nsh-*` (`nsh-core`, `nsh-base`, `nsh-bundler`, `nsh-dev` at `0.6.0`), using `taffy::ScrollableOverflow::new` and `&self` `cache_get`. 4-mode Material 3 Expressive tokens (`M3Mode`, `M3_SPRINGS`) sync via `gpui_ui::nsh` and 12 `aphrody_nsh::material3_kit` builders + `export_m3_nsh_tsx_kit()`. |
 | **Longbridge GPUI Kit `0.10.0` + M3 Kit** (`longbridge/gpui-kit`) | [`crates/gpui-kit/Cargo.toml`](../../../crates/gpui-kit/Cargo.toml), [`crates/gpui-component/Cargo.toml`](../../../crates/gpui-component/Cargo.toml), [`crates/gpui-base/Cargo.toml`](../../../crates/gpui-base/Cargo.toml), [`material3.rs`](../../../crates/gpui-component/src/material3.rs), [`crates/gpui_ui/src/kit.rs`](../../../crates/gpui_ui/src/kit.rs) | `gpui-kit`, `gpui-component`, `gpui-base`, `gpui-component-macros`, and `gpui-kit-assets` unified at `0.10.0` on single `gpui` + `lsp_types_kit = "0.97"` (`proposed`). Includes 4-mode M3 Expressive tokens (`M3AppearanceMode`, `M3SpringToken`) and 16 `RenderOnce` widgets re-exported via `gpui_kit::material3`. |
-| **Layout & GPU Primitives** (`taffy 0.15.1` + `wgpu v30`) | [`vendor/taffy/Cargo.toml`](../../../vendor/taffy/Cargo.toml), [`vendor/wgpu/Cargo.toml`](../../../vendor/wgpu/Cargo.toml), [`Cargo.toml`](../../../Cargo.toml) | `[patch.crates-io]` pins `taffy = "0.15.1"` (`vendor/taffy`, `flexbox_balance`, `detailed_layout_info`) and `wgpu` / `naga` `30.0.0` (`vendor/wgpu`) across desktop, headless Linux, and WebGPU/Wasm targets. |
-| **Kitesurf Absorbed Forks & Browser Engine** | [`.gitmodules`](../../../.gitmodules), [`vendor/browser/docs/kitesurf.md`](../../../vendor/browser/docs/kitesurf.md), [`vendor/browser/third_party/README.md`](../../../vendor/browser/third_party/README.md), [`upstreams.toml`](../../../vendor/browser/tools/upstreams.toml) | Absorbs Kitesurf engine forks (`taffy`, `parley`, `stylo`, `blitz`, `vello`, `anyrender`, `boa`, `resvg`, `jpeg-encoder`, `ratatui-image`) across `vendor/*`, `Cargo.toml` (`resvg 0.46.0`), and `vendor/browser`. Heavy `vendor/browser/third_party` checkouts stay slimmed to gitlinks with `mode = "pin"` SHAs in `upstreams.lock.json`. |
+| **Layout & GPU Primitives** (`taffy 0.15.1` + `wgpu v30`) | [`Cargo.toml`](../../../Cargo.toml), [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json) | `[patch.crates-io]` redirects `taffy` (`flexbox_balance`, `detailed_layout_info`) and `wgpu` / `naga` `30.0.0` to the pinned `aphrody-labs/taffy` and `aphrody-labs/wgpu` git tags across desktop, headless Linux, and WebGPU/Wasm targets. |
+| **Kitesurf Absorbed Forks & Browser Engine** | [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json), [`Cargo.toml`](../../../Cargo.toml) (`browser-*`, `resvg 0.46.0`) | The browser engine is the external `aphrody-labs/browser` repository (and `aphrody-labs/kitesurf`), consumed as pinned git tags; its absorbed Kitesurf engine forks (`taffy`, `parley`, `stylo`, `blitz`, `vello`, `anyrender`, `boa`, `resvg`, `jpeg-encoder`, `ratatui-image`) and `third_party` pins live in that repository, not in this tree. |
 | `longbridge/quickjs-jit` | [`Cargo.toml`](../../../Cargo.toml) (`rquickjs`, `quickjs-jit-stdlib`), `crates/nsh-js` | Centralized in `[workspace.dependencies]` (`quickjs-jit-sys` built at `opt-level = 3`). |
 | `longbridge/rust-i18n` | [`Cargo.toml`](../../../Cargo.toml) (`rust-i18n`, `rust-i18n-support`), `crates/nsh-i18n` | Centralized in `[workspace.dependencies]`. |
-| `longbridge/wry` | [`.gitmodules`](../../../.gitmodules) (`vendor/tauri/wry`), [`Cargo.toml`](../../../Cargo.toml) (`wry`) | Single path submodule checkout `vendor/tauri/wry` referenced via `[workspace.dependencies]`. |
+| `longbridge/wry` | [`Cargo.toml`](../../../Cargo.toml) (`wry`), [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json) | Single pinned git dependency on `aphrody-labs/wry` (`tag = "v0.57.3-aphrody.20261120"`) referenced via `[workspace.dependencies]`. |
 
 ### 3.2 Ongoing Convergence & Remaining Candidates (`MERGE_CANDIDATE`)
 
 | Upstream / Community Repo | Target Aphrody Crates | Technical Gap & Merge Plan |
 | :--- | :--- | :--- |
 | `longbridge/gpui-mobile` | [`crates/gpui_ios/Cargo.toml`](../../../crates/gpui_ios/Cargo.toml), `crates/nsh-platform-android`, `crates/gpui_platform` | Port Android Vulkan surface lifecycle and unified mobile device/hardware features from `gpui-pre-mobile` onto centralized `gpui_platform`. |
-| `longbridge/wef` | `crates/nsh-platform-gpui`, `vendor/tauri/cef-rs`, `crates/aphrody_desktop` | Evaluate offscreen CEF3 rendering (`wef 0.6.0`, `gpui-webview 0.10.0`) alongside `vendor/tauri/cef-rs` for consistent embedded web surfaces. |
+| `longbridge/wef` | `crates/nsh-platform-gpui`, `crates/aphrody_desktop` | Evaluate offscreen CEF3 rendering (`wef 0.6.0`, `gpui-webview 0.10.0`) alongside the reference `aphrody-labs/cef-rs` fork for consistent embedded web surfaces. |
 | `longbridge/purview` | [`crates/aphrody_craft/src/mcp.rs`](../../../crates/aphrody_craft/src/mcp.rs), `crates/inspector_ui`, `crates/gpui_ui` | Adopt structured semantic multi-window GPUI projection over `rmcp` so AI agents inspect and drive live GPUI windows alongside `aphrody_pilot`. |
 | `longbridge/longbridge-ai-acp` & `acp-registry` | `crates/acp_thread`, `crates/acp_tools`, `crates/agent_servers` | Align ACP auth/rich-content contracts with root `agent-client-protocol`. |
 | `longbridge/longbridge-mcp` & `longbridge-terminal` | `crates/aphrody_craft`, `crates/context_server`, `crates/terminal_view`, `crates/nsh-platform-tui` | Harmonize streamable-HTTP `rmcp` servers and Ratatui/CLI release packaging profiles. |
@@ -123,7 +123,7 @@ flowchart LR
 
 1. **Workspace Lints (`[lints] workspace = true`)**: Flag any member missing workspace lint inheritance.
 2. **Non-Workspace Dependency Elimination**:
-   - **Core pins in root [`Cargo.toml`](../../../Cargo.toml)**: `gpui-kit` / `gpui-component` / `gpui-base` `0.10.0`, `nsh-core` / `nsh-base` / `nsh-bundler` / `nsh-dev` `0.6.0`, `lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }`, `resvg 0.46.0`, and `[patch.crates-io]` overrides for `taffy = "0.15.1"` (`vendor/taffy`) and `wgpu` / `naga` `30.0.0` (`vendor/wgpu`).
+   - **Core pins in root [`Cargo.toml`](../../../Cargo.toml)**: `gpui-kit` / `gpui-component` / `gpui-base` `0.10.0`, `nsh-core` / `nsh-base` / `nsh-bundler` / `nsh-dev` `0.6.0`, `lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }`, `resvg 0.46.0`, and `[patch.crates-io]` overrides redirecting `taffy` `0.15.1` and `wgpu` / `naga` `30.0.0` to the pinned `aphrody-labs/taffy` and `aphrody-labs/wgpu` tags.
    - **Direct `git` dependencies outside `[workspace.dependencies]`**: Hoist crate-local `git` and versioned dependencies (`etw_tracing`, `fs`, `gpui_linux`, `vim`, `gpui`, `gpui_shared_string`, `ztracing`) into root `[workspace.dependencies]` for single-revision pinning.
 3. **Resolved Graph Duplicate Reduction**: See [Production Guide](./production-guide.md) and `target/longbridge-ingest/graph.json` (`duplicatePackages`) for remaining multi-version splits.
 

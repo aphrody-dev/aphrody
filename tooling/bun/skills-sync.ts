@@ -21,16 +21,6 @@ interface SkillTarget {
 
 const TARGETS: SkillTarget[] = [
   {
-    path: ".agents/plugins/aphrody/skills/gpui/SKILL.md",
-    crates: [{ name: "gpui" }, { name: "taffy" }, { name: "accesskit" }],
-    repos: [{ repo: "zed-industries/zed" }, { repo: "aphrody-dev/aphrody" }],
-  },
-  {
-    path: ".agents/plugins/aphrody/skills/nsh/SKILL.md",
-    crates: [{ name: "gpui" }],
-    repos: [{ repo: "longbridge/nsh" }, { repo: "aphrody-dev/aphrody" }],
-  },
-  {
     path: ".agents/skills/gpui-kit/SKILL.md",
     crates: [{ name: "gpui-component" }],
     repos: [{ repo: "longbridge/gpui-component" }],
@@ -39,11 +29,6 @@ const TARGETS: SkillTarget[] = [
     path: ".agents/skills/gpui-fast/SKILL.md",
     crates: [{ name: "gpui" }],
     repos: [{ repo: "zed-industries/zed" }],
-  },
-  {
-    path: ".agents/plugins/aphrody/skills/wgpu/SKILL.md",
-    crates: [{ name: "wgpu" }, { name: "naga" }],
-    repos: [{ repo: "gfx-rs/wgpu" }],
   },
 ];
 

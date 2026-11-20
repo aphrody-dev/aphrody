@@ -217,7 +217,7 @@ function classifyDomain(entry: LearnJournalEntry): { slug: string; title: string
     return { slug: "mcp-context", title: "MCP Budget & Context Hygiene" };
   }
   if (/(git |submodule|merge|rebase|commit)/.test(hay)) {
-    return { slug: "git-workflow", title: "Git & Submodule Hygiene", skill: "github-ops" };
+    return { slug: "git-workflow", title: "Git Workflow Hygiene", skill: "github-ops" };
   }
   return { slug: "general", title: "Autonomous Execution & Recovery" };
 }

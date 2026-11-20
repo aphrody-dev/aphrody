@@ -10,7 +10,7 @@ Auditing `aphrody-labs/agent-desktop@main` (`3,801` blobs across `~51.2 MB`) sep
 |---|---:|---:|---|---|
 | **Marketing Media (`assets/`)** | 7 files | 37,212 KB | **Purged** | Video/GIF bloat removed; GPUI visual smoke & PNG capture handle verification. |
 | **Docs Web App (`apps/docs/`)** | 102 files | 1,162 KB | **Purged** | Upstream web docs template replaced by [`docs/aphrody/architecture/`](./README.md). |
-| **Historical Probes (`probes/`)** | 345 files | 5,518 KB | **Purged & Distilled** | Exploratory PS1/Python heuristics folded into [`backend_windows.rs`](../../../crates/aphrody_pilot/src/backend_windows.rs) & [`platforms-matrix.md`](../../../.agents/plugins/aphrody/skills/ai-os-pilot/references/platforms-matrix.md). |
+| **Historical Probes (`probes/`)** | 345 files | 5,518 KB | **Purged & Distilled** | Exploratory PS1/Python heuristics folded into [`backend_windows.rs`](../../../crates/aphrody_pilot/src/backend_windows.rs) & platforms-matrix.md (`fw: plugins/aphrody/skills/ai-os-pilot/references/platforms-matrix.md`). |
 | **C ABI & Cross-Lang Rigs (`crates/ffi/`, `tests/fixture-app*`, `tests/native/`, `tests/real-apps/`, `tests/ffi-python/`)** | 253 files | ~900 KB | **Purged** | Aphrody is pure Rust + Wasm + MCP/JSON-RPC; UI tests run natively on GPUI + `AccessKit`. |
 | **Standalone Wrapper & VM (`npm/`, `providers/macos/`)** | 12 files | ~144 KB | **Purged** | Replaced by [`aphrody_store`](../../../crates/aphrody_store/src/packagers.rs) (22 packagers) & `fleet:verify`. |
 | **Legacy Cursor Overlay (`cursor_overlay/`)** | 80+ files | ~250 KB | **Replaced** | Replaced by native GPU compositor HUD [`pilot_hud.rs`](../../../crates/aphrody_desktop/src/pilot_hud.rs) in `aphrody_desktop`. |

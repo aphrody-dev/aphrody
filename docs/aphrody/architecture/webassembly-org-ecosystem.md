@@ -32,4 +32,4 @@ Synced snapshot of [100 repositories](https://github.com/orgs/WebAssembly/reposi
 
 - Registry manifest: [webassembly_ecosystem.toml](../../../assets/os/webassembly_ecosystem.toml)
 - Compact agent index: [webassembly-org-llms.txt](./webassembly-org-llms.txt)
-- Toolchain skill: [.agents/plugins/aphrody/skills/webassembly/SKILL.md](../../../.agents/plugins/aphrody/skills/webassembly/SKILL.md)
+- Toolchain skill: `fw: plugins/aphrody/skills/webassembly`

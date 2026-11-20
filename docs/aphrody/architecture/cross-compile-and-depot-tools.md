@@ -21,7 +21,7 @@
 1. **Pure Rust Graphics (`wgpu` v30 + `naga`)**: Compiles WGSL directly to Vulkan SPIR-V, DX12 DXIL/DXBC, Metal MSL, and WebGPU without Chromium Dawn/ANGLE build trees.
 2. **Prebuilt WebRTC (`webrtc-sys`)**: Fetches versioned release archives containing headers and static `libwebrtc.a` / `webrtc.lib`.
    - **ABI Caution**: Upstream prebuilt Linux `libwebrtc.a` links against GNU `libstdc++` (`-std=c++20`). When cross-compiling C++ crates with `cargo-zigbuild` (which defaults to LLVM `libc++`), pass `CXXFLAGS="-stdlib=libstdc++"` or run WebRTC links natively on Linux `fr1`.
-3. **Prebuilt CEF / WebView (`aphrody-labs/cef-rs` ref + [`vendor/tauri/wry`](../../../vendor/tauri/wry))**: CEF reference moved to [`vendor-reference-ecosystem.md`](./vendor-reference-ecosystem.md) (`CEF_PATH` / `CEF_DOWNLOAD_URL` avoids 35 GB Chromium checkouts), while `vendor/tauri/wry` remains vendored for `nsh-platform-gpui`. Keep `/srv/depot_tools` on `fr1` exclusively for custom Chromium/ANGLE source rebuilds.
+3. **Prebuilt CEF / WebView (`aphrody-labs/cef-rs` ref + pinned `aphrody-labs/wry`)**: CEF reference moved to [`vendor-reference-ecosystem.md`](./vendor-reference-ecosystem.md) (`CEF_PATH` / `CEF_DOWNLOAD_URL` avoids 35 GB Chromium checkouts), while `wry` is a pinned git tag dependency (`aphrody-labs/wry`) for `nsh-platform-gpui`. Keep `/srv/depot_tools` on `fr1` exclusively for custom Chromium/ANGLE source rebuilds.
 4. **Windows CRT Caution**: `+crt-static` resolves `livekit` static lib conflicts in standalone executables, but dynamic C-API plugins/extensions (e.g. external CEF DLL boundaries) require matching CRT linkage across DLL boundaries.
 
 ---

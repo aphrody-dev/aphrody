@@ -1,4 +1,4 @@
-# GPUI Starter Pack, Web Standards & Submodule Parity Matrix
+# GPUI Starter Pack, Web Standards & Fork Parity Matrix
 
 > Authoritative cross-stack specification unifying **Core Web Vitals**, **Lighthouse**, **W3C** (HTML5, WCAG 2.2 AA, WAI-ARIA, CharMod, BCP 47, DTCG), **Google Style Guides**, **Vercel Web Interface Guidelines**, and **shadcn/ui + Base UI + Tailwind v4** directly into Aphrody GPUI, NSH, and WebGPU.
 
@@ -12,9 +12,9 @@
 | GPU Frame Cadence | `<= 16.67 ms` (60Hz) / `<= 8.33 ms` (120Hz) | Shared WGSL Naga v30 pipelines + M3 Expressive damped springs |
 | Critical Wasm Payload | `<= 358400 B` Brotli | `[profile.web-lto]` + Binaryen `wasm-opt -Oz` cohorts |
 
-## Fork Submodule Parity Matrix
+## Fork Parity Matrix (pinned git dependencies)
 
-| Stack / Submodule | Patched | Wasm32 | WASI P2 | WGPU v30 | Taffy | AccessKit | M3 + Tailwind | shadcn/Base UI | MCP |
+| Stack / Fork | Patched | Wasm32 | WASI P2 | WGPU v30 | Taffy | AccessKit | M3 + Tailwind | shadcn/Base UI | MCP |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Aphrody GPUI Core + Starter Pack | YES | YES | YES | YES | YES | YES | YES | YES | YES |
 | WGPU v30 + Naga (aphrody-labs/wgpu) | YES | YES | YES | YES | - | - | - | - | YES |
@@ -22,25 +22,25 @@
 | AccessKit (aphrody-labs/accesskit) | YES | YES | - | - | - | YES | - | - | YES |
 | Cosmic Text (aphrody-labs/cosmic-text) | YES | YES | YES | - | - | - | - | - | - |
 | Egui (aphrody-labs/egui) | YES | YES | - | YES | - | YES | - | - | - |
-| WRY WebView (aphrody-labs/wry) | - | - | - | - | - | YES | - | - | - |
-| Craft Libs (aphrody-labs/craft-libs) | - | YES | YES | - | - | - | - | - | YES |
-| Craft Anything (aphrody-labs/craft-anything) | - | YES | - | YES | - | YES | - | - | YES |
-| Mullvad VPN (aphrody-labs/mullvadvpn-app) | - | - | - | - | - | - | - | - | YES |
-| Aphrody Browser (aphrody-labs/browser) | - | YES | - | YES | - | YES | - | - | YES |
+| WRY WebView (aphrody-labs/wry) | YES | - | - | - | - | YES | - | - | - |
+| Craft Libs (aphrody-labs/craft-libs) | YES | YES | YES | - | - | - | - | - | YES |
+| Craft Anything (aphrody-labs/craft-anything) | YES | YES | - | YES | - | YES | - | - | YES |
+| Mullvad VPN (aphrody-labs/mullvadvpn-app) | YES | - | - | - | - | - | - | - | YES |
+| Aphrody Browser (aphrody-labs/browser) | YES | YES | - | YES | - | YES | - | - | YES |
 
 ## Deterministic Micro-Benchmarks (Bun Native)
 
 | Benchmark | Iterations | Throughput (ops/sec) | p50 (us) | p95 (us) |
 | --- | ---: | ---: | ---: | ---: |
-| `design_md_frontmatter_parse` | 200 | 400000 | 2.4 | 4.6 |
-| `shadcn_tailwind_v4_css_emit` | 200 | 147558 | 5.6 | 9.5 |
-| `cwv_lighthouse_w3c_html_audit` | 200 | 1310616 | 0.4 | 3.1 |
-| `submodule_parity_graph_resolve` | 50 | 56491 | 16.5 | 25.1 |
+| `design_md_frontmatter_parse` | 200 | 415628 | 2.4 | 4.7 |
+| `shadcn_tailwind_v4_css_emit` | 200 | 176710 | 5 | 9.4 |
+| `cwv_lighthouse_w3c_html_audit` | 200 | 1635323 | 0.5 | 1.3 |
+| `fork_parity_graph_resolve` | 50 | 46125 | 20.8 | 29 |
 
 ## Monorepo TS -> Rust AI-Agent Readiness Audit
 
-- TypeScript files checked via `Bun.Transpiler`: **66** (syntax errors: 0, explicit `any` warnings: 10)
-- Pure-Rust core crate files checked: **56** (`mod.rs` violations: 0, production `.unwrap()`: 0)
+- TypeScript files checked via `Bun.Transpiler`: **77** (syntax errors: 0, explicit `any` warnings: 10)
+- Pure-Rust core crate files checked: **59** (`mod.rs` violations: 0, production `.unwrap()`: 0)
 - Machine path leaks across TS + Rust: **0**
 
 ## Key Source Files

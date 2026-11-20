@@ -60,7 +60,6 @@ jobs:
           [ -f docs/aphrody/nsh/README.md ] && cp docs/aphrody/nsh/README.md /tmp/wiki/NSH-Overview.md
           [ -f "${PLUGIN_DIR}/docs/INDEX.md" ] && cp "${PLUGIN_DIR}/docs/INDEX.md" /tmp/wiki/Plugin-and-Skills.md
           [ -f "${PLUGIN_DIR}/docs/gpui-kit/ARCHITECTURE.md" ] && cp "${PLUGIN_DIR}/docs/gpui-kit/ARCHITECTURE.md" /tmp/wiki/GPUI-Kit-Architecture.md
-          [ -f "${PLUGIN_DIR}/skills/github-ops/SKILL.md" ] && cp "${PLUGIN_DIR}/skills/github-ops/SKILL.md" /tmp/wiki/GitHub-Automation.md
 
           printf '%s\n' \
             "### ${APP_NAME} / ${PLUGIN_NAME} Wiki" \
@@ -72,8 +71,7 @@ jobs:
             '- [[WGPU Full Reference|WGPU-Reference]]' \
             '- [[Vulkan Backend|GPU-Vulkan]]' \
             '- [[DirectX 12 Backend|GPU-DirectX12]]' \
-            '- [[WebGPU Backend|GPU-WebGPU]]' \
-            '- [[GitHub Automation|GitHub-Automation]]' > /tmp/wiki/_Sidebar.md
+            '- [[WebGPU Backend|GPU-WebGPU]]' > /tmp/wiki/_Sidebar.md
 
           git -C /tmp/wiki add -A
           if ! git -C /tmp/wiki diff --cached --quiet; then

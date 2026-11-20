@@ -7,17 +7,10 @@ Aphrody compiles `wasm32-unknown-unknown` apps under `[profile.web]` using direc
 ## Core Documentation & Best Practices
 
 - [Aphrody wasm-bindgen Ecosystem Guide](./wasm-bindgen-ecosystem.md): Full architectural analysis of all 8 upstream repos, live `crates.io` vs `Cargo.lock` telemetry, `walrus`/`wasm-opt` pipelines, and `gpui_web` FFI standards.
-- [wasm-bindgen Agent Skill](../../../.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md): Progressive-disclosure skill entrypoint (`agentskills.io` compliant) with non-negotiable FFI invariants and build verification commands.
+- Agent skill: `fw: plugins/aphrody/skills/wasm-bindgen`
 - [Unified Web Build Pipeline](../../../tooling/bun/web-build.ts): Single-source Bun orchestrator enforcing exact `wasm-bindgen` CLI == `Cargo.lock` pinning, `[profile.web]`, 3-cohort builds (`baseline`, `simd-baseline`, `multithreaded`), `wasm-opt -Oz`, and Brotli size budgets.
 - [GPUI Web Platform Crate](../../../crates/gpui_web/Cargo.toml): Production browser platform backend (`52` minimized `web-sys` features, `Closure` lifecycle cleanup, `async_channel` Fetch streaming, and `Atomics.waitAsync` worker mailbox).
 - [Workspace Cargo Manifest](../../../Cargo.toml): Workspace dependency pins (`wasm-bindgen = "0.2.120"`, `wasm_thread` rev `0cf96c7708df`) and `[profile.web]` linker/opt settings.
-
-## Skill Reference Modules
-
-- [8-Repo Ecosystem Matrix](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/repos-matrix.md): Live GitHub commits, stars, MSRV, sub-crate manifests, and `crates.io` parity across all 8 `wasm-bindgen` org repos.
-- [js-sys, web-sys & Futures FFI Patterns](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/js-web-sys-patterns.md): `Closure` drop guards vs `once_into_js`, zero-copy `Uint8Array::view` vs `to_vec`, `wasm-bindgen-futures` microtasks, `web-sys` feature minimization, and `Reflect` feature probing.
-- [walrus, weedle, ts-gen & js-bindgen](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/walrus-weedle-tsgen.md): How `walrus` dead-symbol/section/`externref` passes prepare binaries for `wasm-opt`, `weedle` WebIDL parsing for `web-sys`, `ts-gen` `.d.ts` codegen, `js-bindgen` linker interop, and boxed `Externref` RFC.
-- [Aphrody Best Practices & WebGPU Integration](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/aphrody-best-practices.md): Why `cargo build + wasm-bindgen + wasm-opt` beats `wasm-pack`, `gpui_web` reentrancy take/call/restore safety, `web-build.ts` cohort verification, and `nsh-platform-web` custom ABI contrast.
 
 ## Repositories (github.com/wasm-bindgen)
 

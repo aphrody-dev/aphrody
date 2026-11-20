@@ -1,6 +1,6 @@
-# Aphrody Vendor, Third-Party Supply-Chain, and WireGuard LAN Plan
+# Aphrody Pinned Forks, Third-Party Supply-Chain, and WireGuard LAN Plan
 
-Single source of truth for Zed contributor conformity, split licensing, vendor/third-party submodule parity, third-party supply-chain policy, and the WireGuard LAN build/verification fleet.
+Single source of truth for Zed contributor conformity, split licensing, pinned fork dependencies, third-party supply-chain policy, and the WireGuard LAN build/verification fleet.
 
 ## 1. Zed Contributor Guide & Workspace Conformity
 
@@ -14,20 +14,19 @@ Single source of truth for Zed contributor conformity, split licensing, vendor/t
 
 - [deny.toml](../../../deny.toml) enforces:
   - Approved SPDX license allowlist (including `Apache-2.0`, `MIT`, `BSD-2-Clause`, `BSD-3-Clause`, `GPL-3.0-or-later`, `ISC`, `MPL-2.0`, `Zlib`, `Unicode-3.0`, `bzip2-1.0.6`, `WTFPL`).
-  - `unknown-registry = "deny"` and `unknown-git = "deny"`, with an explicit allowlist matching every pinned git source in `Cargo.lock`.
+  - `unknown-registry = "deny"` and `unknown-git = "deny"`, with an explicit allowlist of git sources plus the `aphrody-labs` GitHub organization for the pinned forks.
 - Verification command: `cargo deny check licenses sources --hide-inclusion-graph`.
 
-## 3. Vendor & Nested Submodule Remediation
+## 3. Pinned Fork Dependencies
 
-- Top-level `.gitmodules` ([.gitmodules](../../../.gitmodules)) declares 24 fork submodules (`vendor/mullvad`, `vendor/browser`, `vendor/bun`, `vendor/wgpu`, `vendor/taffy`, `vendor/dioxus`, `vendor/blitz`, `vendor/libcosmic`, etc.).
-- Nested submodules required by vendored Cargo manifests (`vendor/libcosmic/iced`) are automatically discovered via `listNestedReferencedPaths` in [submodules.ts](../../../tooling/bun/submodules.ts) and initialized across:
-  - CI action: [.github/actions/vendor-submodules/action.yml](../../../.github/actions/vendor-submodules/action.yml)
-  - Remote Linux hosts: [fleet-sync.ts](../../../tooling/bun/fleet-sync.ts)
-  - `[patch.crates-io]` overrides in [Cargo.toml](../../../Cargo.toml) (`taffy`, `cosmic-text`, `wgpu*`, `naga`, `accesskit*`, plus Zed's upstream patches).
-- **WGPU Pinning Decision (`vendor/wgpu`)**: `vendor/wgpu` remains unified on `wgpu 30.0.0` / `naga 30.0.0` with Aphrody's custom Metal patch so `gpui_wgpu`, `aphrody_cli`, `nsh-*`, and `vendor/vello` resolve against a single `wgpu`/`naga` graph without dual-version conflicts vs `gfx-rs/wgpu` `v30.0.2` / `trunk`.
+- There are no git submodules and no `vendor/` directory. Every upstream fork (`wgpu`, `taffy`, `accesskit`, `cosmic-text`, `egui`, `wry`, `craft-libs`, `craft-anything`, `mullvadvpn-app`, `browser`, `kitesurf`) is a Cargo git dependency pinned to a release tag: `git = "https://github.com/aphrody-labs/<fork>.git", tag = "..."` in the root [Cargo.toml](../../../Cargo.toml).
+- The tags are recorded in [forks-manifest.json](../../../tooling/bun/forks-manifest.json) (repo, upstream, tag, sha, release and tarball URLs).
+- `[patch.crates-io]` (between `APHRODY_ISOLATED_PATCHES START/END`) redirects `taffy`, `cosmic-text`, `wgpu*`, `naga`, `accesskit*`, and `egui*` crates to the same pinned tags, next to Zed's upstream patches; `[patch."https://github.com/storytold/craft-libs"]` redirects the `craft-*` crates to the `aphrody-labs/craft-libs` tag.
+- **WGPU Pinning Decision**: `aphrody-labs/wgpu` stays unified on `wgpu 30.0.0` / `naga 30.0.0` with Aphrody's custom Metal patch so `gpui_wgpu`, `aphrody_cli`, and `nsh-*` resolve against a single `wgpu`/`naga` graph without dual-version conflicts vs `gfx-rs/wgpu` `v30.0.2` / `trunk`.
+- Bun is its own repository (`aphrody-labs/bun`) and is not pulled into this workspace.
 
 ## 4. WireGuard LAN Fleet & `aphrody_vpn` Local Network Sharing
 
 - Heavy Linux workspace builds and integration tests offload from the Windows workstation to the WireGuard `wg1` mesh (`10.200.77.0/24` across `fr1`, `fr2`, and `prd`) via SSH aliases in [fleet-sync.ts](../../../tooling/bun/fleet-sync.ts).
 - Local-network split tunneling inside `crates/aphrody_vpn` is wired through `Toggle::AllowLan` in [backend.rs](../../../crates/aphrody_vpn/src/backend.rs) and enforced in [daemon_backend.rs](../../../crates/aphrody_vpn/src/daemon_backend.rs) so local WireGuard/LAN traffic stays reachable alongside the tunnel.
-- Automated full-stack audit: [vendor-lan-doctor.ts](../../../tooling/bun/vendor-lan-doctor.ts) (`bun run vendor:doctor`).
+- Automated audit of Cargo patches, `deny.toml` and LAN: [vendor-lan-doctor.ts](../../../tooling/bun/vendor-lan-doctor.ts) (`bun run vendor:doctor`).

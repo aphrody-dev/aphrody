@@ -21,12 +21,10 @@ import {
   SCAN_OUT_REL,
   type ScanReport,
   selectKeyDigestFiles,
-  SKILL_DIR_REL,
   updateEcosystemSummaryBlocks,
   validateGitIngestDigest,
   validateLlmsTxt,
   validateRelativeLinks,
-  validateSkillFrontmatter,
 } from "./wasm-bindgen-ingest.ts";
 
 describe("wasm-bindgen-ingest pure parsers, serializers & validators", () => {
@@ -111,19 +109,6 @@ once_cell = "1.12"
     );
     expect(parsed.filesAnalyzed).toBe(238);
     expect(parsed.estimatedTokens).toBe("302.6k");
-  });
-
-  test("validateSkillFrontmatter enforces agentskills.io naming and length rules", () => {
-    expect(
-      validateSkillFrontmatter("---\nname: wasm-bindgen\ndescription: Valid skill\n---\n# Title\n").ok,
-    ).toBe(true);
-    expect(
-      validateSkillFrontmatter("---\nname: Invalid_Name\ndescription: Bad slug\n---\n").ok,
-    ).toBe(false);
-    expect(
-      validateSkillFrontmatter(`---\nname: ${"a".repeat(65)}\ndescription: Too long\n---\n`).ok,
-    ).toBe(false);
-    expect(validateSkillFrontmatter("# Missing frontmatter").ok).toBe(false);
   });
 
   test("validateLlmsTxt validates llmstxt.org H1, blockquote, H2, and markdown link list", () => {
@@ -258,10 +243,8 @@ describe("wasm-bindgen-ingest Aphrody workspace & fixture emit", () => {
       };
 
       const res = runEmitCommand(scan, manifest, fixture);
-      expect(res.skillFrontmatterOk).toBe(true);
       expect(res.llmsTxtOk).toBe(true);
       expect(res.brokenLinks).toEqual([]);
-      expect(res.referencePaths.length).toBe(4);
 
       const customWrapper = [
         "# Header Keep",
@@ -282,7 +265,7 @@ describe("wasm-bindgen-ingest Aphrody workspace & fixture emit", () => {
 });
 
 describe("wasm-bindgen-ingest generated repo artifacts & live digests verification", () => {
-  test("all 8 GitIngest digests, llms.txt, Skill bundle, ecosystem doc, and relative links are valid", () => {
+  test("all 8 GitIngest digests, llms.txt, ecosystem doc, and relative links are valid", () => {
     // The digests are gitignored output of a live org scan; verify them only where that scan has run.
     if (!existsSync(join(REPO_ROOT, SCAN_OUT_REL))) return;
     expect(existsSync(join(REPO_ROOT, INGEST_MANIFEST_REL))).toBe(true);
@@ -315,23 +298,6 @@ describe("wasm-bindgen-ingest generated repo artifacts & live digests verificati
       expect(readFileSync(llmsAbs, "utf8")).toContain(`wasm-bindgen/${expected}`);
     }
 
-    const skillAbs = join(REPO_ROOT, SKILL_DIR_REL, "SKILL.md");
-    expect(existsSync(skillAbs)).toBe(true);
-    const fm = validateSkillFrontmatter(readFileSync(skillAbs, "utf8"));
-    expect(fm.ok).toBe(true);
-    expect(fm.name).toBe("wasm-bindgen");
-
-    const refFiles = [
-      "repos-matrix.md",
-      "js-web-sys-patterns.md",
-      "walrus-weedle-tsgen.md",
-      "aphrody-best-practices.md",
-    ].map((f) => join(REPO_ROOT, SKILL_DIR_REL, "references", f));
-    for (const rf of refFiles) {
-      expect(existsSync(rf)).toBe(true);
-      expect(readFileSync(rf, "utf8").length).toBeGreaterThan(1500);
-    }
-
     const ecoAbs = join(REPO_ROOT, ECOSYSTEM_DOC_REL);
     expect(existsSync(ecoAbs)).toBe(true);
     const ecoMd = readFileSync(ecoAbs, "utf8");
@@ -340,7 +306,7 @@ describe("wasm-bindgen-ingest generated repo artifacts & live digests verificati
     expect(ecoMd).toContain("gpui_web");
     expect(ecoMd).toContain("web-build.ts");
 
-    const broken = validateRelativeLinks([llmsAbs, ecoAbs, skillAbs, ...refFiles]);
+    const broken = validateRelativeLinks([llmsAbs, ecoAbs]);
     expect(broken).toEqual([]);
 
     const hygiene = checkRepoHygiene(REPO_ROOT);

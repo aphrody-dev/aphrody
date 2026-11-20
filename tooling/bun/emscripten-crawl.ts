@@ -15,9 +15,19 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
-import { isInsideUninitialisedSubmodule } from "./repo-hygiene.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
+
+/** Blob URL of a file inside a pinned fork (Cargo git dependency), at the tag recorded in forks-manifest.json. */
+export function pinnedForkBlobUrl(forkName: string, path: string, root = REPO_ROOT): string {
+  const manifestPath = join(root, "tooling/bun/forks-manifest.json");
+  const manifest = existsSync(manifestPath)
+    ? (JSON.parse(readFileSync(manifestPath, "utf8")) as { forks?: Array<{ name: string; repo: string; tag: string }> })
+    : {};
+  const fork = manifest.forks?.find((f) => f.name === forkName);
+  if (!fork) throw new Error(`Fork '${forkName}' is not pinned in tooling/bun/forks-manifest.json`);
+  return `https://github.com/${fork.repo}/blob/${fork.tag}/${path}`;
+}
 export const EMSCRIPTEN_ORIGIN = "https://emscripten.org";
 export const EMSCRIPTEN_ORG = "emscripten-core";
 export const GITINGEST_BASE_URL = "https://gitingest.com";
@@ -30,12 +40,6 @@ export const ORG_MANIFEST_REL = "target/gitingest/emscripten-core/org-manifest.j
 
 export const LLMS_TXT_REL = "docs/aphrody/architecture/emscripten-llms.txt";
 export const ARCH_DOC_REL = "docs/aphrody/architecture/emscripten-ecosystem.md";
-export const SKILL_DIR_REL = ".agents/plugins/aphrody/skills/emscripten";
-export const SKILL_MD_REL = ".agents/plugins/aphrody/skills/emscripten/SKILL.md";
-export const REF_REPOS_REL = ".agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md";
-export const REF_SITEMAP_REL = ".agents/plugins/aphrody/skills/emscripten/references/sitemap-and-api-reference.md";
-export const REF_BEST_PRACTICES_REL = ".agents/plugins/aphrody/skills/emscripten/references/emcc-wasm-best-practices.md";
-export const REF_WEBGPU_INTEROP_REL = ".agents/plugins/aphrody/skills/emscripten/references/c-cpp-webgpu-interop.md";
 
 const USER_AGENT = "AphrodyEmscriptenIngest/1.0 (+https://github.com/aphrody-dev/aphrody)";
 
@@ -1313,25 +1317,6 @@ export async function runIngestCommand(opts: {
 // Validators (`agentskills.io`, `llmstxt.org`, Relative Links)
 // ---------------------------------------------------------------------------
 
-export function validateSkillFrontmatter(skillMd: string): { ok: boolean; name: string; descriptionLength: number; errors: string[] } {
-  const errors: string[] = [];
-  const fmMatch = skillMd.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!fmMatch) {
-    return { ok: false, name: "", descriptionLength: 0, errors: ["Missing YAML frontmatter delimited by ---"] };
-  }
-  const parsed = Bun.YAML.parse(fmMatch[1]!) as { name?: unknown; description?: unknown } | null;
-  const name = typeof parsed?.name === "string" ? parsed.name.trim() : "";
-  const desc = typeof parsed?.description === "string" ? parsed.description.trim() : "";
-  if (!name) errors.push("Missing frontmatter 'name'");
-  if (name.length > 64) errors.push(`Skill name exceeds 64 chars (${name.length})`);
-  if (name && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) {
-    errors.push(`Skill name '${name}' violates agentskills.io lowercase hyphenated pattern`);
-  }
-  if (!desc) errors.push("Missing frontmatter 'description'");
-  if (desc.length > 1024) errors.push(`Skill description exceeds 1024 chars (${desc.length})`);
-  return { ok: errors.length === 0, name, descriptionLength: desc.length, errors };
-}
-
 export function validateLlmsTxt(content: string): { ok: boolean; h1Count: number; hasBlockquote: boolean; h2Count: number; linkCount: number; errors: string[] } {
   const lines = content.split(/\r?\n/);
   const h1Lines = lines.filter((l) => /^#\s+\S/.test(l));
@@ -1359,7 +1344,7 @@ export function findBrokenRelativeLinks(docRelPaths: readonly string[], root = R
       const target = (match[1] ?? "").split("#")[0]!.trim();
       if (!target || /^(https?:|mailto:|#)/i.test(target)) continue;
       const resolved = resolve(dirname(full), target);
-      if (!existsSync(resolved) && !isInsideUninitialisedSubmodule(resolved, root)) {
+      if (!existsSync(resolved)) {
         broken.push(`${rel} -> ${target}`);
       }
     }
@@ -1393,14 +1378,10 @@ export function buildLlmsTxtContent(
     "- Use `emcc`/`em++` with `--use-port=emdawnwebgpu` (replacing legacy `-sUSE_WEBGPU`), `-sMODULARIZE -sEXPORT_ES6` for ES module bundles, `-sSTRICT`, `-sJSPI` or `-sASYNCIFY`, `-pthread` (requiring COOP/COEP `SharedArrayBuffer` headers), and `-msimd128`.",
     "- Upstream Emscripten 7.0.1-git expects LLVM 24 (`EXPECTED_LLVM_VERSION = 24`); check local host toolchain telemetry in [Emscripten Ecosystem Architecture](./emscripten-ecosystem.md).",
     "",
-    "## Aphrody Architecture & Progressive-Disclosure Skill",
+    "## Aphrody Architecture & Agent Skill",
     "",
     "- [Emscripten Ecosystem & Aphrody Integration Guide](./emscripten-ecosystem.md): Full 12-repo matrix, live crawl stats, `emscripten` vs `wasm32-unknown-unknown` vs `wasm32-wasip2`, Clang/LLVM 23 linking, and Bun+xh CI checks.",
-    "- [Emscripten Agent Skill (`SKILL.md`)](../../.agents/plugins/aphrody/skills/emscripten/SKILL.md): Concise operational rules, compiler defaults, and progressive-disclosure reference map.",
-    "- [Repositories & emsdk Reference](../../.agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md): All 12 `emscripten-core` repositories, `emsdk` manifest layout, GitHub Actions (`setup-emsdk`), and Bazel `emsdk` module.",
-    "- [Sitemap & API Reference](../../.agents/plugins/aphrody/skills/emscripten/references/sitemap-and-api-reference.md): Crawled `emscripten.org` route hierarchy (`searchindex.js` + BFS), C/C++ headers (`emscripten.h`, `html5.h`, `fetch.h`, `bind.h`), and JS runtime FS/Module APIs.",
-    "- [emcc & Wasm Best Practices](../../.agents/plugins/aphrody/skills/emscripten/references/emcc-wasm-best-practices.md): Official 7.0.x compiler flags, ESM modularization, JSPI vs Asyncify, pthreads/COOP/COEP, `-msimd128`, and Wasm linking.",
-    "- [C/C++ & WebGPU Interop](../../.agents/plugins/aphrody/skills/emscripten/references/c-cpp-webgpu-interop.md): Emdawnwebgpu (`--use-port=emdawnwebgpu`), `EM_JS`/`EM_ASYNC_JS`, Embind link-time invokers, `ccall`/`cwrap`, and Aphrody `gpui_web`/`vendor/wgpu` integration.",
+    "- Agent skill: `fw: plugins/aphrody/skills/emscripten`",
     "",
     "## Core Upstream Documentation (`emscripten.org`)",
     "",
@@ -1544,7 +1525,7 @@ Aphrody targets three complementary WebAssembly ABIs documented across [\`rust-t
 
 | Dimension | \`wasm32-unknown-unknown\` (Aphrody Browser UI) | \`wasm32-wasip2\` (Aphrody Extensions) | \`wasm32-unknown-emscripten\` (C/C++ POSIX & Emscripten) |
 | :--- | :--- | :--- | :--- |
-| **Primary Aphrody Crates** | [\`gpui_web\`](../../../crates/gpui_web/Cargo.toml), \`aphrody_desktop\`, \`nsh-platform-web\`, \`gpui_wgpu\` | [\`extension_host\`](../../../crates/extension_host/Cargo.toml) (Wasmtime \`48.0.7\`), \`extension_api\` (WIT) | [\`nsh-core\`](../../../crates/nsh-core/Cargo.toml#L99-L100) (\`target_os = "emscripten"\`), [\`wgpu-core-deps-emscripten\`](../../../vendor/wgpu/wgpu-core/platform-deps/emscripten/Cargo.toml) |
+| **Primary Aphrody Crates** | [\`gpui_web\`](../../../crates/gpui_web/Cargo.toml), \`aphrody_desktop\`, \`nsh-platform-web\`, \`gpui_wgpu\` | [\`extension_host\`](../../../crates/extension_host/Cargo.toml) (Wasmtime \`48.0.7\`), \`extension_api\` (WIT) | [\`nsh-core\`](../../../crates/nsh-core/Cargo.toml#L99-L100) (\`target_os = "emscripten"\`), [\`wgpu-core-deps-emscripten\`](${pinnedForkBlobUrl("wgpu", "wgpu-core/platform-deps/emscripten/Cargo.toml")}) |
 | **Standard C Library (\`libc\`)** | None (pure Rust \`std\` stub + JS bindings) | WASI Preview 2 component model + \`wasi-libc\` | Full POSIX/musl \`libc\` (\`emscripten-core/musl\`), \`cfg(unix)\`, signals, pthreads, virtual FS |
 | **JS / Host Bindings** | \`wasm-bindgen 0.2.129\` + \`web-sys\` / \`js-sys\` | Canonical ABI / \`wit-bindgen\` host imports | Embind (\`bind.h\` link-time invokers in 7.0.1), \`EM_JS\`, \`EM_ASM\`, \`ccall\`/\`cwrap\`, \`WebIDL Binder\` |
 | **WebGPU API Bridge** | Browser \`navigator.gpu\` via \`wgpu\` -> \`web-sys\` | Host-mediated WIT GPU/UI capability | **Emdawnwebgpu** (\`--use-port=emdawnwebgpu\`, \`<webgpu/webgpu.h>\`, replacing removed \`-sUSE_WEBGPU\`) |
@@ -1595,490 +1576,16 @@ bun tooling/bun/repo-hygiene.ts
 xh --ignore-stdin --check-status --headers --follow GET https://emscripten.org/
 \`\`\`
 
-### Progressive-Disclosure Skill & Companion Artifacts
+### Companion Artifacts
 
 - **\`llms.txt\` Index**: [\`docs/aphrody/architecture/emscripten-llms.txt\`](./emscripten-llms.txt)
-- **Agent Skill Entrypoint**: [\`.agents/plugins/aphrody/skills/emscripten/SKILL.md\`](../../../.agents/plugins/aphrody/skills/emscripten/SKILL.md)
-- **Skill Reference — Repos & \`emsdk\`**: [\`references/repos-and-emsdk.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md)
-- **Skill Reference — Sitemap & APIs**: [\`references/sitemap-and-api-reference.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/sitemap-and-api-reference.md)
-- **Skill Reference — \`emcc\` & Wasm Best Practices**: [\`references/emcc-wasm-best-practices.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/emcc-wasm-best-practices.md)
-- **Skill Reference — C/C++ & WebGPU Interop**: [\`references/c-cpp-webgpu-interop.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/c-cpp-webgpu-interop.md)
+- **Agent Skill**: \`fw: plugins/aphrody/skills/emscripten\`
 - **Cross-Compilation Context**: [\`docs/aphrody/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md) & [\`docs/aphrody/architecture/production-guide.md\`](./production-guide.md)
-`;
-}
-
-export function buildSkillMdContent(
-  crawl: SitemapCrawlReport | null,
-  manifest: OrgIngestManifest | null,
-  host: HostToolchainProbe,
-): string {
-  const docsVer = crawl?.emscriptenDocsVersion ?? "7.0.1-git";
-  const routeCount = crawl?.stats.totalDiscoveredRoutes ?? 90;
-  const repoCount = manifest?.repoCount ?? 12;
-  const emccNote = host.emcc.present
-    ? `Local \`emcc\` detected: \`${host.emcc.version}\` (\`${host.emcc.path}\`).`
-    : "Local `emcc`/`emsdk` is NOT installed on this Windows host (host has `clang` `" +
-      (host.clang.version ?? "N/A") +
-      "`, `lld` `" +
-      (host.lld.version ?? "N/A") +
-      "`, `wasm-opt` `" +
-      (host.wasmOpt.version ?? "N/A") +
-      "`); install via `emsdk` or `setup-emsdk` before compiling C/C++ Emscripten targets.";
-
-  return `---
-name: emscripten
-description: >-
-  Authoritative Emscripten ${docsVer} toolchain, emsdk, and C/C++-to-WebAssembly engineering
-  skill for aphrody. Use whenever compiling C/C++ with emcc/em++, targeting
-  wasm32-unknown-emscripten alongside wasm32-unknown-unknown and wasm32-wasip2,
-  wiring Emdawnwebgpu (--use-port=emdawnwebgpu), configuring -sMODULARIZE -sEXPORT_ES6,
-  JSPI/Asyncify, Embind/EM_JS/EM_ASM, pthreads with COOP/COEP, or -msimd128.
-license: Apache-2.0
-compatibility: >-
-  Compliant with agentskills.io, Claude Code, and Aphrody plugin discovery.
-  Requires emsdk/emcc for C/C++ Wasm compilation; Bun, xh, and gh for live doc/repo sync.
-metadata:
-  upstream-version: "${docsVer}"
-  crawled-routes: "${routeCount}"
-  ingested-repos: "${repoCount}"
-  generator: "tooling/bun/emscripten-crawl.ts"
----
-
-# Emscripten (${docsVer}) & C/C++ WebAssembly Engineering
-
-> Progressive-disclosure skill synthesized from live \`emscripten.org\` (${routeCount} routes) and all ${repoCount} \`github.com/emscripten-core\` repositories. ${emccNote}
-
-## Quick Reference Map
-
-Read only the targeted reference file needed for your task:
-
-| Focus Area | Reference Document | When to Read |
-| :--- | :--- | :--- |
-| **All ${repoCount} Repos & \`emsdk\` Setup** | [references/repos-and-emsdk.md](references/repos-and-emsdk.md) | Installing \`emsdk\`, CI via \`setup-emsdk\`, Bazel \`emsdk\`, \`musl\`, LLVM 24 vs host Clang 23, or checking repo roles |
-| **Docs Sitemap & C/JS APIs** | [references/sitemap-and-api-reference.md](references/sitemap-and-api-reference.md) | Locating official \`emscripten.org\` pages (\`searchindex.js\` index), C headers (\`emscripten.h\`, \`html5.h\`, \`fetch.h\`), or FS/Module APIs |
-| **\`emcc\` Flags & Wasm Best Practices** | [references/emcc-wasm-best-practices.md](references/emcc-wasm-best-practices.md) | Selecting \`-sSTRICT\`, \`-sMODULARIZE -sEXPORT_ES6\`, \`-sJSPI\` vs \`-sASYNCIFY\`, \`-pthread\` + COOP/COEP, \`-msimd128\`, or \`wasm32-unknown-unknown\`/\`wasip2\` tradeoffs |
-| **C/C++ & WebGPU Interop** | [references/c-cpp-webgpu-interop.md](references/c-cpp-webgpu-interop.md) | Integrating \`--use-port=emdawnwebgpu\`, \`EM_JS\`/\`EM_ASYNC_JS\`, Embind (7.0.1 link-time invokers), \`ccall\`/\`cwrap\`, or Aphrody \`gpui_web\`/\`nsh-core\` bridges |
-
-## Non-Negotiable Directives & Traps to Avoid
-
-1. **Use Emdawnwebgpu (\`--use-port=emdawnwebgpu\`), Never \`-sUSE_WEBGPU\`**:
-   Emscripten's legacy built-in WebGPU bindings were replaced by Dawn's external port. Pass \`--use-port=emdawnwebgpu\` at **both** compile and link steps, and add \`--closure=1\` when linking release builds.
-2. **Follow Modern \`emcc\` Flag Hygiene (\`7.0.x\`)**:
-   - Omit \`-sWASM=1\` (always default) and omit \`=1\` on boolean flags (\`-sSTRICT\`, \`-sALLOW_MEMORY_GROWTH\`, \`-sMODULARIZE\`, \`-sEXPORT_ES6\`).
-   - Prefer standard compiler flags: \`-pthread\` (not \`-sUSE_PTHREADS\`), \`-m64\` (not \`-sMEMORY64\`), \`-O3\`/\`-Os\`/\`-Oz\`, \`-flto\`.
-   - Use \`.mjs\` or \`-sEXPORT_ES6\` (implies \`-sMODULARIZE\`) to prevent polluting global \`Module\`.
-3. **Avoid High-Frequency Wasm <-> JS Boundary Calls**:
-   Batch pixels, vertices, and audio frames in linear memory views (\`HEAPU8\` / \`HEAPF32\` / \`typed_memory_view\`) instead of per-item callbacks.
-4. **Gate \`-pthread\` Behind COOP/COEP Headers**:
-   Browser \`SharedArrayBuffer\` requires \`Cross-Origin-Opener-Policy: same-origin\` and \`Cross-Origin-Embedder-Policy: require-corp\` (or \`credentialless\`). Test locally with Bun + \`xh\` header verification before shipping.
-5. **Respect Aphrody Target Boundaries**:
-   - Keep pure-Rust browser UI (\`aphrody_desktop\`, \`gpui_web\`, \`nsh-platform-web\`) on \`wasm32-unknown-unknown\` via \`tooling/bun/web-build.ts\`.
-   - Keep sandboxed extensions on \`wasm32-wasip2\` (\`wasmtime 48.0.7\`).
-   - Use \`wasm32-unknown-emscripten\` only for C/C++ POSIX, pthreads, virtual FS, or native \`webgpu.h\` workloads (\`nsh-core\` \`cfg(target_os = "emscripten")\`).
-6. **Emscripten 7.0.0–7.0.1 ABI & Linker Changes**:
-   - Emscripten 7.0.1 generates Embind invokers at link time (\`-sDYNAMIC_EXECUTION=0\` fast without \`-sEMBIND_AOT\`).
-   - Emscripten 7.0.0 removed \`EMCC_ONLY_FORCED_STDLIBS\` and introduced \`libemcc\` (\`-lemcc\` when linking with \`-nostdlib\`).
-   - Upstream \`7.0.1-git\` checks \`EXPECTED_LLVM_VERSION = 24\`; always use \`emsdk\`'s bundled LLVM/Binaryen for final \`emcc\` links rather than mixing host Clang 23 bitcode.
-
-## Verification & Sync Commands
-
-\`\`\`sh
-# Refresh live crawl (emscripten.org) + all ${repoCount} emscripten-core repos + docs/skills
-bun tooling/bun/emscripten-crawl.ts all --max-pages 80 --concurrency 6
-
-# Verify offline unit tests, XML/frontmatter invariants, and link integrity
-bun test tooling/bun/emscripten-crawl.test.ts
-
-# Check workspace-wide docs & skill hygiene
-bun tooling/bun/repo-hygiene.ts
-\`\`\`
-
-- Architecture overview: [\`docs/aphrody/architecture/emscripten-ecosystem.md\`](../../../../../docs/aphrody/architecture/emscripten-ecosystem.md)
-- LLM compact index: [\`docs/aphrody/architecture/emscripten-llms.txt\`](../../../../../docs/aphrody/architecture/emscripten-llms.txt)
-`;
-}
-
-export function buildRefReposAndEmsdk(
-  manifest: OrgIngestManifest | null,
-  host: HostToolchainProbe,
-): string {
-  const repoCount = manifest?.repoCount ?? 12;
-  return `# Repositories & \`emsdk\` Reference (\`emscripten-core\`)
-
-> Complete inventory of all ${repoCount} repositories in \`https://github.com/orgs/emscripten-core/repositories\` plus \`emsdk\` provisioning, CI setup, Bazel rules, and host toolchain diagnostics.
-
----
-
-## 1. Host Toolchain Diagnostic (\`probeEmcc()\`)
-
-| Tool / Variable | Host State (\`${host.platform}/${host.arch}\`) | Notes |
-| :--- | :--- | :--- |
-| \`emcc\` / \`em++\` | ${host.emcc.present ? `\`${host.emcc.version}\` (\`${host.emcc.path}\`)` : "**Absent on host**"} | Required for C/C++ -> \`wasm32-unknown-emscripten\` linking & JS glue generation |
-| \`emsdk\` CLI & Env | \`emsdk\`: ${host.emsdk.present ? `\`${host.emsdk.path}\`` : "Absent"}, \`EMSDK=${host.emsdkEnv.EMSDK ?? "unset"}\` | Provision via \`git clone https://github.com/emscripten-core/emsdk\` |
-| \`clang\` | \`${host.clang.version ?? "absent"}\` (\`${host.clang.path ?? "—"}\`) | Host LLVM 23 vs Emscripten 7.0.1-git \`EXPECTED_LLVM_VERSION = 24\` |
-| \`lld\` | \`${host.lld.version ?? "absent"}\` | Host \`lld-link\`; Emscripten bundles \`wasm-ld\` inside \`emsdk\` \`upstream/bin/\` |
-| \`wasm-opt\` | \`${host.wasmOpt.version ?? "absent"}\` | Binaryen optimizer shared with \`tooling/bun/web-build.ts\` |
-| \`wasm-bindgen\` | \`${host.wasmBindgen.version ?? "absent"}\` | Rust \`wasm32-unknown-unknown\` binding generator |
-| \`xh\` / \`gh\` | \`xh\`: \`${host.xh.version ?? "absent"}\`; \`gh\`: \`${host.gh.version ?? "absent"}\` | Used by \`tooling/bun/emscripten-crawl.ts\` |
-
----
-
-## 2. Complete \`emscripten-core\` Organization Matrix (${repoCount} Repos)
-
-| Repository | State | Language | Stars | Head SHA | Ingest Digest | Role & Integration Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-${renderRepoMatrixRows(manifest)}
-
----
-
-## 3. \`emsdk\` Toolchain Architecture (\`emsdk_manifest.json\`)
-
-1. **Upstream Binary Waterfall**:
-   - \`emsdk_manifest.json\` fetches prebuilt \`wasm-binaries.{tar.xz,zip}\` from \`storage.googleapis.com/webassembly/emscripten-releases-builds/\` containing aligned **LLVM + Clang + \`wasm-ld\` + Binaryen + Node + Python** under \`upstream/\`.
-   - Sets \`LLVM_ROOT\`, \`BINARYEN_ROOT\`, \`EMSCRIPTEN_ROOT\`, and generates \`.emscripten\` config automatically on \`emsdk activate\`.
-2. **Standard Installation & Pinning**:
-   \`\`\`sh
-   git clone https://github.com/emscripten-core/emsdk.git
-   cd emsdk
-   ./emsdk install latest   # or pin exact release e.g. 7.0.0
-   ./emsdk activate latest
-   source ./emsdk_env.sh    # Windows cmd: emsdk_env.bat
-   emcc --version
-   \`\`\`
-3. **LLVM Version Matching Invariant**:
-   - Live \`tools/shared.py\` in \`emscripten-core/emscripten\` enforces \`EXPECTED_LLVM_VERSION = 24\` for \`7.0.1-git\`.
-   - When using a standalone host Clang (e.g. LLVM \`23.1.5\` on Windows), \`clang --target=wasm32-unknown-emscripten -c\` emits object files, **but** final \`emcc\` linking and LTO bitcode require matching LLVM major versions (or pre-built \`emsdk\` LLVM 24). Never pass mismatched \`-flto\` bitcode between Clang 23 and LLVM 24 \`wasm-ld\`.
-4. **GitHub Actions (\`emscripten-core/setup-emsdk\` & \`emscripten-ci\`)**:
-   - Use \`emscripten-core/setup-emsdk\` (or \`mymindstorm/setup-emsdk\`) with pinned \`version: 7.0.0\` and Actions cache enabled instead of \`latest\` on production release lanes.
-   - Reference \`emscripten-core/emscripten-ci\` \`Dockerfile\` when reproducing upstream Linux CI containers on fleet node \`fr1\`.
-5. **Bazel (\`emscripten-core/bazel-central-registry\`) & Legacy Archives**:
-   - Bzlmod projects pull \`emsdk\` via \`bazel_dep(name = "emsdk", ...)\` maintained in \`emscripten-core/bazel-central-registry/modules/emsdk/\`.
-   - **Do NOT use** \`emscripten-fastcomp\`, \`emscripten-fastcomp-clang\` (archived 2021 asm.js backend), or \`emscripten-core/terser\` (archived fork; upstream \`terser\` is used directly).
-`;
-}
-
-export function buildRefSitemapAndApi(crawl: SitemapCrawlReport | null): string {
-  const docsVer = crawl?.emscriptenDocsVersion ?? "7.0.1-git";
-  const total = crawl?.stats.totalDiscoveredRoutes ?? 0;
-  const crawled = crawl?.stats.crawledHtmlPages ?? 0;
-  const searchDocs = crawl?.searchIndexProbe.docCount ?? 0;
-  const sitemapStatus = crawl?.sitemapXmlProbe.httpStatus ?? 503;
-
-  const docsNode = crawl?.routeTree.children.find((c) => c.segment === "docs");
-  const sectionBlocks: string[] = [];
-  if (docsNode) {
-    const collectSectionRoutes = (node: RouteTreeNode): Array<{ path: string; url: string; title: string }> => {
-      const list = [...node.routes];
-      for (const ch of node.children) list.push(...collectSectionRoutes(ch));
-      return list;
-    };
-    for (const sec of docsNode.children) {
-      const all = collectSectionRoutes(sec).sort((a, b) => a.path.localeCompare(b.path));
-      sectionBlocks.push(`### \`docs/${sec.segment}/\` (${all.length} routes)`);
-      sectionBlocks.push("");
-      for (const r of all) {
-        sectionBlocks.push(`- [\`${r.path}\`](${r.url}) — ${r.title || "Emscripten Docs"}`);
-      }
-      sectionBlocks.push("");
-    }
-  } else {
-    sectionBlocks.push("- Run `bun tooling/bun/emscripten-crawl.ts crawl` to materialize all crawled Sphinx routes.");
-  }
-
-  return `# \`emscripten.org\` Sitemap & API Reference (${docsVer})
-
-> Live crawl summary: **${total}** unique same-origin HTML routes discovered (**${crawled}** fetched in bounded BFS, **${searchDocs}** indexed in \`/searchindex.js\`; \`/sitemap.xml\` returned \`HTTP ${sitemapStatus}\` on GitHub Pages Sphinx).
-
----
-
-## 1. Crawl Methodology & \`xh\` Transport Findings
-
-1. **Why \`/sitemap.xml\` Fails Upstream**: \`GET https://emscripten.org/sitemap.xml\` currently returns \`${crawl?.sitemapXmlProbe.statusLine || `HTTP ${sitemapStatus}`}\` from GitHub Pages/Varnish (historically \`404\`/\`503\`).
-2. **Authoritative Discovery via \`/searchindex.js\` + BFS**:
-   - \`https://emscripten.org/searchindex.js\` returns \`HTTP 200\` JSON inside \`Search.setIndex({...})\` listing all \`docnames\`, \`titles\`, and \`filenames\`.
-   - Concurrent BFS from \`https://emscripten.org/\` discovers root pages (\`/index.html\`, \`/genindex.html\`, \`/search.html\`), verifies HTTP 200 status codes, and extracts cross-origin specification links.
-   - Core pages are cross-verified with \`xh --ignore-stdin --check-status --follow --timeout=15 GET <url>\`.
-
----
-
-## 2. Core C/C++ Headers & JS Runtime APIs
-
-| Header / Runtime Surface | Purpose | Key Docs Route |
-| :--- | :--- | :--- |
-| \`<emscripten.h>\` | \`emscripten_set_main_loop\`, \`EM_JS\`, \`EM_ASM\`, \`emscripten_sleep\`, \`emscripten_run_script\` | [\`emscripten.h\`](https://emscripten.org/docs/api_reference/emscripten.h.html) |
-| \`<emscripten/html5.h>\` | DOM callbacks (keyboard, mouse, pointer, touch, wheel, resize, fullscreen, WebGL context) | [\`html5.h\`](https://emscripten.org/docs/api_reference/html5.h.html) |
-| \`<emscripten/bind.h>\` & \`<emscripten/val.h>\` | Embind C++ classes/functions/smart pointers and dynamic JS \`val\` handles | [\`bind.h\`](https://emscripten.org/docs/api_reference/bind.h.html), [\`val.h\`](https://emscripten.org/docs/api_reference/val.h.html) |
-| \`<emscripten/fetch.h>\` | Async/sync \`XMLHttpRequest\` / IndexedDB caching C API | [\`fetch.h\`](https://emscripten.org/docs/api_reference/fetch.html) |
-| \`<emscripten/proxying.h>\` & \`wasm_workers\` | Lock-free worker task proxying and lightweight Wasm Workers without full pthreads | [\`proxying.h\`](https://emscripten.org/docs/api_reference/proxying.h.html), [\`wasm_workers\`](https://emscripten.org/docs/api_reference/wasm_workers.html) |
-| \`<emscripten/fiber.h>\` & \`stack.h\` | User-space Asyncify fibers and stack inspection/bounds checking | [\`fiber.h\`](https://emscripten.org/docs/api_reference/fiber.h.html), [\`stack.h\`](https://emscripten.org/docs/api_reference/stack.h.html) |
-| \`<webgpu/webgpu.h>\` (\`emdawnwebgpu\`) | Dawn-compatible C/C++ WebGPU API layered over browser \`navigator.gpu\` | [\`WebGPU-support\`](https://emscripten.org/docs/porting/multimedia_and_graphics/WebGPU-support.html) |
-| \`FS\` (\`MEMFS\`, \`IDBFS\`, \`NODEFS\`, \`WORKERFS\`) | Virtual POSIX filesystem APIs, preloading (\`--preload-file\`), and persistent IndexedDB mounts | [\`Filesystem-API\`](https://emscripten.org/docs/api_reference/Filesystem-API.html) |
-| \`Module\` & \`preamble.js\` | Factory lifecycle hooks (\`onRuntimeInitialized\`, \`locateFile\`, \`print\`, \`ccall\`, \`cwrap\`) | [\`module\`](https://emscripten.org/docs/api_reference/module.html), [\`preamble.js\`](https://emscripten.org/docs/api_reference/preamble.js.html) |
-
----
-
-## 3. Complete Crawled Route Index by Section
-
-${sectionBlocks.join("\n")}
-`;
-}
-
-export function buildRefBestPractices(): string {
-  return `# \`emcc\` & WebAssembly Best Practices (Emscripten 7.0.x)
-
-> Grounded directly in \`https://emscripten.org/docs/compiling/best_practices.html\`, \`Modularized-Output.html\`, \`asyncify.html\`, \`pthreads.html\`, \`simd.html\`, and \`ChangeLog.md\` (7.0.0 / 7.0.1-git).
-
----
-
-## 1. Official \`emcc\` Command-Line Hygiene
-
-- **Omit enabled-by-default settings**: Do not pass \`-sWASM=1\`.
-- **Omit \`=1\` on boolean \`-s\` flags**: Write \`-sSTRICT\`, \`-sALLOW_MEMORY_GROWTH\`, \`-sMODULARIZE\`, \`-sEXPORT_ES6\` rather than \`=1\`.
-- **Prefer standard driver flags**: Use \`-pthread\` (not \`-sUSE_PTHREADS\`), \`-m64\` (not \`-sMEMORY64\`), \`-Werror -Wall\`.
-- **Use comma-separated lists & response files**: Write \`-sEXPORTED_FUNCTIONS=_main,_malloc\` (avoid JSON array quoting) and move huge flag lists into \`@flags.rsp\`.
-- **Separate compilation**: Compile \`emcc -c foo.cpp -o foo.o\` per translation unit before linking \`emcc foo.o bar.o -o out.mjs\`.
-- **Release vs Debug profiles**:
-  - **Release**: \`-O3\` (max speed) or \`-Os\`/\`-Oz\` (min size) + \`-flto\` at **both** compile and link + \`--closure=1\` at link (unless an external bundler minifies JS) + \`-sENVIRONMENT=web\` (or \`web,worker\`).
-  - **Debug**: \`-g\` at compile + \`-g\`, \`-gline-tables-only\`, or \`-gsource-map\` at link; omit \`-O2\`/\`-O3\`/\`-flto\`.
-
----
-
-## 2. Modularized ES6 Output (\`-sMODULARIZE\` & \`-sEXPORT_ES6\`)
-
-\`\`\`sh
-# Emitting .mjs automatically enables -sEXPORT_ES6 (which implies -sMODULARIZE).
-emcc -O3 -flto -sSTRICT -sENVIRONMENT=web,worker \\
-  -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=CreateEngine \\
-  --closure=1 engine.o -o dist/engine.mjs
-\`\`\`
-
-\`\`\`ts
-// Clean TypeScript / Bun ESM consumption with zero global Module pollution
-import CreateEngine from "./dist/engine.mjs";
-
-const engine = await CreateEngine({
-  locateFile: (path: string) => new URL(path, import.meta.url).href,
-  print: (line: string) => console.info("[wasm]", line),
-});
-engine._engine_step(16.6);
-\`\`\`
-
-- **\`-sMODULARIZE=instance\` (experimental)**: Exports a single shared instance initializer rather than a multi-instance factory (implicitly enables \`EXPORT_ES6\`).
-- **\`-sWASM_ESM_INTEGRATION\` / Source Phase Imports**: Experimental ES Module Integration binding Wasm imports/exports directly via native ESM phase imports.
-
----
-
-## 3. Asynchronous Execution: Main Loop, JSPI, and Asyncify
-
-Never block the browser main thread in an infinite C/C++ \`while (true)\` loop:
-
-| Mechanism | Flag / API | Binary Overhead | Best For |
-| :--- | :--- | :--- | :--- |
-| **Event-Loop Callback** | \`emscripten_set_main_loop(fn, 0, true)\` | Zero | Frame-driven rendering / WebGPU games / UI loops |
-| **JSPI (Recommended Async)** | \`-sJSPI\` + \`EM_ASYNC_JS\` | **Zero code bloat** | Modern Chromium/V8 & JSPI-capable engines awaiting Promises synchronously from C/C++ |
-| **Asyncify (Universal)** | \`-sASYNCIFY\` + \`-sASYNCIFY_ONLY=[...]\` | Significant without allowlist | Older browsers without JSPI when porting legacy blocking C/C++ call stacks |
-
-> **Tip**: Always scope \`-sASYNCIFY_ONLY\` (or \`-sASYNCIFY_IGNORE_INDIRECT\`) when using \`-sASYNCIFY\` so Binaryen does not instrument unrelated hot loops.
-
----
-
-## 4. Pthreads (\`SharedArrayBuffer\`), Wasm Workers, and COOP/COEP
-
-\`\`\`sh
-emcc -O3 -pthread -c worker_math.cpp -o worker_math.o
-emcc -O3 -pthread -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency worker_math.o -o dist/worker_math.mjs
-\`\`\`
-
-- **Mandatory HTTP Response Headers** (browser gate on \`SharedArrayBuffer\`):
-  - \`Cross-Origin-Opener-Policy: same-origin\`
-  - \`Cross-Origin-Embedder-Policy: require-corp\` (or \`credentialless\` when embedding uncredentialed third-party assets)
-- Guard C/C++ code portably with \`#ifdef __EMSCRIPTEN_PTHREADS__\`.
-- **Single-binary note**: A \`-pthread\` build requires \`SharedArrayBuffer\` (COOP/COEP) and will not silently run in a non-COI context; build separate \`baseline\` vs \`coi\` cohorts (matching Aphrody's \`tooling/bun/web-build.ts\` \`--coi\` cohort rule!).
-- **Lightweight alternative**: \`-sWASM_WORKERS\` creates dedicated Wasm Workers with \`<emscripten/wasm_worker.h>\` and smaller startup overhead than full POSIX pthreads.
-
----
-
-## 5. WebAssembly SIMD (\`-msimd128\`) & Exceptions
-
-- Pass \`-msimd128\` at **compile time** to enable:
-  1. LLVM SLP/loop autovectorization (disable with \`-fno-vectorize -fno-slp-vectorize\` if unwanted).
-  2. GCC/Clang vector extensions (\`__attribute__((vector_size(16)))\`).
-  3. Portable Wasm intrinsics (\`#include <wasm_simd128.h>\`).
-  4. Automatic translation of x86 \`*mmintrin.h\` (SSE through AVX2/FMA) and ARM \`<arm_neon.h>\`.
-- Supported across Chrome >= 91, Firefox >= 89, Safari >= 16.4, Node >= 16.4, and Bun.
-- Prefer native Wasm EH (\`-fwasm-exceptions\`) over legacy JS \`try/catch\` invoke wrappers when targeting modern runtimes.
-
----
-
-## 6. Emscripten 7.0.0 & 7.0.1-git Breaking Changes Checklist
-
-- **7.0.1-git**: Embind emits JS invokers at **link time** (no \`new Function\` at runtime; \`-sDYNAMIC_EXECUTION=0\` runs fast without needing \`-sEMBIND_AOT\`).
-- **7.0.0**: \`libclang_rt.builtins\` and \`libclang_rt.profile\` now link into side modules directly; new \`libemcc\` holds program-wide symbols (\`-lemcc\` required if using \`-nostdlib\`); \`EMCC_ONLY_FORCED_STDLIBS\` removed.
-`;
-}
-
-export function buildRefWebgpuInterop(host: HostToolchainProbe): string {
-  return `# C/C++, JavaScript & WebGPU Interop (Emscripten 7.0.x & Aphrody)
-
-> Covers Dawn's \`emdawnwebgpu\` port (\`--use-port=emdawnwebgpu\`), \`EM_JS\`/\`EM_ASYNC_JS\`, Embind, \`ccall\`/\`cwrap\`, Clang/LLVM 23 vs LLVM 24 linking, and Aphrody \`gpui_web\`/\`wgpu\`/\`nsh-core\` integration.
-
----
-
-## 1. WebGPU in Emscripten: \`--use-port=emdawnwebgpu\`
-
-Upstream Emscripten removed legacy \`-sUSE_WEBGPU\` in favor of **Emdawnwebgpu** (maintained in Google Dawn, implementing \`<webgpu/webgpu.h>\` and \`<webgpu/webgpu_cpp.h>\`, currently pinned at \`v20261105.214757\` in \`tools/ports/emdawnwebgpu.py\` for Emscripten 4.0.10+).
-
-### Compile & Link Invocation
-
-\`\`\`sh
-# Pass --use-port=emdawnwebgpu during BOTH compile and link; always add --closure=1 in release links!
-em++ -std=c++20 -O3 -flto --use-port=emdawnwebgpu -c webgpu_renderer.cpp -o webgpu_renderer.o
-em++ -O3 -flto --use-port=emdawnwebgpu --closure=1 \\
-  -sSTRICT -sEXPORT_ES6 -sMODULARIZE -sJSPI -sALLOW_MEMORY_GROWTH \\
-  webgpu_renderer.o -o dist/webgpu_renderer.mjs
-\`\`\`
-
-- **Disable C++ wrappers if needed**: \`--use-port=emdawnwebgpu:cpp_bindings=false\` when supplying custom/pinned \`webgpu_cpp.h\`.
-- **Pre-warm port cache**: \`embuilder build emdawnwebgpu\` (useful in CI Docker layers).
-- **Local/offline port**: Extract \`emdawnwebgpu_pkg-*.zip\` from \`google/dawn/releases\` and pass \`--use-port=path/to/emdawnwebgpu.port.py\`.
-
-### Minimal \`<webgpu/webgpu_cpp.h>\` Canvas Surface Setup
-
-\`\`\`cpp
-#include <emscripten/emscripten.h>
-#include <webgpu/webgpu_cpp.h>
-
-static wgpu::Instance instance = wgpu::CreateInstance();
-
-void init_surface(wgpu::Device device, const char* canvas_selector) {
-  wgpu::EmscriptenSurfaceSourceCanvasHTMLSelector canvasDesc{};
-  canvasDesc.selector = canvas_selector; // e.g. "#canvas"
-
-  wgpu::SurfaceDescriptor surfDesc{};
-  surfDesc.nextInChain = &canvasDesc;
-  wgpu::Surface surface = instance.CreateSurface(&surfDesc);
-
-  wgpu::SurfaceConfiguration cfg{};
-  cfg.device = device;
-  cfg.format = wgpu::TextureFormat::BGRA8Unorm;
-  cfg.usage = wgpu::TextureUsages::RenderAttachment;
-  cfg.width = 1280;
-  cfg.height = 800;
-  cfg.presentMode = wgpu::PresentMode::Fifo;
-  surface.Configure(&cfg);
-}
-\`\`\`
-
-> **Aphrody alignment**: Keep WebGPU surface creation, 256-byte row alignment (\`COPY_BYTES_PER_ROW_ALIGNMENT\`), and 16-byte uniform struct padding identical to [\`.agents/plugins/aphrody/skills/webgpu/SKILL.md\`](../../webgpu/SKILL.md).
-
----
-
-## 2. C/C++ <-> JavaScript Interop Patterns
-
-### A. \`EM_JS\` & \`EM_ASYNC_JS\` (Typed Zero-Boilerplate JS Calls)
-
-\`\`\`cpp
-#include <emscripten/emscripten.h>
-#include <stdint.h>
-
-// Preferred over EM_ASM: explicit C signature, safe with --closure=1 and separate compilation.
-EM_JS(void, aphrody_submit_telemetry, (const char* tag_ptr, double ms), {
-  const tag = UTF8ToString(tag_ptr);
-  globalThis.__aphrodyMetrics?.record(tag, ms);
-});
-
-// With -sJSPI (recommended) or -sASYNCIFY, pause C/C++ cleanly across a JS Promise:
-EM_ASYNC_JS(int, aphrody_has_webgpu_adapter, (), {
-  if (!navigator.gpu) return 0;
-  const adapter = await navigator.gpu.requestAdapter();
-  return adapter ? 1 : 0;
-});
-\`\`\`
-
-### B. Embind (\`<emscripten/bind.h>\`) & Bulk Zero-Copy Buffer Passing
-
-\`\`\`cpp
-#include <emscripten/bind.h>
-#include <emscripten/val.h>
-#include <vector>
-
-struct FrameStats {
-  uint32_t drawCalls;
-  double frameMs;
-};
-
-void upload_vertices(uintptr_t ptr, size_t byte_len) {
-  const auto* bytes = reinterpret_cast<const uint8_t*>(ptr);
-  (void)bytes; (void)byte_len;
-}
-
-emscripten::val get_heap_slice(const std::vector<float>& buf) {
-  // Zero-copy TypedArray view directly into Wasm linear memory (valid until memory growth!)
-  return emscripten::val(emscripten::typed_memory_view(buf.size(), buf.data()));
-}
-
-EMSCRIPTEN_BINDINGS(aphrody_bridge) {
-  emscripten::value_object<FrameStats>("FrameStats")
-      .field("drawCalls", &FrameStats::drawCalls)
-      .field("frameMs", &FrameStats::frameMs);
-  emscripten::function("uploadVertices", &upload_vertices);
-  emscripten::function("getHeapSlice", &get_heap_slice);
-}
-\`\`\`
-
-- Link with \`-lembind\`. In Emscripten **7.0.1+**, invokers are generated at link time (no runtime \`eval\`/\`new Function\`), preserving strict CSP (\`-sDYNAMIC_EXECUTION=0\`) compatibility!
-- **Heap Safety Rule**: Never retain a \`typed_memory_view\` across calls that allocate (\`_malloc\`) when \`-sALLOW_MEMORY_GROWTH\` is enabled, because \`memory.grow\` detaches the underlying \`ArrayBuffer\`.
-
-### C. \`ccall\` / \`cwrap\` for C Exports
-
-\`\`\`sh
-emcc -O3 api.c -sEXPORTED_FUNCTIONS=_compute_hash,_malloc,_free -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -o api.mjs
-\`\`\`
-
----
-
-## 3. C/C++ Wasm Linking, Clang/LLVM ${host.clang.version?.match(/\d+/)?.[0] ?? "23"} & Aphrody Crates
-
-- **Rust <-> C/Emscripten in Aphrody**:
-  - \`crates/nsh-core/Cargo.toml\` explicitly treats Emscripten as both \`wasm32\` and \`unix\` (\`cfg(any(not(target_arch = "wasm32"), target_os = "emscripten"))\` pulling \`libc\`).
-  - \`vendor/wgpu/wgpu-core/platform-deps/emscripten/Cargo.toml\` provides \`wgpu-core-deps-emscripten\` forwarding \`wgpu-hal/gles\` for \`target_os = "emscripten"\`.
-- **Host Clang (${host.clang.version ?? "23.1.5"}) vs Emscripten \`emsdk\` (LLVM 24)**:
-  - Host \`clang --target=wasm32-unknown-unknown -nostdlib -O3\` builds freestanding C kernels directly via \`lld\` (\`wasm-ld\`) with zero \`emsdk\` dependency.
-  - For \`wasm32-unknown-emscripten\`, **always link with \`emcc\` using \`emsdk\`'s matched LLVM 24 + \`musl\` sysroot + JS runtime libraries** rather than mixing LLVM 23 LTO bitcode with LLVM 24 \`wasm-ld\`.
-
----
-
-## 4. Bun + \`xh\` Local Serving & COOP/COEP Verification
-
-\`\`\`ts
-// Minimal Bun dev server verifying COOP/COEP + .wasm MIME + xh header checks
-Bun.serve({
-  hostname: "127.0.0.1",
-  port: 4196,
-  async fetch(req) {
-    const path = new URL(req.url).pathname === "/" ? "/index.html" : new URL(req.url).pathname;
-    const file = Bun.file(\`./dist\${path}\`);
-    if (!(await file.exists())) return new Response("Not Found", { status: 404 });
-    return new Response(file, {
-      headers: {
-        "Cross-Origin-Opener-Policy": "same-origin",
-        "Cross-Origin-Embedder-Policy": "require-corp",
-        ...(path.endsWith(".wasm") ? { "Content-Type": "application/wasm" } : {}),
-      },
-    });
-  },
-});
-\`\`\`
-
-\`\`\`sh
-xh --ignore-stdin --check-status --headers GET http://127.0.0.1:4196/engine.wasm
-\`\`\`
 `;
 }
 
 export interface EmitReport {
   emittedFiles: string[];
-  skillValidation: ReturnType<typeof validateSkillFrontmatter>;
   llmsValidation: ReturnType<typeof validateLlmsTxt>;
   brokenLinks: string[];
   hostProbe: HostToolchainProbe;
@@ -2091,34 +1598,15 @@ export function runEmitCommand(): EmitReport {
 
   const llmsTxt = buildLlmsTxtContent(crawl, manifest);
   const ecosystemDoc = buildEcosystemDocContent(crawl, manifest, hostProbe);
-  const skillMd = buildSkillMdContent(crawl, manifest, hostProbe);
-  const refRepos = buildRefReposAndEmsdk(manifest, hostProbe);
-  const refSitemap = buildRefSitemapAndApi(crawl);
-  const refBestPractices = buildRefBestPractices();
-  const refWebgpu = buildRefWebgpuInterop(hostProbe);
 
   writeRepoFile(LLMS_TXT_REL, llmsTxt);
   writeRepoFile(ARCH_DOC_REL, ecosystemDoc);
-  writeRepoFile(SKILL_MD_REL, skillMd);
-  writeRepoFile(REF_REPOS_REL, refRepos);
-  writeRepoFile(REF_SITEMAP_REL, refSitemap);
-  writeRepoFile(REF_BEST_PRACTICES_REL, refBestPractices);
-  writeRepoFile(REF_WEBGPU_INTEROP_REL, refWebgpu);
 
   const emittedFiles = [
     LLMS_TXT_REL,
     ARCH_DOC_REL,
-    SKILL_MD_REL,
-    REF_REPOS_REL,
-    REF_SITEMAP_REL,
-    REF_BEST_PRACTICES_REL,
-    REF_WEBGPU_INTEROP_REL,
   ];
 
-  const skillValidation = validateSkillFrontmatter(skillMd);
-  if (!skillValidation.ok) {
-    throw new Error(`Generated SKILL.md failed agentskills.io validation: ${skillValidation.errors.join("; ")}`);
-  }
   const llmsValidation = validateLlmsTxt(llmsTxt);
   if (!llmsValidation.ok) {
     throw new Error(`Generated llms.txt failed validation: ${llmsValidation.errors.join("; ")}`);
@@ -2126,11 +1614,6 @@ export function runEmitCommand(): EmitReport {
   const brokenLinks = findBrokenRelativeLinks([
     ARCH_DOC_REL,
     LLMS_TXT_REL,
-    SKILL_MD_REL,
-    REF_REPOS_REL,
-    REF_SITEMAP_REL,
-    REF_BEST_PRACTICES_REL,
-    REF_WEBGPU_INTEROP_REL,
   ]);
   if (brokenLinks.length > 0) {
     throw new Error(`Broken relative markdown links detected:\n${brokenLinks.join("\n")}`);
@@ -2138,7 +1621,6 @@ export function runEmitCommand(): EmitReport {
 
   return {
     emittedFiles,
-    skillValidation,
     llmsValidation,
     brokenLinks,
     hostProbe,

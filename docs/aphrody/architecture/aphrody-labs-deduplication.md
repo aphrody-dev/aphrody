@@ -8,7 +8,7 @@
 | --- | ---: | --- |
 | Total repositories (`aphrody-dev` + `aphrody-labs` + `rose-griffon`) | 1,180 | Deduplicated live (35 duplicate forks, `-1` suffixes & dead slice archives deleted; 23 superseded repos archived) |
 | Archived repositories | 25 | `legacy`, `bun-os`, `bun-distribution`, `ayvpn`, `ay-tools`, `yolo*`, `wii-os`, `google-bun`, `gemini-super-app` |
-| Active upstream forks & mirrors | 1,132 | Canonical `<upstream>` / `<owner>-<name>` forks (`24` pinned in [`.gitmodules`](../../../.gitmodules), `38` in `ay/submodules.toml`) |
+| Active upstream forks & mirrors | 1,132 | Canonical `<upstream>` / `<owner>-<name>` forks (`11` pinned as Cargo git tag dependencies in [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) |
 | Active original repositories | 23 | Flagship products (`aphrody`, `ay`, `anu`, `ai-os`, `aydroid`, `aynt`, `aysh`, `bun`, `browser`, `nie`, `shenron`, `open`, `auto`, `aphrody-m3`, `aphrody-git`, `rust-mono`, `r2b`, `msys`, `.github`) |
 
 ## 2. Canonical Monorepo Owners
@@ -25,17 +25,17 @@
 
 | Family / Cluster | Count | Strategy |
 | --- | ---: | --- |
-| `other-ecosystem-forks` | 764 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `agents-mcp-acp-a2a` | 47 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `craft-studio-forks` | 39 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `cosmic-desktop-suite` | 33 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `browser-crawler-scrape` | 19 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `yolo-legacy-experiments` | 19 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `dioxus-blitz-layout` | 16 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `compilers-cargo-wasm` | 11 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `zed-gpui-core` | 8 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `bun-runtime-and-pkgs` | 6 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
-| `tauri-webview-stack` | 5 | Consolidate active forks via [`.gitmodules`](../../../.gitmodules) & archive superseded 0-ahead copies |
+| `other-ecosystem-forks` | 764 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `agents-mcp-acp-a2a` | 47 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `craft-studio-forks` | 39 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `cosmic-desktop-suite` | 33 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `browser-crawler-scrape` | 19 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `yolo-legacy-experiments` | 19 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `dioxus-blitz-layout` | 16 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `compilers-cargo-wasm` | 11 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `zed-gpui-core` | 8 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `bun-runtime-and-pkgs` | 6 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
+| `tauri-webview-stack` | 5 | Consolidate active forks as pinned git tag dependencies ([`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)) & archive superseded 0-ahead copies |
 
 ## 4. Deduplication & Consolidation Actions Executed
 

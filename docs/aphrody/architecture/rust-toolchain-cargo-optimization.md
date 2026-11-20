@@ -1,6 +1,6 @@
 # Rust Toolchain, Cache, `fmt`, `check`, `clippy`, Linker & Cargo Optimization Guide
 
-> End-to-end build velocity, linker, cache, lint-boundary, and toolchain-fork architecture tailored for the `aphrody` / GPUI / Zed monorepo (`302` workspace members, `2,069` resolved lockfile entries, `37` relative submodules). All tool versions, flags, crate releases, and upstream PRs documented here were verified live on `2026-11-16`.
+> End-to-end build velocity, linker, cache, lint-boundary, and toolchain-fork architecture tailored for the `aphrody` / GPUI / Zed monorepo (`302` workspace members, `2,069` resolved lockfile entries). All tool versions, flags, crate releases, and upstream PRs documented here were verified live on `2026-11-16`.
 
 ---
 
@@ -12,7 +12,7 @@ Audited directly via [`tooling/bun/toolchain-audit.ts`](../../../tooling/bun/too
 
 | Dimension | Live Observed State | Key Bottleneck / Action |
 | :--- | :--- | :--- |
-| **Workspace Scale** ([`Cargo.toml`](../../../Cargo.toml)) | `302` members (`294` `crates/*`, `4` `extensions/*`, `4` `tooling/*`), `20` excluded `vendor/*`, `10` `default-members` | Switching between `gpui_ui`, `aphrody_desktop`, `nsh-cli`, and `zed` triggers feature-unification rebuilds without `cargo-hakari` or `[resolver] feature-unification`. |
+| **Workspace Scale** ([`Cargo.toml`](../../../Cargo.toml)) | `302` members (`294` `crates/*`, `4` `extensions/*`, `4` `tooling/*`), `1` excluded glob (`templates/wasm-wgpu/*`), `10` `default-members` | Switching between `gpui_ui`, `aphrody_desktop`, `nsh-cli`, and `zed` triggers feature-unification rebuilds without `cargo-hakari` or `[resolver] feature-unification`. |
 | **`Cargo.lock` Footprint** ([`Cargo.lock`](../../../Cargo.lock)) | `2,069` package entries across `1,804` unique crates; **`183` duplicated crate names** (`hashbrown` x5, `itertools` x5, `quick-xml` x5, `rand*` x5, `windows*` x5, `darling*` x4, `toml_edit` x4) | Deduplicate top offenders and unify features to cut duplicate LLVM bitcode & metadata emission. |
 | **Pinned Toolchain** ([`rust-toolchain.toml`](../../../rust-toolchain.toml)) | `1.98.1` (`rustc 1.98.1 48a229cea`, LLVM `22.1.8`, `cargo 1.98.1`, `clippy 0.1.98`, `rustfmt 1.9.0-stable`); locally `1.100.0` (LLVM `23.1.5`) & `1.102.0-nightly` are also installed | `1.98.1` accepts `-Zthreads=8`, while `1.100.0+` / `1.102.0-nightly` deprecates `-Zthreads` in favor of `--jobs-frontend=8`. System LLVM (`clang`/`lld-link` `23.1.5`) matches `1.100.0`. |
 | **Active `.cargo/config.toml`** ([`.cargo/config.toml`](../../../.cargo/config.toml)) | Sets `RUSTC_BOOTSTRAP = "1"`, `symbol-mangling-version=v0`, `--cfg tokio_unstable`, Windows `+crt-static`/`windows_slim_errors`, and `aarch64-unknown-linux-gnu` `-fuse-ld=lld` | Missing `x86_64-pc-windows-msvc` `lld`, `x86_64-unknown-linux-gnu` `mold`/`wild`, `build.build-dir` separation, `[cache] auto-clean-frequency`, and feature unification. |
@@ -170,9 +170,9 @@ Per fleet role separation ([`tooling/bun/fleet-sync.ts`](../../../tooling/bun/fl
   # Full CI check (matches package.json "fmt:check")
   cargo fmt --all -- --check
   ```
-- **Targeted `cargo check` & Parallel Worktrees**:
+- **Targeted `cargo check` & Parallel Agents**:
   - Bare `cargo check` uses the 10 `default-members` (`gpui_wgpu`, `gpui_web`, `gpui_ui`, `gpui_code`, `aphrody_store`, `aphrody_session`, `aphrody_craft`, `aphrody_ui`, `aphrody_desktop`, `aphrody_cli`) instead of all 302 members.
-  - Use [`tooling/bun/worktree.ts`](../../../tooling/bun/worktree.ts) (`bun run worktree:create -- --id <name>`) so parallel agents get separate `CARGO_TARGET_DIR` paths (`../target-worktrees/aphrody-<id>`) and never stall on Cargo file locks (`rust-lang/cargo#16804`).
+  - Heavy parallel builds run on the fleet (`fr1`/`fr2`) with their own `CARGO_TARGET_DIR` via [`tooling/bun/fleet-sync.ts`](../../../tooling/bun/fleet-sync.ts), so agents on the workstation never stall on Cargo file locks (`rust-lang/cargo#16804`).
 
 ### 4.2 Fast `clippy` & the `nsh-core` / `nsh-*` Lint Boundary
 
@@ -229,23 +229,23 @@ Per fleet role separation ([`tooling/bun/fleet-sync.ts`](../../../tooling/bun/fl
 
 ## 5. Forking & Upstream Auto-Integration (`cargo`, `rust-clippy`, `wild`, `sccache`)
 
-### 5.1 Aphrody Org & Relative Submodule Convention
+### 5.1 Aphrody Org & Pinned Fork Convention
 
-Verified via `gh repo list Aphrody-Dev`, `gh repo list aphrody-labs`, and [`.gitmodules`](../../../.gitmodules):
+Verified via `gh repo list Aphrody-Dev`, `gh repo list aphrody-labs`, and [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json):
 - Primary monorepo: `aphrody-dev/aphrody` (fork of `zed-industries/zed`).
-- Upstream dependency & tool forks live under `https://github.com/aphrody-labs/<tool>` and mount as **relative submodules** (`url = ../../aphrody-labs/<tool>.git`) under `vendor/*` (excluded from root `[workspace]` in [`Cargo.toml`](../../../Cargo.toml) and fetched selectively with `--depth 1 --jobs 8` via [`tooling/bun/submodules.ts`](../../../tooling/bun/submodules.ts) and [`.github/actions/vendor-submodules/action.yml`](../../../.github/actions/vendor-submodules/action.yml)).
+- Upstream dependency forks live under `https://github.com/aphrody-labs/<tool>` and are consumed as **pinned Cargo git dependencies** (`git = "https://github.com/aphrody-labs/<tool>.git", tag = "..."` in the root [`Cargo.toml`](../../../Cargo.toml), tags recorded in `forks-manifest.json`). There are no git submodules and no `vendor/` directory.
 - None of `cargo`, `rust-clippy`, `wild`, or `sccache` are forked in `aphrody-labs` yet.
 
 ### 5.2 Declarative Toolchain Fork Plan
 
 Run `bun tooling/bun/toolchain-audit.ts fork-plan` for live JSON specs:
 
-| Fork (`aphrody-labs/*`) | Upstream & Default Branch | Submodule Path | Priority Cherry-Picks / Patches |
+| Fork (`aphrody-labs/*`) | Upstream & Default Branch | Planned Pin | Priority Cherry-Picks / Patches |
 | :--- | :--- | :--- | :--- |
-| **`aphrody-labs/sccache`** | `mozilla/sccache` (`main`) | `vendor/toolchain/sccache` | **`#3026`** (`2026-11-14`, `@rsp` response file spawning fixing `web-sys` Windows `os error 206`) + **`#3022`** (`SCCACHE_BASEDIRS_VERBATIM_ENV_DEPS`) |
-| **`aphrody-labs/cargo`** | `rust-lang/cargo` (`master`) | `vendor/toolchain/cargo` | **`#17518`** (`debug=line-tables-only` default), **`#17512`** (`shared-storage` cross-workspace artifact dedup), **`#17524`** (`cargo clean gc --max-target-age`), **`#16659`** (parallel `-Zfine-grain-locking`) |
-| **`aphrody-labs/wild`** | `wild-linker/wild` (`main`) | `vendor/toolchain/wild` | **`#2975` & `#2979`** (`2026-11-15`, Windows PE/COFF `.CRT$` linking) + **`#2980` & `#2977`** (`wasm32` `--soname` / `--import-table`) |
-| **`aphrody-labs/rust-clippy`** | `rust-lang/rust-clippy` (`main`) | `vendor/toolchain/rust-clippy` | Pin `clippy_utils` cleanly for [`tooling/lints/`](../../../tooling/lints/Cargo.toml) alongside `nsh-*` lint exemptions |
+| **`aphrody-labs/sccache`** | `mozilla/sccache` (`main`) | release tag `<tool>-aphrody.<date>` | **`#3026`** (`2026-11-14`, `@rsp` response file spawning fixing `web-sys` Windows `os error 206`) + **`#3022`** (`SCCACHE_BASEDIRS_VERBATIM_ENV_DEPS`) |
+| **`aphrody-labs/cargo`** | `rust-lang/cargo` (`master`) | release tag `<tool>-aphrody.<date>` | **`#17518`** (`debug=line-tables-only` default), **`#17512`** (`shared-storage` cross-workspace artifact dedup), **`#17524`** (`cargo clean gc --max-target-age`), **`#16659`** (parallel `-Zfine-grain-locking`) |
+| **`aphrody-labs/wild`** | `wild-linker/wild` (`main`) | release tag `<tool>-aphrody.<date>` | **`#2975` & `#2979`** (`2026-11-15`, Windows PE/COFF `.CRT$` linking) + **`#2980` & `#2977`** (`wasm32` `--soname` / `--import-table`) |
+| **`aphrody-labs/rust-clippy`** | `rust-lang/rust-clippy` (`main`) | release tag `<tool>-aphrody.<date>` | Pin `clippy_utils` cleanly for [`tooling/lints/`](../../../tooling/lints/Cargo.toml) alongside `nsh-*` lint exemptions |
 
 ### 5.3 Automated Upstream Rebase / Cherry-Pick & Regression Gate Pipeline
 
@@ -254,12 +254,11 @@ Extend [`.github/workflows/aphrody-upstream-sync.yml`](../../../.github/workflow
 1. **Fork Bootstrap (one-time per tool)**:
    ```sh
    gh repo fork mozilla/sccache --org aphrody-labs --clone=false
-   git submodule add -b main ../../aphrody-labs/sccache.git vendor/toolchain/sccache
    ```
-   Add `vendor/toolchain/cargo`, `vendor/toolchain/rust-clippy`, `vendor/toolchain/wild`, and `vendor/toolchain/sccache` to `[workspace.exclude]` in [`Cargo.toml`](../../../Cargo.toml).
+   Tag each synced fork (`<upstream-version>-aphrody.<date>`) and record it in [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json); tool forks are built as standalone binaries, never added to the root workspace.
 2. **Automated Sync & Cherry-Pick Loop** (matching [`aphrody-auto-merge.yml`](../../../.github/workflows/aphrody-auto-merge.yml)):
    - Fetch `upstream/<default-branch>`, reset/rebase `aphrody/patched` onto `upstream`, and apply declarative `cherry-pick` commit lists (or open an `upstream-sync` issue automatically on merge conflicts, matching the existing `sync-zed-and-wgpu-digest` pattern).
-   - Build tool binaries on `fr1` / CI (`cargo build --manifest-path vendor/toolchain/<tool>/Cargo.toml --release`) and publish internal artifacts / R2 cache drops.
+   - Build tool binaries on `fr1` / CI (`git clone --depth 1 --branch <tag> https://github.com/aphrody-labs/<tool>.git` then `cargo build --manifest-path <tool>/Cargo.toml --release`) and publish internal artifacts / R2 cache drops.
 3. **Mandatory Verification & Perf Regression Gates**:
    - Repository hygiene & doc links: `bun run hygiene` ([`tooling/bun/repo-hygiene.ts`](../../../tooling/bun/repo-hygiene.ts))
    - Tooling tests: `bun run test:tooling`

@@ -12,8 +12,8 @@
 - `gpui-wgpu wasm inspect|validate|optimize|aot|bindgen|compose|strip`: Binary inspection (`wasmparser` + gzip/SHA-256), strict validation, `wasm-opt -Oz`, Wasmtime AOT `.cwasm`, lockstep `wasm-bindgen`, component composition (`wac`), and pure-Rust section stripping (`wasm-encoder`).
 - `gpui-wgpu doctor`: Probes installed `wasm32` Rust targets, Binaryen/Wasmtime/SH/DXC/SPIR-V tools, and active GPU adapters.
 - `gpui-wgpu app list|new|build|tokens`: Scaffolds and builds the 5 standalone starter templates under [`assets/os/awesome_wasm_wgpu.toml`](../../../assets/os/awesome_wasm_wgpu.toml).
-- `gpui-wgpu design mirror|sitemap|design-md|stitch|web-guidance|lighthouse|parity-matrix`: Live pure-Rust `https://design.google/` mirror, Stitch TSX/PNG synthesis, Tailwind v4 `@theme` / `components.json` export, CWV + 4-category Lighthouse scoring, and fork submodule parity matrix queries.
-- `gpui-wgpu mcp`: 24-tool stdio JSON-RPC 2.0 MCP server exposing WGPU/Naga, Wasm LTO/AOT, `DESIGN.md`, Stitch capture, Core Web Vitals/Lighthouse, shadcn/Tailwind, GPUI Starter Pack catalog, and submodule parity queries.
+- `gpui-wgpu design mirror|sitemap|design-md|stitch|web-guidance|lighthouse|parity-matrix`: Live pure-Rust `https://design.google/` mirror, Stitch TSX/PNG synthesis, Tailwind v4 `@theme` / `components.json` export, CWV + 4-category Lighthouse scoring, and fork parity matrix queries.
+- `gpui-wgpu mcp`: 24-tool stdio JSON-RPC 2.0 MCP server exposing WGPU/Naga, Wasm LTO/AOT, `DESIGN.md`, Stitch capture, Core Web Vitals/Lighthouse, shadcn/Tailwind, GPUI Starter Pack catalog, and fork parity queries.
 
 ## Standalone Templates (`templates/wasm-wgpu/*`)
 

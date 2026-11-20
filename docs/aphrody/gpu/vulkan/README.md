@@ -9,7 +9,7 @@ This directory documents the Vulkan graphics and compute architecture, compilati
 `aphrody` leverages Vulkan across three key operational layers:
 
 1. **`gpui_wgpu`**: High-level UI surface rendering and glyph composition via WGPU's hardware abstraction layer.
-2. **`vendor/wgpu/wgpu-hal/src/vulkan`**: Low-overhead Rust translation layer dynamically dispatching to the Vulkan driver via `ash` (`0.38`) and suballocating memory blocks with `gpu-allocator` (`0.28`).
+2. **`wgpu-hal/src/vulkan` (pinned `aphrody-labs/wgpu` tag)**: Low-overhead Rust translation layer dynamically dispatching to the Vulkan driver via `ash` (`0.38`) and suballocating memory blocks with `gpu-allocator` (`0.28`).
 3. **`crates/aphrody_cli` (`gpui-wgpu`)**: Hardware diagnostic, shader validation, cross-compilation, and offscreen compute benchmarking CLI.
 
 ```
@@ -71,7 +71,7 @@ Production shader examples and end-to-end verification scripts are located in:
 
 ## Reference Guides
 
-Detailed technical specifications are maintained in `.agents/plugins/aphrody/skills/vulkan/references/`:
-- [Vulkan Architecture](../../../../.agents/plugins/aphrody/skills/vulkan/references/vulkan-architecture.md): Synchronization2, Dynamic Rendering, Timeline Semaphores, Descriptor Indexing.
-- [SPIR-V & GLSL Pipeline](../../../../.agents/plugins/aphrody/skills/vulkan/references/spirv-and-glsl-pipeline.md): Compilation commands, optimization flags, viewport Y-flipping (`height = -height`).
-- [wgpu-hal Vulkan Backend](../../../../.agents/plugins/aphrody/skills/vulkan/references/wgpu-vulkan-hal.md): Ash 0.38 linkage, gpu-allocator memory heaps, swapchain presentation, RTX 4070 profile.
+Detailed technical specifications are maintained in `fw: plugins/aphrody/skills/vulkan/references/`:
+- Vulkan Architecture (`fw: plugins/aphrody/skills/vulkan/references/vulkan-architecture.md`): Synchronization2, Dynamic Rendering, Timeline Semaphores, Descriptor Indexing.
+- SPIR-V & GLSL Pipeline (`fw: plugins/aphrody/skills/vulkan/references/spirv-and-glsl-pipeline.md`): Compilation commands, optimization flags, viewport Y-flipping (`height = -height`).
+- wgpu-hal Vulkan Backend (`fw: plugins/aphrody/skills/vulkan/references/wgpu-vulkan-hal.md`): Ash 0.38 linkage, gpu-allocator memory heaps, swapchain presentation, RTX 4070 profile.

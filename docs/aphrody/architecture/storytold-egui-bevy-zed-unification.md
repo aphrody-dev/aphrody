@@ -1,6 +1,6 @@
 # Storytold 82-Repository Ecosystem, `egui 0.37` & Bevy Unreal 5.8 Unification in Zed
 
-> Canonical architecture blueprint unifying all **82 `https://github.com/orgs/storytold/repositories`** (`vendor/craft-libs` 165 crates + `vendor/craft-anything` 13 crates + 18 Studio apps), **`egui 0.37`** (`vendor/egui` -> [`crates/egui_gpui`](../../../crates/egui_gpui/src/egui_gpui.rs)), **Bevy + `bevy_egui` Unreal Engine 5.8** ([`crates/bevy_gpui`](../../../crates/bevy_gpui/src/bevy_gpui.rs)), and **Google Design + Stitch Studio** ([`crates/aphrody_craft`](../../../crates/aphrody_craft/src/aphrody_craft.rs), [`docs/aphrody/design/`](../design/manifest.json)) inside the single `aphrody` Zed monorepo.
+> Canonical architecture blueprint unifying all **82 `https://github.com/orgs/storytold/repositories`** (pinned `aphrody-labs/craft-libs` 165 crates + pinned `aphrody-labs/craft-anything` 13 crates + 18 Studio apps), **`egui 0.37`** (pinned `aphrody-labs/egui` -> [`crates/egui_gpui`](../../../crates/egui_gpui/src/egui_gpui.rs)), **Bevy + `bevy_egui` Unreal Engine 5.8** ([`crates/bevy_gpui`](../../../crates/bevy_gpui/src/bevy_gpui.rs)), and **Google Design + Stitch Studio** ([`crates/aphrody_craft`](../../../crates/aphrody_craft/src/aphrody_craft.rs), [`docs/aphrody/design/`](../design/manifest.json)) inside the single `aphrody` Zed monorepo.
 
 ---
 
@@ -11,18 +11,18 @@
 | Dimension | `storytold/craft-libs/crates/ui` (`craft-ui`) | Zed / Aphrody `crates/gpui` + `crates/ui` + `crates/aphrody_ui` | Unification Strategy in [`crates/egui_gpui`](../../../crates/egui_gpui/src/egui_gpui.rs) |
 | --- | --- | --- | --- |
 | Paradigm | Immediate-mode (`&mut egui::Ui` per frame) | Retained Entity + `Render` / `RenderOnce` + Taffy Flexbox/Grid | Both run side-by-side (`GpuiGoogleDesign`, `EguiImmediate`, `SplitSideBySide`) |
-| GPU & Text Stack | `egui 0.34..0.37`, `epaint` font atlas, `egui-wgpu` | `vendor/wgpu` v30, `cosmic-text`, platform DirectWrite/CoreText/Blade | Single `vendor/wgpu` v30 (`SharedWgpuHandles`) + `GoogleDesignTokens` bridge |
-| Accessibility | `accesskit` via `egui::Context` | `vendor/accesskit` 0.25.2 + `aphrody_pilot` | Unified `[patch.crates-io]` -> `vendor/accesskit` 0.25.2 |
+| GPU & Text Stack | `egui 0.34..0.37`, `epaint` font atlas, `egui-wgpu` | pinned `aphrody-labs/wgpu` v30, `cosmic-text`, platform DirectWrite/CoreText/Blade | Single pinned `wgpu` v30 (`SharedWgpuHandles`) + `GoogleDesignTokens` bridge |
+| Accessibility | `accesskit` via `egui::Context` | pinned `aphrody-labs/accesskit` 0.25.2 + `aphrody_pilot` | Unified `[patch.crates-io]` -> pinned `aphrody-labs/accesskit` tag (0.25.2) |
 | Reusable Controls | Dock tabs, combo menus, property rows, IME wire composer | `StarterButton`, `ExpressiveOmnibar`, `CascadingPopoverCard`, `SegmentedStudioBar` | [`craft_controls.rs`](../../../crates/egui_gpui/src/craft_controls.rs) natively on `egui 0.37` |
 | Styling Source | Ad-hoc dark theme structs | 3-tier `GoogleDesignTokens` (`assets/os/google_design_tokens.toml`) | `google_design_to_egui_visuals()` + `shadcn_theme_to_egui_visuals()` |
 
-### 1.2 Zed Upstream `crates/gpui/Cargo.toml` vs `emilk/egui/Cargo.toml` (`vendor/egui`)
+### 1.2 Zed Upstream `crates/gpui/Cargo.toml` vs `emilk/egui/Cargo.toml` (`aphrody-labs/egui` tag)
 
-| Manifest Aspect | `crates/gpui/Cargo.toml` (Zed Layout) | `vendor/egui/Cargo.toml` (`emilk/egui` 0.37) | Monorepo Resolution |
+| Manifest Aspect | `crates/gpui/Cargo.toml` (Zed Layout) | `egui/Cargo.toml` (`emilk/egui` 0.37, pinned tag) | Monorepo Resolution |
 | --- | --- | --- | --- |
 | Workspace Resolver | `resolver = "2"`, centralized `[workspace.dependencies]`, `[lints] workspace = true` | `resolver = "2"`, 15 subcrates (`ecolor`, `emath`, `epaint`, `egui`, `egui-wgpu`, `egui_extras`, …) | Core 7 `egui` crates registered in root `[workspace.dependencies]` + `[patch.crates-io]` |
-| Crate Placement | First-party crates under `crates/<name>/src/<name>.rs` (zero `mod.rs`) | `vendor/egui/crates/*` | Bridge placed at [`crates/egui_gpui/src/egui_gpui.rs`](../../../crates/egui_gpui/src/egui_gpui.rs) matching `crates/gpui` |
-| WGPU Version | `wgpu = "30.0.0"` (`vendor/wgpu`) | `egui-wgpu` upgraded to `wgpu = "30.0.0"` | Zero duplicate `wgpu` or `naga` versions in `Cargo.lock` |
+| Crate Placement | First-party crates under `crates/<name>/src/<name>.rs` (zero `mod.rs`) | `crates/*` inside the pinned `aphrody-labs/egui` checkout | Bridge placed at [`crates/egui_gpui/src/egui_gpui.rs`](../../../crates/egui_gpui/src/egui_gpui.rs) matching `crates/gpui` |
+| WGPU Version | `wgpu = "30.0.0"` (pinned `aphrody-labs/wgpu` tag) | `egui-wgpu` upgraded to `wgpu = "30.0.0"` | Zero duplicate `wgpu` or `naga` versions in `Cargo.lock` |
 | Tooling & Lints | `cargo xtask package-conformity`, `cargo xtask licenses`, `deny.toml` | `cargo deny`, `typos`, `wasm32` checks | Validated by `cargo xtask package-conformity` + `bun tooling/bun/web-build.ts check` |
 
 ---
@@ -31,10 +31,10 @@
 
 Tracked declaratively in [`assets/os/storytold_ecosystem.toml`](../../../assets/os/storytold_ecosystem.toml) and audited via [`tooling/bun/storytold-unify.ts`](../../../tooling/bun/storytold-unify.ts) (`bun run storytold:audit`):
 
-1. **Core Engines & Monorepos (4)**: `craft-libs` (`vendor/craft-libs`, 165 crates), `craft-anything` (`vendor/craft-anything`, 13 crates), `egui` (`vendor/egui` + `crates/egui_gpui`), `artcraft`.
+1. **Core Engines & Monorepos (4)**: `craft-libs` (pinned git tag, 165 crates), `craft-anything` (pinned git tag, 13 crates), `egui` (pinned git tag + `crates/egui_gpui`), `artcraft`.
 2. **18 Integrated Studio Apps (`assets/os/craft_catalog.toml` + `crates/aphrody_craft`)**: `figcraft`, `cadcraft`, `meshcraft`, `anicraft`, `pixelcraft`, `vectorcraft`, `gradecraft`, `rawcraft`, `drawcraft`, `cutcraft`, `texcraft`, `sfxLab`, `typecraft`, `writecraft`, `gridcraft`, `deckcraft`, `pdfcraft`, and `unrealcraft` (Unreal Bevy 5.8).
 3. **Bevy 3D / CAD / Simulation Stack (11 -> `crates/bevy_gpui`)**: `bevy-cad`, `bevy-mesh`, `bevy-sculpt`, `bevy-skeleton`, `bevy-mocap`, `bevy-cloth`, `bevy-hair`, `bevy-2d-animator`, `bevy-timeline`, `bevy-gpu-Readback`, `bevy-xsens-mocap`.
-4. **Pure-Rust Codecs, Parsers & Renderers (38 -> `vendor/craft-libs/crates/*` & `crates/aphrody_craft`)**: `.fig` (`craft-fig`, `craft-kiwi`), `.sketch` (`craft-sketch`), `.penpot` (`craft-penpot`), `.mtlx` (`craft-materialx`), `.usdc` (`craft-usd`), `.psd`/`.ora`/`.kra`/`.xcf`/`.exr`/`.hdr`/`.dds`/`.tga`, `.docx`/`.xlsx`/`.pptx`/`.csv`, `.dxf`/`.gcode`, `.midi`/`.sf2`, ELF/PE/Mach-O/archive readers.
+4. **Pure-Rust Codecs, Parsers & Renderers (38 -> pinned `craft-libs` crates & `crates/aphrody_craft`)**: `.fig` (`craft-fig`, `craft-kiwi`), `.sketch` (`craft-sketch`), `.penpot` (`craft-penpot`), `.mtlx` (`craft-materialx`), `.usdc` (`craft-usd`), `.psd`/`.ora`/`.kra`/`.xcf`/`.exr`/`.hdr`/`.dds`/`.tga`, `.docx`/`.xlsx`/`.pptx`/`.csv`, `.dxf`/`.gcode`, `.midi`/`.sf2`, ELF/PE/Mach-O/archive readers.
 5. **AI, Reverse-Engineering & GPU Compute (11 -> `crates/aphrody_craft` & `crates/aphrody_craft` MCP)**: `craft-anything` Oxc JS/TS AST + x86_64/ARM64/Wasm disassembler + SHA-256 evidence store, exposed via `storytold_ecosystem_status` and `craft_anything_js_analyze` MCP tools.
 
 ---

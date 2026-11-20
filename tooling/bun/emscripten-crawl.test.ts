@@ -8,7 +8,6 @@ import {
   buildEcosystemDocContent,
   buildLlmsTxtContent,
   buildRouteTree,
-  buildSkillMdContent,
   buildXhArgs,
   escapeXml,
   extractHtmlPageInfo,
@@ -21,16 +20,10 @@ import {
   parseSphinxSearchIndex,
   parseXhResponseStatus,
   probeEmcc,
-  REF_BEST_PRACTICES_REL,
-  REF_REPOS_REL,
-  REF_SITEMAP_REL,
-  REF_WEBGPU_INTEROP_REL,
   REPO_ROOT,
   serializeSitemapXml,
   type SitemapCrawlReport,
-  SKILL_MD_REL,
   validateLlmsTxt,
-  validateSkillFrontmatter,
 } from "./emscripten-crawl.ts";
 
 describe("emscripten-crawl pure parsers, serializers & validators", () => {
@@ -202,7 +195,7 @@ describe("emscripten-crawl pure parsers, serializers & validators", () => {
     expect(digest).toContain("FROM ubuntu:24.04");
   });
 
-  test("validateSkillFrontmatter and validateLlmsTxt enforce agentskills.io and llmstxt.org contracts", () => {
+  test("validateLlmsTxt enforces the llmstxt.org contract", () => {
     const probe = probeEmcc();
     expect(typeof probe.emcc.present).toBe("boolean");
     expect(probe.platform).toBe(process.platform);
@@ -303,19 +296,10 @@ describe("emscripten-crawl pure parsers, serializers & validators", () => {
     expect(llmsValid.h1Count).toBe(1);
     expect(llmsValid.hasBlockquote).toBe(true);
 
-    const skill = buildSkillMdContent(mockCrawl, mockManifest, probe);
-    const skillValid = validateSkillFrontmatter(skill);
-    expect(skillValid.ok).toBe(true);
-    expect(skillValid.name).toBe("emscripten");
-    expect(skillValid.descriptionLength).toBeLessThanOrEqual(1024);
-
     const eco = buildEcosystemDocContent(mockCrawl, mockManifest, probe);
     expect(eco).toContain("--use-port=emdawnwebgpu");
     expect(eco).toContain("wasm32-unknown-unknown");
     expect(eco).toContain("wasm32-wasip2");
-
-    const badSkill = "---\nname: Bad_Name\ndescription: oops\n---\n";
-    expect(validateSkillFrontmatter(badSkill).ok).toBe(false);
   });
 
   test("findBrokenRelativeLinks isolates checks cleanly in os.tmpdir() and verifies emitted repo docs", () => {
@@ -333,16 +317,9 @@ describe("emscripten-crawl pure parsers, serializers & validators", () => {
     const generatedDocs = [
       ARCH_DOC_REL,
       LLMS_TXT_REL,
-      SKILL_MD_REL,
-      REF_REPOS_REL,
-      REF_SITEMAP_REL,
-      REF_BEST_PRACTICES_REL,
-      REF_WEBGPU_INTEROP_REL,
     ];
     if (generatedDocs.every((rel) => existsSync(join(REPO_ROOT, rel)))) {
       expect(findBrokenRelativeLinks(generatedDocs, REPO_ROOT)).toEqual([]);
-      const skillContent = readFileSync(join(REPO_ROOT, SKILL_MD_REL), "utf8");
-      expect(validateSkillFrontmatter(skillContent).ok).toBe(true);
       const llmsContent = readFileSync(join(REPO_ROOT, LLMS_TXT_REL), "utf8");
       expect(validateLlmsTxt(llmsContent).ok).toBe(true);
     }

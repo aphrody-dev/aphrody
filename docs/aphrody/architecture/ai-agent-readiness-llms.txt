@@ -10,7 +10,7 @@
 - NSH workspace studio actions: OpenGoogleDesignMirror, OpenStitchStudio, OpenGpuiStarterPack
 
 ## Verification Commands
-- `bun run standards:audit` — submodule parity matrix + micro-bench + TS/Rust Google Style audit
+- `bun run standards:audit` — fork parity matrix + micro-bench + TS/Rust Google Style audit
 - `bun run design:audit` — https://design.google/ token & contrast verification
 - `bun run i18n:check` — W3C CharMod / LTLI / BCP 47 / String-Meta verification
 - `bun run web:check` — wasm32-unknown-unknown + wasm32-wasip2 full workspace verification
@@ -18,14 +18,14 @@
 - `gpui-wgpu mcp` — 24-tool JSON-RPC MCP server for Wasm/WGPU/Google Design/Lighthouse/Starter Pack
 
 ## Audited Stacks (11 entries)
-- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,aphrody_ui,gpui_wgpu,aphrody_design} (399 source modules)
-- wgpu: WGPU v30 + Naga (aphrody-labs/wgpu) -> vendor/wgpu (500 source modules)
-- taffy: Taffy Layout (aphrody-labs/taffy) -> vendor/taffy (115 source modules)
-- accesskit: AccessKit (aphrody-labs/accesskit) -> vendor/accesskit (116 source modules)
-- cosmic-text: Cosmic Text (aphrody-labs/cosmic-text) -> vendor/cosmic-text (51 source modules)
-- egui: Egui (aphrody-labs/egui) -> vendor/egui (443 source modules)
-- wry: WRY WebView (aphrody-labs/wry) -> vendor/tauri/wry (59 source modules)
-- craft-libs: Craft Libs (aphrody-labs/craft-libs) -> vendor/craft-libs (500 source modules)
-- craft-anything: Craft Anything (aphrody-labs/craft-anything) -> vendor/craft-anything (500 source modules)
-- mullvad: Mullvad VPN (aphrody-labs/mullvadvpn-app) -> vendor/mullvad (500 source modules)
-- browser: Aphrody Browser (aphrody-labs/browser) -> vendor/browser (26 source modules)
+- aphrody-core: Aphrody GPUI Core + Starter Pack -> crates/{gpui,gpui_ui,nsh-base,aphrody_ui,gpui_wgpu,aphrody_design} (400 source modules)
+- wgpu: WGPU v30 + Naga (aphrody-labs/wgpu) -> aphrody-labs/wgpu@v30.0.0-aphrody.20261120 (pinned git dependency)
+- taffy: Taffy Layout (aphrody-labs/taffy) -> aphrody-labs/taffy@v0.15.1-aphrody.20261120 (pinned git dependency)
+- accesskit: AccessKit (aphrody-labs/accesskit) -> aphrody-labs/accesskit@v0.25.2-aphrody.20261120 (pinned git dependency)
+- cosmic-text: Cosmic Text (aphrody-labs/cosmic-text) -> aphrody-labs/cosmic-text@v0.19.0-aphrody.20261120 (pinned git dependency)
+- egui: Egui (aphrody-labs/egui) -> aphrody-labs/egui@v0.37.0-aphrody.20261120 (pinned git dependency)
+- wry: WRY WebView (aphrody-labs/wry) -> aphrody-labs/wry@v0.57.3-aphrody.20261120 (pinned git dependency)
+- craft-libs: Craft Libs (aphrody-labs/craft-libs) -> aphrody-labs/craft-libs@v0.1.0-aphrody.20261120.2 (pinned git dependency)
+- craft-anything: Craft Anything (aphrody-labs/craft-anything) -> aphrody-labs/craft-anything@v0.6.1-aphrody.20261120 (pinned git dependency)
+- mullvad: Mullvad VPN (aphrody-labs/mullvadvpn-app) -> aphrody-labs/mullvadvpn-app@v2026.11.20-aphrody.3 (pinned git dependency)
+- browser: Aphrody Browser (aphrody-labs/browser) -> aphrody-labs/browser@v2026.11.20-aphrody.3 (pinned git dependency)

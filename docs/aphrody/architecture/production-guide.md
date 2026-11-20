@@ -1,6 +1,6 @@
 # Aphrody Production-Ready Monorepo Architecture & Hardening Guide
 
-> Synthesized from codebase telemetry (`C:\src\aphrody` root workspace, `Cargo.lock`, `.gitmodules`), live cross-platform test verification (Windows, Linux Lavapipe, Chrome Headless WebGPU, Android `aarch64-linux-android` check), and primary upstream references (2025–2026).
+> Synthesized from codebase telemetry (`C:\src\aphrody` root workspace, `Cargo.lock`, `tooling/bun/forks-manifest.json`), live cross-platform test verification (Windows, Linux Lavapipe, Chrome Headless WebGPU, Android `aarch64-linux-android` check), and primary upstream references (2025–2026).
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Dimension | Current Observed State | Production Target |
 | :--- | :--- | :--- |
-| **Workspace Scale** | `301` member crates, `20` excluded `vendor/*` directories, `default-members = 7` | Strict 6-tier one-way DAG validated via `cargo xtask check-layers` |
-| **Submodules** | `37` relative submodules (`../../aphrody-labs/*.git`) in [`.gitmodules`](../../../.gitmodules); `6` Cargo path-referenced (`taffy`, `wgpu`, `cosmic-text`, `accesskit`, `craft-libs`, `tauri/wry`) | Parallel `--jobs 8` shallow/blobless checkout via [`tooling/bun/submodules.ts`](../../../tooling/bun/submodules.ts) |
+| **Workspace Scale** | `326` member crates, `1` excluded glob (`templates/wasm-wgpu/*`), `default-members = 21` | Strict 6-tier one-way DAG validated via `cargo xtask check-layers` |
+| **Pinned Forks** | `11` `aphrody-labs/*` forks as Cargo git tag dependencies (`wgpu`, `taffy`, `accesskit`, `cosmic-text`, `egui`, `wry`, `craft-libs`, `craft-anything`, `mullvadvpn-app`, `browser`, `kitesurf`); no git submodules, no `vendor/` | Tags recorded in [`tooling/bun/forks-manifest.json`](../../../tooling/bun/forks-manifest.json), resolved by Cargo into `~/.cargo/git` |
 | **`Cargo.lock` Graph** | `2,063` package entries across `1,801` unique crates; **`180` duplicated crate names** (`hashbrown`, `itertools`, `quick-xml`, `rand*`, `windows*` x5; `darling*`, `toml_edit` x4) | Eliminate top-8 duplicates + unify features with `cargo-hakari` |
 | **Converged Core Stack** | `wgpu 30.0.0`, `taffy 0.15.1`, `cosmic-text 0.19.0`, `accesskit 0.25.2`, `wry 0.57.2`, `wasm-bindgen 0.2.129`, `wasmtime 48.0.7`, `rustls 0.23.46`, `quickjs-jit 0.14.2`, `agent-client-protocol 5.3.0` | Automated `cargo-deny` + `cargo-semver-checks` on public SDK crates |
 | **Web (`wasm32`) Footprint** | `aphrody_desktop` (`web_os`, debug + `wasm-opt -Oz`): `23,452,112` B raw (`simd-baseline`), **`6,388,025` B Brotli** | `< 4.5 MB` raw / **`<= 1.5 MB` Brotli** (`[profile.web]` + decoupled WOFF2 fonts & audio) |

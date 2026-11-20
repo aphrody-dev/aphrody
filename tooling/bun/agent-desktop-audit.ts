@@ -267,7 +267,6 @@ export function scanMigratedTree(root: string): AgentDesktopAuditReport["migrate
     "crates/aphrody_browser/src/chromium_gpui.rs",
     "crates/aphrody_desktop/src/pilot_hud.rs",
     "crates/aphrody_desktop/src/main.rs",
-    ".agents/plugins/aphrody/skills/ai-os-pilot/SKILL.md",
     "docs/aphrody/architecture/agent-desktop-ai-os.md",
   ];
   return targets.map((rel) => {

@@ -1,6 +1,6 @@
 # Fleet, Edge & Asset Orchestration Architecture
 
-Reproducible multi-VPS build scheduling, Cloudflare edge distribution, R2 asset offloading, `vendor/browser/third_party` pinning, and GitHub workflow automation for `aphrody`. All configuration resolves from repository manifests, `~/.ssh/config`, and environment variables without hardcoded IP addresses, usernames, account IDs, or machine-local paths.
+Reproducible multi-VPS build scheduling, Cloudflare edge distribution, R2 asset offloading, pinned-fork, and GitHub workflow automation for `aphrody`. All configuration resolves from repository manifests, `~/.ssh/config`, and environment variables without hardcoded IP addresses, usernames, account IDs, or machine-local paths.
 
 ---
 
@@ -71,16 +71,13 @@ Heavy non-boot binary assets (reference PNG captures, showcase GIFs/WebPs, sound
 
 - **Content-Addressed Keys**: Each asset is hashed (`sha256`) into `v1/<category>/<sha256>.<ext>` inside R2 bucket `aphrody-assets` and served at `https://assets.aphrody.app/<r2_key>` (and Worker `/r2-assets/<r2_key>`) with `Cache-Control: public, max-age=31536000, immutable` and `ETag` `304` handling.
 - **Boot Asset Guard (`keep_local_boot`)**: Compile-time `include_bytes!`, `cargo xtask brand check` assets (`assets/images/*`), and bundled core fonts (`assets/fonts/lilex/`, `ibm-plex-sans/`, `GoogleSansCode-Variable.ttf`, `JetBrainsMono-Regular.ttf`, `crates/gpui/examples/image/app-icon.png`) stay tracked on disk (`2,917,160` bytes kept local; `9,115,541` bytes across offloadable entries in the 50-asset manifest).
-- **On-Demand Hydration & Local Slimming**: `bun run r2:hydrate` verifies SHA-256 digests into `target/r2-cache/` (or `--working-tree`); `bun run r2:prune` and [`tooling/bun/disk-slim.ts`](../../../tooling/bun/disk-slim.ts) (`bun run disk:slim`) reclaim `target/*` build caches and multi-pack submodule `.git` history safely.
+- **On-Demand Hydration & Local Slimming**: `bun run r2:hydrate` verifies SHA-256 digests into `target/r2-cache/` (or `--working-tree`); `bun run r2:prune` and [`tooling/bun/disk-slim.ts`](../../../tooling/bun/disk-slim.ts) (`bun run disk:slim`) reclaim `target/*` build caches safely.
 
 ---
 
-## 4. Slimmed `vendor/browser/third_party` Pinning
+## 4. Browser Third-Party Pinning
 
-Inside the `vendor/browser` submodule ([`vendor/browser/third_party/README.md`](../../../vendor/browser/third_party/README.md)), third-party trees are decoupled from checked-in copies:
-
-- **Zero-Byte Gitlink Mountpoints**: `third_party/browse`, `third_party/bun`, `third_party/kitesurf`, and `third_party/mullvad` are tracked as gitlinks (`160000`) initialized on demand rather than vendored source duplicates.
-- **Live Upstream Revision Pinning (`mode = "pin"`)**: [`vendor/browser/tools/upstreams.toml`](../../../vendor/browser/tools/upstreams.toml) and [`vendor/browser/tools/upstreams.lock.json`](../../../vendor/browser/tools/upstreams.lock.json) record exact branch/tag SHAs (with `crates = {}`) resolved via `git ls-remote` across Servo crates, `stylo`, `webrender`, `mozjs`, `html5ever`, `obscura`, `agent-browser`, `lol-html`, `hyperfine`, and `JetStream`. Heavy Chromium checkouts stay external on build hosts via `CHROMIUM_SRC` and `DEPS`.
+The browser engine lives in its own repository, `aphrody-labs/browser`, consumed here as a pinned Cargo git dependency (`tag = "v2026.11.20-aphrody.3"`, recorded in [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json)). Its `third_party/` trees and upstream revision pins are maintained in that repository and nothing from them is checked into `aphrody`. Heavy Chromium checkouts stay external on build hosts via `CHROMIUM_SRC` and `DEPS`.
 
 ---
 

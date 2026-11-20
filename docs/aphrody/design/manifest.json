@@ -384,7 +384,7 @@
     },
     "stitch": {
       "path": "./kits/stitch-design-kit.json",
-      "sha256": "0ddb62d247f7f390c5a5c3add82dd05ae7eb49d9fcd21f624b08b0184cdfc3e6",
+      "sha256": "950ee8d0794b58f1cd8980d37bc8bfcdce3a6a77c829c27f43b54a21f21978c0",
       "screenCount": 4,
       "preserveDataStitchId": true
     }
@@ -410,7 +410,7 @@
       "deviceType": "DESKTOP",
       "title": "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)",
       "defaultTheme": "neural",
-      "bytes": 5457
+      "bytes": 5468
     },
     {
       "id": "03-web-landing-hero",

@@ -52,7 +52,7 @@ Stage 0: Sources (product.toml · Cargo.toml · docs/src · wit/ · grammars/ ·
 ### Target Agent Discovery Contracts
 1. **`/llms.txt` & Scoped `*/llms-full.txt`**: `llmstxt.org` v2 index linking Core Guides, GPUI SDK, NSH, OS, WGPU (`docs/aphrody/wgpu/llms.txt`), WIT Extensions, Schemas, OpenAPI, and Skills; keep subsystem `llms-full.txt` modular to avoid multi-MB root dumps.
 2. **HTTP `Accept: text/markdown` + `<link rel="alternate" type="text/markdown">`**: Clean Markdown twin rendered beside every route and negotiated at the Cloudflare Worker edge with `Vary: Accept`.
-3. **`/.well-known/agent-skills/index.json` (`0.2.0`) & `/context7.json`**: Deterministic `.zip` skill archives with `sha256:` digests matching `discovery/0.2.0` schema plus `context7.json` indexing rules excluding `vendor/` and `target/`.
+3. **`/.well-known/agent-skills/index.json` (`0.2.0`) & `/context7.json`**: Deterministic `.zip` skill archives with `sha256:` digests matching `discovery/0.2.0` schema plus `context7.json` indexing rules excluding `target/`.
 
 ### Verification Gates
 - `cargo xtask brand check` (zero stale upstream branding)

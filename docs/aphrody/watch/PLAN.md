@@ -8,7 +8,7 @@ Hand-written. Everything `tooling/kernel-watch` generates (pages, data, probe an
 - `cli.ts poll`: conditional (ETag, If-Modified-Since), per-source minimum interval, exponential backoff and Retry-After or rate-limit-reset on 429 and 5xx, bounded per run (`--max-sources`, `--budget`), resumable because all state is in SQLite. Items land in a store with FTS5.
 - `cli.ts build`: deterministic views (`versions.md`, `kernels/<id>.md`, `state-of-kernels.md`, `data/*.json`) from the store.
 - GitHub Actions workflow `aphrody-kernel-watch.yml`: polls on a schedule and checks that the views build. It commits nothing; the poll store lives in the Actions cache, never in git.
-- Skill `.agents/plugins/aphrody/skills/kernel-watch/SKILL.md` for agents.
+- Skill `fw: plugins/aphrody/skills/kernel-watch` for agents.
 
 ## Latency
 

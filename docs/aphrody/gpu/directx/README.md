@@ -8,12 +8,6 @@ Welcome to the DirectX 12 GPU Architecture documentation for `aphrody`. This gui
 
 ```
 aphrody/
-├── .agents/plugins/aphrody/skills/directx/
-│   ├── SKILL.md                          # DirectX 12 skill definition
-│   └── references/
-│       ├── d3d12-architecture.md         # Enhanced Barriers, Root Signatures, Descriptors
-│       ├── hlsl-dxc-and-naga.md          # DXC flags, SM 6.0–6.9, Wave Intrinsics, Naga HLSL
-│       └── gpui-and-wgpu-dx12.md         # gpui_windows vs wgpu-hal dx12, DComp, DRED
 ├── docs/aphrody/gpu/directx/
 │   └── README.md                         # This architecture document
 ├── crates/gpui_windows/                  # Native Win32 / DirectWrite / DirectX renderer

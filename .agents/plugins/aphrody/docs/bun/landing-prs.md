@@ -1,5 +1,7 @@
 # Landing PRs: situational review guidance
 
+Scope: the Bun repository (`aphrody-labs/bun`, its own repository and not vendored in `aphrody`); every `vendor/` path and submodule pointer below refers to that repository.
+
 Companion to the "Landing PRs: What Bun Reviewers Catch" section in CLAUDE.md. These sections apply at specific moments — read the relevant one when:
 
 - **Node/Web compat** — touching `node:*` modules, Web-standard APIs, or anything under `src/runtime/node/` / `src/js/node/`.

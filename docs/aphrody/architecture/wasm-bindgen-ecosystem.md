@@ -101,14 +101,9 @@
 
 ---
 
-## 5. Linked Artifacts & Progressive-Disclosure Skill
+## 5. Linked Artifacts
 
 - **`llms.txt` Index**: [`docs/aphrody/architecture/wasm-bindgen-llms.txt`](./wasm-bindgen-llms.txt)
-- **Agent Skill**: [`.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/SKILL.md)
-- **Skill References**:
-  - [`repos-matrix.md`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/repos-matrix.md)
-  - [`js-web-sys-patterns.md`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/js-web-sys-patterns.md)
-  - [`walrus-weedle-tsgen.md`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/walrus-weedle-tsgen.md)
-  - [`aphrody-best-practices.md`](../../../.agents/plugins/aphrody/skills/wasm-bindgen/references/aphrody-best-practices.md)
+- **Agent Skill**: `fw: plugins/aphrody/skills/wasm-bindgen`
 - **Automation CLI & Test Suite**: [`tooling/bun/wasm-bindgen-ingest.ts`](../../../tooling/bun/wasm-bindgen-ingest.ts), [`tooling/bun/wasm-bindgen-ingest.test.ts`](../../../tooling/bun/wasm-bindgen-ingest.test.ts)
 - **Gitignored Digest Cache**: `target/gitingest/wasm-bindgen/*.txt` + `target/gitingest/wasm-bindgen/ingest-manifest.json`

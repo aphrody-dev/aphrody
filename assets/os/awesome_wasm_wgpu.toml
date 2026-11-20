@@ -3,8 +3,8 @@ schema_version = 1
 design_source_of_truth = "https://design.google/"
 cli_binary = "gpui-wgpu"
 mcp_tool_count = 24
-starter_pack_crate = "crates/os_ui/src/starter_pack.rs"
-design_stitch_crate = "crates/google_design_stitch/src/google_design_stitch.rs"
+starter_pack_crate = "crates/aphrody_ui/src/starter_pack.rs"
+design_stitch_crate = "crates/aphrody_design/src/stitch_client.rs"
 
 [[templates]]
 id = "wgpu-compute-particles"
@@ -45,7 +45,7 @@ description = "Core Web Vitals >= 95, Lighthouse, W3C WCAG AA/ARIA, Vercel UI, a
 id = "webassembly-org"
 manifest = "assets/os/webassembly_ecosystem.toml"
 doc = "docs/architecture/webassembly-org-ecosystem.md"
-skill = ".agents/plugins/aphrody/skills/webassembly/SKILL.md"
+skill = "fw: plugins/aphrody/skills/webassembly"
 
 [[ecosystems]]
 id = "google-design-stitch"

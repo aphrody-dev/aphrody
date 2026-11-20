@@ -1,37 +1,37 @@
 # WGPU v30.0.0 & Naga v30.0.0 — Complete Technical Reference (`aphrody`)
 
-> Authoritative source-verified reference for `wgpu` v30.0.0 and `naga` v30.0.0 vendored at `vendor/wgpu` (upstream `gfx-rs/wgpu` commit `cddb2f5d80dc0009b2ef6767635140cacf90a007`), `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/aphrody_cli` (`gpui-wgpu`).
+> Authoritative source-verified reference for `wgpu` v30.0.0 and `naga` v30.0.0 consumed as the pinned `aphrody-labs/wgpu` git tag `v30.0.0-aphrody.20261120` (commit `3d3f41fd568b7b742b758a219a4f5a850d9e2e3f`; paths below are relative to that repository's root), `crates/gpui_wgpu`, `crates/nsh-core`, `crates/nsh-engine`, and `crates/aphrody_cli` (`gpui-wgpu`).
 
 ---
 
-## 1. Vendored Stack Overview & Workspace Architecture
+## 1. Pinned Stack Overview & Workspace Architecture
 
-### 1.1 Why Commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` Is Pinned
-`aphrody` pins `wgpu` and `naga` to commit `cddb2f5d80dc0009b2ef6767635140cacf90a007` (v30.0.0 branch with critical post-release fixes). Upstream crates.io `30.0.1` lacks two fixes required by `aphrody`:
+### 1.1 Why Tag `v30.0.0-aphrody.20261120` Is Pinned
+`aphrody` pins `wgpu` and `naga` to the `aphrody-labs/wgpu` git tag `v30.0.0-aphrody.20261120` (commit `3d3f41fd568b7b742b758a219a4f5a850d9e2e3f`, v30.0.0 with critical post-release fixes) in the root `Cargo.toml`. Upstream crates.io `30.0.1` lacks two fixes required by `aphrody`:
 1. **Vulkan surface-drop ordering fix** (`wgpu#10230`) preventing driver crashes when windows close or recreate surfaces.
 2. **WebGL2 canvas resize fix** (`wgpu#10348`) required by `gpui_web`.
 
-All GPU crates in `aphrody` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from `vendor/wgpu` so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `aphrody_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
+All GPU crates in `aphrody` MUST resolve `wgpu`, `wgpu-core`, `wgpu-hal`, `wgpu-types`, and `naga` from the pinned `aphrody-labs/wgpu` tag so compile-time shader checks (`naga` in `nsh-core`, `gpui_wgpu` tests, and `aphrody_cli`) match runtime `Device::create_shader_module` parsing and bounds-check code generation byte-for-byte.
 
-### 1.2 Directory & Crate Map (`vendor/wgpu/`)
+### 1.2 Directory & Crate Map (root of the pinned `aphrody-labs/wgpu` repository)
 
 | Crate | Path | MSRV / Edition | Role |
 | :--- | :--- | :--- | :--- |
-| `wgpu` | `vendor/wgpu/wgpu/` | 1.87 / 2021 (`#![no_std]` + `alloc` + `std`) | Safe high-level Rust API (`Instance`, `Adapter`, `Device`, `Queue`, `Surface`, `Buffer`, `Texture`, `RenderPipeline`, `ComputePipeline`, `CommandEncoder`). Dispatches via `dispatch::Dispatch*` to `ContextWgpuCore`, `ContextWebGpu` (WASM), or `custom` traits. |
-| `wgpu-core` | `vendor/wgpu/wgpu-core/` | 1.87 / 2021 (`#![no_std]`) | State machine, validation, generational `Hub`/`Registry` IDs, `SnatchLock` deferred destruction, resource `Tracker` state transitions, automatic barrier generation, indirect draw/dispatch compute validation, API trace recording. |
-| `wgpu-hal` | `vendor/wgpu/wgpu-hal/` | 1.87 / 2021 (`#![no_std]`) | Unsafe, zero-validation, statically-dispatched hardware abstraction (`Api` trait). Backends: `dx12`, `vulkan`, `metal`, `gles`, `noop`. |
-| `wgpu-types` | `vendor/wgpu/wgpu-types/` | 1.87 / 2021 (`#![no_std]`) | Shared descriptors, `Features` (`[u64; 2]`), `Limits`, `DownlevelCapabilities`, `TextureFormat`, `BufferUsages`, `TextureUsages`, `PollType`, `MemoryHints`, `Backends`, alignment constants. |
-| `naga` | `vendor/wgpu/naga/` | 1.87 / 2021 (`#![no_std]`, `#![forbid(unsafe_code)]`) | Shader frontend (`wgsl`, `glsl`, `spv`), arena-based SSA-like expression/statement IR (`Module`), `Validator` (types, layouts, bindings, uniformity), `proc` (`Layouter`, `Typifier`, `ConstantEvaluator`, `BoundsCheckPolicies`), and backends (`wgsl`, `hlsl`, `msl`, `spv`, `glsl`, `dot`). |
-| `naga-types` | `vendor/wgpu/naga-types/` | 1.87 / 2021 (`#![no_std]`) | Shared shader stage, resource binding, vertex format, GLSL version/profile, and SPIR-V binding types shared by `naga` and `wgpu-types`. |
-| `wgpu-naga-bridge` | `vendor/wgpu/wgpu-naga-bridge/` | 1.87 / 2021 | Converts `wgpu_types::Features` + `DownlevelFlags` into `naga::valid::Capabilities` and `Validator` configs (`create_validator`). |
-| `wgpu-sync` | `vendor/wgpu/wgpu-sync/` | 1.87 / 2021 | `Mutex`, `RwLock`, `OnceCell`, `Condvar`, and `portable-atomic` wrappers supporting `std`, `no_std`, and non-atomic WASM. |
-| `wgpu-core-deps-*` | `vendor/wgpu/wgpu-core/platform-deps/*` | 1.87 / 2021 | Platform-conditional feature-forwarding shims (`windows`, `linux-android-bsd`, `apple`, `wasm`, `emscripten`) solving Cargo target-specific feature unification (`wgpu#3514`, `wgpu#7076`). |
-| `wgpu-info` | `vendor/wgpu/wgpu-info/` | 1.93 / 2021 | Upstream GPU capability dump tool (`GpuReport`). |
-| `player` | `vendor/wgpu/player/` | 1.93 / 2021 | Replays `wgpu-core` API traces captured via `Trace::Directory`. |
-| `cts_runner` / `deno_webgpu` | `vendor/wgpu/cts_runner/`, `deno_webgpu/` | 1.93 / 2021 | WebGPU Conformance Test Suite runner & Deno WebGPU bindings. |
+| `wgpu` | `wgpu/` | 1.87 / 2021 (`#![no_std]` + `alloc` + `std`) | Safe high-level Rust API (`Instance`, `Adapter`, `Device`, `Queue`, `Surface`, `Buffer`, `Texture`, `RenderPipeline`, `ComputePipeline`, `CommandEncoder`). Dispatches via `dispatch::Dispatch*` to `ContextWgpuCore`, `ContextWebGpu` (WASM), or `custom` traits. |
+| `wgpu-core` | `wgpu-core/` | 1.87 / 2021 (`#![no_std]`) | State machine, validation, generational `Hub`/`Registry` IDs, `SnatchLock` deferred destruction, resource `Tracker` state transitions, automatic barrier generation, indirect draw/dispatch compute validation, API trace recording. |
+| `wgpu-hal` | `wgpu-hal/` | 1.87 / 2021 (`#![no_std]`) | Unsafe, zero-validation, statically-dispatched hardware abstraction (`Api` trait). Backends: `dx12`, `vulkan`, `metal`, `gles`, `noop`. |
+| `wgpu-types` | `wgpu-types/` | 1.87 / 2021 (`#![no_std]`) | Shared descriptors, `Features` (`[u64; 2]`), `Limits`, `DownlevelCapabilities`, `TextureFormat`, `BufferUsages`, `TextureUsages`, `PollType`, `MemoryHints`, `Backends`, alignment constants. |
+| `naga` | `naga/` | 1.87 / 2021 (`#![no_std]`, `#![forbid(unsafe_code)]`) | Shader frontend (`wgsl`, `glsl`, `spv`), arena-based SSA-like expression/statement IR (`Module`), `Validator` (types, layouts, bindings, uniformity), `proc` (`Layouter`, `Typifier`, `ConstantEvaluator`, `BoundsCheckPolicies`), and backends (`wgsl`, `hlsl`, `msl`, `spv`, `glsl`, `dot`). |
+| `naga-types` | `naga-types/` | 1.87 / 2021 (`#![no_std]`) | Shared shader stage, resource binding, vertex format, GLSL version/profile, and SPIR-V binding types shared by `naga` and `wgpu-types`. |
+| `wgpu-naga-bridge` | `wgpu-naga-bridge/` | 1.87 / 2021 | Converts `wgpu_types::Features` + `DownlevelFlags` into `naga::valid::Capabilities` and `Validator` configs (`create_validator`). |
+| `wgpu-sync` | `wgpu-sync/` | 1.87 / 2021 | `Mutex`, `RwLock`, `OnceCell`, `Condvar`, and `portable-atomic` wrappers supporting `std`, `no_std`, and non-atomic WASM. |
+| `wgpu-core-deps-*` | `wgpu-core/platform-deps/*` | 1.87 / 2021 | Platform-conditional feature-forwarding shims (`windows`, `linux-android-bsd`, `apple`, `wasm`, `emscripten`) solving Cargo target-specific feature unification (`wgpu#3514`, `wgpu#7076`). |
+| `wgpu-info` | `wgpu-info/` | 1.93 / 2021 | Upstream GPU capability dump tool (`GpuReport`). |
+| `player` | `player/` | 1.93 / 2021 | Replays `wgpu-core` API traces captured via `Trace::Directory`. |
+| `cts_runner` / `deno_webgpu` | `cts_runner/`, `deno_webgpu/` | 1.93 / 2021 | WebGPU Conformance Test Suite runner & Deno WebGPU bindings. |
 
-### 1.3 Native Dependency Matrix in `vendor/wgpu/Cargo.toml`
-When wiring `vendor/wgpu` into a workspace `Cargo.toml`, note exact crate versions used by `wgpu-hal`:
+### 1.3 Native Dependency Matrix in the fork's `Cargo.toml`
+When wiring the `aphrody-labs/wgpu` git tag into a workspace `Cargo.toml`, note exact crate versions used by `wgpu-hal`:
 - **`windows`**: `0.62` (`default-features = false`). `wgpu-hal` `dx12` enables:
   - `Win32_Devices_DeviceAndDriverInstallation`, `Win32_Devices_Display`
   - `Win32_Graphics_Direct3D`, `Win32_Graphics_Direct3D12`, `Win32_Graphics_Direct3D_Dxc`, `Win32_Graphics_Direct3D_Fxc`
@@ -44,14 +44,14 @@ When wiring `vendor/wgpu` into a workspace `Cargo.toml`, note exact crate versio
 - **`range-alloc`**: `0.1`, **`bit-set`**: `0.11`, **`ash`**: `0.38`, **`glow`**: `0.18`, **`khronos-egl`**: `6` (patched in `aphrody` `[patch.crates-io]`), **`objc2`**: `0.6.3`, **`objc2-metal`** / **`objc2-foundation`** / **`objc2-quartz-core`**: `0.3.2`, **`raw-window-metal`**: `1.0`.
 - **`mach-dxcompiler-rs`**: `>=0.1.0, <=0.1.4` (only when optional `static-dxc` feature is enabled on x86/x86_64 Windows MSVC).
 - **`spirv`**: `0.4` (enabled by `naga/spv-in` and `naga/spv-out`).
-- **`rustc-hash`**: `vendor/wgpu` uses `1.1` (`default-features = false`) while `aphrody` uses `2.1.0` (Cargo resolves both cleanly in `Cargo.lock` when `wgpu` is referenced by path).
+- **`rustc-hash`**: the fork uses `1.1` (`default-features = false`) while `aphrody` uses `2.1.0` (Cargo resolves both cleanly in `Cargo.lock` when `wgpu` is referenced as a git dependency).
 
 ---
 
 ## 2. `wgpu` v30.0.0 High-Level Rust API Reference
 
 ### 2.1 `Instance`, `Backends`, and `InstanceDescriptor`
-Source: `vendor/wgpu/wgpu/src/api/instance.rs`, `vendor/wgpu/wgpu-types/src/instance.rs`, `vendor/wgpu/wgpu-types/src/backend.rs`.
+Source: `wgpu/src/api/instance.rs`, `wgpu-types/src/instance.rs`, `wgpu-types/src/backend.rs`.
 
 ```rust
 pub struct InstanceDescriptor {
@@ -92,7 +92,7 @@ Key constructors and methods on `wgpu::Instance`:
 - `noop: NoopBackendOptions { enable: bool }`
 
 ### 2.2 `Adapter`, `RequestAdapterOptions`, and `DeviceDescriptor`
-Source: `vendor/wgpu/wgpu/src/api/adapter.rs`, `vendor/wgpu/wgpu-types/src/adapter.rs`, `vendor/wgpu/wgpu-types/src/device.rs`.
+Source: `wgpu/src/api/adapter.rs`, `wgpu-types/src/adapter.rs`, `wgpu-types/src/device.rs`.
 
 ```rust
 pub struct RequestAdapterOptions<S> {
@@ -139,7 +139,7 @@ Adapter methods:
 - `adapter.cooperative_matrix_properties() -> Vec<CooperativeMatrixProperties>`
 
 ### 2.3 `Device`, Polling (`PollType`), Error Scopes, and Resource Creation
-Source: `vendor/wgpu/wgpu/src/api/device.rs`, `vendor/wgpu/wgpu-types/src/lib.rs`.
+Source: `wgpu/src/api/device.rs`, `wgpu-types/src/lib.rs`.
 
 **v30 `Device::poll` Signature** (changed from older `Maintain` enum):
 ```rust
@@ -183,7 +183,7 @@ In `wgpu::RenderPipelineDescriptor`:
 - `cache: Option<&PipelineCache>`
 
 ### 2.4 `Buffer`, Mapping, and Transfers (`TexelCopy*`)
-Source: `vendor/wgpu/wgpu/src/api/buffer.rs`, `vendor/wgpu/wgpu/src/api/command_encoder.rs`, `vendor/wgpu/wgpu/src/api/queue.rs`.
+Source: `wgpu/src/api/buffer.rs`, `wgpu/src/api/command_encoder.rs`, `wgpu/src/api/queue.rs`.
 
 **v30 Buffer Mapping (`get_mapped_range` returns `Result`!)**:
 ```rust
@@ -221,7 +221,7 @@ Also available in v30: `encoder.map_buffer_on_submit(&staging_buffer, wgpu::MapM
 - `Queue::write_texture` does **NOT** require 256-byte row alignment; `bytes_per_row: Some(width * bytes_per_pixel)` is valid directly.
 
 ### 2.5 `Surface` Presentation Lifecycle in v30
-Source: `vendor/wgpu/wgpu/src/api/surface.rs`, `crates/gpui_wgpu/src/wgpu_renderer.rs`.
+Source: `wgpu/src/api/surface.rs`, `crates/gpui_wgpu/src/wgpu_renderer.rs`.
 
 In `wgpu` v30, `surface.get_current_texture()` returns `wgpu::CurrentSurfaceTexture` (an enum, NOT `Result<SurfaceTexture, SurfaceError>`!) and presentation uses `queue.present(frame)` (or `frame.present()`):
 ```rust
@@ -249,7 +249,7 @@ Note `SurfaceConfiguration` in v30 also includes `color_space: wgpu::SurfaceColo
 
 ## 3. `wgpu-types` `Features`, `Limits`, & `DownlevelFlags` Reference
 
-### 3.1 `Limits` Tiers (`vendor/wgpu/wgpu-types/src/limits.rs`)
+### 3.1 `Limits` Tiers (`wgpu-types/src/limits.rs`)
 
 | Limit Field | `Limits::default()` (WebGPU Core) | `Limits::downlevel_defaults()` | `Limits::downlevel_webgl2_defaults()` | Direction |
 | :--- | :--- | :--- | :--- | :--- |
@@ -294,7 +294,7 @@ let required_limits = wgpu::Limits::downlevel_defaults()
 - `.using_alignment(adapter.limits())` adopts the adapter's required `min_uniform_buffer_offset_alignment` and `min_storage_buffer_offset_alignment` (prevents device request failure on hardware requiring e.g. 256B when defaults differ).
 - On Windows DX12, `max_non_sampler_bindings` defaults to `1_000_000`, causing DX12 to allocate a 1M-descriptor CBV/SRV/UAV heap upfront (~32–64 MB). Setting `max_non_sampler_bindings: 65_536` (as `nsh-engine` does) slashes idle GPU/driver memory for lightweight UI contexts.
 
-### 3.2 Key `Features` (`vendor/wgpu/wgpu-types/src/features.rs`)
+### 3.2 Key `Features` (`wgpu-types/src/features.rs`)
 `Features` combines WebGPU standard flags (`FeaturesWebGPU`) and native WGPU extensions (`FeaturesWGPU`) in a `[u64; 2]` bitset:
 - **Standard WebGPU Features**:
   - `DEPTH_CLIP_CONTROL`, `DEPTH32FLOAT_STENCIL8`
@@ -318,7 +318,7 @@ let required_limits = wgpu::Limits::downlevel_defaults()
 
 ## 4. `wgpu-core` & `wgpu-hal` Deep Internals
 
-### 4.1 `wgpu-core` Architecture (`vendor/wgpu/wgpu-core/src/`)
+### 4.1 `wgpu-core` Architecture (`wgpu-core/src/`)
 1. **Hub & Generational IDs** (`id.rs`, `storage.rs`, `instance.rs`):
    - Every GPU object (`Device`, `Buffer`, `Texture`, `BindGroup`, `RenderPipeline`, etc.) is stored in `Registry<T>` indexed by a packed 64-bit `Id<T>` (`index: u32`, `epoch: NonZeroU32`).
    - Eliminates ABA bugs across FFI/multithreaded usage and allows cheap handle cloning.
@@ -333,7 +333,7 @@ let required_limits = wgpu::Limits::downlevel_defaults()
 5. **Indirect Validation** (`indirect_validation/`):
    - Injects internal WGSL compute passes prior to `draw_indirect` / `dispatch_workgroups_indirect` to clamp out-of-bounds buffer/workgroup arguments to no-ops and populate DX12 `@builtin(num_workgroups)` / `first_instance` constants. (Requires compute shaders; note on NVIDIA OpenGL contexts without compute, device creation fails if indirect validation is required, which is why `nsh-engine` falls back to Vulkan when GL device creation errors).
 
-### 4.2 `wgpu-hal` Backend Specifics (`vendor/wgpu/wgpu-hal/src/`)
+### 4.2 `wgpu-hal` Backend Specifics (`wgpu-hal/src/`)
 - **Direct3D 12 (`src/dx12/`)**:
   - Dynamically loads `d3d12.dll`, `dxgi.dll`, and `dcomp.dll` (`DynLib`).
   - **Descriptor Heaps** (`descriptor.rs`): D3D12 allows only one shader-visible CBV/SRV/UAV heap and one Sampler heap bound simultaneously, with a hard hardware limit of **2,048 samplers** in a shader-visible sampler heap. `wgpu-hal` binds all unique samplers (up to 2,048) in one global sampler heap (`register(s0, space0)` and `register(s2048, space1)`) and passes per-bind-group `StructuredBuffer<uint> nagaGroupXSamplerIndexArray` tables so Naga HLSL indexes samplers indirectly!
@@ -359,7 +359,7 @@ let required_limits = wgpu::Limits::downlevel_defaults()
 
 ## 5. `naga` v30.0.0 Shader Compiler, Validator, Layout & Transpilation Reference
 
-### 5.1 Cargo Features (`vendor/wgpu/naga/Cargo.toml`)
+### 5.1 Cargo Features (`naga/Cargo.toml`)
 `naga` has `#![no_std]` and `#![forbid(unsafe_code)]`. Its Cargo features are:
 - **Frontends**:
   - `wgsl-in` (enables `dep:unicode-ident`)
@@ -376,7 +376,7 @@ let required_limits = wgpu::Limits::downlevel_defaults()
   - `stderr` (`codespan-reporting/std`), `termcolor` (`codespan-reporting/termcolor`), `serialize`, `deserialize`, `arbitrary`.
 
 ### 5.2 Parsing & Validating WGSL with Source-Span Diagnostics
-Source: `vendor/wgpu/naga/src/front/wgsl/mod.rs`, `vendor/wgpu/naga/src/valid/mod.rs`, `vendor/wgpu/naga/src/span.rs`.
+Source: `naga/src/front/wgsl/mod.rs`, `naga/src/valid/mod.rs`, `naga/src/span.rs`.
 
 ```rust
 use naga::front::wgsl;
@@ -412,7 +412,7 @@ let module_info: naga::valid::ModuleInfo = match validator.validate(&module) {
 ```
 
 ### 5.3 Inspecting `Module` IR & Computing Layouts (`naga::proc::Layouter`)
-Source: `vendor/wgpu/naga/src/ir/mod.rs`, `vendor/wgpu/naga/src/proc/layouter.rs`.
+Source: `naga/src/ir/mod.rs`, `naga/src/proc/layouter.rs`.
 
 - **`module.entry_points`**: `Vec<EntryPoint>` where each `EntryPoint` has:
   - `name: String`
@@ -660,7 +660,7 @@ let (module, module_info) = naga::back::pipeline_constants::process_overrides(
    - Cause: WGSL forbids implicit-derivative `textureSample` inside branches conditioned on fragment-varying values (unless `DISABLE_UNIFORMITY_REQ_FOR_FRAGMENT_STAGE` applies or in compute/vertex).
    - Fix: Compute UVs outside the branch, sample unconditionally before `if`/`return` (note how `shaders_subpixel.wgsl` alpha-clips *after* `textureSample`!), or use `textureSampleLevel(..., 0.0)` when mip level 0 is intended (as `nsh-core` does).
 7. **Windows `windows` / `gpu-allocator` version mismatch when patching `wgpu`**:
-   - `vendor/wgpu` v30.0.0 expects `windows = "0.62"`, `windows-core = "0.62"`, `windows-result = "0.4"`, and `gpu-allocator = "0.28"`. Both `aphrody` root `Cargo.toml` and `Cargo.lock` already resolve `windows 0.62.2`, `windows-core 0.62.2`, `windows-result 0.4.1`, and `gpu-allocator 0.28.0`.
+   - `wgpu` v30.0.0 expects `windows = "0.62"`, `windows-core = "0.62"`, `windows-result = "0.4"`, and `gpu-allocator = "0.28"`. Both `aphrody` root `Cargo.toml` and `Cargo.lock` already resolve `windows 0.62.2`, `windows-core 0.62.2`, `windows-result 0.4.1`, and `gpu-allocator 0.28.0`.
 
 
 ---
