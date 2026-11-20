@@ -11,6 +11,7 @@ pub mod google_design_components;
 pub mod google_design_mirror;
 pub mod i18n;
 pub mod immediate;
+pub mod material_glass;
 pub mod reactive;
 pub mod starter_pack;
 pub mod unified_runtime;
@@ -31,6 +32,13 @@ pub use immediate::{
     ColorSwatchRow, ImmediateMemory, ImmediateUi, KeyValueRow, PropertyInspect, SparklineChart,
     StatusBadge, StatusTone, sparkline_chart, status_badge,
 };
+pub use material_glass::{
+    GlassMaterialPreset, M3DynamicVariant, MaterialSymbolStyle, ResolvedGlassPlan,
+    compute_m3_dynamic_scheme, lucide_icon_svg, m3_rgb_to_hsla, material_symbol_svg,
+    os_theme_from_m3_seed,
+};
+#[cfg(any(target_os = "windows", target_os = "macos"))]
+pub use material_glass::apply_native_window_glass;
 pub use reactive::{
     FocusableActionChip, ProgressMeter, ReactiveHost, ReactiveProgram, SliderControl,
     SubscriptionSpec, TaskCommand, ToggleControl, focusable_action_chip, progress_meter,

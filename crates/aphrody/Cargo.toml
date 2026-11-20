@@ -21,8 +21,12 @@ minimal = ["session", "design", "installer"]
 lib = ["minimal", "store", "craft", "cosmic"]
 
 # Target platforms
-desktop = ["lib", "gpui", "pilot"]
-web = ["minimal", "store"]
+desktop = ["lib", "gpui", "kit", "pilot"]
+desktop-shell = ["desktop", "dep:aphrody_desktop"]
+app-shell = ["desktop", "dep:gpui_app_shell"]
+web = ["minimal", "store", "kit"]
+web-slim = ["minimal", "store", "aphrody_store/slim"]
+webgpu-only = []
 mobile = ["minimal"]
 server = ["minimal", "pilot", "headless"]
 headless = ["minimal", "pilot", "craft", "cosmic", "mcp"]
@@ -30,6 +34,7 @@ fullstack = ["desktop", "web", "server", "mcp"]
 
 # Unified Rust UI & Compositor backends placed cleanly alongside GPUI
 gpui = ["dep:gpui", "dep:gpui_ui", "dep:aphrody_ui", "dep:aphrody_nsh"]
+kit = ["dep:gpui-kit"]
 iced = ["dep:iced_gpui", "dep:aphrody_ui"]
 egui = ["dep:egui_gpui", "dep:aphrody_ui"]
 bevy = ["egui", "dep:bevy_gpui"]
@@ -38,6 +43,7 @@ cosmic = ["dep:cosmic_gpui"]
 nsh = ["dep:nsh-core", "dep:nsh-base"]
 
 # Subsystems
+auto = ["dep:aphrody_auto"]
 session = ["dep:aphrody_session"]
 design = ["dep:aphrody_design"]
 ui = ["dep:aphrody_ui"]
@@ -55,6 +61,7 @@ vpn = ["dep:aphrody_vpn"]
 full = [
     "fullstack",
     "gpui",
+    "kit",
     "iced",
     "egui",
     "bevy",
@@ -69,12 +76,15 @@ full = [
     "installer",
     "design",
     "vpn",
+    "auto",
 ]
 
 [dependencies]
+aphrody_auto = { workspace = true, optional = true }
 aphrody_browser = { workspace = true, optional = true }
 aphrody_craft = { workspace = true, optional = true }
 aphrody_design = { workspace = true, optional = true }
+aphrody_desktop = { workspace = true, optional = true }
 aphrody_installer = { workspace = true, optional = true }
 aphrody_nsh = { workspace = true, optional = true }
 aphrody_pilot = { workspace = true, optional = true }
@@ -83,11 +93,13 @@ aphrody_store = { workspace = true, optional = true }
 aphrody_ui = { workspace = true, optional = true }
 aphrody_vpn = { workspace = true, optional = true }
 bevy_gpui = { workspace = true, optional = true }
-brand.workspace = true
+brand = { workspace = true, features = ["serde"] }
 cosmic_gpui = { workspace = true, optional = true }
 editor = { workspace = true, optional = true }
 egui_gpui = { workspace = true, optional = true }
 gpui = { workspace = true, optional = true }
+gpui-kit = { workspace = true, optional = true }
+gpui_app_shell = { workspace = true, optional = true }
 gpui_code = { workspace = true, optional = true }
 gpui_ui = { workspace = true, optional = true }
 iced_gpui = { workspace = true, optional = true }
@@ -95,6 +107,8 @@ language = { workspace = true, optional = true }
 nsh-base = { workspace = true, optional = true }
 nsh-core = { workspace = true, optional = true }
 project = { workspace = true, optional = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
 tauri_gpui = { workspace = true, optional = true }
 tree-sitter = { workspace = true, optional = true }
 workspace = { workspace = true, optional = true }

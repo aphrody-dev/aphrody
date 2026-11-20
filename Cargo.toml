@@ -1326,6 +1326,12 @@ brand = { path = "crates/brand" }
 cosmic_gpui = { path = "crates/cosmic_gpui" }
 egui_gpui = { path = "crates/egui_gpui" }
 aphrody_design = { path = "crates/aphrody_design" }
+aphrody_desktop = { path = "crates/aphrody_desktop", default-features = false }
+backdrop-blur-core = "0.2.0"
+lucide-static-svg = "1.76.0"
+material-colors = { version = "0.5.0", default-features = false, features = ["std"] }
+md-icons = "0.4.0"
+window-vibrancy = "0.8.1"
 gpui-base = { version = "0.10.0", path = "crates/gpui-base" }
 gpui-component = { version = "0.10.0", path = "crates/gpui-component" }
 gpui-component-macros = { version = "0.10.0", path = "crates/gpui-component-macros" }

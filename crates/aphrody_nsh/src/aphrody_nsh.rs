@@ -12,6 +12,13 @@
 
 #[cfg(feature = "studio")]
 pub mod design_stitch_studio;
+#[cfg(feature = "studio")]
+pub use design_stitch_studio::{
+    CaptureDesignScreen, DesignStitchStudioItem, OpenAphrodySuite, OpenGoogleCraftAnythingStudio,
+    OpenGoogleDesignMirror, OpenGoogleFigCraftStudio, OpenGpuiStarterPack,
+    OpenMaterial3ComposeStudio, OpenStitchStudio, OpenUnrealBevyStudio, StudioMode,
+    ToggleStudioGuiParity,
+};
 pub mod material3_kit;
 
 pub use gpui_ui::nsh::{

@@ -17,6 +17,7 @@ struct ViewportUniform {
 // 4 = StatefulSlider (SliderState track + active segment + expressive handle)
 // 5 = SplitButton / ButtonGroup segment with material3-ripple:1.5.0 inset focus ring
 // 6 = Compose 1.13 Progressive Blur gradient overlay
+// 7 = Liquid / Frosted Glass surface (backdrop-blur-core Dual-Kawase tint + Fresnel specular rim)
 struct M3Instance {
     bounds: vec4<f32>,         // x, y, width, height in logical px
     fill_rgba: vec4<f32>,      // primary / container color
@@ -145,6 +146,17 @@ fn fs_main(in: VsOut) -> @location(0) vec4<f32> {
         let blur_factor = smoothstep(0.35, 1.0, t);
         color = vec4<f32>(inst.fill_rgba.rgb, inst.fill_rgba.a * blur_factor);
         alpha = 1.0;
+    } else if (kind == 7u) {
+        // Liquid / Frosted Glass: rounded SDF + top-left directional Fresnel specular rim + subtle sheen
+        let d = sdf_rounded_box(p, half, inst.shape_params.x);
+        alpha = 1.0 - smoothstep(-1.0, 1.0, d);
+        let rim = (1.0 - smoothstep(0.0, 2.5, abs(d + 1.0))) * clamp(inst.effect_params.x, 0.15, 0.75);
+        let uv_norm = in.local_px / max(size, vec2<f32>(1.0, 1.0));
+        let top_sheen = pow(1.0 - clamp(uv_norm.y, 0.0, 1.0), 2.2) * 0.16;
+        let fresnel_dir = smoothstep(1.2, 0.0, uv_norm.x + uv_norm.y);
+        let glass_rgb = mix(inst.fill_rgba.rgb, inst.accent_rgba.rgb, top_sheen)
+            + vec3<f32>(1.0, 1.0, 1.0) * (rim * (0.35 + 0.65 * fresnel_dir));
+        color = vec4<f32>(clamp(glass_rgb, vec3<f32>(0.0), vec3<f32>(1.0)), inst.fill_rgba.a);
     } else {
         let d = sdf_rounded_box(p, half, inst.shape_params.x);
         alpha = 1.0 - smoothstep(-1.0, 1.0, d);

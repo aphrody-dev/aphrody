@@ -4,7 +4,25 @@
 //! composable library facade (modeled after `dioxus`), enabling clean minimal binaries on Web/Wasm,
 //! Headless MCP servers, Native Desktop/Mobile apps, and multi-backend UI stacks.
 
+pub mod suite;
+
 pub use brand;
+pub use suite::{AphrodyPillarStatus, AphrodySuiteProfile};
+
+#[cfg(feature = "auto")]
+pub use aphrody_auto as auto;
+
+#[cfg(feature = "desktop-shell")]
+pub use aphrody_desktop as desktop_shell;
+
+#[cfg(feature = "app-shell")]
+pub use gpui_app_shell as app_shell;
+
+#[cfg(feature = "kit")]
+pub use gpui_kit as kit;
+
+#[cfg(feature = "kit")]
+pub use gpui_kit::material3 as m3;
 
 #[cfg(feature = "session")]
 pub use aphrody_session as session;
@@ -97,9 +115,20 @@ pub mod prelude {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn facade_brand_identity_is_consistent() {
+    fn facade_brand_identity_and_suite_profile_are_consistent() -> Result<(), serde_json::Error> {
         assert!(!crate::brand::APP_NAME.is_empty());
         assert!(!crate::brand::APP_SLUG.is_empty());
+        let profile = AphrodySuiteProfile::current();
+        assert_eq!(profile.total_pillars, 12);
+        assert!(profile.has_pillar("brand-design"));
+        assert_eq!(profile.theme_modes.len(), 4);
+        assert!((profile.wcag_aa_min_contrast - 4.5).abs() < f32::EPSILON);
+        let serialized = serde_json::to_string(&profile)?;
+        assert!(serialized.contains("material3-kit"));
+        assert!(serialized.contains("cosmic-os"));
+        Ok(())
     }
 }

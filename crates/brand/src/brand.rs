@@ -9,6 +9,7 @@ use std::env;
 use std::ffi::OsString;
 
 pub mod design;
+pub mod suite;
 
 include!(concat!(env!("OUT_DIR"), "/product_constants.rs"));
 

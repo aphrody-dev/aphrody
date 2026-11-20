@@ -12,7 +12,17 @@ default-run = "aphrody"
 workspace = true
 
 [features]
-default = ["nsh"]
+default = ["aphrody"]
+# Consolidated Aphrody fork feature uniting NSH TSX Studio, Material 3 Compose 1.5.0 &
+# Parametric Studio, Design/Stitch/FigCraft/Craft/Bevy Hub, and AI OS Pilot / Headless MCP.
+aphrody = [
+    "nsh",
+    "studio",
+    "pilot",
+]
+pilot = [
+    "dep:aphrody_pilot",
+]
 extensions = [
     "dep:extension_host",
     "dep:extensions_ui",
@@ -81,6 +91,7 @@ grammars = [
     "languages/load-grammars",
 ]
 full = [
+    "aphrody",
     "extensions",
     "debugger",
     "repl",
@@ -88,8 +99,6 @@ full = [
     "ai",
     "updater",
     "crash-reporting",
-    "nsh",
-    "studio",
     "grammars",
 ]
 tracy = ["ztracing/tracy"]
@@ -157,7 +166,7 @@ agent_settings.workspace = true
 agent_skills = { workspace = true, optional = true }
 agent_ui = { workspace = true, optional = true }
 anyhow.workspace = true
-aphrody_pilot.workspace = true
+aphrody_pilot = { workspace = true, optional = true }
 askpass.workspace = true
 assets.workspace = true
 audio = { workspace = true, optional = true }

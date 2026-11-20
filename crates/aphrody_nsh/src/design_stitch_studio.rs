@@ -30,6 +30,10 @@ use gpui_ui::gpui::{
     IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement as _, Styled,
     Subscription, Window, actions, div, px,
 };
+use gpui_ui::kit::{
+    COMPOSE_M3_VERSION, M3AppearanceMode, M3Compose15Catalog, M3MaterialShape,
+    M3ParametricPrototyperView, apply_kit_m3_theme,
+};
 use gpui_ui::ui::{
     FluentBuilder as _, Icon, IconName, InteractiveElement as _, Label, LabelCommon as _, h_flex,
     v_flex,
@@ -47,6 +51,10 @@ use workspace::item::{Item, ItemEvent};
 actions!(
     google_design_studio,
     [
+        /// Opens the consolidated Aphrody Suite Hub uniting all 12 fork pillars, Material 3 modes, and studio launchers.
+        OpenAphrodySuite,
+        /// Opens the live Compose Material 3 1.5.0 Stable & Parametric Prototyping Studio powered by GPUI Kit.
+        OpenMaterial3ComposeStudio,
         /// Opens a live GPUI panel mirroring `https://design.google/` (*Code is a Design Material*, *Google Sans Flex*, and sitemap URLs).
         OpenGoogleDesignMirror,
         /// Opens the native Google Stitch (`https://stitch.withgoogle.com/`) & `DESIGN.md` studio workspace tab.
@@ -68,12 +76,41 @@ actions!(
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StudioMode {
+    AphrodySuiteHub,
+    Material3ComposeStudio,
     GoogleDesignMirror,
     StitchStudio,
     GpuiStarterPack,
     GoogleFigCraftStudio,
     GoogleCraftAnythingStudio,
     UnrealBevyStudio,
+}
+
+impl StudioMode {
+    pub const ALL: [Self; 8] = [
+        Self::AphrodySuiteHub,
+        Self::Material3ComposeStudio,
+        Self::GoogleDesignMirror,
+        Self::StitchStudio,
+        Self::GpuiStarterPack,
+        Self::GoogleFigCraftStudio,
+        Self::GoogleCraftAnythingStudio,
+        Self::UnrealBevyStudio,
+    ];
+
+    #[must_use]
+    pub const fn short_label(self) -> &'static str {
+        match self {
+            Self::AphrodySuiteHub => "Suite Hub",
+            Self::Material3ComposeStudio => "Material 3 1.5",
+            Self::GoogleDesignMirror => "Design Mirror",
+            Self::StitchStudio => "Stitch",
+            Self::GpuiStarterPack => "Starter Pack",
+            Self::GoogleFigCraftStudio => "FigCraft",
+            Self::GoogleCraftAnythingStudio => "Craft Anything",
+            Self::UnrealBevyStudio => "Bevy 5.8",
+        }
+    }
 }
 
 struct LiveMirrorPayload {
@@ -98,6 +135,8 @@ pub struct DesignStitchStudioItem {
     parity_matrix: Option<SubmoduleParityMatrix>,
     craft_session: Option<CraftStudioSession>,
     figcraft_view: Option<Entity<FigCraftStudioView>>,
+    m3_prototyper_view: Option<Entity<M3ParametricPrototyperView>>,
+    m3_mode: M3AppearanceMode,
     status_message: SharedString,
     last_capture: Option<PathBuf>,
     is_busy: bool,
@@ -207,6 +246,12 @@ impl DesignStitchStudioItem {
             None
         };
 
+        let m3_prototyper_view = if mode == StudioMode::Material3ComposeStudio {
+            Some(cx.new(M3ParametricPrototyperView::new))
+        } else {
+            None
+        };
+
         let status_message = SharedString::from(format!(
             "Synced from {} ({} sitemap routes, WCAG {})",
             brand::DESIGN_SOURCE_OF_TRUTH,
@@ -230,6 +275,8 @@ impl DesignStitchStudioItem {
             parity_matrix,
             craft_session,
             figcraft_view,
+            m3_prototyper_view,
+            m3_mode: M3AppearanceMode::NeuralObsidian,
             status_message,
             last_capture: None,
             is_busy: false,
@@ -243,6 +290,40 @@ impl DesignStitchStudioItem {
             },
             _subscriptions: subscriptions,
         }
+    }
+
+    pub fn switch_mode(&mut self, next: StudioMode, cx: &mut Context<Self>) {
+        self.mode = next;
+        if next == StudioMode::Material3ComposeStudio && self.m3_prototyper_view.is_none() {
+            self.m3_prototyper_view = Some(cx.new(M3ParametricPrototyperView::new));
+        }
+        if next == StudioMode::GoogleFigCraftStudio && self.figcraft_view.is_none() {
+            let view = spawn_figcraft_studio_view(self.craft_session.as_ref(), cx);
+            self.figcraft_view = Some(view);
+        }
+        if let Some(ref mut session) = self.craft_session {
+            session.active_pillar = match next {
+                StudioMode::GoogleFigCraftStudio => StudioPillar::FigCraftGoogle,
+                StudioMode::GoogleCraftAnythingStudio => StudioPillar::CraftAnythingGoogle,
+                StudioMode::UnrealBevyStudio => StudioPillar::UnrealBevy58,
+                _ => StudioPillar::StorytoldSuiteCatalog,
+            };
+        }
+        self.status_message = SharedString::from(format!(
+            "Active studio: {}",
+            studio_mode_tab_title(next)
+        ));
+        cx.notify();
+    }
+
+    pub fn set_m3_mode(&mut self, mode: M3AppearanceMode, cx: &mut Context<Self>) {
+        self.m3_mode = mode;
+        apply_kit_m3_theme(mode, cx);
+        self.status_message = SharedString::from(format!(
+            "Material 3 mode: {} (Compose {COMPOSE_M3_VERSION})",
+            mode.display_name()
+        ));
+        cx.notify();
     }
 
     pub fn cycle_parity_mode(&mut self, cx: &mut Context<Self>) {
@@ -344,6 +425,8 @@ impl DesignStitchStudioItem {
             .join(brand::LOCAL_SETTINGS_FOLDER)
             .join("captures");
         let slug = match self.mode {
+            StudioMode::AphrodySuiteHub => "aphrody-suite-hub.png",
+            StudioMode::Material3ComposeStudio => "m3-compose15-studio.png",
             StudioMode::GoogleDesignMirror => "design-google-mirror.png",
             StudioMode::StitchStudio => "stitch-studio-capture.png",
             StudioMode::GpuiStarterPack => "gpui-starter-pack-capture.png",
@@ -388,6 +471,24 @@ impl DesignStitchStudioItem {
         _window: &mut Window,
         _cx: &mut Context<Workspace>,
     ) {
+        workspace.register_action(|workspace, _: &OpenAphrodySuite, window, cx| {
+            let root = workspace
+                .worktrees(cx)
+                .next()
+                .map(|w| w.read(cx).abs_path().to_path_buf());
+            let item = cx.new(|cx| Self::new(StudioMode::AphrodySuiteHub, root, cx));
+            workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
+        });
+
+        workspace.register_action(|workspace, _: &OpenMaterial3ComposeStudio, window, cx| {
+            let root = workspace
+                .worktrees(cx)
+                .next()
+                .map(|w| w.read(cx).abs_path().to_path_buf());
+            let item = cx.new(|cx| Self::new(StudioMode::Material3ComposeStudio, root, cx));
+            workspace.add_item_to_active_pane(Box::new(item), None, true, window, cx);
+        });
+
         workspace.register_action(|workspace, _: &OpenGoogleDesignMirror, window, cx| {
             let root = workspace
                 .worktrees(cx)
@@ -484,6 +585,258 @@ impl DesignStitchStudioItem {
                 .into_any_element(),
         )
     }
+    fn render_mode_switcher_bar(&self, cx: &mut Context<Self>) -> AnyElement {
+        let colors = cx.theme().colors();
+        h_flex()
+            .id("aphrody-unified-studio-switcher")
+            .w_full()
+            .flex_wrap()
+            .gap_1p5()
+            .px_2()
+            .py_1p5()
+            .rounded_full()
+            .bg(colors.toolbar_background)
+            .border_1()
+            .border_color(colors.border)
+            .children(StudioMode::ALL.into_iter().map(|candidate| {
+                let active = self.mode == candidate;
+                div()
+                    .id(SharedString::from(format!(
+                        "studio-mode-{}",
+                        candidate.short_label()
+                    )))
+                    .px_3()
+                    .py_1()
+                    .rounded_full()
+                    .cursor_pointer()
+                    .bg(if active {
+                        colors.element_selected
+                    } else {
+                        colors.element_background
+                    })
+                    .border_1()
+                    .border_color(if active {
+                        colors.border_focused
+                    } else {
+                        colors.border_transparent
+                    })
+                    .child(
+                        Label::new(candidate.short_label())
+                            .size(gpui_ui::ui::LabelSize::Small),
+                    )
+                    .on_click(cx.listener(move |this, _, _, cx| {
+                        this.switch_mode(candidate, cx);
+                    }))
+            }))
+            .into_any_element()
+    }
+
+    fn render_material3_compose_workspace(&self, cx: &mut Context<Self>) -> AnyElement {
+        let switcher = self.render_mode_switcher_bar(cx);
+        let colors = cx.theme().colors();
+        let catalog = M3Compose15Catalog::canonical();
+        v_flex()
+            .id("aphrody-m3-compose15-studio-workspace")
+            .size_full()
+            .p_3()
+            .gap_3()
+            .bg(colors.editor_background)
+            .child(switcher)
+            .child(
+                h_flex()
+                    .w_full()
+                    .flex_wrap()
+                    .justify_between()
+                    .items_center()
+                    .gap_2()
+                    .p_3()
+                    .rounded_md()
+                    .border_1()
+                    .border_color(colors.border)
+                    .bg(colors.toolbar_background)
+                    .child(
+                        v_flex()
+                            .gap_0p5()
+                            .child(Label::new(format!(
+                                "{} Material 3 Compose {COMPOSE_M3_VERSION} & Parametric Studio",
+                                brand::APP_NAME
+                            )))
+                            .child(
+                                Label::new(format!(
+                                    "{} parity entries · {} MaterialShapes WGSL SDFs · {}",
+                                    catalog.parity_entries.len(),
+                                    M3MaterialShape::ALL_35.len(),
+                                    self.status_message
+                                ))
+                                .size(gpui_ui::ui::LabelSize::Small),
+                            ),
+                    )
+                    .child(
+                        h_flex()
+                            .gap_1p5()
+                            .flex_wrap()
+                            .children(M3AppearanceMode::ALL.into_iter().map(|mode| {
+                                let selected = self.m3_mode == mode;
+                                div()
+                                    .id(SharedString::from(format!("studio-m3-mode-{}", mode.slug())))
+                                    .px_2p5()
+                                    .py_1()
+                                    .rounded_full()
+                                    .cursor_pointer()
+                                    .bg(if selected {
+                                        colors.element_selected
+                                    } else {
+                                        colors.element_background
+                                    })
+                                    .border_1()
+                                    .border_color(if selected {
+                                        colors.border_focused
+                                    } else {
+                                        colors.border
+                                    })
+                                    .child(Label::new(mode.label()).size(gpui_ui::ui::LabelSize::Small))
+                                    .on_click(cx.listener(move |this, _, _, cx| {
+                                        this.set_m3_mode(mode, cx);
+                                    }))
+                            })),
+                    ),
+            )
+            .child(
+                div()
+                    .id("m3-compose-studio-scroll")
+                    .flex_1()
+                    .min_h_0()
+                    .w_full()
+                    .overflow_y_scroll()
+                    .when_some(self.m3_prototyper_view.clone(), |pane, view| {
+                        pane.child(view)
+                    }),
+            )
+            .into_any_element()
+    }
+
+    fn render_aphrody_suite_hub(&self, cx: &mut Context<Self>) -> AnyElement {
+        let switcher = self.render_mode_switcher_bar(cx);
+        let colors = cx.theme().colors();
+        let catalog = M3Compose15Catalog::canonical();
+        v_flex()
+            .id("aphrody-consolidated-suite-hub")
+            .size_full()
+            .overflow_y_scroll()
+            .p_4()
+            .gap_3()
+            .bg(colors.editor_background)
+            .child(switcher)
+            .child(
+                h_flex()
+                    .w_full()
+                    .flex_wrap()
+                    .justify_between()
+                    .items_center()
+                    .gap_2()
+                    .p_3()
+                    .rounded_md()
+                    .border_1()
+                    .border_color(colors.border)
+                    .bg(colors.surface_background)
+                    .child(
+                        v_flex()
+                            .gap_1()
+                            .child(Label::new(format!(
+                                "{} Consolidated Fork Suite ({} Pillars)",
+                                brand::APP_NAME,
+                                brand::suite::APHRODY_PILLARS.len()
+                            )))
+                            .child(
+                                Label::new(format!(
+                                    "Single feature `aphrody` · Compose M3 {COMPOSE_M3_VERSION} ({} entries, {} shapes) · WCAG {:.1}:1 · {}",
+                                    catalog.parity_entries.len(),
+                                    M3MaterialShape::ALL_35.len(),
+                                    brand::design::WCAG_AA_MIN_CONTRAST,
+                                    brand::DESIGN_SOURCE_OF_TRUTH,
+                                ))
+                                .size(gpui_ui::ui::LabelSize::Small),
+                            ),
+                    )
+                    .child(
+                        h_flex()
+                            .gap_1p5()
+                            .flex_wrap()
+                            .children(M3AppearanceMode::ALL.into_iter().map(|mode| {
+                                let selected = self.m3_mode == mode;
+                                div()
+                                    .id(SharedString::from(format!("hub-m3-mode-{}", mode.slug())))
+                                    .px_2p5()
+                                    .py_1()
+                                    .rounded_full()
+                                    .cursor_pointer()
+                                    .bg(if selected {
+                                        colors.element_selected
+                                    } else {
+                                        colors.element_background
+                                    })
+                                    .border_1()
+                                    .border_color(if selected {
+                                        colors.border_focused
+                                    } else {
+                                        colors.border
+                                    })
+                                    .child(Label::new(mode.label()).size(gpui_ui::ui::LabelSize::Small))
+                                    .on_click(cx.listener(move |this, _, _, cx| {
+                                        this.set_m3_mode(mode, cx);
+                                    }))
+                            })),
+                    ),
+            )
+            .child(
+                h_flex()
+                    .w_full()
+                    .flex_wrap()
+                    .gap_2()
+                    .children(brand::suite::APHRODY_PILLARS.iter().map(|pillar| {
+                        let target_mode = match pillar.id {
+                            "material3-kit" => Some(StudioMode::Material3ComposeStudio),
+                            "design-stitch" => Some(StudioMode::StitchStudio),
+                            "craft-suite" => Some(StudioMode::GoogleFigCraftStudio),
+                            "brand-design" => Some(StudioMode::GoogleDesignMirror),
+                            _ => None,
+                        };
+                        div()
+                            .id(SharedString::from(format!("hub-pillar-{}", pillar.id)))
+                            .w(px(300.0))
+                            .p_3()
+                            .rounded_md()
+                            .border_1()
+                            .border_color(colors.border)
+                            .bg(colors.panel_background)
+                            .when_some(target_mode, |card, mode| {
+                                card.cursor_pointer().on_click(cx.listener(move |this, _, _, cx| {
+                                    this.switch_mode(mode, cx);
+                                }))
+                            })
+                            .child(
+                                v_flex()
+                                    .gap_1()
+                                    .child(
+                                        h_flex()
+                                            .justify_between()
+                                            .gap_2()
+                                            .child(Label::new(pillar.name))
+                                            .child(
+                                                Label::new(pillar.primary_crate)
+                                                    .size(gpui_ui::ui::LabelSize::Small),
+                                            ),
+                                    )
+                                    .child(
+                                        Label::new(pillar.summary)
+                                            .size(gpui_ui::ui::LabelSize::Small),
+                                    ),
+                            )
+                    })),
+            )
+            .into_any_element()
+    }
+
     fn render_figcraft_workspace(&self, cx: &mut Context<Self>) -> AnyElement {
         let colors = cx.theme().colors();
         let parity_mode = self
@@ -615,10 +968,20 @@ impl EventEmitter<ItemEvent> for DesignStitchStudioItem {}
 
 impl Render for DesignStitchStudioItem {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        if self.mode == StudioMode::AphrodySuiteHub {
+            return self.render_aphrody_suite_hub(cx);
+        }
+        if self.mode == StudioMode::Material3ComposeStudio {
+            return self.render_material3_compose_workspace(cx);
+        }
         if self.mode == StudioMode::GoogleFigCraftStudio {
             return self.render_figcraft_workspace(cx);
         }
         let mode_title = match self.mode {
+            StudioMode::AphrodySuiteHub => "Aphrody Consolidated Suite Hub (12 Pillars)",
+            StudioMode::Material3ComposeStudio => {
+                "Material 3 Compose 1.5.0 & Parametric Prototyping Studio"
+            }
             StudioMode::GoogleDesignMirror => "Google Design Live Mirror (design.google)",
             StudioMode::StitchStudio => "Google Stitch & DESIGN.md Studio",
             StudioMode::GpuiStarterPack => {
@@ -704,6 +1067,7 @@ impl Render for DesignStitchStudioItem {
         } else {
             None
         };
+        let switcher_bar = self.render_mode_switcher_bar(cx);
         let colors = cx.theme().colors();
 
         v_flex()
@@ -713,6 +1077,7 @@ impl Render for DesignStitchStudioItem {
             .p_4()
             .gap_3()
             .bg(colors.editor_background)
+            .child(switcher_bar)
             .child(
                 h_flex()
                     .justify_between()
@@ -909,6 +1274,8 @@ impl Item for DesignStitchStudioItem {
 
 pub(crate) fn studio_mode_tab_title(mode: StudioMode) -> &'static str {
     match mode {
+        StudioMode::AphrodySuiteHub => "Aphrody Suite Hub",
+        StudioMode::Material3ComposeStudio => "Material 3 Compose 1.5 Studio",
         StudioMode::GoogleDesignMirror => "Google Design Mirror",
         StudioMode::StitchStudio => "Stitch DESIGN.md Studio",
         StudioMode::GpuiStarterPack => "GPUI Starter Pack",
@@ -924,6 +1291,25 @@ mod tests {
     use aphrody_craft::{
         CraftStudioSession, FigCraftDesignMode, FigCraftDocument, ParityRenderMode,
     };
+
+    #[test]
+    fn consolidated_aphrody_suite_modes_cover_all_eight_studios_and_m3_compose15() -> anyhow::Result<()> {
+        assert_eq!(StudioMode::ALL.len(), 8);
+        assert_eq!(
+            studio_mode_tab_title(StudioMode::AphrodySuiteHub),
+            "Aphrody Suite Hub"
+        );
+        assert_eq!(
+            studio_mode_tab_title(StudioMode::Material3ComposeStudio),
+            "Material 3 Compose 1.5 Studio"
+        );
+        assert_eq!(brand::suite::APHRODY_PILLARS.len(), 12);
+        let catalog = M3Compose15Catalog::canonical();
+        assert!(!catalog.parity_entries.is_empty());
+        assert_eq!(M3MaterialShape::ALL_35.len(), 35);
+        assert_eq!(M3AppearanceMode::ALL.len(), 4);
+        Ok(())
+    }
 
     #[test]
     fn google_figcraft_studio_mode_and_session_default_to_gpui_google_design() -> anyhow::Result<()> {

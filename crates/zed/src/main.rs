@@ -298,26 +298,46 @@ fn main() {
     }
 
     if args.mcp {
-        let root = args.paths_or_urls.first().map(PathBuf::from);
-        if let Err(err) = aphrody_pilot::run_headless_mcp_stdio(root) {
-            eprintln!("headless MCP server failed: {err:#}");
+        #[cfg(feature = "pilot")]
+        {
+            let root = args.paths_or_urls.first().map(PathBuf::from);
+            if let Err(err) = aphrody_pilot::run_headless_mcp_stdio(root) {
+                eprintln!("headless MCP server failed: {err:#}");
+                process::exit(1);
+            }
+            return;
+        }
+        #[cfg(not(feature = "pilot"))]
+        {
+            eprintln!("--mcp requires building with `--features aphrody` (or `--features pilot`)");
             process::exit(1);
         }
-        return;
     }
 
     if args.headless {
-        let root = args.paths_or_urls.first().map(PathBuf::from).unwrap_or_else(|| PathBuf::from("."));
-        let mut headless = aphrody_pilot::HeadlessZedController::new(root);
-        let status = headless.execute_tool("zed_headless_status", &serde_json::json!({}));
-        match status {
-            Ok(val) => println!("{val}"),
-            Err(err) => {
-                eprintln!("headless status failed: {err:#}");
-                process::exit(1);
+        #[cfg(feature = "pilot")]
+        {
+            let root = args
+                .paths_or_urls
+                .first()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("."));
+            let mut headless = aphrody_pilot::HeadlessZedController::new(root);
+            let status = headless.execute_tool("zed_headless_status", &serde_json::json!({}));
+            match status {
+                Ok(val) => println!("{val}"),
+                Err(err) => {
+                    eprintln!("headless status failed: {err:#}");
+                    process::exit(1);
+                }
             }
+            return;
         }
-        return;
+        #[cfg(not(feature = "pilot"))]
+        {
+            eprintln!("--headless requires building with `--features aphrody` (or `--features pilot`)");
+            process::exit(1);
+        }
     }
 
     let restart_arguments = if let Some(directory) = args.user_data_dir.as_deref() {

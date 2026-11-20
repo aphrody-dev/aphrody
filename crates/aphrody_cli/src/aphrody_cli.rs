@@ -96,6 +96,8 @@ enum Command {
         #[command(subcommand)]
         cmd: unified::InstallSubcommand,
     },
+    /// Inspect the consolidated Aphrody fork feature suite (12 pillars, M3 modes, WebGPU/Wasm status)
+    Suite(unified::SuiteArgs),
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, ValueEnum)]
@@ -255,5 +257,6 @@ pub fn run_main() -> Result<()> {
         Command::Cosmic { cmd } => unified::run_cosmic(cmd),
         Command::Zed { cmd } => unified::run_zed(cmd),
         Command::Install { cmd } => unified::run_install(cmd),
+        Command::Suite(args) => unified::run_suite(args),
     }
 }

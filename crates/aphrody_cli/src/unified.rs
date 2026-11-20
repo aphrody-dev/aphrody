@@ -30,6 +30,39 @@ pub(crate) enum UnifiedBuildTarget {
 }
 
 #[derive(Debug, Args)]
+pub(crate) struct SuiteArgs {
+    /// Emit structured JSON capability profile
+    #[arg(long)]
+    pub json: bool,
+}
+
+pub(crate) fn run_suite(args: SuiteArgs) -> Result<()> {
+    let profile = aphrody::AphrodySuiteProfile::current();
+    if args.json {
+        println!("{}", serde_json::to_string_pretty(&profile)?);
+    } else {
+        println!(
+            "{} Consolidated Suite — {}/{} pillars compiled in CLI | Design: {} | Modes: {}",
+            profile.product,
+            profile.compiled_pillars,
+            profile.total_pillars,
+            profile.design_source_of_truth,
+            profile.theme_modes.join(", "),
+        );
+        for pillar in &profile.pillars {
+            let state = if pillar.compiled { "active" } else { "available" };
+            println!(
+                "  [{state:9}] {:16} ({}) [{}]",
+                pillar.id,
+                pillar.primary_crate,
+                pillar.surfaces.join(", "),
+            );
+        }
+    }
+    Ok(())
+}
+
+#[derive(Debug, Args)]
 pub(crate) struct BuildArgs {
     /// Target surface (`desktop`, `web`, `headless`, `craft`, `cosmic`, `bun-release`, `all`)
     #[arg(long, value_enum, default_value_t = UnifiedBuildTarget::Desktop)]

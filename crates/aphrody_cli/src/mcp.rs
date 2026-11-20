@@ -58,6 +58,7 @@ pub(crate) fn builtin_tools() -> Vec<Value> {
         json!({ "name": "installer_switch_de_plan", "description": "Plan live desktop environment switch across Aphrody Rust Userlands (GPUI, Iced COSMIC, egui+Bevy, WebGPU) and Arch DEs.", "inputSchema": {"type": "object", "properties": {"from": {"type": "string"}, "to": {"type": "string"}}, "required": ["to"], "additionalProperties": false} }),
         json!({ "name": "zed_headless_parse_ast", "description": "Parse Rust/TS/TSX/Python/JSON source using workspace Tree-sitter grammars headlessly.", "inputSchema": {"type": "object", "properties": {"language": {"type": "string"}, "source": {"type": "string"}}, "required": ["source"], "additionalProperties": false} }),
         json!({ "name": "browser_validate_url", "description": "Validate URL against absorbed agent-browser SSRF / non-public IP / IMDS security policy.", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}}, "required": ["url"], "additionalProperties": false} }),
+        json!({ "name": "aphrody_suite_status", "description": "Return the consolidated Aphrody fork capability matrix across all 12 pillars, Material 3 modes, and target surfaces.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
     ]
 }
 
@@ -331,6 +332,8 @@ fn call_tool(params: &Value) -> Result<Value, (i32, String)> {
                     .map_err(|e| (-32002, e.to_string()))?
             }
         }
+        "aphrody_suite_status" => serde_json::to_value(aphrody::AphrodySuiteProfile::current())
+            .map_err(|e| (-32000, e.to_string()))?,
         unknown => return Err((-32601, format!("unknown tool '{unknown}'"))),
     };
 
@@ -376,7 +379,14 @@ mod tests {
         let tools = list_json["result"]["tools"]
             .as_array()
             .context("tools array")?;
-        assert!(tools.len() >= 29);
+        assert!(tools.len() >= 30);
+
+        let suite_res = dispatch_json_rpc_line(
+            r#"{"jsonrpc":"2.0","id":30,"method":"tools/call","params":{"name":"aphrody_suite_status","arguments":{}}}"#,
+        )
+        .context("aphrody_suite_status should respond")?;
+        assert!(suite_res.contains("material3-kit"));
+        assert!(suite_res.contains("cosmic-os"));
 
         let wgsl_res = dispatch_json_rpc_line(
             r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"wgpu_validate_wgsl","arguments":{"source":"@compute @workgroup_size(1) fn main() {}"}}}"#,
