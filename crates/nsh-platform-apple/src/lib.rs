@@ -26,5 +26,11 @@ pub mod unified_log;
 // from the docs, so it stays out of what NSH keeps compatible.
 #[doc(hidden)]
 pub mod web_download;
+// The stack blur of decoded images and the `NSURLSession` network, shared by the macOS and iOS backends, no API of apps':
+// hidden from the docs.
+#[doc(hidden)]
+pub mod blur;
+#[doc(hidden)]
+pub mod net;
 pub mod web_evaluation;
 pub mod web_scheme;

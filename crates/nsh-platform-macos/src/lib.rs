@@ -27,7 +27,6 @@ mod access;
 mod agent;
 mod animation;
 mod app;
-mod blur;
 mod canvas;
 mod chrome;
 mod decor;
@@ -46,7 +45,6 @@ mod login_item;
 mod mount;
 mod native;
 mod navigation;
-mod net;
 mod picker;
 mod screen_color;
 mod scroll;
@@ -55,7 +53,7 @@ mod shader;
 mod share;
 mod sight;
 // Shared with iOS.
-use nsh_platform_apple::{audio, notifications, speech};
+use nsh_platform_apple::{audio, blur, net, notifications, speech};
 mod surface;
 #[cfg(feature = "dev")]
 mod synth;

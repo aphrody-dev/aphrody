@@ -13,7 +13,7 @@ use objc2_core_graphics::{
 
 /// `image` blurred by `radius` pixels and passed through a 4×5 color
 /// `matrix` (CSS filters on images).
-pub(crate) fn filtered(
+pub fn filtered(
     image: &CGImage,
     radius: f64,
     matrix: Option<[f32; 20]>,

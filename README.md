@@ -1,9 +1,6 @@
-> [!IMPORTANT]
-> Remove this line to confirm you've reviewed this PR before submitting.
+# Aphrody — GPU UI Library (`aphrody`)
 
-# Aphrody — GPUI OS (`aphrody`)
-
-Modular, local-first, ultra-fast Rust **GPU UI Framework**, **Code Engine**, **Native Shell (TSX/Rust)**, **WGPU Toolkit**, **Application Starter Pack**, and **Aphrody Studio** — with **100% ecosystem compatibility with Zed**.
+Modular, local-first Rust **GPU UI Library** (GPUI, WGPU, Taffy layout, Native Shell TSX/Rust, AccessKit, Cosmic-Text, design tokens, and composable UI primitives) — with full Zed UI ecosystem compatibility. OS, kernel, POSIX, Windows, AI, and ML layers live in `fw`.
 
 `aphrody` unifies the GPUI desktop/mobile/web engine, Native Shell (`nsh`), pinned [`aphrody-labs/*`](./tooling/bun/forks-manifest.json) GitHub Releases (`wgpu` v30.0.0, `taffy` + Cloudflare Kitesurf patches, `egui`, `accesskit`, `cosmic-text`, `wry`, `mullvadvpn-app`, `browser`, `kitesurf`, `craft-libs`, `craft-anything`), and `ghcr.io/aphrody-labs/aphrody-forks:20261120` into composable Rust libraries plus the **Aphrody** studio binary (`aphrody`), driven by a single declarative identity manifest ([`product.toml`](./product.toml)).
 

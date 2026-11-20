@@ -61,7 +61,6 @@ mod agent;
 mod animation;
 mod app;
 mod auth_session;
-mod blur;
 mod bottom_bar;
 mod canvas;
 mod component;
@@ -79,7 +78,6 @@ mod keymap;
 mod mount;
 mod native_view;
 mod navigation;
-mod net;
 mod picker;
 mod press;
 mod scroll_watch;
@@ -89,7 +87,7 @@ mod share;
 mod split;
 // Sound (`Sound`, `AudioPlayer`), the Speech framework's recognizer and the
 // notification center, shared with macOS.
-use nsh_platform_apple::{audio, notifications, speech};
+use nsh_platform_apple::{audio, blur, net, notifications, speech};
 mod surface;
 #[cfg(feature = "dev")]
 mod synth;

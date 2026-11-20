@@ -31,7 +31,7 @@ use objc2_foundation::{
 use rustc_hash::FxHashMap;
 
 /// The process-wide network stack.
-pub(crate) fn network() -> Arc<dyn Network> {
+pub fn network() -> Arc<dyn Network> {
     static NETWORK: OnceLock<Arc<UrlSessionNetwork>> = OnceLock::new();
     NETWORK
         .get_or_init(|| Arc::new(UrlSessionNetwork::new()))
