@@ -12,6 +12,7 @@ pub mod edit;
 pub mod installer;
 pub mod store;
 pub mod term;
+pub mod vpn;
 
 pub use crate::studio_view::{StudioCallbacks, StudioState, render_studio_window};
 pub use crate::windows::{

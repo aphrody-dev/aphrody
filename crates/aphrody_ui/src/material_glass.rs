@@ -15,7 +15,7 @@ use material_colors::scheme::Scheme;
 use crate::cosmic_theme::{AppearanceMode, OsColorTokens, OsLayoutTokens, OsTheme};
 
 /// Official Google Material 3 Dynamic Color scheme variants backed by `material-colors 0.5`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, serde::Serialize, serde::Deserialize)]
 pub enum M3DynamicVariant {
     #[default]
     Expressive,
@@ -30,6 +30,33 @@ pub enum M3DynamicVariant {
 }
 
 impl M3DynamicVariant {
+    pub const ALL: [Self; 9] = [
+        Self::Expressive,
+        Self::TonalSpot,
+        Self::Vibrant,
+        Self::Fidelity,
+        Self::Content,
+        Self::Neutral,
+        Self::Monochrome,
+        Self::Rainbow,
+        Self::FruitSalad,
+    ];
+
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Expressive => "Expressive",
+            Self::TonalSpot => "Tonal Spot",
+            Self::Vibrant => "Vibrant",
+            Self::Fidelity => "Fidelity",
+            Self::Content => "Content",
+            Self::Neutral => "Neutral",
+            Self::Monochrome => "Monochrome",
+            Self::Rainbow => "Rainbow",
+            Self::FruitSalad => "Fruit Salad",
+        }
+    }
+
     #[must_use]
     pub const fn to_upstream(self) -> Variant {
         match self {
@@ -213,9 +240,84 @@ pub fn lucide_icon_svg(icon: lucide_static_svg::Icon) -> &'static str {
     icon.svg_str()
 }
 
+/// Curated Material 3 HCT dynamic seed color preset shared by Desktop OS and IDE Studio.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct M3SeedPreset {
+    pub id: &'static str,
+    pub name: &'static str,
+    pub rgb: [u8; 3],
+    pub hex: &'static str,
+}
+
+/// Curated Google Material 3 Expressive (`Spec2025`) dynamic seed colors.
+pub const M3_DYNAMIC_SEEDS: &[M3SeedPreset] = &[
+    M3SeedPreset {
+        id: "google-blue",
+        name: "Google Blue",
+        rgb: [66, 133, 244],
+        hex: "#4285F4",
+    },
+    M3SeedPreset {
+        id: "aphrody-violet",
+        name: "Aphrody Violet",
+        rgb: [124, 77, 255],
+        hex: "#7C4DFF",
+    },
+    M3SeedPreset {
+        id: "neural-teal",
+        name: "Neural Teal",
+        rgb: [0, 191, 165],
+        hex: "#00BFA5",
+    },
+    M3SeedPreset {
+        id: "solar-amber",
+        name: "Solar Amber",
+        rgb: [255, 109, 0],
+        hex: "#FF6D00",
+    },
+    M3SeedPreset {
+        id: "rose-crimson",
+        name: "Rose Crimson",
+        rgb: [233, 30, 99],
+        hex: "#E91E63",
+    },
+    M3SeedPreset {
+        id: "emerald-pulse",
+        name: "Emerald",
+        rgb: [0, 200, 83],
+        hex: "#00C853",
+    },
+];
+
+/// Canonical Material Symbol names backed by `md-icons 0.4`.
+pub const MATERIAL_SYMBOL_NAMES: &[&str] = &[
+    "home",
+    "search",
+    "settings",
+    "palette",
+    "notifications",
+    "auto_awesome",
+    "layers",
+    "terminal",
+    "folder",
+    "tune",
+];
+
+/// Curated Lucide icon showcase entries backed by `lucide-static-svg 1.76`.
+pub const LUCIDE_SHOWCASE_ICONS: &[(&str, lucide_static_svg::Icon)] = &[
+    ("sparkles", lucide_static_svg::Icon::Sparkles),
+    ("palette", lucide_static_svg::Icon::Palette),
+    ("layers", lucide_static_svg::Icon::Layers),
+    ("globe", lucide_static_svg::Icon::Globe),
+    ("shield", lucide_static_svg::Icon::ShieldCheck),
+    ("terminal", lucide_static_svg::Icon::Terminal),
+    ("cpu", lucide_static_svg::Icon::Cpu),
+    ("sliders", lucide_static_svg::Icon::SlidersHorizontal),
+];
+
 /// Unified frosted / liquid glass material presets mapped onto `backdrop-blur-core 0.2`
 /// and native OS `window-vibrancy 0.8` (Windows 11 Mica/Acrylic, macOS NSVisualEffect/LiquidGlass).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, serde::Serialize, serde::Deserialize)]
 pub enum GlassMaterialPreset {
     /// Subtle Windows 11 Mica / macOS UnderWindow ambient glass (18pt blur).
     Mica,
@@ -226,6 +328,20 @@ pub enum GlassMaterialPreset {
     Acrylic,
     /// High-clarity Liquid Glass with specular Fresnel edge refraction (28pt blur).
     LiquidGlass,
+}
+
+impl GlassMaterialPreset {
+    pub const ALL: [Self; 4] = [Self::Mica, Self::MicaAlt, Self::Acrylic, Self::LiquidGlass];
+
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Mica => "Mica",
+            Self::MicaAlt => "Mica Alt",
+            Self::Acrylic => "Acrylic",
+            Self::LiquidGlass => "Liquid Glass",
+        }
+    }
 }
 
 /// Resolved blur pipeline plan produced by `backdrop-blur-core 0.2` for WGPU v30 / WebGPU shaders.

@@ -2,7 +2,8 @@
 
 use aphrody_session::{CosmicSettingsDaemon, PowerProfile, TilingMode};
 use aphrody_ui::{
-    KeyValueRow, NavItem, OsTheme, OsThemeCatalog, StatusTone, render_nav_rail, status_badge,
+    GlassMaterialPreset, KeyValueRow, M3_DYNAMIC_SEEDS, M3DynamicVariant, NavItem, OsTheme,
+    OsThemeCatalog, StatusTone, render_nav_rail, status_badge,
 };
 use gpui::{AnyElement, App, SharedString, div, prelude::*, px};
 use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, v_flex};
@@ -73,6 +74,9 @@ impl SettingsPage {
 pub struct CosmicSettingsCallbacks {
     pub on_select_page: Box<dyn Fn(SettingsPage, &mut App) + 'static>,
     pub on_select_theme: Box<dyn Fn(&str, &mut App) + 'static>,
+    pub on_select_m3_seed: Box<dyn Fn([u8; 3], &mut App) + 'static>,
+    pub on_select_m3_variant: Box<dyn Fn(M3DynamicVariant, &mut App) + 'static>,
+    pub on_select_glass_preset: Box<dyn Fn(GlassMaterialPreset, &mut App) + 'static>,
     pub on_toggle_mode: Box<dyn Fn(&mut App) + 'static>,
     pub on_set_layout: Box<dyn Fn(TilingMode, &mut App) + 'static>,
     pub on_toggle_active_hint: Box<dyn Fn(&mut App) + 'static>,
@@ -86,6 +90,9 @@ pub fn render_cosmic_settings_window(
     theme: &OsTheme,
     catalog: &OsThemeCatalog,
     active_theme_id: &str,
+    active_seed_rgb: Option<[u8; 3]>,
+    active_m3_variant: M3DynamicVariant,
+    active_glass_preset: GlassMaterialPreset,
     active_layout: TilingMode,
     active_hint_enabled: bool,
     active_hint_px: f32,
@@ -115,6 +122,9 @@ pub fn render_cosmic_settings_window(
     );
 
     let on_theme = std::rc::Rc::new(cb.on_select_theme);
+    let on_seed = std::rc::Rc::new(cb.on_select_m3_seed);
+    let on_variant = std::rc::Rc::new(cb.on_select_m3_variant);
+    let on_glass = std::rc::Rc::new(cb.on_select_glass_preset);
     let on_toggle_mode = std::rc::Rc::new(cb.on_toggle_mode);
     let on_layout = std::rc::Rc::new(cb.on_set_layout);
     let on_hint = std::rc::Rc::new(cb.on_toggle_active_hint);
@@ -127,7 +137,7 @@ pub fn render_cosmic_settings_window(
             let mut swatches = h_flex().gap_2().flex_wrap();
             for (idx, (id_key, entry)) in catalog.entries.iter().enumerate() {
                 let id_owned = id_key.clone();
-                let selected = id_owned == active_theme_id;
+                let selected = active_seed_rgb.is_none() && id_owned == active_theme_id;
                 let cb_t = std::rc::Rc::clone(&on_theme);
                 swatches = swatches.child(
                     div()
@@ -151,6 +161,103 @@ pub fn render_cosmic_settings_window(
                         .child(Label::new(entry.name.clone()).size(LabelSize::XSmall)),
                 );
             }
+
+            let mut seed_row = h_flex().gap_2().flex_wrap();
+            for (idx, seed) in M3_DYNAMIC_SEEDS.iter().enumerate() {
+                let selected = active_seed_rgb == Some(seed.rgb);
+                let cb_s = std::rc::Rc::clone(&on_seed);
+                let rgb = seed.rgb;
+                let swatch_color: gpui::Hsla = gpui::Rgba {
+                    r: f32::from(rgb[0]) / 255.0,
+                    g: f32::from(rgb[1]) / 255.0,
+                    b: f32::from(rgb[2]) / 255.0,
+                    a: 1.0,
+                }
+                .into();
+                seed_row = seed_row.child(
+                    div()
+                        .id(("m3-seed-swatch", idx))
+                        .cursor_pointer()
+                        .px_2p5()
+                        .py_1()
+                        .rounded_full()
+                        .border_1()
+                        .border_color(if selected {
+                            theme.colors.primary
+                        } else {
+                            theme.colors.outline_variant
+                        })
+                        .bg(if selected {
+                            theme.colors.primary_container
+                        } else {
+                            theme.colors.surface_container_high
+                        })
+                        .on_click(move |_ev, _w, cx| cb_s(rgb, cx))
+                        .child(
+                            h_flex()
+                                .gap_1p5()
+                                .items_center()
+                                .child(div().size(px(10.0)).rounded_full().bg(swatch_color))
+                                .child(Label::new(seed.name).size(LabelSize::XSmall)),
+                        ),
+                );
+            }
+
+            let mut variant_row = h_flex().gap_1p5().flex_wrap();
+            for (idx, variant) in M3DynamicVariant::ALL.into_iter().enumerate() {
+                let selected = variant == active_m3_variant;
+                let cb_v = std::rc::Rc::clone(&on_variant);
+                variant_row = variant_row.child(
+                    div()
+                        .id(("m3-variant-pill", idx))
+                        .cursor_pointer()
+                        .px_2()
+                        .py_1()
+                        .rounded_full()
+                        .border_1()
+                        .border_color(if selected {
+                            theme.colors.primary
+                        } else {
+                            theme.colors.outline_variant.opacity(0.6)
+                        })
+                        .bg(if selected {
+                            theme.colors.secondary_container
+                        } else {
+                            theme.colors.surface_container
+                        })
+                        .on_click(move |_ev, _w, cx| cb_v(variant, cx))
+                        .child(Label::new(variant.label()).size(LabelSize::XSmall)),
+                );
+            }
+
+            let glass_plan = active_glass_preset.resolve_gpu_plan(2.0, 16.0);
+            let mut glass_row = h_flex().gap_2().flex_wrap();
+            for (idx, preset) in GlassMaterialPreset::ALL.into_iter().enumerate() {
+                let selected = preset == active_glass_preset;
+                let cb_g = std::rc::Rc::clone(&on_glass);
+                glass_row = glass_row.child(
+                    div()
+                        .id(("glass-preset-pill", idx))
+                        .cursor_pointer()
+                        .px_2p5()
+                        .py_1()
+                        .rounded_full()
+                        .border_1()
+                        .border_color(if selected {
+                            theme.colors.primary
+                        } else {
+                            theme.colors.outline_variant
+                        })
+                        .bg(if selected {
+                            theme.colors.primary_container
+                        } else {
+                            theme.colors.surface_container_high
+                        })
+                        .on_click(move |_ev, _w, cx| cb_g(preset, cx))
+                        .child(Label::new(preset.label()).size(LabelSize::XSmall)),
+                );
+            }
+
             v_flex()
                 .gap_3()
                 .child(section_heading(
@@ -158,23 +265,51 @@ pub fn render_cosmic_settings_window(
                     "COSMIC Palette & Material 3 Expressive",
                 ))
                 .child(swatches)
+                .child(section_heading(
+                    theme,
+                    "Dynamic Material 3 HCT Seed (material-colors 0.5 Spec2025)",
+                ))
+                .child(seed_row)
+                .child(variant_row)
+                .child(section_heading(
+                    theme,
+                    "Frosted & Liquid Glass (backdrop-blur-core + window-vibrancy)",
+                ))
+                .child(glass_row)
                 .child(
-                    div()
-                        .id("cosmic-settings-toggle-mode")
-                        .cursor_pointer()
-                        .px_3()
-                        .py_1p5()
-                        .rounded(px(8.0))
-                        .bg(theme.colors.secondary_container)
-                        .on_click(move |_ev, _w, cx| on_toggle_mode(cx))
+                    h_flex()
+                        .gap_2()
+                        .flex_wrap()
                         .child(
-                            Label::new(format!("Appearance: {:?}", theme.mode))
-                                .size(LabelSize::XSmall),
-                        ),
+                            div()
+                                .id("cosmic-settings-toggle-mode")
+                                .cursor_pointer()
+                                .px_3()
+                                .py_1p5()
+                                .rounded(px(8.0))
+                                .bg(theme.colors.secondary_container)
+                                .on_click(move |_ev, _w, cx| on_toggle_mode(cx))
+                                .child(
+                                    Label::new(format!("Appearance: {:?}", theme.mode))
+                                        .size(LabelSize::XSmall),
+                                ),
+                        )
+                        .child(status_badge(
+                            IconName::Sparkle,
+                            format!(
+                                "{} · {:.0}px · {} Kawase · Fresnel {:.0}%",
+                                active_glass_preset.label(),
+                                glass_plan.physical_radius_px,
+                                glass_plan.kawase_levels,
+                                glass_plan.specular_intensity * 100.0
+                            ),
+                            StatusTone::Accent,
+                            theme,
+                        )),
                 )
                 .child(KeyValueRow::new(
                     "Active Token Source",
-                    "assets/os/google_design_tokens.toml",
+                    "material-colors 0.5 Spec2025 + assets/os/google_design_tokens.toml",
                 ))
         }
         SettingsPage::DesktopTiling => {

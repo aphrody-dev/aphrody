@@ -41,6 +41,11 @@ use gpui_ui::ui::{
 use aphrody_ui::AppearanceMode;
 use aphrody_ui::google_design::{GoogleSansFlexAxes, MirrorAccentPalette};
 use aphrody_ui::google_design_mirror::{ReferenceGallery, ReferenceGalleryState};
+use aphrody_ui::material_glass::{
+    GlassMaterialPreset, LUCIDE_SHOWCASE_ICONS, M3_DYNAMIC_SEEDS, M3DynamicVariant,
+    MATERIAL_SYMBOL_NAMES, MaterialSymbolStyle, compute_m3_dynamic_scheme, lucide_icon_svg,
+    m3_rgb_to_hsla, material_symbol_svg,
+};
 use aphrody_ui::starter_pack::{
     ShadcnGpuiTheme, StarterBadge, StarterButton, StarterCard, StarterKpiCard,
     StarterPackCatalog, StarterSize, StarterVariant, SubmoduleParityMatrix,
@@ -101,13 +106,13 @@ impl StudioMode {
     #[must_use]
     pub const fn short_label(self) -> &'static str {
         match self {
-            Self::AphrodySuiteHub => "Suite Hub",
+            Self::AphrodySuiteHub => "Aphrody Hub",
             Self::Material3ComposeStudio => "Material 3 1.5",
             Self::GoogleDesignMirror => "Design Mirror",
             Self::StitchStudio => "Stitch",
             Self::GpuiStarterPack => "Starter Pack",
-            Self::GoogleFigCraftStudio => "FigCraft",
-            Self::GoogleCraftAnythingStudio => "Craft Anything",
+            Self::GoogleFigCraftStudio => "Canvas",
+            Self::GoogleCraftAnythingStudio => "Inspector",
             Self::UnrealBevyStudio => "Bevy 5.8",
         }
     }
@@ -137,6 +142,9 @@ pub struct DesignStitchStudioItem {
     figcraft_view: Option<Entity<FigCraftStudioView>>,
     m3_prototyper_view: Option<Entity<M3ParametricPrototyperView>>,
     m3_mode: M3AppearanceMode,
+    m3_seed_rgb: [u8; 3],
+    m3_variant: M3DynamicVariant,
+    glass_preset: GlassMaterialPreset,
     status_message: SharedString,
     last_capture: Option<PathBuf>,
     is_busy: bool,
@@ -277,6 +285,9 @@ impl DesignStitchStudioItem {
             figcraft_view,
             m3_prototyper_view,
             m3_mode: M3AppearanceMode::NeuralObsidian,
+            m3_seed_rgb: M3_DYNAMIC_SEEDS[0].rgb,
+            m3_variant: M3DynamicVariant::Expressive,
+            glass_preset: GlassMaterialPreset::LiquidGlass,
             status_message,
             last_capture: None,
             is_busy: false,
@@ -631,8 +642,163 @@ impl DesignStitchStudioItem {
             .into_any_element()
     }
 
+    fn render_material_glass_lab_bar(&self, cx: &mut Context<Self>) -> AnyElement {
+        let colors = cx.theme().colors();
+        let dark = self.m3_mode != M3AppearanceMode::Light;
+        let scheme = compute_m3_dynamic_scheme(
+            (self.m3_seed_rgb[0], self.m3_seed_rgb[1], self.m3_seed_rgb[2]),
+            dark,
+            self.m3_variant,
+            0.0,
+        );
+        let glass_plan = self.glass_preset.resolve_gpu_plan(2.0, 16.0);
+        let md_count = MATERIAL_SYMBOL_NAMES
+            .iter()
+            .filter(|name| material_symbol_svg(name, MaterialSymbolStyle::Rounded).is_some())
+            .count();
+        let lucide_count = LUCIDE_SHOWCASE_ICONS
+            .iter()
+            .filter(|(_, icon)| lucide_icon_svg(*icon).contains("<svg"))
+            .count();
+
+        let tonal_swatches = [
+            ("Primary", m3_rgb_to_hsla(scheme.primary)),
+            ("Container", m3_rgb_to_hsla(scheme.primary_container)),
+            ("Secondary", m3_rgb_to_hsla(scheme.secondary)),
+            ("Tertiary", m3_rgb_to_hsla(scheme.tertiary)),
+            ("Surface", m3_rgb_to_hsla(scheme.surface_container_high)),
+            ("Error", m3_rgb_to_hsla(scheme.error)),
+        ];
+
+        v_flex()
+            .w_full()
+            .p_3()
+            .gap_2()
+            .rounded_md()
+            .border_1()
+            .border_color(colors.border)
+            .bg(colors.surface_background)
+            .child(
+                h_flex()
+                    .justify_between()
+                    .flex_wrap()
+                    .gap_2()
+                    .child(
+                        Label::new(format!(
+                            "Material 3 HCT (Spec2025 · {}) · {} ({:.0}px · {} Kawase · Fresnel {:.0}%) · Icons: {} md-icons + {} Lucide",
+                            self.m3_variant.label(),
+                            self.glass_preset.label(),
+                            glass_plan.physical_radius_px,
+                            glass_plan.kawase_levels,
+                            glass_plan.specular_intensity * 100.0,
+                            md_count,
+                            lucide_count,
+                        ))
+                        .size(gpui_ui::ui::LabelSize::Small),
+                    )
+                    .child(
+                        h_flex()
+                            .gap_1()
+                            .children(tonal_swatches.into_iter().map(|(label, swatch)| {
+                                h_flex()
+                                    .gap_1()
+                                    .px_1p5()
+                                    .py_0p5()
+                                    .rounded_full()
+                                    .border_1()
+                                    .border_color(colors.border)
+                                    .items_center()
+                                    .child(div().size(px(10.0)).rounded_full().bg(swatch))
+                                    .child(Label::new(label).size(gpui_ui::ui::LabelSize::XSmall))
+                            })),
+                    ),
+            )
+            .child(
+                h_flex()
+                    .gap_1p5()
+                    .flex_wrap()
+                    .children(M3_DYNAMIC_SEEDS.iter().enumerate().map(|(idx, seed)| {
+                        let selected = self.m3_seed_rgb == seed.rgb;
+                        let rgb = seed.rgb;
+                        let swatch: gpui_ui::gpui::Hsla = gpui_ui::gpui::Rgba {
+                            r: f32::from(rgb[0]) / 255.0,
+                            g: f32::from(rgb[1]) / 255.0,
+                            b: f32::from(rgb[2]) / 255.0,
+                            a: 1.0,
+                        }
+                        .into();
+                        div()
+                            .id(("nsh-m3-seed", idx))
+                            .px_2()
+                            .py_1()
+                            .rounded_full()
+                            .cursor_pointer()
+                            .bg(if selected {
+                                colors.element_selected
+                            } else {
+                                colors.element_background
+                            })
+                            .border_1()
+                            .border_color(if selected {
+                                colors.border_focused
+                            } else {
+                                colors.border
+                            })
+                            .child(
+                                h_flex()
+                                    .gap_1()
+                                    .items_center()
+                                    .child(div().size(px(10.0)).rounded_full().bg(swatch))
+                                    .child(
+                                        Label::new(seed.name).size(gpui_ui::ui::LabelSize::XSmall),
+                                    ),
+                            )
+                            .on_click(cx.listener(move |this, _, _, cx| {
+                                this.m3_seed_rgb = rgb;
+                                this.status_message = SharedString::from(format!(
+                                    "M3 HCT seed {} ({})",
+                                    seed.name,
+                                    this.m3_variant.label()
+                                ));
+                                cx.notify();
+                            }))
+                    }))
+                    .children(GlassMaterialPreset::ALL.into_iter().enumerate().map(|(idx, preset)| {
+                        let selected = self.glass_preset == preset;
+                        div()
+                            .id(("nsh-glass-preset", idx))
+                            .px_2()
+                            .py_1()
+                            .rounded_full()
+                            .cursor_pointer()
+                            .bg(if selected {
+                                colors.element_selected
+                            } else {
+                                colors.element_background
+                            })
+                            .border_1()
+                            .border_color(if selected {
+                                colors.border_focused
+                            } else {
+                                colors.border
+                            })
+                            .child(Label::new(preset.label()).size(gpui_ui::ui::LabelSize::XSmall))
+                            .on_click(cx.listener(move |this, _, _, cx| {
+                                this.glass_preset = preset;
+                                this.status_message = SharedString::from(format!(
+                                    "Glass preset: {}",
+                                    preset.label()
+                                ));
+                                cx.notify();
+                            }))
+                    })),
+            )
+            .into_any_element()
+    }
+
     fn render_material3_compose_workspace(&self, cx: &mut Context<Self>) -> AnyElement {
         let switcher = self.render_mode_switcher_bar(cx);
+        let material_glass_bar = self.render_material_glass_lab_bar(cx);
         let colors = cx.theme().colors();
         let catalog = M3Compose15Catalog::canonical();
         v_flex()
@@ -642,6 +808,7 @@ impl DesignStitchStudioItem {
             .gap_3()
             .bg(colors.editor_background)
             .child(switcher)
+            .child(material_glass_bar)
             .child(
                 h_flex()
                     .w_full()
@@ -717,6 +884,7 @@ impl DesignStitchStudioItem {
 
     fn render_aphrody_suite_hub(&self, cx: &mut Context<Self>) -> AnyElement {
         let switcher = self.render_mode_switcher_bar(cx);
+        let material_glass_bar = self.render_material_glass_lab_bar(cx);
         let colors = cx.theme().colors();
         let catalog = M3Compose15Catalog::canonical();
         v_flex()
@@ -743,7 +911,7 @@ impl DesignStitchStudioItem {
                         v_flex()
                             .gap_1()
                             .child(Label::new(format!(
-                                "{} Consolidated Fork Suite ({} Pillars)",
+                                "{} Hub ({} Capabilities)",
                                 brand::APP_NAME,
                                 brand::suite::APHRODY_PILLARS.len()
                             )))
@@ -788,6 +956,7 @@ impl DesignStitchStudioItem {
                             })),
                     ),
             )
+            .child(material_glass_bar)
             .child(
                 h_flex()
                     .w_full()
@@ -795,12 +964,22 @@ impl DesignStitchStudioItem {
                     .gap_2()
                     .children(brand::suite::APHRODY_PILLARS.iter().map(|pillar| {
                         let target_mode = match pillar.id {
-                            "material3-kit" => Some(StudioMode::Material3ComposeStudio),
-                            "design-stitch" => Some(StudioMode::StitchStudio),
-                            "craft-suite" => Some(StudioMode::GoogleFigCraftStudio),
-                            "brand-design" => Some(StudioMode::GoogleDesignMirror),
-                            _ => None,
+                            "material3-kit" => StudioMode::Material3ComposeStudio,
+                            "design-stitch" => StudioMode::StitchStudio,
+                            "craft-suite" => StudioMode::GoogleFigCraftStudio,
+                            "brand-design" => StudioMode::GoogleDesignMirror,
+                            "pilot-mcp" => StudioMode::GoogleCraftAnythingStudio,
+                            "cosmic-os" | "browser" | "store" | "installer" | "vpn" | "auto" => {
+                                StudioMode::GpuiStarterPack
+                            }
+                            _ => StudioMode::Material3ComposeStudio,
                         };
+                        let surface_list = pillar
+                            .surfaces
+                            .iter()
+                            .map(|s| s.as_str())
+                            .collect::<Vec<_>>()
+                            .join(" · ");
                         div()
                             .id(SharedString::from(format!("hub-pillar-{}", pillar.id)))
                             .w(px(300.0))
@@ -809,11 +988,10 @@ impl DesignStitchStudioItem {
                             .border_1()
                             .border_color(colors.border)
                             .bg(colors.panel_background)
-                            .when_some(target_mode, |card, mode| {
-                                card.cursor_pointer().on_click(cx.listener(move |this, _, _, cx| {
-                                    this.switch_mode(mode, cx);
-                                }))
-                            })
+                            .cursor_pointer()
+                            .on_click(cx.listener(move |this, _, _, cx| {
+                                this.switch_mode(target_mode, cx);
+                            }))
                             .child(
                                 v_flex()
                                     .gap_1()
@@ -830,6 +1008,13 @@ impl DesignStitchStudioItem {
                                     .child(
                                         Label::new(pillar.summary)
                                             .size(gpui_ui::ui::LabelSize::Small),
+                                    )
+                                    .child(
+                                        Label::new(SharedString::from(format!(
+                                            "{surface_list} -> {}",
+                                            target_mode.short_label()
+                                        )))
+                                        .size(gpui_ui::ui::LabelSize::XSmall),
                                     ),
                             )
                     })),
@@ -978,7 +1163,7 @@ impl Render for DesignStitchStudioItem {
             return self.render_figcraft_workspace(cx);
         }
         let mode_title = match self.mode {
-            StudioMode::AphrodySuiteHub => "Aphrody Consolidated Suite Hub (12 Pillars)",
+            StudioMode::AphrodySuiteHub => "Aphrody Hub (12 Capabilities)",
             StudioMode::Material3ComposeStudio => {
                 "Material 3 Compose 1.5.0 & Parametric Prototyping Studio"
             }
@@ -988,10 +1173,10 @@ impl Render for DesignStitchStudioItem {
                 "GPUI Starter Pack (CWV + Lighthouse + W3C + Vercel + shadcn/Base UI/Tailwind)"
             }
             StudioMode::GoogleFigCraftStudio => {
-                "Google FigCraft + Stitch Studio (.fig + Sketch + Penpot + GPUI vs egui 0.37)"
+                "Design Canvas (.fig + Sketch + Penpot + GPUI vs egui 0.37)"
             }
             StudioMode::GoogleCraftAnythingStudio => {
-                "Google Craft Anything Workbench (X64/A64 Disasm + oxc JS AST + GPUI vs egui 0.37)"
+                "Binary & JS Inspector (X64/A64 Disasm + oxc JS AST + GPUI vs egui 0.37)"
             }
             StudioMode::UnrealBevyStudio => {
                 "Unreal Engine 5.8 Studio (Bevy 0.20 + Nanite Meshlets + Solari GI + MaterialX->WGSL)"

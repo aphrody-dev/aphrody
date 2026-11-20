@@ -386,6 +386,7 @@ fn slot(device: &wgpu::Device, raw: &ID3D12Device, width: u32, height: u32) -> O
             size,
             1,
             1,
+            None,
         )
     };
     // SAFETY: the descriptor says what `hal_texture` is. wgpu takes it as

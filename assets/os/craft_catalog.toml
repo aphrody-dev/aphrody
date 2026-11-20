@@ -6,7 +6,7 @@ default_layout = "dwindle"
 
 [[apps]]
 id = "photocraft"
-name = "PhotoCraft"
+name = "Photo"
 tagline = "Layered raster editor, RAW color pipelines, and non-destructive adjustments"
 category = "image"
 icon = "image"
@@ -18,7 +18,7 @@ inspector_groups = ["canvas", "layers", "histogram", "color_profile"]
 
 [[apps]]
 id = "vectorcraft"
-name = "VectorCraft"
+name = "Vector"
 tagline = "Precision Bezier graphics, boolean path ops, and SVG/EPS mastering"
 category = "vector"
 icon = "pencil"
@@ -30,7 +30,7 @@ inspector_groups = ["canvas", "path_geometry", "fill_stroke", "constraints"]
 
 [[apps]]
 id = "filmcraft"
-name = "FilmCraft"
+name = "Film"
 tagline = "Multi-track timeline editing, EXR color grading, and AAF/EDL interchange"
 category = "motion"
 icon = "play_filled"
@@ -42,7 +42,7 @@ inspector_groups = ["timeline", "scopes", "lut_grade", "audio_bus"]
 
 [[apps]]
 id = "lightcraft"
-name = "LightCraft"
+name = "Light"
 tagline = "Camera RAW cataloging, lens telemetry, and high-bit-depth batch development"
 category = "image"
 icon = "sparkle"
@@ -54,7 +54,7 @@ inspector_groups = ["histogram", "exif_lens", "tone_mapping"]
 
 [[apps]]
 id = "pdfcraft"
-name = "PdfCraft"
+name = "PDF"
 tagline = "PDF inspection, object stream editor, redaction, and vector flattener"
 category = "office"
 icon = "file_doc"
@@ -66,7 +66,7 @@ inspector_groups = ["pages", "fonts_streams", "security_signature"]
 
 [[apps]]
 id = "effectcraft"
-name = "EffectCraft"
+name = "Effects"
 tagline = "Node-based WGSL shader compositing, motion effects, and particle graph"
 category = "motion"
 icon = "bolt_filled"
@@ -78,7 +78,7 @@ inspector_groups = ["shader_uniforms", "node_inputs", "render_stats"]
 
 [[apps]]
 id = "anicraft"
-name = "AniCraft"
+name = "Motion"
 tagline = "Frame-by-frame cel & skeletal vector animation with onion-skinning"
 category = "motion"
 icon = "play_outlined"
@@ -90,7 +90,7 @@ inspector_groups = ["frame_timing", "onion_skin", "rig_bones"]
 
 [[apps]]
 id = "designcraft"
-name = "DesignCraft"
+name = "Layout"
 tagline = "Multi-page layout, typography grids, CMYK prepress, and IDML compatibility"
 category = "layout"
 icon = "book"
@@ -102,7 +102,7 @@ inspector_groups = ["page_grid", "typography", "prepress_inks"]
 
 [[apps]]
 id = "figcraft"
-name = "FigCraft"
+name = "Design Canvas"
 tagline = "Interface components, M3 design token binding, auto-layout, and Figma import"
 category = "layout"
 icon = "blocks"
@@ -114,7 +114,7 @@ inspector_groups = ["constraints", "tokens_m3", "layout_taffy"]
 
 [[apps]]
 id = "texturecraft"
-name = "TextureCraft"
+name = "Texture"
 tagline = "Procedural tileable PBR map generator (albedo, normal, roughness, AO)"
 category = "image"
 icon = "box"
@@ -126,7 +126,7 @@ inspector_groups = ["maps_pbr", "tiling", "texel_budget"]
 
 [[apps]]
 id = "materialcraft"
-name = "MaterialCraft"
+name = "Materials"
 tagline = "Physically based MaterialX / USD shader authoring and sphere viewport"
 category = "engineering"
 icon = "control"
@@ -138,7 +138,7 @@ inspector_groups = ["brdf_params", "ibl_lighting", "wgsl_stage"]
 
 [[apps]]
 id = "soundcraft"
-name = "SoundCraft"
+name = "Audio"
 tagline = "Spectral waveform editor, polyphonic mixer, SF2 instruments, and VST/CLAP host"
 category = "audio"
 icon = "audio_on"
@@ -150,7 +150,7 @@ inspector_groups = ["waveform", "eq_bands", "loudness_lufs"]
 
 [[apps]]
 id = "wordcraft"
-name = "WordCraft"
+name = "Docs"
 tagline = "Structured Markdown, DOCX, and typographic document authoring with track changes"
 category = "office"
 icon = "file_text_outlined"
@@ -162,7 +162,7 @@ inspector_groups = ["document_outline", "typography", "statistics"]
 
 [[apps]]
 id = "deckcraft"
-name = "DeckCraft"
+name = "Slides"
 tagline = "Slide deck composer with PPTX import, M3 themes, and speaker telemetry"
 category = "office"
 icon = "screen"
@@ -174,7 +174,7 @@ inspector_groups = ["slide_layout", "transition_motion", "speaker_notes"]
 
 [[apps]]
 id = "cadcraft"
-name = "CADCraft"
+name = "CAD"
 tagline = "2D/3D parametric drafting for DWG, DXF, SHX typography, and CAM G-code"
 category = "engineering"
 icon = "tool_hammer"
@@ -186,7 +186,7 @@ inspector_groups = ["units_snap", "layer_lineweight", "gcode_feed"]
 
 [[apps]]
 id = "gridcraft"
-name = "GridCraft"
+name = "Sheets"
 tagline = "Formula engine, CSV/XLSX/ODS analytics, and GPU-accelerated table views"
 category = "office"
 icon = "table"
@@ -198,7 +198,7 @@ inspector_groups = ["cell_format", "formula_ast", "summary_stats"]
 
 [[apps]]
 id = "craft-anything"
-name = "Craft Anything"
+name = "Inspector"
 tagline = "Clean-room reverse engineering, binary/Wasm/APK inspection, and evidence MCP workbench"
 category = "engineering"
 icon = "binary"

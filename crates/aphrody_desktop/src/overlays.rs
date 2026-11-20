@@ -182,7 +182,7 @@ pub(crate) fn render_launcher_modal(
                                 .child(
                                     div().flex_1().min_w_0().overflow_hidden().child(
                                         Label::new(if shell.launcher_query.is_empty() {
-                                            "Type to filter 17 ArtCraft apps + system desktop entries…"
+                                            "Type to filter studio apps and system entries…"
                                                 .to_owned()
                                         } else {
                                             format!("Filter: {}", shell.launcher_query)

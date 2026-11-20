@@ -302,10 +302,10 @@ pub fn render_gpui_studio_panel(session: &CraftStudioSession) -> AnyElement {
     let b = &session.last_benchmark;
 
     let pillar_label = match session.active_pillar {
-        StudioPillar::FigCraftGoogle => "Google FigCraft + Stitch Studio",
-        StudioPillar::CraftAnythingGoogle => "Google Craft Anything Workbench",
+        StudioPillar::FigCraftGoogle => "Design Canvas + Stitch Studio",
+        StudioPillar::CraftAnythingGoogle => "Binary & JS Inspector",
         StudioPillar::UnrealBevy58 => "Unreal Engine 5.8 (Bevy 0.20 + Solari + Nanite)",
-        StudioPillar::StorytoldSuiteCatalog => "Storytold 82-Repo Unified Suite",
+        StudioPillar::StorytoldSuiteCatalog => "Creative & Format Catalog",
     };
 
     let mode_label = session.parity_mode.label();
@@ -354,7 +354,7 @@ pub fn render_gpui_studio_panel(session: &CraftStudioSession) -> AnyElement {
         .child(
             StarterCard::new(
                 format!(
-                    "Shared GUI Core · FigCraft ({} pages, {} nodes, {}, {} M3 templates) · Craft Anything ({} insns) · Bevy ({} actors)",
+                    "Shared GUI Core · Canvas ({} pages, {} nodes, {}, {} M3 templates) · Inspector ({} insns) · Bevy ({} actors)",
                     session.figcraft.pages.len(),
                     session.figcraft.total_node_count(),
                     session.figcraft.active_mode.label(),

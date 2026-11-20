@@ -8,10 +8,10 @@ use aphrody_session::{
     UnitPhase,
 };
 use aphrody_ui::{
-    AppearanceMode, ImmediateUi, OsConfigStore, OsI18nCatalog, OsTheme, OsThemeCatalog,
-    ReactiveHost, ReactiveProgram, StatusTone, SubscriptionSpec, TaskCommand,
-    UnifiedPlatformProfile, focusable_action_chip, progress_meter, slider_control, sparkline_chart,
-    status_badge, toggle_control,
+    AppearanceMode, GlassMaterialPreset, ImmediateUi, M3DynamicVariant, OsConfigStore,
+    OsI18nCatalog, OsTheme, OsThemeCatalog, ReactiveHost, ReactiveProgram, StatusTone,
+    SubscriptionSpec, TaskCommand, UnifiedPlatformProfile, focusable_action_chip, progress_meter,
+    slider_control, sparkline_chart, status_badge, toggle_control,
 };
 use serde::{Deserialize, Serialize};
 use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, rems_from_px, v_flex};
@@ -20,6 +20,8 @@ use ui::{IconName, Label, LabelCommon as _, LabelSize, h_flex, rems_from_px, v_f
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum WindowKind {
     Studio,
+    Browser,
+    Vpn,
     Files,
     Settings,
     Monitor,
@@ -31,8 +33,10 @@ pub enum WindowKind {
 }
 
 impl WindowKind {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 11] = [
         Self::Studio,
+        Self::Browser,
+        Self::Vpn,
         Self::Files,
         Self::Settings,
         Self::Monitor,
@@ -47,6 +51,8 @@ impl WindowKind {
     pub const fn app_id(self) -> &'static str {
         match self {
             Self::Studio => "artcraft-studio",
+            Self::Browser => "aphrody-browser",
+            Self::Vpn => "aphrody-vpn",
             Self::Files => "cosmic-files",
             Self::Settings => "cosmic-settings",
             Self::Monitor => "system-monitor",
@@ -61,7 +67,9 @@ impl WindowKind {
     #[must_use]
     pub const fn default_title(self) -> &'static str {
         match self {
-            Self::Studio => "ArtCraft Studio",
+            Self::Studio => "Studio",
+            Self::Browser => "Aphrody Browser",
+            Self::Vpn => "WireGuard VPN",
             Self::Files => "COSMIC Files",
             Self::Settings => "COSMIC Settings",
             Self::Monitor => "System Monitor",
@@ -69,7 +77,7 @@ impl WindowKind {
             Self::Edit => "COSMIC Edit",
             Self::Store => "COSMIC Store",
             Self::Installer => "OS Installer & DE Switcher",
-            Self::Design => "Design Gallery",
+            Self::Design => "Design & Hub",
         }
     }
 
@@ -77,6 +85,8 @@ impl WindowKind {
     pub const fn icon(self) -> IconName {
         match self {
             Self::Studio => IconName::Image,
+            Self::Browser => IconName::ToolWeb,
+            Self::Vpn => IconName::VpnShield,
             Self::Files => IconName::FolderOpen,
             Self::Settings => IconName::Settings,
             Self::Monitor => IconName::Server,
@@ -99,6 +109,12 @@ pub struct DesktopPrefs {
     pub reduced_motion: bool,
     #[serde(default = "default_locale_pref")]
     pub locale: String,
+    #[serde(default)]
+    pub glass_preset: GlassMaterialPreset,
+    #[serde(default)]
+    pub m3_seed_rgb: Option<[u8; 3]>,
+    #[serde(default)]
+    pub m3_variant: M3DynamicVariant,
 }
 
 fn default_locale_pref() -> String {
@@ -114,6 +130,9 @@ impl Default for DesktopPrefs {
             window_gap: 8.0,
             reduced_motion: false,
             locale: default_locale_pref(),
+            glass_preset: GlassMaterialPreset::LiquidGlass,
+            m3_seed_rgb: None,
+            m3_variant: M3DynamicVariant::Expressive,
         }
     }
 }
@@ -526,7 +545,7 @@ pub fn render_files_window(
             ui.button(
                 "files-open-in-studio",
                 IconName::ArrowUpRight,
-                "Open in ArtCraft Studio",
+                "Open in Studio",
                 true,
                 move |_, window, cx| open_cb(path.clone(), window, cx),
             );

@@ -228,7 +228,7 @@ fn render_center_workspace(
     theme: &OsTheme,
     cb: &StudioCallbacks,
 ) -> AnyElement {
-    let app_name = active_app.map_or("ArtCraft Studio", |a| a.name.as_str());
+    let app_name = active_app.map_or("Studio", |a| a.name.as_str());
     let app_tagline = active_app.map_or("Unified creative & inspection workbench", |a| {
         a.tagline.as_str()
     });

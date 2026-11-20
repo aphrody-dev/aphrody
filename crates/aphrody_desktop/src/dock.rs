@@ -36,16 +36,37 @@ pub fn render_cosmic_dock(
             DockTileSpec {
                 id: "dock-studio",
                 icon: IconName::Image,
-                label: SharedString::from("ArtCraft Studio"),
+                label: SharedString::from("Studio"),
                 kind: Some(WindowKind::Studio),
                 craft_id: None,
             },
             DockTileSpec {
                 id: "dock-craft-anything",
                 icon: IconName::Binary,
-                label: SharedString::from("Craft Anything"),
+                label: SharedString::from("Inspector"),
                 kind: None,
                 craft_id: Some("craft-anything"),
+            },
+            DockTileSpec {
+                id: "dock-browser",
+                icon: IconName::ToolWeb,
+                label: SharedString::from("Browser"),
+                kind: Some(WindowKind::Browser),
+                craft_id: None,
+            },
+            DockTileSpec {
+                id: "dock-vpn",
+                icon: IconName::VpnShield,
+                label: SharedString::from("WireGuard VPN"),
+                kind: Some(WindowKind::Vpn),
+                craft_id: None,
+            },
+            DockTileSpec {
+                id: "dock-design",
+                icon: IconName::Sparkle,
+                label: SharedString::from("Design & Hub"),
+                kind: Some(WindowKind::Design),
+                craft_id: None,
             },
             DockTileSpec {
                 id: "dock-files",
@@ -81,30 +102,51 @@ pub fn render_cosmic_dock(
             DockTileSpec {
                 id: "dock-studio",
                 icon: IconName::Image,
-                label: SharedString::from("ArtCraft Studio"),
+                label: SharedString::from("Studio"),
                 kind: Some(WindowKind::Studio),
                 craft_id: None,
             },
             DockTileSpec {
                 id: "dock-photocraft",
                 icon: IconName::Sparkle,
-                label: SharedString::from("PhotoCraft"),
+                label: SharedString::from("Photo"),
                 kind: None,
                 craft_id: Some("photocraft"),
             },
             DockTileSpec {
                 id: "dock-vectorcraft",
                 icon: IconName::Pencil,
-                label: SharedString::from("VectorCraft"),
+                label: SharedString::from("Vector"),
                 kind: None,
                 craft_id: Some("vectorcraft"),
             },
             DockTileSpec {
                 id: "dock-craft-anything",
                 icon: IconName::Binary,
-                label: SharedString::from("Craft Anything"),
+                label: SharedString::from("Inspector"),
                 kind: None,
                 craft_id: Some("craft-anything"),
+            },
+            DockTileSpec {
+                id: "dock-browser",
+                icon: IconName::ToolWeb,
+                label: SharedString::from("Browser"),
+                kind: Some(WindowKind::Browser),
+                craft_id: None,
+            },
+            DockTileSpec {
+                id: "dock-vpn",
+                icon: IconName::VpnShield,
+                label: SharedString::from("WireGuard VPN"),
+                kind: Some(WindowKind::Vpn),
+                craft_id: None,
+            },
+            DockTileSpec {
+                id: "dock-design",
+                icon: IconName::Sparkle,
+                label: SharedString::from("Design & Hub"),
+                kind: Some(WindowKind::Design),
+                craft_id: None,
             },
             DockTileSpec {
                 id: "dock-files",
@@ -169,15 +211,18 @@ pub fn render_cosmic_dock(
         .focused_toplevel
         .and_then(|id| shell.window_kinds.get(&id).copied());
 
+    let glass = shell.glass_preset();
+    let dock_opacity = (glass.tint_alpha() + 0.24).clamp(0.68, 0.94);
+    let border_opacity = (glass.specular_intensity() + 0.22).clamp(0.35, 0.72);
     let mut dock_row = h_flex()
         .px_3()
         .py_1p5()
         .gap_1p5()
         .items_center()
         .rounded_full()
-        .bg(theme.colors.surface_container_high.opacity(0.94))
+        .bg(theme.colors.surface_container_high.opacity(dock_opacity))
         .border_1()
-        .border_color(theme.colors.outline_variant.opacity(0.42))
+        .border_color(theme.colors.outline_variant.opacity(border_opacity))
         .shadow_lg();
 
     for (idx, item) in items.into_iter().enumerate() {

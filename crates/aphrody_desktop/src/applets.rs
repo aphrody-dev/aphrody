@@ -179,7 +179,7 @@ impl PanelApplet for BrandLauncherApplet {
                 IconName::Command,
                 SharedString::from("Apps"),
                 shortcut_badge,
-                SharedString::from("Toggle unified ArtCraft and system app launcher"),
+                SharedString::from("Toggle unified application launcher"),
                 self.launcher_open,
                 15,
                 theme,

@@ -13,7 +13,7 @@ use aphrody_ui::{AppearanceMode, OsThemeCatalog};
 #[command(
     name = "aphrody-os",
     version,
-    about = "Aphrody GPUI OS desktop shell, ArtCraft 17-app suite, and Craft Anything MCP host"
+    about = "Aphrody GPUI OS desktop shell, creative studio, binary inspector, and MCP host"
 )]
 struct Cli {
     /// Initial theme ID (e.g. aphrody, cosmic, m3, oled-studio, hyprland, omarchy).
@@ -24,11 +24,11 @@ struct Cli {
     #[arg(long)]
     mode: Option<String>,
 
-    /// Initial ArtCraft studio app ID (`photocraft`, `vectorcraft`, `craft-anything`, ...).
+    /// Initial studio app ID (`photocraft`, `vectorcraft`, `craft-anything`, ...).
     #[arg(long)]
     app: Option<String>,
 
-    /// Optional file path to pre-load in the Craft inspector when launching the GUI.
+    /// Optional file path to pre-load in the inspector when launching the GUI.
     #[arg(long)]
     inspect: Option<PathBuf>,
 
@@ -40,16 +40,16 @@ struct Cli {
 enum Command {
     /// Launch the COSMIC-style GPUI desktop shell (`aphrody-os`).
     Desktop,
-    /// Launch the Zed app shell hosting the ArtCraft module and, with the `vpn` feature, the VPN client.
+    /// Launch the Zed app shell hosting the studio module and, with the `vpn` feature, the VPN client.
     #[cfg(feature = "shell-module")]
     Shell,
-    /// Inspect an arbitrary image/vector/binary/Wasm/Plist artifact via `craft-libs` & `object`/`wasmparser`.
+    /// Inspect an arbitrary image/vector/binary/Wasm/Plist artifact via native Rust decoders.
     Inspect {
         path: PathBuf,
         #[arg(long)]
         json: bool,
     },
-    /// Print all bundled 17 ArtCraft + Craft Anything studio entries.
+    /// Print all bundled studio and inspector catalog entries.
     Catalog {
         #[arg(long)]
         json: bool,
@@ -64,9 +64,9 @@ enum Command {
         #[arg(long, default_value = "deb")]
         format: String,
     },
-    /// Serve the Craft Anything + Compositor + Session MCP control plane over stdin/stdout JSON-RPC 2.0.
+    /// Serve the OS + Inspector + Compositor + Session MCP control plane over stdin/stdout JSON-RPC 2.0.
     Mcp,
-    /// Serve the Craft Anything MCP + health endpoint over local HTTP (`APHRODY_OS_MCP_ADDR` or `127.0.0.1:4193`).
+    /// Serve the OS + Inspector MCP and health endpoint over local HTTP (`APHRODY_OS_MCP_ADDR` or `127.0.0.1:4193`).
     Serve {
         #[arg(long)]
         addr: Option<String>,

@@ -14,8 +14,9 @@ use aphrody_session::{
     WorkspaceId, discover_system_apps,
 };
 use aphrody_ui::{
-    AdaptiveViewport, AppearanceMode, AppletSlot, OsConfigStore, OsTheme, OsThemeCatalog,
-    PanelApplet, ReactiveHost, StatusTone, focusable_action_chip, status_badge,
+    AdaptiveViewport, AppearanceMode, AppletSlot, GlassMaterialPreset, M3DynamicVariant,
+    OsConfigStore, OsTheme, OsThemeCatalog, PanelApplet, ReactiveHost, StatusTone,
+    focusable_action_chip, os_theme_from_m3_seed, status_badge,
 };
 use ui::{
     Icon, IconName, IconSize, Label, LabelCommon as _, LabelSize, h_flex, rems_from_px,
@@ -27,11 +28,14 @@ use crate::applets::{BrandLauncherApplet, SystemTelemetryApplet, WorkspaceApplet
 use crate::apps::cosmic_settings::{
     CosmicSettingsCallbacks, SettingsPage, render_cosmic_settings_window,
 };
-use crate::apps::design_gallery::{DesignGalleryState, render_design_gallery_window};
+use crate::apps::design_gallery::{
+    DesignGalleryCallbacks, DesignGalleryState, render_design_gallery_window,
+};
 use crate::apps::edit::{CosmicEditState, render_cosmic_edit_window};
 use crate::apps::installer::render_installer_window;
 use crate::apps::store::render_cosmic_store_window;
 use crate::apps::term::{CosmicTermState, render_cosmic_term_window};
+use crate::apps::vpn::{VpnPanelCallbacks, VpnPanelState, render_vpn_window};
 use crate::comp_viewport::render_workspaces_overview;
 use crate::launcher::{LauncherFolder, render_pop_launcher_and_app_library};
 use crate::overlays::{
@@ -101,6 +105,11 @@ pub struct OsDesktopShell {
     pub installer_catalog: aphrody_installer::InstallerProfileCatalog,
     pub selected_de_id: String,
     pub design_gallery: DesignGalleryState,
+    pub browser_view: Entity<aphrody_browser::ChromiumBrowserView>,
+    pub vpn_connected: bool,
+    pub vpn_allow_lan: bool,
+    pub vpn_kill_switch: bool,
+    glass_dirty: bool,
     pub launcher_folder: LauncherFolder,
     pub launcher_open: bool,
     pub launcher_query: String,
@@ -126,18 +135,43 @@ impl OsDesktopShell {
             prefs_store.value.mode = mode;
         }
 
-        let theme = theme_catalog
-            .resolve(&prefs_store.value.theme_id, Some(prefs_store.value.mode))
-            .or_else(|| theme_catalog.resolve(brand::APP_SLUG, Some(prefs_store.value.mode)))
-            .or_else(|| {
-                let ids = theme_catalog.ids();
-                ids.first().and_then(|id| theme_catalog.resolve(id, None))
-            })
-            .unwrap_or_else(|| {
-                log::warn!("OsThemeCatalog is empty, using default theme");
-                OsTheme::default()
-            });
+        let theme = if let Some([r, g, b]) = prefs_store.value.m3_seed_rgb {
+            os_theme_from_m3_seed(
+                "m3-dynamic",
+                format!(
+                    "Material 3 {} ({:02X}{:02X}{:02X})",
+                    prefs_store.value.m3_variant.label(),
+                    r,
+                    g,
+                    b
+                ),
+                (r, g, b),
+                prefs_store.value.mode == AppearanceMode::Dark,
+                prefs_store.value.m3_variant,
+                0.0,
+            )
+        } else {
+            theme_catalog
+                .resolve(&prefs_store.value.theme_id, Some(prefs_store.value.mode))
+                .or_else(|| theme_catalog.resolve(brand::APP_SLUG, Some(prefs_store.value.mode)))
+                .or_else(|| {
+                    let ids = theme_catalog.ids();
+                    ids.first().and_then(|id| theme_catalog.resolve(id, None))
+                })
+                .unwrap_or_else(|| {
+                    log::warn!("OsThemeCatalog is empty, using default theme");
+                    OsTheme::default()
+                })
+        };
         theme.apply_to_gpui(cx);
+        #[cfg(any(target_os = "windows", target_os = "macos"))]
+        if let Err(err) = aphrody_ui::apply_native_window_glass(
+            window,
+            prefs_store.value.glass_preset,
+            theme.mode == AppearanceMode::Dark,
+        ) {
+            log::debug!("native window glass skipped (headless/unsupported): {err:#}");
+        }
 
         let craft_catalog = CraftCatalog::load_with_user_override().unwrap_or_else(|err| {
             log::warn!("failed to load CraftCatalog: {err:#}");
@@ -192,7 +226,7 @@ impl OsDesktopShell {
         });
 
         let mut window_kinds = BTreeMap::new();
-        let studio_win = compositor.open_window("ArtCraft Studio", WindowKind::Studio.app_id());
+        let studio_win = compositor.open_window("Studio", WindowKind::Studio.app_id());
         window_kinds.insert(studio_win, WindowKind::Studio);
         compositor.focus_window(studio_win);
 
@@ -261,6 +295,11 @@ impl OsDesktopShell {
         let installer_catalog =
             aphrody_installer::InstallerProfileCatalog::bundled().unwrap_or_default();
 
+        let browser_view = {
+            let initial_theme = theme.clone();
+            cx.new(|cx| aphrody_browser::ChromiumBrowserView::new(initial_theme, cx))
+        };
+
         Self {
             focus_handle,
             theme_catalog,
@@ -293,6 +332,11 @@ impl OsDesktopShell {
             installer_catalog,
             selected_de_id: "aphrody-gpui".to_owned(),
             design_gallery: DesignGalleryState::bundled(),
+            browser_view,
+            vpn_connected: true,
+            vpn_allow_lan: true,
+            vpn_kill_switch: true,
+            glass_dirty: false,
             launcher_folder: LauncherFolder::default(),
             launcher_open: false,
             launcher_query: String::new(),
@@ -303,22 +347,89 @@ impl OsDesktopShell {
         }
     }
 
-    pub fn apply_preferences(&mut self, prefs: DesktopPrefs, cx: &mut Context<Self>) {
-        self.prefs_store.value = prefs.clone();
-        self.compositor.gap = prefs.window_gap;
-        self.compositor.set_active_mode(prefs.layout_mode);
-        if let Some(resolved) = self
-            .theme_catalog
-            .resolve(&prefs.theme_id, Some(prefs.mode))
-        {
-            self.theme = resolved;
-            self.theme.apply_to_gpui(cx);
-        }
+    #[must_use]
+    pub fn glass_preset(&self) -> GlassMaterialPreset {
+        self.prefs_store.value.glass_preset
+    }
+
+    fn sync_theme_to_subsystems(&mut self, cx: &mut Context<Self>) {
+        self.theme.apply_to_gpui(cx);
+        let next_theme = self.theme.clone();
+        self.browser_view.update(cx, |view, cx| {
+            view.theme = next_theme;
+            cx.notify();
+        });
         self.pilot.gpui.sync_compositor(
             self.compositor.clone(),
             &self.theme.id,
             self.theme.mode == AppearanceMode::Dark,
         );
+        self.glass_dirty = true;
+    }
+
+    fn resolve_active_theme(&self, prefs: &DesktopPrefs) -> Option<OsTheme> {
+        if let Some([r, g, b]) = prefs.m3_seed_rgb {
+            Some(os_theme_from_m3_seed(
+                "m3-dynamic",
+                format!(
+                    "Material 3 {} ({:02X}{:02X}{:02X})",
+                    prefs.m3_variant.label(),
+                    r,
+                    g,
+                    b
+                ),
+                (r, g, b),
+                prefs.mode == AppearanceMode::Dark,
+                prefs.m3_variant,
+                0.0,
+            ))
+        } else {
+            self.theme_catalog.resolve(&prefs.theme_id, Some(prefs.mode))
+        }
+    }
+
+    pub fn select_m3_seed(&mut self, rgb: [u8; 3], cx: &mut Context<Self>) {
+        self.prefs_store.value.m3_seed_rgb = Some(rgb);
+        if let Some(resolved) = self.resolve_active_theme(&self.prefs_store.value) {
+            self.theme = resolved;
+            self.sync_theme_to_subsystems(cx);
+        }
+        cx.notify();
+    }
+
+    pub fn select_m3_variant(&mut self, variant: M3DynamicVariant, cx: &mut Context<Self>) {
+        self.prefs_store.value.m3_variant = variant;
+        if self.prefs_store.value.m3_seed_rgb.is_none() {
+            self.prefs_store.value.m3_seed_rgb = Some([66, 133, 244]);
+        }
+        if let Some(resolved) = self.resolve_active_theme(&self.prefs_store.value) {
+            self.theme = resolved;
+            self.sync_theme_to_subsystems(cx);
+        }
+        cx.notify();
+    }
+
+    pub fn select_glass_preset(&mut self, preset: GlassMaterialPreset, cx: &mut Context<Self>) {
+        self.prefs_store.value.glass_preset = preset;
+        self.glass_dirty = true;
+        cx.notify();
+    }
+
+    pub fn apply_preferences(&mut self, mut prefs: DesktopPrefs, cx: &mut Context<Self>) {
+        if prefs.theme_id != self.prefs_store.value.theme_id {
+            prefs.m3_seed_rgb = None;
+        } else if prefs.m3_seed_rgb.is_none() {
+            prefs.m3_seed_rgb = self.prefs_store.value.m3_seed_rgb;
+            prefs.m3_variant = self.prefs_store.value.m3_variant;
+        }
+        prefs.glass_preset = self.prefs_store.value.glass_preset;
+        self.prefs_store.value = prefs.clone();
+        self.compositor.gap = prefs.window_gap;
+        self.compositor.set_active_mode(prefs.layout_mode);
+        if let Some(resolved) = self.resolve_active_theme(&prefs) {
+            self.theme = resolved;
+            self.sync_theme_to_subsystems(cx);
+        }
         cx.notify();
     }
 
@@ -370,7 +481,7 @@ impl OsDesktopShell {
 
     pub fn select_craft_app(&mut self, app_id: &str, cx: &mut Context<Self>) {
         self.studio.select_app(app_id, &self.craft_catalog);
-        self.open_or_focus_window(WindowKind::Studio, "ArtCraft Studio", cx);
+        self.open_or_focus_window(WindowKind::Studio, "Studio", cx);
     }
 
     pub fn toggle_mode(&mut self, cx: &mut Context<Self>) {
@@ -614,7 +725,7 @@ impl OsDesktopShell {
         let active_app_name = self
             .craft_catalog
             .by_id(&self.studio.active_app_id)
-            .map_or("ArtCraft", |app| app.name.as_str());
+            .map_or("Studio", |app| app.name.as_str());
         let launch_entity = entity.clone();
         let brand_applet = BrandLauncherApplet {
             brand_name: SharedString::from(brand::APP_NAME),
@@ -854,10 +965,91 @@ impl OsDesktopShell {
 
         let body = match kind {
             WindowKind::Studio => self.build_studio_body(placed.rect.w, cx),
+            WindowKind::Browser => self.browser_view.clone().into_any_element(),
+            WindowKind::Vpn => {
+                let entity_conn = cx.entity();
+                let entity_exit = cx.entity();
+                let entity_lan = cx.entity();
+                let entity_kill = cx.entity();
+                let entity_browser = cx.entity();
+                let active_exit = self
+                    .browser_view
+                    .read(cx)
+                    .runtime
+                    .browser_model
+                    .vpn_active_exit
+                    .clone();
+                render_vpn_window(
+                    &self.theme,
+                    &VpnPanelState {
+                        connected: self.vpn_connected,
+                        active_exit: &active_exit,
+                        allow_lan: self.vpn_allow_lan,
+                        kill_switch: self.vpn_kill_switch,
+                        post_quantum: true,
+                        daita_enabled: true,
+                    },
+                    VpnPanelCallbacks {
+                        on_toggle_connect: Box::new(move |cx| {
+                            entity_conn.update(cx, |s, cx| {
+                                s.vpn_connected = !s.vpn_connected;
+                                s.notifications.push(
+                                    "aphrody-vpn",
+                                    "WireGuard Tunnel",
+                                    if s.vpn_connected {
+                                        "Tunnel connected"
+                                    } else {
+                                        "Tunnel disconnected"
+                                    },
+                                    aphrody_session::NotificationUrgency::Normal,
+                                );
+                                cx.notify();
+                            });
+                        }),
+                        on_select_exit: Box::new(move |code, cx| {
+                            let target = code.to_owned();
+                            entity_exit.update(cx, |s, cx| {
+                                s.browser_view.update(cx, |browser, cx| {
+                                    if let Err(err) = browser.runtime.vpn_router.select_exit(&target) {
+                                        log::warn!("VPN exit switch failed: {err:#}");
+                                    }
+                                    browser.runtime.browser_model.vpn_active_exit = target.clone();
+                                    cx.notify();
+                                });
+                                cx.notify();
+                            });
+                        }),
+                        on_toggle_allow_lan: Box::new(move |cx| {
+                            entity_lan.update(cx, |s, cx| {
+                                s.vpn_allow_lan = !s.vpn_allow_lan;
+                                cx.notify();
+                            });
+                        }),
+                        on_toggle_kill_switch: Box::new(move |cx| {
+                            entity_kill.update(cx, |s, cx| {
+                                s.vpn_kill_switch = !s.vpn_kill_switch;
+                                cx.notify();
+                            });
+                        }),
+                        on_open_browser: Box::new(move |cx| {
+                            entity_browser.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    WindowKind::Browser,
+                                    WindowKind::Browser.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                    },
+                )
+            }
             WindowKind::Files => self.build_files_body(cx),
             WindowKind::Settings => {
                 let entity_page = cx.entity();
                 let entity_theme = cx.entity();
+                let entity_seed = cx.entity();
+                let entity_variant = cx.entity();
+                let entity_glass = cx.entity();
                 let entity_mode = cx.entity();
                 let entity_layout = cx.entity();
                 let entity_hint = cx.entity();
@@ -869,6 +1061,9 @@ impl OsDesktopShell {
                     &self.theme,
                     &self.theme_catalog,
                     &self.theme.id,
+                    self.prefs_store.value.m3_seed_rgb,
+                    self.prefs_store.value.m3_variant,
+                    self.prefs_store.value.glass_preset,
                     self.compositor
                         .workspaces
                         .get(&self.compositor.active_workspace)
@@ -886,6 +1081,15 @@ impl OsDesktopShell {
                         }),
                         on_select_theme: Box::new(move |id, cx| {
                             entity_theme.update(cx, |s, cx| s.select_theme(id, cx));
+                        }),
+                        on_select_m3_seed: Box::new(move |rgb, cx| {
+                            entity_seed.update(cx, |s, cx| s.select_m3_seed(rgb, cx));
+                        }),
+                        on_select_m3_variant: Box::new(move |variant, cx| {
+                            entity_variant.update(cx, |s, cx| s.select_m3_variant(variant, cx));
+                        }),
+                        on_select_glass_preset: Box::new(move |preset, cx| {
+                            entity_glass.update(cx, |s, cx| s.select_glass_preset(preset, cx));
                         }),
                         on_toggle_mode: Box::new(move |cx| {
                             entity_mode.update(cx, |s, cx| s.toggle_mode(cx));
@@ -983,16 +1187,38 @@ impl OsDesktopShell {
             }
             WindowKind::Design => {
                 let entity_design = cx.entity();
+                let entity_open = cx.entity();
+                let entity_seed = cx.entity();
+                let entity_glass = cx.entity();
                 render_design_gallery_window(
                     &self.theme,
                     &self.design_gallery,
-                    Box::new(move |change, cx| {
-                        entity_design.update(cx, |s, cx| {
-                            if s.design_gallery.apply(change) {
-                                cx.notify();
-                            }
-                        });
-                    }),
+                    self.prefs_store.value.m3_seed_rgb,
+                    self.prefs_store.value.glass_preset,
+                    DesignGalleryCallbacks {
+                        on_change: Box::new(move |change, cx| {
+                            entity_design.update(cx, |s, cx| {
+                                if s.design_gallery.apply(change) {
+                                    cx.notify();
+                                }
+                            });
+                        }),
+                        on_open_window: Box::new(move |target_kind, cx| {
+                            entity_open.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    target_kind,
+                                    target_kind.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                        on_select_seed: Box::new(move |rgb, cx| {
+                            entity_seed.update(cx, |s, cx| s.select_m3_seed(rgb, cx));
+                        }),
+                        on_select_glass: Box::new(move |preset, cx| {
+                            entity_glass.update(cx, |s, cx| s.select_glass_preset(preset, cx));
+                        }),
+                    },
                 )
             }
             WindowKind::Installer => {
@@ -1291,7 +1517,7 @@ impl OsDesktopShell {
             Arc::new(move |path: PathBuf, _w, cx| {
                 e2.update(cx, |shell, cx| {
                     shell.studio.inspect_local_file(&path, &shell.craft_catalog);
-                    shell.open_or_focus_window(WindowKind::Studio, "ArtCraft Studio", cx);
+                    shell.open_or_focus_window(WindowKind::Studio, "Studio", cx);
                 });
             }),
             Arc::new(move |_w, cx| {
@@ -1334,6 +1560,17 @@ impl Focusable for OsDesktopShell {
 impl Render for OsDesktopShell {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         self.record_frame_sample();
+        if self.glass_dirty {
+            self.glass_dirty = false;
+            #[cfg(any(target_os = "windows", target_os = "macos"))]
+            if let Err(err) = aphrody_ui::apply_native_window_glass(
+                window,
+                self.prefs_store.value.glass_preset,
+                self.theme.mode == AppearanceMode::Dark,
+            ) {
+                log::debug!("native window glass update skipped: {err:#}");
+            }
+        }
         let viewport = window.viewport_size();
         let vw = f32::from(viewport.width).max(320.0);
         let vh = f32::from(viewport.height).max(240.0);
@@ -1483,6 +1720,21 @@ impl Render for OsDesktopShell {
                                             ":monitor" => s.open_or_focus_window(
                                                 WindowKind::Monitor,
                                                 "System Monitor",
+                                                cx,
+                                            ),
+                                            ":browser" => s.open_or_focus_window(
+                                                WindowKind::Browser,
+                                                WindowKind::Browser.default_title(),
+                                                cx,
+                                            ),
+                                            ":vpn" => s.open_or_focus_window(
+                                                WindowKind::Vpn,
+                                                WindowKind::Vpn.default_title(),
+                                                cx,
+                                            ),
+                                            ":design" => s.open_or_focus_window(
+                                                WindowKind::Design,
+                                                WindowKind::Design.default_title(),
                                                 cx,
                                             ),
                                             ":files" => s.open_or_focus_window(

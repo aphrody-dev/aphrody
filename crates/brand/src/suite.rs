@@ -95,10 +95,10 @@ pub const APHRODY_PILLARS: &[AphrodyPillarSpec] = &[
     },
     AphrodyPillarSpec {
         id: "craft-suite",
-        name: "ArtCraft, FigCraft & Craft Anything",
+        name: "Creative Studio, Canvas & Binary Inspector",
         primary_crate: "aphrody_craft",
         cargo_feature: "craft",
-        summary: "Unified creative workbench, FigCraft GPUI/egui parity, Unreal Bevy 5.8 viewport, and multi-format binary/SVG/Wasm inspection.",
+        summary: "Unified creative workbench, vector/UI canvas GPUI/egui parity, Unreal Bevy 5.8 viewport, and multi-format binary/SVG/Wasm inspection.",
         surfaces: &[
             AphrodySurface::Ide,
             AphrodySurface::DesktopOs,

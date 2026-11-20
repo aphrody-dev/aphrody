@@ -30,7 +30,7 @@ impl LauncherFolder {
         match self {
             Self::All => "Library Home",
             Self::AphrodyUserland => "Aphrody OS",
-            Self::StorytoldCraft => "ArtCraft Suite",
+            Self::StorytoldCraft => "Studio Apps",
             Self::CosmicEpoch => "COSMIC Epoch",
             Self::Developer => "Rust & WGPU",
         }

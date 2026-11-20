@@ -97,8 +97,9 @@ pub fn mount_desktop_shell(options: DesktopOptions, cx: &mut App) {
     if let Err(err) = cx.open_window(
         WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(bounds)),
+            window_background: gpui::WindowBackgroundAppearance::Blurred,
             titlebar: Some(gpui::TitlebarOptions {
-                title: Some(format!("{} OS — ArtCraft Studio", brand::APP_NAME).into()),
+                title: Some(format!("{} OS", brand::APP_NAME).into()),
                 ..Default::default()
             }),
             ..Default::default()
