@@ -19,4 +19,4 @@ arch="$(uname -m)"
 commit=$(git rev-parse HEAD | cut -c 1-7)
 archive="zed-linux-${arch}.tar.gz"
 export ZED_BUNDLE_PATH="${CARGO_TARGET_DIR:-target}/release/${archive}"
-script/install.sh
+script/aphrody-install.sh

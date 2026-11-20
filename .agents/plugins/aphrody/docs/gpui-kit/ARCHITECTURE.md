@@ -2,9 +2,9 @@
 
 ## Status and Scope
 
-This document describes the architecture implemented by `crates/base`. It is a
+This document describes the architecture implemented by `crates/gpui-base`. It is a
 source-derived reference, not a migration plan. Public exports in
-`crates/base/src/lib.rs` and the Rust API documentation remain authoritative for
+`crates/gpui-base/src/lib.rs` and the Rust API documentation remain authoritative for
 individual methods.
 
 `gpui-base` is the reusable foundation below the styled `gpui-component` crate.
@@ -319,7 +319,7 @@ LSP configuration are absent from its API. Multi-line code must construct
 - auto-scroll, viewport scrolling, and cursor visibility;
 - native text-content integration where supported.
 
-The implementation under `crates/base/src/input` is organized by responsibility:
+The implementation under `crates/gpui-base/src/input` is organized by responsibility:
 
 - `base/` contains the shared editing engine and foundational mechanics;
 - `input/` contains the single-line control and state facade;
@@ -542,7 +542,7 @@ interfere.
 
 ## Dock Layout Architecture
 
-`crates/base/src/dock` owns the layout tree, persistence, drag hit-testing,
+`crates/gpui-base/src/dock` owns the layout tree, persistence, drag hit-testing,
 resize arithmetic, the active-panel state machine, zoom, focus, and the panel
 registry. `crates/component/src/dock` is a skin: `DockSkin` implements the renderer
 traits below to supply the tab bar, toolbar, drop-indicator, and dock-toggle

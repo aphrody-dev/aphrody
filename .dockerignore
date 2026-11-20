@@ -5,7 +5,6 @@ target
 **/target
 node_modules
 **/node_modules
-.blob_store
 .private
 .secrets
 .env

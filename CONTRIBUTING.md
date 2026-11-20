@@ -1,6 +1,6 @@
 # Contributing to Aphrody (`aphrody`)
 
-Thank you for helping make **Aphrody** (`aphrody-dev/aphrody`) better! Aphrody unifies GPUI, Native Shell (`crates/nsh-*`), `gpui-kit`, WGPU/Naga v30 (`vendor/wgpu`, `crates/gpui_wgpu`, `crates/wgpu_cli`), Aphrody GPUI OS (`crates/os_*`), and Bun (`vendor/bun`) with 100% Zed ecosystem compatibility driven by [`product.toml`](./product.toml).
+Thank you for helping make **Aphrody** (`aphrody-dev/aphrody`) better! Aphrody is the OS and desktop layer (Zed fork, GPUI): the desktop shell, session and installer (`crates/aphrody_desktop`, `crates/aphrody_session`, `crates/aphrody_installer`), GPUI, Native Shell (`crates/nsh-*`), `gpui-kit`, and WGPU/Naga v30 (`crates/gpui_wgpu`, `crates/aphrody_cli`, with the `aphrody-labs/wgpu` fork pinned as a Cargo git dependency), with 100% Zed ecosystem compatibility driven by [`product.toml`](./product.toml).
 
 ## Before You Start
 
@@ -9,9 +9,9 @@ Thank you for helping make **Aphrody** (`aphrody-dev/aphrody`) better! Aphrody u
 - **Discuss features before you start writing code.**
   If there is not already a confirmed GitHub Issue, start a [GitHub Discussion](https://github.com/aphrody-dev/aphrody/discussions) rather than opening a premature PR or duplicate issue. This is especially important for large cross-crate refactors and changes to the `zed:extension` Extension API (`crates/extension_api`).
   - Before proposing a moderate-to-large feature, read [Aphrody's Feature Process](./docs/src/development/feature-process.md) for the motivation, integration points, and design checklist to cover.
-- **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, `gfx-rs/wgpu`, and `aphrody-labs/bun` is managed through [`.github/workflows/aphrody-upstream-sync.yml`](./.github/workflows/aphrody-upstream-sync.yml).
+- **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, and `gfx-rs/wgpu` is managed through [`.github/workflows/aphrody-upstream-sync.yml`](./.github/workflows/aphrody-upstream-sync.yml).
 - **Code of Conduct**: All participation across issues, discussions, and pull requests is governed by [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
-- **Plugin, coding rules & architecture guides**: Read [`AGENTS.md`](./AGENTS.md), [`.agents/plugins/aphrody/rules/AGENTS.md`](./.agents/plugins/aphrody/rules/AGENTS.md), [`.agents/plugins/aphrody/docs/INDEX.md`](./.agents/plugins/aphrody/docs/INDEX.md), and [`docs/architecture/README.md`](./docs/architecture/README.md).
+- **Plugin, coding rules & architecture guides**: Read [`AGENTS.md`](./AGENTS.md), [`.agents/plugins/aphrody/rules/AGENTS.md`](./.agents/plugins/aphrody/rules/AGENTS.md), [`.agents/plugins/aphrody/docs/INDEX.md`](./.agents/plugins/aphrody/docs/INDEX.md), and [`docs/aphrody/architecture/README.md`](./docs/aphrody/architecture/README.md).
 
 ### Things We Will (Probably) Not Merge
 
@@ -44,7 +44,7 @@ Use the structured issue templates:
 - [Crash Report](./.github/ISSUE_TEMPLATE/11_crash_report.yml?plain=1)
 - [Upstream Sync / Issue Fix](./.github/ISSUE_TEMPLATE/20_feature_or_issue_fix.yml?plain=1)
 
-Include minimal reproduction steps from a clean setup, `aphrody: copy system specs into clipboard` output, relevant redacted logs (`Aphrody.log` via `aphrody: open log` or `aphrody --foreground` — redact any tokens/API keys), redacted `settings.json` / `keymap.json`, and for rendering/shader bugs the output of `cargo run -p wgpu_cli -- adapters --json`.
+Include minimal reproduction steps from a clean setup, `aphrody: copy system specs into clipboard` output, relevant redacted logs (`Aphrody.log` via `aphrody: open log` or `aphrody --foreground` — redact any tokens/API keys), redacted `settings.json` / `keymap.json`, and for rendering/shader bugs the output of `cargo run -p aphrody_cli -- adapters --json`.
 
 ## AI Policy
 
@@ -60,20 +60,15 @@ This policy is adapted from Zed's and [ripgrep's AI policy](https://github.com/B
 
 ## Building from Source
 
-### 1. Submodules & Toolchain
+### 1. Forks & Toolchain
 
-Aphrody vendors `wgpu`, `bun`, `craft-libs`, and companion submodules under `vendor/`. Sync them and ensure the pinned Rust toolchain ([`rust-toolchain.toml`](./rust-toolchain.toml)) is active:
+Upstream forks (`wgpu`, `taffy`, `accesskit`, `cosmic-text`, `egui`, `wry`, `craft-libs`, `craft-anything`, `mullvadvpn-app`, `browser`) are not submodules and there is no `vendor/` directory: Cargo resolves each as a pinned git dependency (`git = "https://github.com/aphrody-labs/<fork>.git", tag = "..."`) recorded in [`tooling/bun/forks-manifest.json`](./tooling/bun/forks-manifest.json). Ensure the pinned Rust toolchain ([`rust-toolchain.toml`](./rust-toolchain.toml)) is active; `cargo` fetches the forks on first build.
 
-```sh
-bun run submodules:status
-bun run submodules:sync
-```
-
-> Note: Root [`Cargo.toml`](./Cargo.toml) sets `default-members` to the modular SDK/OS crates (`gpui_ui`, `gpui_code`, `os_session`, `os_craft`, `os_ui`, `os_desktop`, `wgpu_cli`). Pass `-p zed` to build/run the **Aphrody Studio** binary (`aphrody`), or `--workspace` for workspace-wide tests.
+> Note: Root [`Cargo.toml`](./Cargo.toml) sets `default-members` to the modular SDK/OS crates (`gpui_ui`, `gpui_code`, `aphrody_session`, `aphrody_craft`, `aphrody_ui`, `aphrody_desktop`, `aphrody_cli`, and others). Pass `-p zed` to build/run the **Aphrody Studio** binary (`aphrody`), or `--workspace` for workspace-wide tests.
 
 ### 2. Platform Guides
 
-- **Linux**: [`docs/src/development/linux.md`](./docs/src/development/linux.md) — install OS deps with `./script/linux`, run `cargo run -p zed` (or `--no-default-features` for core studio, `cargo run -p os_desktop --bin aphrody-os` for the GPUI OS shell), install locally with `./script/install-linux`, or force X11 on Wayland with `WAYLAND_DISPLAY=''`.
+- **Linux**: [`docs/src/development/linux.md`](./docs/src/development/linux.md) — install OS deps with `./script/linux`, run `cargo run -p zed` (or `--no-default-features` for core studio, `cargo run -p aphrody_desktop --bin aphrody-os` for the GPUI OS shell), install locally with `./script/install-linux`, or force X11 on Wayland with `WAYLAND_DISPLAY=''`.
 - **macOS**: [`docs/src/development/macos.md`](./docs/src/development/macos.md) — requires `rustup`, Xcode + Command Line Tools, and `cmake`; run `cargo run -p zed` and optional visual tests (`cargo run -p zed --bin zed-visual-test-runner --features visual-tests`).
 - **Windows**: [`docs/src/development/windows.md`](./docs/src/development/windows.md) — requires `rustup`, MSVC Build Tools + Spectre-mitigated libs, Windows 10/11 SDK, `cmake`, and Git/Windows long-path support. Do not override `.cargo/config.toml` `RUSTFLAGS` via environment variables (see [`.cargo/config.toml`](./.cargo/config.toml)); run `cargo run -p zed`.
 - **FreeBSD (experimental)**: [`docs/src/development/freebsd.md`](./docs/src/development/freebsd.md) — `./script/freebsd`.
@@ -97,7 +92,7 @@ bun run submodules:sync
   4. **GPUI Concurrency & Hygiene**: Use full-word variable names, shadow clones cleanly in async blocks, never drop a `Task` without `.await`, `.detach()`, `.detach_and_log_err(cx)`, or storing it, and write comments only to explain non-obvious *why*.
   5. **Brand Consistency**: Never hardcode product strings (`Zed`/`Aphrody`); consume `brand::*` or run `cargo xtask brand check` (and `cargo xtask brand apply` after editing [`product.toml`](./product.toml) or [`assets/images/aphrody_logo.svg`](./assets/images/aphrody_logo.svg)).
   6. **Bun for TypeScript/TSX & Hooks**: Use `bun` (`bun test`, `bun check`, `bun fmt`, `bun build`) or `cargo run -p nsh-cli -- ...`, never `node`, `npm`, or `npx`.
-  7. **GPU & Shader Verification**: Validate WGSL with vendored Naga v30 (`cargo run -p wgpu_cli -- validate ...`) and verify backend changes across Vulkan, DirectX 12, and WebGPU ([`examples/gpu/`](./examples/gpu), [`docs/gpu/`](./docs/gpu)).
+  7. **GPU & Shader Verification**: Validate WGSL with the pinned Naga v30 (`cargo run -p aphrody_cli -- validate ...`) and verify backend changes across Vulkan, DirectX 12, and WebGPU ([`examples/gpu/`](./examples/gpu), [`docs/aphrody/gpu/`](./docs/aphrody/gpu)).
   8. **Modular Boundaries**:
      - Keep `gpui_ui` free of `settings_content`, `cloud_llm_client`, and `language_model_core`.
      - Keep `gpui_code --no-default-features` free of `buffer_diff`, `language`, `rpc`, and `proto`.
@@ -133,8 +128,8 @@ cargo test -j 4 -p brand -p xtask --bins
 cargo check -j 4 -p gpui_ui --features nsh-full
 cargo check -j 4 -p gpui_code --no-default-features
 cargo check -j 4 -p gpui_app_shell --features nsh
-cargo test -j 4 -p wgpu_cli --bins
-cargo check -j 4 -p wgpu_cli --examples
+cargo test -j 4 -p aphrody_cli --bins
+cargo check -j 4 -p aphrody_cli --examples
 bun run hygiene && bun run test:tooling
 ```
 
@@ -153,7 +148,7 @@ Additional repository checks: `cargo xtask licenses` / `./script/check-licenses`
 - **Build, run locally, and manually test your changes** before opening a PR; document tested platforms and concise reviewer verification steps.
 - **Keep each PR about one thing**, leaving unrelated features and cleanups for separate PRs.
 - **Visual & non-visual artifacts**: For UI changes, follow [`docs/src/development/ui-checklist.md`](./docs/src/development/ui-checklist.md) and attach before/after screenshots or video. For performance, GPU, or CLI changes, attach benchmarks, `gpui-wgpu` reports, or test output.
-- **PR Titles & Release Notes** ([`AGENTS.md`](./AGENTS.md), [`docs/src/development/release-notes.md`](./docs/src/development/release-notes.md)):
+- **PR Titles & Release Notes** ([`docs/src/development/release-notes.md`](./docs/src/development/release-notes.md)):
   - Use a clear, capitalized, imperative PR title without conventional-commit prefixes (`fix:`, `feat:`, `docs:`, etc.) or trailing punctuation (optional crate scope prefix, e.g. `git_ui: Add history view`).
   - Include a final `Release Notes:` section with a blank line followed by `- Added ...`, `- Fixed ...`, `- Improved ...`, or `- N/A`. Any PR touching `crates/gpui*` must include a `- [GPUI] ...` entry (or `- [GPUI] N/A`).
 - **README Self-Review Guard**: Leave lines 1–2 of [`README.md`](./README.md) intact during edits; human authors remove line 2 manually only to confirm final diff self-review.
@@ -164,27 +159,24 @@ Additional repository checks: `cargo xtask licenses` / `./script/check-licenses`
 Aphrody maintains the upstream Zed split license boundary:
 
 - Application and editor crates are licensed under **GNU GPL v3.0-or-later** ([`LICENSE-GPL`](./LICENSE-GPL)).
-- Reusable UI, SDK, OS, and WGPU CLI crates (`gpui`, `gpui_ui`, `wgpu_cli`, `os_*`, etc.) are licensed under **Apache-2.0** ([`LICENSE-APACHE`](./LICENSE-APACHE)).
+- Reusable UI, SDK and WGPU CLI crates (`gpui`, `gpui_ui`, `aphrody_cli`, etc.) are licensed under **Apache-2.0** ([`LICENSE-APACHE`](./LICENSE-APACHE)) where their `Cargo.toml` says so; the desktop, session and installer crates are GPL-3.0-or-later.
 - First-party crates must never use AGPL and must include a relative symlink (`../../LICENSE-GPL` or `../../LICENSE-APACHE`) matching `package.license` in `Cargo.toml` (enforced by `./script/check-licenses`, `cargo xtask licenses`, and `cargo xtask gpui`).
 
 Contributions are accepted under an **inbound=outbound** policy (under the license of the modified crate) with **Developer Certificate of Origin (DCO)** sign-off (`git commit -s` / `Signed-off-by: Name <email>`), attesting that you have the right to submit the code under [`LICENSE-GPL`](./LICENSE-GPL) and [`LICENSE-APACHE`](./LICENSE-APACHE) without needing an external CLA portal.
 
-## Autonomous Worktrees, Cross-Compilation, Fleet & Release Channels
+## Cross-Compilation, Fleet & Release Channels
 
-1. **Out-of-tree isolated worktrees** (keep the root checkout cleanly on `main`):
-   - `bun run worktree:create -- --id <task>` allocates `../worktrees/aphrody-<task>` paired with `CARGO_TARGET_DIR=../target-worktrees/aphrody-<task>`.
-   - `bun run worktree:list` / `bun run worktree:prune -- --id <task>`.
-2. **Cross-compilation toolchain**:
+1. **Cross-compilation toolchain**:
    - `bun run cross:doctor` inspects `cargo-xwin`, `cargo-zigbuild`, `zig`, LLVM (`clang`, `lld-link`, `llvm-objdump`), Wasm tools, and `rustup` targets.
    - `bun run cross:matrix` and `bun run cross:check -- --target <triple> --package <crate>`.
-3. **Fleet sync & verification**:
+2. **Fleet sync & verification**:
    - `bun run fleet:sync` and `bun run fleet:verify` synchronize and verify remote fleet builds (`fr1`) and tests/benchmarks (`fr2`).
-4. **Six release tracks**: `lts`, `stable`, `preview`, `canary`, `nightly`, and `dev` (configured in [`product.toml`](./product.toml), [`crates/release_channel`](./crates/release_channel), [`.github/workflows/aphrody-release.yml`](./.github/workflows/aphrody-release.yml), and [`.cloudflare/aphrody-releases/`](./.cloudflare/aphrody-releases)).
-5. **Repo hygiene & automated gates**: run `bun run hygiene && bun run test:tooling` before committing; never store durable scripts or plans outside the repository.
+3. **Six release tracks**: `lts`, `stable`, `preview`, `canary`, `nightly`, and `dev` (configured in [`product.toml`](./product.toml), [`crates/release_channel`](./crates/release_channel), [`.github/workflows/aphrody-release.yml`](./.github/workflows/aphrody-release.yml), and [`.cloudflare/aphrody-releases/`](./.cloudflare/aphrody-releases)).
+4. **Repo hygiene & automated gates**: run `bun run hygiene && bun run test:tooling` before committing; never store durable scripts or plans outside the repository.
 
 ## Resources
 
-- **Codebase overview**: [`docs/src/development.md`](./docs/src/development.md), [`docs/src/development/glossary.md`](./docs/src/development/glossary.md), [`README.md`](./README.md), and [`docs/architecture/README.md`](./docs/architecture/README.md)
+- **Codebase overview**: [`docs/src/development.md`](./docs/src/development.md), [`docs/src/development/glossary.md`](./docs/src/development/glossary.md), [`README.md`](./README.md), and [`docs/aphrody/architecture/README.md`](./docs/aphrody/architecture/README.md)
 - **UI/UX checklist & icons**: [`docs/src/development/ui-checklist.md`](./docs/src/development/ui-checklist.md) and [`crates/icons/README.md`](./crates/icons/README.md)
 - **Platform build & Linux packaging notes**: [`docs/src/development/linux.md#notes-for-packaging-zed`](./docs/src/development/linux.md#notes-for-packaging-zed), [`macos.md`](./docs/src/development/macos.md), [`windows.md`](./docs/src/development/windows.md), [`freebsd.md`](./docs/src/development/freebsd.md)
 - **Extensions**: [`docs/src/extensions/developing-extensions.md`](./docs/src/extensions/developing-extensions.md)

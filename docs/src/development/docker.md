@@ -2,10 +2,9 @@
 
 Aphrody provides reproducible, multi-platform Docker workflows aligned with official [`github.com/orgs/docker`](https://github.com/orgs/docker) standards (`docker/docs`, `docker/skills`, `docker/mcp-gateway`, `docker/buildx`, `docker/compose`, `docker/docker-bench-security`).
 
-## Buildx Bake & Compose
+## Buildx Bake
 
 - **`docker-bake.hcl`**: declarative Buildx Bake builds (`docker buildx bake --print`, `BASE_IMAGE=ubuntu:24.04 docker buildx bake distros`) with OCI labels and BuildKit cache-from/cache-to parameters.
-- **`compose.yml`**: local companion services (`blob_store`, `livekit_server`).
 - **`.dockerignore`**: excludes `.git`, `target/`, `node_modules/`, `.env*`, TLS keys, `.agents`, `.claude`, `.gemini`, and screenshot/audit outputs.
 
 ## Official Skills & MCP Gateway

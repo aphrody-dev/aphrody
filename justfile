@@ -2,26 +2,18 @@ set dotenv-load
 
 just := just_executable()
 
-# List available Pop!_OS / COSMIC-style workspace recipes
+# List available workspace recipes
 default:
     @{{ just }} --list
 
-# Verify repository hygiene, submodules, starter-pack parity matrix, and Bun tooling tests
-check: hygiene submodules-check standards tooling-test
+# Verify repository hygiene, starter-pack parity matrix, and Bun tooling tests
+check: hygiene standards tooling-test
 
 # Enforce repository hygiene and README guard
 hygiene:
     bun tooling/bun/repo-hygiene.ts
 
-# Check that all declared vendor submodules are initialized and clean
-submodules-check:
-    bun tooling/bun/submodules.ts check
-
-# Sync Cargo-referenced submodules in parallel
-submodules-sync jobs="8":
-    bun tooling/bun/submodules.ts sync --jobs {{ jobs }}
-
-# Regenerate starter-pack & submodule parity matrix
+# Regenerate starter-pack & fork parity matrix
 standards:
     bun tooling/bun/prod-standards-starterpack.ts all
 

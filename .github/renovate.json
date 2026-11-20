@@ -15,7 +15,7 @@
   "platformAutomerge": true,
   "addLabels": ["dependencies", "auto-merge"],
   "prFooter": "Release Notes:\n\n- N/A",
-  "ignorePaths": ["**/node_modules/**", "vendor/**"],
+  "ignorePaths": ["**/node_modules/**"],
   "packageRules": [
     {
       "description": "Group wasmtime crates together.",
@@ -23,7 +23,7 @@
       "matchPackageNames": ["wasmtime{/,}**"]
     },
     {
-      "description": "Never auto-bump vendored wgpu crates outside vendor/wgpu.",
+      "description": "Never auto-bump wgpu crates: the aphrody-labs/wgpu fork is pinned by git tag.",
       "matchPackageNames": ["wgpu{/,}**", "naga{/,}**"],
       "enabled": false
     }

@@ -12,7 +12,6 @@
 !.agents/plugins.json
 !.agents/plugins/
 !.agents/skills/
-.blob_store
 .build
 .claude/settings.local.json
 .envrc
@@ -32,7 +31,6 @@
 /crates/collab/seed.json
 /crates/theme/schemas/theme.json
 /crates/zed/resources/flatpak/flatpak-cargo-sources.json
-/crates/project_panel/benches/linux_repo_snapshot.txt
 /dev.zed.Zed*.json
 /node_modules/
 /plugins/bin

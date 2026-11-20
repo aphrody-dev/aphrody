@@ -4,11 +4,12 @@ Single authoritative operating contract for agents working inside `<repo-root>` 
 
 ## Architecture & Product Stack
 
-- **Product**: `Aphrody` (`product.toml`, `crates/brand`, binary `aphrody` from `crates/zed`) uniting **GPUI**, **NSH** (`crates/nsh-*`), **gpui-kit**, **WGPU/Naga v30.0.0** (`vendor/wgpu`, `crates/gpui_wgpu`, `crates/aphrody_cli`), and **Bun** (`vendor/bun`) with **100% Zed ecosystem compatibility**.
+- **Product**: `Aphrody`, the OS and desktop layer (Zed fork, GPUI): `product.toml`, `crates/brand`, binary `aphrody` from `crates/zed`, the desktop shell (`crates/aphrody_desktop`, `crates/aphrody_session`, `crates/aphrody_installer`), **GPUI**, **NSH** (`crates/nsh-*`), **gpui-kit**, and **WGPU/Naga v30.0.0** (`crates/gpui_wgpu`, `crates/aphrody_cli`) with **100% Zed ecosystem compatibility**.
+- **Forks**: upstream forks (`wgpu`, `taffy`, `accesskit`, `cosmic-text`, `egui`, `wry`, `craft-libs`, `craft-anything`, `mullvadvpn-app`, `browser`) are pinned Cargo git dependencies (`git` + `tag`, listed in [`tooling/bun/forks-manifest.json`](../../../../tooling/bun/forks-manifest.json)); there are no submodules and no `vendor/` directory.
 - **Modularity boundaries**:
   - Keep `gpui_ui` free of `settings_content`, `cloud_llm_client`, and `language_model_core`.
   - Keep `gpui_code --no-default-features` free of `buffer_diff`, `language`, `rpc`, and `proto`.
-  - Always resolve WGPU/Naga from the `vendor/wgpu` submodule ([`.gitmodules`](../../../../.gitmodules)) so validation and runtime semantics match identically.
+  - Always resolve WGPU/Naga from the pinned `aphrody-labs/wgpu` git dependency in the root `Cargo.toml` so validation and runtime semantics match identically.
 
 ## Coding Standards (`.rules` & Tooling)
 

@@ -1,12 +1,8 @@
 version: 2
 updates:
-  # Security updates only: the vendored submodules under vendor/ are nested Cargo
-  # workspaces with glob members, which the Cargo file fetcher cannot expand
-  # relative to the nested root, so they are excluded from fetching.
+  # Security updates only: forks are pinned git dependencies in Cargo.toml, updated by the fork release flow.
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 0
-    exclude-paths:
-      - vendor/**

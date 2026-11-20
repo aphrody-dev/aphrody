@@ -1,3 +1,12 @@
+# Aphrody: OS and desktop (Zed fork, GPUI)
+
+* Role: this repository (`aphrody-labs/aphrody`) is the OS and desktop layer of the Aphrody stack: the desktop shell, session and installer (`crates/aphrody_desktop`, `crates/aphrody_session`, `crates/aphrody_installer`), the Studio editor (`crates/zed`, binary `aphrody`), GPUI and the GPU UI stack. Product identity lives in `product.toml` and `crates/brand`.
+* Forks are pinned Cargo git dependencies (`git = ..., tag = ...` in the root `Cargo.toml`, listed in `tooling/bun/forks-manifest.json`). There are no submodules and no `vendor/` directory; never add either.
+* Siblings under the shared workspace root: `../fw` (toolchain and agent runtime; its `plugins/aphrody` is the installed agent plugin and canonical skill source), `../ay` (SDK, cloud and edge), `../nie`, `../shenron`, `../wiki`, `../browser`, `../fw-nt` (Windows/NT forks).
+* Dependency direction: Rust dependencies only point down the stack (`fw` <- `aphrody` <- `ay`); never depend on a crate of a repository above this one.
+* Work on `main` in place: no branches, worktrees, stash or reset. Heavy builds run on the fleet, not on the PC.
+* Upstream Zed guidelines below still apply to the Rust and GPUI code.
+
 # Rust coding guidelines
 
 * Prioritize code correctness and clarity. Speed and efficiency are secondary priorities unless otherwise specified.
@@ -135,35 +144,6 @@ Other entities can then register a callback to handle these events by doing `cx.
 ## Build guidelines
 
 - Use `./script/clippy` instead of `cargo clippy`
-
-# Pull request hygiene
-
-When an agent opens or updates a pull request, it must:
-
-- Use a clear, correctly capitalized, imperative PR title (for example, `Fix crash in project panel`).
-- Avoid conventional commit prefixes in PR titles (`fix:`, `feat:`, `docs:`, etc.).
-- Avoid trailing punctuation in PR titles.
-- Optionally prefix the title with a crate name when one crate is the clear scope (for example, `git_ui: Add history view`).
-- Include a `Release Notes:` section as the final section in the PR body.
-- Use one bullet under `Release Notes:`:
-  - `- Added ...`, `- Fixed ...`, or `- Improved ...` for user-facing changes, or
-  - `- N/A` for docs-only and other non-user-facing changes.
-- Changes to `gpui` (including its benchmark and test harnesses) must have a bullet prefixed with `[GPUI]` describing the improvement even when nothing is user-facing in Zed itself, since GPUI is consumed as a library (CI enforces this), for example `- [GPUI] Improved benchmarks to report retired CPU instructions alongside wall time on Linux`.
-- Format release notes exactly with a blank line after the heading, for example:
-
-```
-Release Notes:
-
-- N/A
-```
-
-# Crash Investigation
-
-## Sentry Integration
-- Crash investigation prompts: `.factory/prompts/crash/investigate.md`
-- Crash fix prompts: `.factory/prompts/crash/fix.md`
-- Fetch crash reports: `script/sentry-fetch <issue-id>`
-- Generate investigation prompt from crash: `script/crash-to-prompt <issue-id>`
 
 # Rules Hygiene
 

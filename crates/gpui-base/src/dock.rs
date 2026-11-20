@@ -125,7 +125,7 @@
 //! sources, drop hit-testing, focus and keyboard handling to the elements it
 //! got back, so appearance is not a set of overrides on top of a default look —
 //! there is no default look. `crates/component/src/dock` and
-//! `crates/base/examples/showcase/components/dock.rs` are two unrelated
+//! `crates/gpui-base/examples/showcase/components/dock.rs` are two unrelated
 //! appearances over one behavior.
 //!
 //! The naming follows the same neighborhood where it can. A tab group here is
@@ -162,7 +162,7 @@
 //! });
 //! ```
 //!
-//! `crates/base/examples/showcase/components/dock.rs` is that program in full,
+//! `crates/gpui-base/examples/showcase/components/dock.rs` is that program in full,
 //! renderers included — run it with `cargo run -p gpui-base dock`.
 //! `crates/component/src/dock` is the production skin over the same seam.
 
