@@ -2983,6 +2983,7 @@ dependencies = [
 name = "brand"
 version = "0.1.0"
 dependencies = [
+ "fw-m3",
  "schemars 1.0.4",
  "serde",
  "toml 0.9.8",
@@ -3055,7 +3056,6 @@ version = "0.1.0"
 source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
 
 [[package]]
- "fw-m3",
 name = "browser-views"
 version = "0.1.0"
 source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
@@ -9489,6 +9489,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fw-m3"
+version = "0.1.0"
+dependencies = [
+ "schemars 1.0.4",
+ "serde",
+ "toml 1.2.1+spec-1.1.0",
+]
+
+[[package]]
 name = "gaoya"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9574,15 +9583,6 @@ dependencies = [
  "glib-sys 0.22.11",
  "gobject-sys 0.22.9",
  "libc",
-[[package]]
-name = "fw-m3"
-version = "0.1.0"
-dependencies = [
- "schemars 1.0.4",
- "serde",
- "toml 1.2.1+spec-1.1.0",
-]
-
  "system-deps 9.0.1",
 ]
 

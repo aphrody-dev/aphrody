@@ -7,7 +7,7 @@
 - **Compose Material 3 `1.5.0` Stable**: `https://m3.material.io/blog/compose-material-3-is-stable` (`https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0`)
 - **Material 3 Parametric Prototyping**: `https://m3.material.io/blog/enhance-your-component-designs-with-parametric-prototyping`
 - **Official Material 3 Figma Design Kit**: `https://www.figma.com/community/file/1035203688168086460/material-3-design-kit`
-- **Single Token Source of Truth**: [`assets/os/google_design_tokens.toml`](../../../assets/os/google_design_tokens.toml) + [`assets/os/m3_compose_tracker_lock.toml`](../../../assets/os/m3_compose_tracker_lock.toml)
+- **Single Token Source of Truth**: [`fw/crates/fw-m3/tokens/google_design_tokens.toml`](https://github.com/aphrody-labs/fw/blob/main/crates/fw-m3/tokens/google_design_tokens.toml) + [`assets/os/m3_compose_tracker_lock.toml`](../../../assets/os/m3_compose_tracker_lock.toml)
 
 ## 2. End-to-End Architecture & Layering
 
@@ -15,7 +15,7 @@
 flowchart LR
     Maven["Google Maven + JetBrains Compose"] --> Tracker["tooling/bun/m3-compose-tracker.ts"]
     Figma["Figma M3 Design Kit (1035203688168086460)"] --> Tracker
-    Tokens["assets/os/google_design_tokens.toml"] --> Tracker
+    Tokens["fw/crates/fw-m3/tokens/google_design_tokens.toml"] --> Tracker
     Tracker --> Lock["assets/os/m3_compose_tracker_lock.toml + m3_compose_catalog.json"]
     Tracker --> DTCG["docs/aphrody/design/kits/figma-m3-1035203688168086460-dtcg.json"]
     Tracker --> WGSL["assets/shaders/m3_expressive.wgsl (Naga v30 / WebGPU)"]

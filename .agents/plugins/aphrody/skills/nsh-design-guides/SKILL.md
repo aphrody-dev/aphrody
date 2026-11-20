@@ -66,6 +66,6 @@ order (`grep -n '^## ' references/design-guides.md`):
 | Finishing checklist                   | Before finishing; run every item on the running app and report each group |
 | Design review checklist               | Before finishing; run every item against the work                      |
 
-Before writing a screen, write its motion inventory ("Motion inventory"). Anchor NSH color, typography, shape-morphing, density, and spring tokens to **`https://design.google/`** via [`google_design_tokens.toml`](../../../../assets/os/google_design_tokens.toml) (`aphrody_ui::google_design`). Finish by
+Before writing a screen, write its motion inventory ("Motion inventory"). Anchor NSH color, typography, shape-morphing, density, and spring tokens to **`https://design.google/`** via [`google_design_tokens.toml`](https://github.com/aphrody-labs/fw/blob/main/crates/fw-m3/tokens/google_design_tokens.toml) (`aphrody_ui::google_design`). Finish by
 running the Finishing checklist on the running app, in light and dark, reporting each
 group as passed or what was fixed, then the Design review checklist.

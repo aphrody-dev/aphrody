@@ -14,7 +14,7 @@
 | GPU & Text Stack | `egui 0.34..0.37`, `epaint` font atlas, `egui-wgpu` | pinned `aphrody-labs/wgpu` v30, `cosmic-text`, platform DirectWrite/CoreText/Blade | Single pinned `wgpu` v30 (`SharedWgpuHandles`) + `GoogleDesignTokens` bridge |
 | Accessibility | `accesskit` via `egui::Context` | pinned `aphrody-labs/accesskit` 0.25.2 + `aphrody_pilot` | Unified `[patch.crates-io]` -> pinned `aphrody-labs/accesskit` tag (0.25.2) |
 | Reusable Controls | Dock tabs, combo menus, property rows, IME wire composer | `StarterButton`, `ExpressiveOmnibar`, `CascadingPopoverCard`, `SegmentedStudioBar` | [`craft_controls.rs`](../../../crates/egui_gpui/src/craft_controls.rs) natively on `egui 0.37` |
-| Styling Source | Ad-hoc dark theme structs | 3-tier `GoogleDesignTokens` (`assets/os/google_design_tokens.toml`) | `google_design_to_egui_visuals()` + `shadcn_theme_to_egui_visuals()` |
+| Styling Source | Ad-hoc dark theme structs | 3-tier `GoogleDesignTokens` (`fw/crates/fw-m3/tokens/google_design_tokens.toml`) | `google_design_to_egui_visuals()` + `shadcn_theme_to_egui_visuals()` |
 
 ### 1.2 Zed Upstream `crates/gpui/Cargo.toml` vs `emilk/egui/Cargo.toml` (`aphrody-labs/egui` tag)
 

@@ -50,7 +50,7 @@ flowchart TD
 
 ## 3. 4-Mode Theme & Color System (WCAG 2.2 AA `>= 4.5:1`)
 
-Defined cleanly across [`google_design_tokens.toml`](../../../assets/os/google_design_tokens.toml), [`themes.json`](../../../assets/os/themes.json), [`aphrody.json`](../../../assets/themes/aphrody/aphrody.json), and [`DESIGN.md`](../../../DESIGN.md):
+Defined cleanly across [`google_design_tokens.toml`](https://github.com/aphrody-labs/fw/blob/main/crates/fw-m3/tokens/google_design_tokens.toml), [`themes.json`](../../../assets/os/themes.json), [`aphrody.json`](../../../assets/themes/aphrody/aphrody.json), and [`DESIGN.md`](../../../DESIGN.md):
 
 | Theme Mode | `surface` | `surface-container-low` | `surface-container-high` | `primary` / `on-primary` | Signature Accent / Aura |
 | :--- | :--- | :--- | :--- | :--- | :--- |

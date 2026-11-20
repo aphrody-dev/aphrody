@@ -7,7 +7,7 @@ description: Authoritative design system specification anchored to https://desig
 
 Every UI surface, theme, component token table, shader palette, and studio workspace in Aphrody derives from **`https://design.google/`** and the canonical [`docs/aphrody/design/`](../../../../../docs/aphrody/design/manifest.json) package:
 
-- **Material 3 Expressive & Neural Expressive (Nov 2026)** 3-tier tokens (`assets/os/google_design_tokens.toml`, [`docs/aphrody/design/stylesheet.css`](../../../../../docs/aphrody/design/stylesheet.css), `aphrody_ui::google_design`)
+- **Material 3 Expressive & Neural Expressive (Nov 2026)** 3-tier tokens (`fw/crates/fw-m3/tokens/google_design_tokens.toml`, [`docs/aphrody/design/stylesheet.css`](../../../../../docs/aphrody/design/stylesheet.css), `aphrody_ui::google_design`)
 - ***Code is a Design Material*** (`https://design.google/library/code-is-a-design-material`): live Rust/WGSL/TypeScript code + shaders as expressive design material
 - ***Google Sans Flex*** (`https://design.google/library/google-sans-flex-font`): 6 variable axes (`opsz`, `wght`, `wdth`, `GRAD`, `slnt`, `ROND`) paired with `JetBrains Mono` for code & hex telemetry
 - Root [`DESIGN.md`](../../../../../DESIGN.md), [`docs/aphrody/design/DESIGN.md`](../../../../../docs/aphrody/design/DESIGN.md), Figma W3C DTCG kit ([`docs/aphrody/design/kits/figma-design-kit.json`](../../../../../docs/aphrody/design/kits/figma-design-kit.json)), and Google Stitch kit ([`docs/aphrody/design/kits/stitch-design-kit.json`](../../../../../docs/aphrody/design/kits/stitch-design-kit.json))

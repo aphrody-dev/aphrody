@@ -58,4 +58,4 @@ A floor, not a substitute for the guide.
   button, not `Are you sure?` with `OK`.
 
 Finish by running the Design review checklist against the work.
-- **Google Design Source of Truth (`https://design.google/`)**: Anchor semantic color roles, Material 3 Expressive springs, corner radii, and typescale to `assets/os/google_design_tokens.toml`.
+- **Google Design Source of Truth (`https://design.google/`)**: Anchor semantic color roles, Material 3 Expressive springs, corner radii, and typescale to `fw/crates/fw-m3/tokens/google_design_tokens.toml`.
