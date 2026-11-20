@@ -135,8 +135,8 @@ archived = false
 fork = true
 default_branch = "dev"
 pushed_at = "2026-07-30T15:26:09Z"
-local_matches = ["vendor/tauri/wry", "Cargo.toml#wry", "crates/nsh-platform-gpui"]
-target_crates = ["vendor/tauri/wry", "Cargo.toml#wry", "crates/nsh-platform-gpui"]
+local_matches = ["aphrody-labs/wry", "Cargo.toml#wry", "crates/nsh-platform-gpui"]
+target_crates = ["aphrody-labs/wry", "Cargo.toml#wry", "crates/nsh-platform-gpui"]
 
 [[longbridge_repos]]
 name = "gpui-kit"
@@ -152,7 +152,7 @@ default_branch = "main"
 pushed_at = "2026-11-16T21:58:59Z"
 homepage = "http://gpui-kit.com"
 local_matches = []
-target_crates = ["crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 open_prs = 17
 open_issues = 107
 latest_sha = "cfab7b210b06"
@@ -218,7 +218,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-01-01T14:31:11Z"
 local_matches = []
-target_crates = ["crates/nsh-platform-gpui", "vendor/tauri/cef-rs", "crates/os_desktop"]
+target_crates = ["crates/nsh-platform-gpui", "crates/aphrody_desktop"]
 open_prs = 5
 open_issues = 3
 latest_sha = "034489786368"
@@ -241,7 +241,7 @@ default_branch = "main"
 pushed_at = "2026-08-24T15:33:19Z"
 homepage = "https://longbridge.github.io/purview/"
 local_matches = []
-target_crates = ["crates/os_craft", "crates/inspector_ui", "crates/gpui_ui"]
+target_crates = ["crates/aphrody_craft", "crates/inspector_ui", "crates/gpui_ui"]
 open_prs = 0
 open_issues = 0
 latest_sha = "5988c6311ae7"
@@ -286,7 +286,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-11-16T10:23:47Z"
 local_matches = []
-target_crates = ["crates/os_craft", "crates/context_server"]
+target_crates = ["crates/aphrody_craft", "crates/context_server"]
 open_prs = 6
 open_issues = 1
 latest_sha = "06fd47a339e7"
@@ -331,7 +331,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-10-08T09:08:03Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "gpui-kit-showcases"
@@ -347,7 +347,7 @@ default_branch = "main"
 pushed_at = "2026-11-16T04:43:29Z"
 homepage = "https://gpui-kit.com/apps/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 open_prs = 1
 open_issues = 0
 latest_sha = "9ab4173c73cc"
@@ -370,7 +370,7 @@ default_branch = "main"
 pushed_at = "2026-11-16T15:24:07Z"
 homepage = "https://nsh.dev/apps"
 local_matches = ["crates/nsh-base", "crates/nsh-bundler", "crates/nsh-cli", "crates/nsh-core", "crates/nsh-dev", "crates/nsh-engine", "crates/nsh-gpui-host", "crates/nsh-i18n"]
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 open_prs = 2
 open_issues = 0
 latest_sha = "3f6d550c4b33"
@@ -407,7 +407,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-10-17T09:53:07Z"
 local_matches = ["crates/nsh-base", "crates/nsh-bundler", "crates/nsh-cli", "crates/nsh-core", "crates/nsh-dev", "crates/nsh-engine", "crates/nsh-gpui-host", "crates/nsh-i18n"]
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "nsh-compat"
@@ -423,7 +423,7 @@ default_branch = "main"
 pushed_at = "2026-11-16T05:32:31Z"
 homepage = "https://nsh.dev"
 local_matches = ["crates/nsh-base", "crates/nsh-bundler", "crates/nsh-cli", "crates/nsh-core", "crates/nsh-dev", "crates/nsh-engine", "crates/nsh-gpui-host", "crates/nsh-i18n"]
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 open_prs = 0
 open_issues = 0
 latest_sha = "aa0241568afd"
@@ -483,7 +483,7 @@ default_branch = "master"
 pushed_at = "2026-06-07T14:58:34Z"
 homepage = "https://openpencil.dev"
 local_matches = []
-target_crates = ["crates/os_desktop", "crates/os_craft"]
+target_crates = ["crates/aphrody_desktop", "crates/aphrody_craft"]
 
 [[longbridge_repos]]
 name = "ri"
@@ -530,7 +530,7 @@ default_branch = "main"
 pushed_at = "2026-05-07T10:48:13Z"
 homepage = "https://longbridge.github.io/feishu-pages/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "skills"
@@ -546,7 +546,7 @@ default_branch = "main"
 pushed_at = "2026-11-08T09:22:30Z"
 homepage = "https://open.longbridge.com/skill/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "developers"
@@ -562,7 +562,7 @@ default_branch = "main"
 pushed_at = "2026-11-12T07:44:09Z"
 homepage = "https://open.longbridge.com"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "cli-candlestick-chart"
@@ -577,7 +577,7 @@ fork = true
 default_branch = "main"
 pushed_at = "2021-12-15T10:25:28Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "omarchy-longbridge"
@@ -593,7 +593,7 @@ default_branch = "main"
 pushed_at = "2026-11-04T01:50:20Z"
 homepage = "https://omarchyplugins.com/plugin.html?id=longbridge.omarchy"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "longbridge-desktop-website"
@@ -609,7 +609,7 @@ default_branch = "main"
 pushed_at = "2026-11-11T02:19:21Z"
 homepage = "https://longbridge.com/desktop/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "navi"
@@ -625,7 +625,7 @@ default_branch = "main"
 pushed_at = "2026-11-13T07:06:32Z"
 homepage = "https://navi-lang.org"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "whale-docs"
@@ -641,7 +641,7 @@ default_branch = "main"
 pushed_at = "2026-11-16T11:25:53Z"
 homepage = "https://developers.longportwhale.com"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "vscode-i18n-extractor"
@@ -656,7 +656,7 @@ fork = true
 default_branch = "master"
 pushed_at = "2022-11-17T15:21:20Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "extras-skills"
@@ -671,7 +671,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-07-13T07:45:31Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "longbridgeai-docs"
@@ -686,7 +686,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-09-08T01:57:55Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "awesome-copilot"
@@ -702,7 +702,7 @@ default_branch = "main"
 pushed_at = "2026-05-26T08:15:39Z"
 homepage = "https://awesome-copilot.github.com/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "docs"
@@ -718,7 +718,7 @@ default_branch = "main"
 pushed_at = "2026-11-16T22:33:01Z"
 homepage = "https://longbridge.github.io/docs/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "financial-services"
@@ -733,7 +733,7 @@ fork = true
 default_branch = "main"
 pushed_at = "2026-11-08T09:22:09Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "financial-services-plugins"
@@ -748,7 +748,7 @@ fork = true
 default_branch = "main"
 pushed_at = "2026-03-13T22:12:13Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "longbridge-presence"
@@ -763,7 +763,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-07-09T02:13:30Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "longbridge.github.io"
@@ -778,7 +778,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-09-04T10:40:13Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "mcp-go"
@@ -794,7 +794,7 @@ default_branch = "main"
 pushed_at = "2025-11-25T03:35:39Z"
 homepage = "http://mcp-go.dev/"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "mintlify-docs"
@@ -809,7 +809,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2026-07-08T09:48:04Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "nsh-website-translates"
@@ -824,7 +824,7 @@ fork = false
 default_branch = "agent/T-0399-bootstrap"
 pushed_at = "2026-11-06T15:54:53Z"
 local_matches = ["crates/nsh-base", "crates/nsh-bundler", "crates/nsh-cli", "crates/nsh-core", "crates/nsh-dev", "crates/nsh-engine", "crates/nsh-gpui-host", "crates/nsh-i18n"]
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "open-connector"
@@ -840,7 +840,7 @@ default_branch = "main"
 pushed_at = "2026-07-07T12:58:23Z"
 homepage = "https://oomol.com"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "rust-i18n-example"
@@ -855,7 +855,7 @@ fork = false
 default_branch = "main"
 pushed_at = "2022-12-21T08:42:14Z"
 local_matches = []
-target_crates = ["docs/architecture", "crates/os_desktop"]
+target_crates = ["docs/architecture", "crates/aphrody_desktop"]
 
 [[longbridge_repos]]
 name = "openapi"
@@ -1765,7 +1765,7 @@ classification = "MERGE_CANDIDATE"
 stars = 2966
 language = "Rust"
 homepage = "https://gpuix.dev"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[community_gpui]]
@@ -1855,7 +1855,7 @@ classification = "MERGE_CANDIDATE"
 stars = 1794
 language = "Rust"
 homepage = "https://argustask.com"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[community_gpui]]
@@ -1884,7 +1884,7 @@ classification = "MERGE_CANDIDATE"
 stars = 1627
 language = "Rust"
 homepage = "https://gpui-ce.github.io/"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[community_gpui]]
@@ -1913,7 +1913,7 @@ full_name = "1bye/gpui-motion"
 classification = "MERGE_CANDIDATE"
 stars = 139
 language = "Rust"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[community_gpui]]
@@ -1923,7 +1923,7 @@ classification = "MERGE_CANDIDATE"
 stars = 38
 language = "Rust"
 homepage = "https://wsafight.github.io/gpui-rsx/"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[community_gpui]]
@@ -1932,7 +1932,7 @@ full_name = "tiborgats/native-theme"
 classification = "MERGE_CANDIDATE"
 stars = 24
 language = "Rust"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[community_gpui]]
@@ -1942,7 +1942,7 @@ classification = "MERGE_CANDIDATE"
 stars = 21
 language = "Rust"
 homepage = "https://longbridge.github.io/gpui-component/"
-target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/os_ui"]
+target_crates = ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"]
 rationale = "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
 
 [[workspace_feature_matrix]]
@@ -2476,9 +2476,9 @@ features = []
 non_workspace_deps = 0
 
 [[workspace_feature_matrix]]
-crate_name = "os_craft"
+crate_name = "aphrody_craft"
 version = "0.1.0"
-path = "crates/os_craft"
+path = "crates/aphrody_craft"
 license = "GPL-3.0-or-later"
 workspace_lints = true
 feature_count = 4
@@ -2486,9 +2486,9 @@ features = ["codecs", "default", "native-inspect", "wasm-inspect"]
 non_workspace_deps = 0
 
 [[workspace_feature_matrix]]
-crate_name = "os_desktop"
+crate_name = "aphrody_desktop"
 version = "0.1.0"
-path = "crates/os_desktop"
+path = "crates/aphrody_desktop"
 license = "GPL-3.0-or-later"
 workspace_lints = true
 feature_count = 6
@@ -2496,9 +2496,9 @@ features = ["cli", "default", "desktop", "mobile", "shell-module", "web"]
 non_workspace_deps = 0
 
 [[workspace_feature_matrix]]
-crate_name = "os_session"
+crate_name = "aphrody_session"
 version = "0.1.0"
-path = "crates/os_session"
+path = "crates/aphrody_session"
 license = "GPL-3.0-or-later"
 workspace_lints = true
 feature_count = 2
@@ -2506,9 +2506,9 @@ features = ["default", "test-support"]
 non_workspace_deps = 0
 
 [[workspace_feature_matrix]]
-crate_name = "os_ui"
+crate_name = "aphrody_ui"
 version = "0.1.0"
-path = "crates/os_ui"
+path = "crates/aphrody_ui"
 license = "GPL-3.0-or-later"
 workspace_lints = true
 feature_count = 2

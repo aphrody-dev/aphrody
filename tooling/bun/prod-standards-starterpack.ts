@@ -8,7 +8,7 @@
  * - W3C Standards (HTML5, WCAG 2.2 AA, WAI-ARIA, CharMod-Norm, BCP 47 + String-Meta, DTCG)
  * - Google Style Guides (HTML/CSS, TypeScript, Rust, https://design.google/ M3 Expressive)
  * - Vercel Web Interface Guidelines (focus-visible, reduced motion, tabular-nums, touch targets)
- * - shadcn/ui + Base UI + Tailwind v4 -> Pure-Rust GPUI & NSH Starter Pack + Fork Submodule Parity Matrix
+ * - shadcn/ui + Base UI + Tailwind v4 -> Pure-Rust GPUI & NSH Starter Pack + Fork Parity Matrix (pinned git dependencies)
  *
  * Usage:
  *   bun tooling/bun/prod-standards-starterpack.ts matrix [--json]
@@ -18,7 +18,6 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
-import { parseGitmodules } from "./submodules.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const PARITY_MATRIX_TOML_REL = "assets/os/submodule_parity_matrix.toml";
@@ -99,10 +98,11 @@ export interface MonorepoReadinessReport {
   findings: StandardsAuditFinding[];
 }
 
-interface SubmoduleTemplateSpec {
+/** One pinned `aphrody-labs/*` fork: `fork` is the `name` in `tooling/bun/forks-manifest.json`, resolved by Cargo as a `git` + `tag` dependency. */
+interface ForkTemplateSpec {
   id: string;
   label: string;
-  path: string;
+  fork: string;
   wasm32Unknown: boolean;
   wasip2Aot: boolean;
   wgpuV30Webgpu: boolean;
@@ -114,11 +114,11 @@ interface SubmoduleTemplateSpec {
   role: string;
 }
 
-const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
+const FORK_SPECS: ForkTemplateSpec[] = [
   {
     id: "wgpu",
     label: "WGPU v30 + Naga (aphrody-labs/wgpu)",
-    path: "vendor/wgpu",
+    fork: "wgpu",
     wasm32Unknown: true,
     wasip2Aot: true,
     wgpuV30Webgpu: true,
@@ -132,7 +132,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "taffy",
     label: "Taffy Layout (aphrody-labs/taffy)",
-    path: "vendor/taffy",
+    fork: "taffy",
     wasm32Unknown: true,
     wasip2Aot: true,
     wgpuV30Webgpu: false,
@@ -146,7 +146,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "accesskit",
     label: "AccessKit (aphrody-labs/accesskit)",
-    path: "vendor/accesskit",
+    fork: "accesskit",
     wasm32Unknown: true,
     wasip2Aot: false,
     wgpuV30Webgpu: false,
@@ -160,7 +160,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "cosmic-text",
     label: "Cosmic Text (aphrody-labs/cosmic-text)",
-    path: "vendor/cosmic-text",
+    fork: "cosmic-text",
     wasm32Unknown: true,
     wasip2Aot: true,
     wgpuV30Webgpu: false,
@@ -174,7 +174,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "egui",
     label: "Egui (aphrody-labs/egui)",
-    path: "vendor/egui",
+    fork: "egui",
     wasm32Unknown: true,
     wasip2Aot: false,
     wgpuV30Webgpu: true,
@@ -188,7 +188,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "wry",
     label: "WRY WebView (aphrody-labs/wry)",
-    path: "vendor/tauri/wry",
+    fork: "wry",
     wasm32Unknown: false,
     wasip2Aot: false,
     wgpuV30Webgpu: false,
@@ -202,7 +202,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "craft-libs",
     label: "Craft Libs (aphrody-labs/craft-libs)",
-    path: "vendor/craft-libs",
+    fork: "craft-libs",
     wasm32Unknown: true,
     wasip2Aot: true,
     wgpuV30Webgpu: false,
@@ -216,7 +216,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "craft-anything",
     label: "Craft Anything (aphrody-labs/craft-anything)",
-    path: "vendor/craft-anything",
+    fork: "craft-anything",
     wasm32Unknown: true,
     wasip2Aot: false,
     wgpuV30Webgpu: true,
@@ -230,7 +230,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "mullvad",
     label: "Mullvad VPN (aphrody-labs/mullvadvpn-app)",
-    path: "vendor/mullvad",
+    fork: "mullvadvpn-app",
     wasm32Unknown: false,
     wasip2Aot: false,
     wgpuV30Webgpu: false,
@@ -244,7 +244,7 @@ const SUBMODULE_SPECS: SubmoduleTemplateSpec[] = [
   {
     id: "browser",
     label: "Aphrody Browser (aphrody-labs/browser)",
-    path: "vendor/browser",
+    fork: "browser",
     wasm32Unknown: true,
     wasip2Aot: false,
     wgpuV30Webgpu: true,
@@ -304,11 +304,14 @@ function parsePatchPaths(cargoTomlRaw: string): Set<string> {
   return patched;
 }
 
+interface ForksManifest {
+  forks: Array<{ name: string; repo: string; tag: string; gitUrl: string }>;
+}
+
 export function buildParityMatrix(root = REPO_ROOT): FrameworkParityRow[] {
   const cargoTomlRaw = readFileSync(join(root, "Cargo.toml"), "utf8");
-  const patchedPaths = parsePatchPaths(cargoTomlRaw);
-  const gitmodulesRaw = readFileSync(join(root, ".gitmodules"), "utf8");
-  const declared = new Map(parseGitmodules(gitmodulesRaw).map((entry) => [entry.path, entry]));
+  const manifest = JSON.parse(readFileSync(join(root, "tooling/bun/forks-manifest.json"), "utf8")) as ForksManifest;
+  const pinnedForks = new Map(manifest.forks.map((fork) => [fork.name, fork]));
 
   const coreModuleCount =
     walkFiles(join(root, "crates/aphrody_ui/src"), new Set([".rs"])).length +
@@ -337,27 +340,20 @@ export function buildParityMatrix(root = REPO_ROOT): FrameworkParityRow[] {
     },
   ];
 
-  for (const spec of SUBMODULE_SPECS) {
-    const dir = join(root, spec.path);
-    const present = existsSync(dir);
-    const manifestPresent =
-      existsSync(join(dir, "Cargo.toml")) || existsSync(join(dir, "package.json"));
-    const cargoPatched = Array.from(patchedPaths).some(
-      (p) => p === spec.path || p.startsWith(`${spec.path}/`),
-    );
-    const moduleFileCount =
-      spec.id === "bun"
-        ? walkFiles(join(dir, "packages"), new Set([".ts", ".tsx", ".rs"]), 500).length
-        : walkFiles(dir, new Set([".rs"]), 500).length;
-
-    const declaredEntry = declared.get(spec.path);
+  // Forks are pinned Cargo git dependencies (git + tag), never checkouts: "present" means the manifest entry is
+  // pinned in the root Cargo.toml at its tag, so no per-fork source module count exists on disk.
+  for (const spec of FORK_SPECS) {
+    const fork = pinnedForks.get(spec.fork);
+    const pinned =
+      fork !== undefined &&
+      cargoTomlRaw.split(/\r?\n/).some((line) => line.includes(fork.gitUrl) && line.includes(`tag = "${fork.tag}"`));
     rows.push({
       id: spec.id,
       label: spec.label,
-      repoOrSubmodule: declaredEntry?.path ?? spec.path,
-      presentOnDisk: present,
-      manifestPresent,
-      cargoPatched,
+      repoOrSubmodule: fork ? `${fork.repo}@${fork.tag}` : spec.fork,
+      presentOnDisk: pinned,
+      manifestPresent: fork !== undefined,
+      cargoPatched: pinned,
       wasm32Unknown: spec.wasm32Unknown,
       wasip2Aot: spec.wasip2Aot,
       wgpuV30Webgpu: spec.wgpuV30Webgpu,
@@ -366,7 +362,7 @@ export function buildParityMatrix(root = REPO_ROOT): FrameworkParityRow[] {
       googleDesignTailwind: spec.googleDesignTailwind,
       shadcnBaseUiStarter: spec.shadcnBaseUiStarter,
       aiAgentMcp: spec.aiAgentMcp,
-      moduleFileCount,
+      moduleFileCount: 0,
       role: spec.role,
     });
   }
@@ -414,7 +410,7 @@ export function runParityBenchmarks(root = REPO_ROOT): BenchmarkMetric[] {
     '<body><main data-slot="shell"><canvas width="1280" height="720"></canvas><button type="button" data-stitch-id="btn-1">Run</button></main></body>',
     "</html>",
   ].join("\n");
-  const gitmodulesRaw = readFileSync(join(root, ".gitmodules"), "utf8");
+  const forksManifestRaw = readFileSync(join(root, "tooling/bun/forks-manifest.json"), "utf8");
   const cargoTomlRaw = readFileSync(join(root, "Cargo.toml"), "utf8");
 
   return [
@@ -438,10 +434,10 @@ export function runParityBenchmarks(root = REPO_ROOT): BenchmarkMetric[] {
         lower.includes("--md-sys-")
       );
     }),
-    runMicroBench("submodule_parity_graph_resolve", 50, () => {
-      const subs = parseGitmodules(gitmodulesRaw);
+    runMicroBench("fork_parity_graph_resolve", 50, () => {
+      const forks = (JSON.parse(forksManifestRaw) as ForksManifest).forks;
       const patches = parsePatchPaths(cargoTomlRaw);
-      return subs.length + patches.size;
+      return forks.length + patches.size;
     }),
   ];
 }
@@ -625,8 +621,9 @@ export function renderParityMatrixToml(
   audit: MonorepoReadinessReport,
 ): string {
   const lines: string[] = [
-    "# Declarative GPUI Starter Pack & Submodule Parity Feature Matrix",
+    "# Declarative GPUI Starter Pack & Fork Parity Feature Matrix (pinned git dependencies)",
     "# Generated by `bun tooling/bun/prod-standards-starterpack.ts all` — embedded by `crates/aphrody_ui`.",
+    "# Forks are pinned Cargo git dependencies (no submodules): `repo_or_submodule` is `<repo>@<tag>`; `present_on_disk` and `cargo_patched` mean pinned at that tag in the root Cargo.toml.",
     "schema_version = 1",
     'design_source_of_truth = "https://design.google/"',
     'starter_pack_crate = "crates/aphrody_ui/src/starter_pack.rs"',
@@ -683,7 +680,7 @@ export function renderArchitectureMarkdown(
   audit: MonorepoReadinessReport,
 ): string {
   const lines: string[] = [
-    "# GPUI Starter Pack, Web Standards & Submodule Parity Matrix",
+    "# GPUI Starter Pack, Web Standards & Fork Parity Matrix",
     "",
     "> Authoritative cross-stack specification unifying **Core Web Vitals**, **Lighthouse**, **W3C** (HTML5, WCAG 2.2 AA, WAI-ARIA, CharMod, BCP 47, DTCG), **Google Style Guides**, **Vercel Web Interface Guidelines**, and **shadcn/ui + Base UI + Tailwind v4** directly into Aphrody GPUI, NSH, and WebGPU.",
     "",
@@ -697,9 +694,9 @@ export function renderArchitectureMarkdown(
     `| GPU Frame Cadence | \`<= ${CORE_WEB_VITALS_BUDGETS.gpuFrame60HzMs} ms\` (60Hz) / \`<= ${CORE_WEB_VITALS_BUDGETS.gpuFrame120HzMs} ms\` (120Hz) | Shared WGSL Naga v30 pipelines + M3 Expressive damped springs |`,
     `| Critical Wasm Payload | \`<= ${CORE_WEB_VITALS_BUDGETS.wasmCriticalBrotliBytes} B\` Brotli | \`[profile.web-lto]\` + Binaryen \`wasm-opt -Oz\` cohorts |`,
     "",
-    "## Fork Submodule Parity Matrix",
+    "## Fork Parity Matrix (pinned git dependencies)",
     "",
-    "| Stack / Submodule | Patched | Wasm32 | WASI P2 | WGPU v30 | Taffy | AccessKit | M3 + Tailwind | shadcn/Base UI | MCP |",
+    "| Stack / Fork | Patched | Wasm32 | WASI P2 | WGPU v30 | Taffy | AccessKit | M3 + Tailwind | shadcn/Base UI | MCP |",
     "| --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
   ];
 
@@ -758,7 +755,7 @@ export function renderAgentLlmsTxt(rows: FrameworkParityRow[]): string {
     "- NSH workspace studio actions: OpenGoogleDesignMirror, OpenStitchStudio, OpenGpuiStarterPack",
     "",
     "## Verification Commands",
-    "- `bun run standards:audit` — submodule parity matrix + micro-bench + TS/Rust Google Style audit",
+    "- `bun run standards:audit` — fork parity matrix + micro-bench + TS/Rust Google Style audit",
     "- `bun run design:audit` — https://design.google/ token & contrast verification",
     "- `bun run i18n:check` — W3C CharMod / LTLI / BCP 47 / String-Meta verification",
     "- `bun run web:check` — wasm32-unknown-unknown + wasm32-wasip2 full workspace verification",
@@ -766,7 +763,11 @@ export function renderAgentLlmsTxt(rows: FrameworkParityRow[]): string {
     "- `gpui-wgpu mcp` — 24-tool JSON-RPC MCP server for Wasm/WGPU/Google Design/Lighthouse/Starter Pack",
     "",
     `## Audited Stacks (${rows.length} entries)`,
-    ...rows.map((r) => `- ${r.id}: ${r.label} -> ${r.repoOrSubmodule} (${r.moduleFileCount} source modules)`),
+    ...rows.map((r) =>
+      r.moduleFileCount > 0
+        ? `- ${r.id}: ${r.label} -> ${r.repoOrSubmodule} (${r.moduleFileCount} source modules)`
+        : `- ${r.id}: ${r.label} -> ${r.repoOrSubmodule} (pinned git dependency)`,
+    ),
     "",
   ].join("\n");
 }

@@ -72,7 +72,7 @@ impl FrameworkLayer {
             Self::Gpui => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/gpui",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -83,7 +83,7 @@ impl FrameworkLayer {
             Self::Nsh => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/nsh-engine",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: true,
                 supports_webgpu: true,
@@ -94,7 +94,7 @@ impl FrameworkLayer {
             Self::GpuiKit => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/gpui_ui",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -105,7 +105,7 @@ impl FrameworkLayer {
             Self::Craft => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_craft",
-                vendor_submodule: Some("vendor/craft-libs"),
+                pinned_fork: Some("aphrody-labs/craft-libs"),
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: true,
                 supports_webgpu: true,
@@ -116,7 +116,7 @@ impl FrameworkLayer {
             Self::Cosmic => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: false,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -127,7 +127,7 @@ impl FrameworkLayer {
             Self::Iced => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -138,7 +138,7 @@ impl FrameworkLayer {
             Self::Egui => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: Some("vendor/egui"),
+                pinned_fork: Some("aphrody-labs/egui"),
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -149,7 +149,7 @@ impl FrameworkLayer {
             Self::Wgpu => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/gpui_wgpu",
-                vendor_submodule: Some("vendor/wgpu"),
+                pinned_fork: Some("aphrody-labs/wgpu"),
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: true,
                 supports_webgpu: true,
@@ -160,7 +160,7 @@ impl FrameworkLayer {
             Self::Taffy => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/gpui",
-                vendor_submodule: Some("vendor/taffy"),
+                pinned_fork: Some("aphrody-labs/taffy"),
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: true,
                 supports_webgpu: false,
@@ -171,7 +171,7 @@ impl FrameworkLayer {
             Self::Blitz => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_ui",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -182,7 +182,7 @@ impl FrameworkLayer {
             Self::Winit => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/gpui_platform",
-                vendor_submodule: None,
+                pinned_fork: None,
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: false,
                 supports_webgpu: true,
@@ -193,7 +193,7 @@ impl FrameworkLayer {
             Self::TauriBun => FrameworkCapabilityDescriptor {
                 layer: self,
                 crate_anchor: "crates/aphrody_nsh",
-                vendor_submodule: Some("vendor/tauri/wry"),
+                pinned_fork: Some("aphrody-labs/wry"),
                 supports_wasm32_unknown: true,
                 supports_wasip2_aot: true,
                 supports_webgpu: true,
@@ -205,12 +205,12 @@ impl FrameworkLayer {
     }
 }
 
-/// Capability descriptor linking a [`FrameworkLayer`] to its workspace crate, submodule, Wasm/LTO/AOT support, and Google Design tokens.
+/// Capability descriptor linking a [`FrameworkLayer`] to its workspace crate, pinned fork (git dependency), Wasm/LTO/AOT support, and Google Design tokens.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FrameworkCapabilityDescriptor {
     pub layer: FrameworkLayer,
     pub crate_anchor: &'static str,
-    pub vendor_submodule: Option<&'static str>,
+    pub pinned_fork: Option<&'static str>,
     pub supports_wasm32_unknown: bool,
     pub supports_wasip2_aot: bool,
     pub supports_webgpu: bool,

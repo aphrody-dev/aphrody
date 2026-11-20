@@ -19,7 +19,7 @@ describe("disk-slim local footprint reducer", () => {
       expect(before.metrics.length).toBe(2);
       expect(measurePathBytes(join(dir, "target", "debug"))).toBe(1024 * 64);
 
-      const applied = applyDiskSlim(dir, false);
+      const applied = applyDiskSlim(dir);
       expect(applied.ok).toBe(true);
       expect(applied.removedTargets.map((t) => t.relPath)).toEqual([
         "target/debug",

@@ -13,7 +13,7 @@ stars = 11647
 forks = 721
 language = "Markdown"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = []
 
 [[repos]]
@@ -61,7 +61,7 @@ stars = 3472
 forks = 545
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = ["specification"]
 
 [[repos]]
@@ -109,7 +109,7 @@ stars = 1056
 forks = 84
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = ["proposal"]
 
 [[repos]]
@@ -181,7 +181,7 @@ stars = 557
 forks = 41
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = ["proposal"]
 
 [[repos]]
@@ -277,7 +277,7 @@ stars = 249
 forks = 67
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = []
 
 [[repos]]
@@ -373,7 +373,7 @@ stars = 170
 forks = 32
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = ["proposal"]
 
 [[repos]]
@@ -445,7 +445,7 @@ stars = 109
 forks = 7
 language = "Markdown"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = []
 
 [[repos]]
@@ -457,7 +457,7 @@ stars = 105
 forks = 15
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = ["proposal"]
 
 [[repos]]
@@ -1009,7 +1009,7 @@ stars = 10
 forks = 7
 language = "JavaScript"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = []
 
 [[repos]]
@@ -1057,7 +1057,7 @@ stars = 7
 forks = 2
 language = "WebAssembly"
 category = "spec-and-testsuite"
-aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/wgpu_cli"
+aphrody_binding = "wasmparser::Validator::new_with_features(WasmFeatures::all()) in crates/aphrody_cli"
 topics = []
 
 [[repos]]

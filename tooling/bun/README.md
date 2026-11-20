@@ -15,7 +15,8 @@ Aligned with `zed-industries/zed`'s `tooling/xtask` architecture:
    Consolidates every TypeScript/Web/Design/Storytold/Fleet utility behind one typed dispatcher:
    - `bun tooling/bun/cli.ts list [--json]`
    - `bun tooling/bun/cli.ts check [--json]`
-   - `bun tooling/bun/cli.ts workspace <hygiene|submodules|vendor-doctor|i18n|standards|agy-audit>`
+   - `bun tooling/bun/cli.ts workspace <hygiene|vendor-doctor|i18n|standards|agy-audit>`
+     (upstream forks are pinned Cargo git dependencies, `git` + `tag`, recorded in [`forks-manifest.json`](./forks-manifest.json); there are no submodules and no `vendor/` checkouts)
    - `bun tooling/bun/cli.ts design <sync|audit|pack>`
    - `bun tooling/bun/cli.ts storytold <sync|audit>`
    - `bun tooling/bun/cli.ts web <matrix|check|build|verify|cross|issues>`

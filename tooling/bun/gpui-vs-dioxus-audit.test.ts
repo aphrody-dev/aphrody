@@ -11,71 +11,56 @@ import {
   CRATES_IO_TARGETS,
   emitArtifacts,
   extractManifestSummary,
+  FORKS_MANIFEST_REL,
+  forkTagVersion,
   type GpuiVsDioxusAuditReport,
+  isForkPinnedInCargo,
   MATRIX_TOML_REL,
-  parseSubmoduleStatusOutput,
+  readForksManifest,
   renderArchitectureMarkdown,
   REPO_ROOT,
   runAudit,
   scanIntegrationBridges,
   serializeMatrixToml,
   stripNullish,
-  TARGET_SUBMODULES,
+  TARGET_FORKS,
 } from "./gpui-vs-dioxus-audit.ts";
-import { checkRepoHygiene, isInsideUninitialisedSubmodule } from "./repo-hygiene.ts";
+import { checkRepoHygiene } from "./repo-hygiene.ts";
 
 describe("gpui-vs-dioxus-audit pure parsers & conflict analyzer", () => {
-  test("parseSubmoduleStatusOutput parses clean, modified, uninitialized, and conflict rows", () => {
-    const sample = [
-      " 2798f45cb4c4e2f53cdf25c4e526283efb5b2e59 vendor/wgpu (heads/main)",
-      "+fd26cf0d676495d7856dc64b3f10cf5447ad9885 vendor/egui (heads/main)",
-      "-62f7a7e4777d9b60f55a18a8865c73bb12297f38 vendor/craft-libs",
-      "U2649e09d44ec4a1b928d957cbb0043ae1a3f56a5 vendor/taffy (heads/main)",
-    ].join("\n");
-    expect(parseSubmoduleStatusOutput(sample)).toEqual([
-      {
-        state: "clean",
-        sha: "2798f45cb4c4e2f53cdf25c4e526283efb5b2e59",
-        path: "vendor/wgpu",
-        refDesc: "heads/main",
-      },
-      {
-        state: "modified",
-        sha: "fd26cf0d676495d7856dc64b3f10cf5447ad9885",
-        path: "vendor/egui",
-        refDesc: "heads/main",
-      },
-      {
-        state: "uninitialized",
-        sha: "62f7a7e4777d9b60f55a18a8865c73bb12297f38",
-        path: "vendor/craft-libs",
-        refDesc: "",
-      },
-      {
-        state: "conflict",
-        sha: "2649e09d44ec4a1b928d957cbb0043ae1a3f56a5",
-        path: "vendor/taffy",
-        refDesc: "heads/main",
-      },
-    ]);
+  test("readForksManifest, isForkPinnedInCargo and forkTagVersion derive pins from forks-manifest.json", () => {
+    const manifest = readForksManifest(REPO_ROOT);
+    for (const spec of TARGET_FORKS) {
+      const pin = manifest.find((f) => f.name === spec.name);
+      expect(pin).toBeDefined();
+      expect(pin?.repo).toBe(spec.forkRepo);
+      expect(pin?.sha).toMatch(/^[0-9a-f]{40}$/);
+    }
+    const fork = { gitUrl: "https://github.com/aphrody-labs/taffy.git", tag: "v0.15.1-aphrody.20261120" };
+    const pinned = `taffy = { git = "${fork.gitUrl}", tag = "${fork.tag}", default-features = false }`;
+    expect(isForkPinnedInCargo(pinned, fork)).toBe(true);
+    expect(isForkPinnedInCargo(pinned.replace(fork.tag, "v0.0.0"), fork)).toBe(false);
+    expect(isForkPinnedInCargo('taffy = { path = "crates/taffy" }', fork)).toBe(false);
+    expect(forkTagVersion("v30.0.0-aphrody.20261120")).toBe("30.0.0");
+    expect(forkTagVersion("v0.1.0-aphrody.20261120.2")).toBe("0.1.0");
   });
 
-  test("classifyForkDrift accurately distinguishes identical, ahead, behind, diverged, and local lag", () => {
+  test("classifyForkDrift accurately distinguishes identical, ahead, behind, diverged, and pin lag", () => {
     expect(
-      classifyForkDrift({ localSha: "aaa", forkSha: "aaa", upstreamSha: "aaa", aheadBy: 0, behindBy: 0, localBehindFork: 0 }),
+      classifyForkDrift({ pinnedSha: "aaa", forkSha: "aaa", upstreamSha: "aaa", aheadBy: 0, behindBy: 0, pinBehindFork: 0 }),
     ).toBe("identical");
     expect(
-      classifyForkDrift({ localSha: "bbb", forkSha: "bbb", upstreamSha: "aaa", aheadBy: 2, behindBy: 0, localBehindFork: 0 }),
+      classifyForkDrift({ pinnedSha: "bbb", forkSha: "bbb", upstreamSha: "aaa", aheadBy: 2, behindBy: 0, pinBehindFork: 0 }),
     ).toBe("ahead (+2)");
     expect(
-      classifyForkDrift({ localSha: "aaa", forkSha: "aaa", upstreamSha: "bbb", aheadBy: 0, behindBy: 1, localBehindFork: 0 }),
+      classifyForkDrift({ pinnedSha: "aaa", forkSha: "aaa", upstreamSha: "bbb", aheadBy: 0, behindBy: 1, pinBehindFork: 0 }),
     ).toBe("behind (-1)");
     expect(
-      classifyForkDrift({ localSha: "ccc", forkSha: "ccc", upstreamSha: "bbb", aheadBy: 1, behindBy: 291, localBehindFork: 0 }),
+      classifyForkDrift({ pinnedSha: "ccc", forkSha: "ccc", upstreamSha: "bbb", aheadBy: 1, behindBy: 291, pinBehindFork: 0 }),
     ).toBe("diverged (+1/-291)");
     expect(
-      classifyForkDrift({ localSha: "aaa", forkSha: "bbb", upstreamSha: "bbb", aheadBy: 0, behindBy: 0, localBehindFork: 5 }),
-    ).toBe("local-behind-fork (-5)");
+      classifyForkDrift({ pinnedSha: "aaa", forkSha: "bbb", upstreamSha: "bbb", aheadBy: 0, behindBy: 0, pinBehindFork: 5 }),
+    ).toBe("pin-behind-fork (-5)");
   });
 
   test("analyzeLockfileConflicts identifies unified foundations and multi-version splits", () => {
@@ -110,10 +95,10 @@ dependencies = [
 `;
     const sampleCargo = `
 [patch.crates-io]
-wgpu = { path = "vendor/wgpu/wgpu" }
+wgpu = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
 
 [patch."https://github.com/storytold/craft-libs"]
-craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
+craft-sniff = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
 `;
     const report = analyzeLockfileConflicts(sampleLock, sampleCargo);
     expect(report.totalLockfilePackages).toBe(5);
@@ -171,43 +156,41 @@ opt-level = "z"
 });
 
 describe("gpui-vs-dioxus multi-ecosystem offline fixture workflow", () => {
-  test("audits kept submodules, emits TOML + Mermaid doc, and preserves doc markers", async () => {
+  test("audits pinned forks, emits TOML + Mermaid doc, and preserves doc markers", async () => {
     const fixtureRoot = mkdtempSync(join(tmpdir(), "aphrody-ecosystem-fixture-"));
     try {
       mkdirSync(join(fixtureRoot, "crates/gpui/src"), { recursive: true });
       mkdirSync(join(fixtureRoot, "crates/egui_gpui"), { recursive: true });
       mkdirSync(join(fixtureRoot, "crates/aphrody_craft/src"), { recursive: true });
       mkdirSync(join(fixtureRoot, "crates/iced_gpui/src"), { recursive: true });
-      mkdirSync(join(fixtureRoot, "vendor/taffy"), { recursive: true });
-      mkdirSync(join(fixtureRoot, "vendor/egui/crates/egui"), { recursive: true });
+      mkdirSync(join(fixtureRoot, "crates/gpui_wgpu"), { recursive: true });
+      mkdirSync(join(fixtureRoot, "crates/aphrody_ui"), { recursive: true });
+      mkdirSync(join(fixtureRoot, "tooling/bun"), { recursive: true });
 
-      writeFileSync(
-        join(fixtureRoot, ".gitmodules"),
-        [
-          '[submodule "vendor/taffy"]',
-          "\tpath = vendor/taffy",
-          "\turl = ../../aphrody-labs/taffy.git",
-          "\tbranch = main",
-          '[submodule "vendor/egui"]',
-          "\tpath = vendor/egui",
-          "\turl = ../../aphrody-labs/egui.git",
-          "\tbranch = main",
-        ].join("\n"),
-      );
+      const fixtureForks = [
+        { name: "taffy", upstream: "DioxusLabs/taffy", tag: "v0.15.1-aphrody.20261120", sha: "7".repeat(40) },
+        { name: "egui", upstream: "emilk/egui", tag: "v0.37.0-aphrody.20261120", sha: "e".repeat(40) },
+      ].map((f) => ({
+        ...f,
+        repo: `aphrody-labs/${f.name}`,
+        branch: "main",
+        gitUrl: `https://github.com/aphrody-labs/${f.name}.git`,
+      }));
+      writeFileSync(join(fixtureRoot, FORKS_MANIFEST_REL), JSON.stringify({ schemaVersion: 1, forks: fixtureForks }));
 
       writeFileSync(
         join(fixtureRoot, "Cargo.toml"),
         `
 [workspace]
 members = ["crates/gpui", "crates/egui_gpui", "crates/aphrody_craft", "crates/iced_gpui"]
-exclude = ["vendor/egui"]
+exclude = ["crates/bevy_gpui"]
 
 [workspace.package]
 version = "0.5.0"
 
-[patch.crates-io]
-taffy = { path = "vendor/taffy" }
-wgpu = { path = "vendor/wgpu/wgpu" }
+[workspace.dependencies]
+taffy = { git = "https://github.com/aphrody-labs/taffy.git", tag = "v0.15.1-aphrody.20261120" }
+egui = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
 `,
       );
       writeFileSync(join(fixtureRoot, "Cargo.lock"), `[[package]]\nname = "wgpu"\nversion = "30.0.0"\n`);
@@ -216,8 +199,8 @@ wgpu = { path = "vendor/wgpu/wgpu" }
       writeFileSync(join(fixtureRoot, "crates/egui_gpui/Cargo.toml"), `[package]\nname = "egui_gpui"\nversion = "0.37.0"\n`);
       writeFileSync(join(fixtureRoot, "crates/aphrody_craft/Cargo.toml"), `[package]\nname = "aphrody_craft"\nversion = "0.1.0"\n`);
       writeFileSync(join(fixtureRoot, "crates/iced_gpui/Cargo.toml"), `[package]\nname = "iced_gpui"\nversion = "0.14.0"\n`);
-      writeFileSync(join(fixtureRoot, "vendor/taffy/Cargo.toml"), `[package]\nname = "taffy"\nversion = "0.15.1"\n[features]\ndefault = []\n`);
-      writeFileSync(join(fixtureRoot, "vendor/egui/crates/egui/Cargo.toml"), `[package]\nname = "egui"\nversion = "0.37.0"\n[features]\ndefault = []\n`);
+      writeFileSync(join(fixtureRoot, "crates/gpui_wgpu/Cargo.toml"), `[package]\nname = "gpui_wgpu"\nversion = "0.2.2"\n[features]\ndefault = []\n`);
+      writeFileSync(join(fixtureRoot, "crates/aphrody_ui/Cargo.toml"), `[package]\nname = "aphrody_ui"\nversion = "0.5.0"\n[features]\ndefault = []\n`);
 
       const bridges = scanIntegrationBridges(fixtureRoot);
       expect(bridges.some((b) => b.id === "gpui-subsecond-hot-reload")).toBe(true);
@@ -226,16 +209,26 @@ wgpu = { path = "vendor/wgpu/wgpu" }
 
       const report = await runAudit({ root: fixtureRoot, offline: true });
       expect(report.offlineMode).toBe(true);
-      expect(report.submodules.length).toBe(TARGET_SUBMODULES.length);
-      expect(report.featureMatrix.length).toBeGreaterThanOrEqual(5);
+      expect(report.forks.length).toBe(TARGET_FORKS.length);
+      const pinnedNames = report.forks.filter((f) => f.pinnedInCargo).map((f) => f.name).sort();
+      expect(pinnedNames).toEqual(["egui", "taffy"]);
+      expect(report.forks.find((f) => f.name === "taffy")?.pinnedTag).toBe("v0.15.1-aphrody.20261120");
+      expect(report.forks.find((f) => f.name === "wgpu")?.pinnedInCargo).toBe(false);
+      expect(report.rootRepo.pinnedForkCount).toBe(2);
+      expect(report.summary.pinnedInCargoCount).toBe(2);
+      expect(report.featureMatrix.length).toBe(6);
 
       const parsedToml = Bun.TOML.parse(serializeMatrixToml(report)) as Record<string, any>;
       expect(parsedToml.schema_version).toBe(2);
-      expect(parsedToml.submodules.length).toBe(TARGET_SUBMODULES.length);
+      expect(parsedToml.forks.length).toBe(TARGET_FORKS.length);
+      expect(parsedToml.forks.find((f: Record<string, any>) => f.name === "egui").pinned_tag).toBe("v0.37.0-aphrody.20261120");
+      expect(parsedToml.submodules).toBeUndefined();
 
       const mermaid = buildArchitectureMermaid(report);
       expect(mermaid).toContain("```mermaid");
       expect(mermaid).not.toContain("<br");
+      expect(mermaid).toContain("aphrody-labs/taffy@v0.15.1-aphrody.20261120");
+      expect(mermaid).not.toContain("vendor/");
 
       const emitted = emitArtifacts(report, fixtureRoot);
       expect(existsSync(emitted.tomlPath)).toBe(true);
@@ -243,6 +236,8 @@ wgpu = { path = "vendor/wgpu/wgpu" }
       const docSecond = renderArchitectureMarkdown(report, readFileSync(emitted.docPath, "utf8"));
       expect(docSecond).toContain("<!-- BEGIN GPUI_DIOXUS_FORK_GRAPH -->");
       expect(docSecond).toContain("<!-- END GPUI_DIOXUS_UNIFICATION -->");
+      expect(docSecond).toContain("<!-- BEGIN GPUI_DIOXUS_FORKS -->");
+      expect(docSecond).not.toMatch(/submodule|vendor\//i);
     } finally {
       rmSync(fixtureRoot, { recursive: true, force: true });
     }
@@ -250,7 +245,7 @@ wgpu = { path = "vendor/wgpu/wgpu" }
 });
 
 describe("live Aphrody multi-ecosystem audit artifacts", () => {
-  test("assets/os/gpui_vs_dioxus_matrix.toml validates submodules, crates.io, feature matrix, and conflicts", () => {
+  test("assets/os/gpui_vs_dioxus_matrix.toml validates pinned forks, crates.io, feature matrix, and conflicts", () => {
     const tomlPath = join(REPO_ROOT, MATRIX_TOML_REL);
     expect(existsSync(tomlPath)).toBe(true);
     const parsed = Bun.TOML.parse(readFileSync(tomlPath, "utf8")) as Record<string, any>;
@@ -260,12 +255,15 @@ describe("live Aphrody multi-ecosystem audit artifacts", () => {
     expect(parsed.root_repo.upstream_repo).toBe("zed-industries/zed");
     expect(parsed.root_repo.workspace_members_count).toBeGreaterThanOrEqual(300);
 
-    expect(Array.isArray(parsed.submodules)).toBe(true);
-    expect(parsed.submodules.length).toBe(TARGET_SUBMODULES.length);
-    for (const expected of TARGET_SUBMODULES) {
-      const found = parsed.submodules.find((s: Record<string, any>) => s.path === expected.path);
+    expect(Array.isArray(parsed.forks)).toBe(true);
+    expect(parsed.forks.length).toBe(TARGET_FORKS.length);
+    const manifest = readForksManifest(REPO_ROOT);
+    for (const expected of TARGET_FORKS) {
+      const found = parsed.forks.find((f: Record<string, any>) => f.name === expected.name);
       expect(found).toBeDefined();
-      expect(found.local_sha).toMatch(/^[0-9a-f]{40}$/);
+      expect(found.pinned_sha).toMatch(/^[0-9a-f]{40}$/);
+      expect(found.pinned_tag).toBe(manifest.find((f) => f.name === expected.name)?.tag);
+      expect(found.pinned_in_cargo).toBe(true);
     }
 
     if (!parsed.offline_mode && Array.isArray(parsed.crates_io) && parsed.crates_io.length > 0) {
@@ -283,8 +281,6 @@ describe("live Aphrody multi-ecosystem audit artifacts", () => {
       "crates/egui_gpui/Cargo.toml",
       "crates/aphrody_craft/Cargo.toml",
       "crates/iced_gpui/Cargo.toml",
-      "vendor/egui/crates/egui/Cargo.toml",
-      "vendor/craft-libs/crates/sniff/Cargo.toml",
     ]) {
       const entry = parsed.feature_matrix.find((m: Record<string, any>) => m.manifest === requiredManifest);
       expect(entry).toBeDefined();
@@ -305,7 +301,7 @@ describe("live Aphrody multi-ecosystem audit artifacts", () => {
     for (const marker of [
       "GPUI_DIOXUS_METRICS",
       "GPUI_DIOXUS_FORK_GRAPH",
-      "GPUI_DIOXUS_SUBMODULES",
+      "GPUI_DIOXUS_FORKS",
       "GPUI_DIOXUS_CRATES_IO",
       "GPUI_DIOXUS_FEATURES",
       "GPUI_DIOXUS_BRIDGES",
@@ -319,12 +315,13 @@ describe("live Aphrody multi-ecosystem audit artifacts", () => {
     expect(md).toContain("```mermaid");
     expect(md).not.toMatch(/<br\s*\/?>/i);
     expect(md).not.toMatch(/\.gemini\/antigravity-cli\/brain/i);
+    expect(md).not.toMatch(/submodule|vendor\//i);
 
     for (const match of md.matchAll(/\]\(([^)]+)\)/g)) {
       const rawTarget = match[1].split("#")[0].trim();
       if (!rawTarget || rawTarget.startsWith("http://") || rawTarget.startsWith("https://")) continue;
       const resolved = resolve(dirname(docPath), rawTarget);
-      expect(existsSync(resolved) || isInsideUninitialisedSubmodule(resolved, REPO_ROOT)).toBe(true);
+      expect(existsSync(resolved)).toBe(true);
     }
   });
 
@@ -333,8 +330,8 @@ describe("live Aphrody multi-ecosystem audit artifacts", () => {
     if (!existsSync(jsonPath)) return;
     const report = JSON.parse(readFileSync(jsonPath, "utf8")) as GpuiVsDioxusAuditReport;
     expect(report.schemaVersion).toBe(2);
-    expect(report.submodules.length).toBe(TARGET_SUBMODULES.length);
-    expect(report.featureMatrix.length).toBeGreaterThanOrEqual(25);
+    expect(report.forks.length).toBe(TARGET_FORKS.length);
+    expect(report.featureMatrix.length).toBeGreaterThanOrEqual(20);
     expect(report.architectureMatrix.length).toBe(6);
   });
 

@@ -302,7 +302,7 @@ export function buildStudioState(customAgyDir?: string): StudioStatePayload {
           label: "GPUI + Google Design Expressive",
           cratePath: "crates/aphrody_ui + crates/aphrody_craft",
           paradigm: "Retained Entity + Taffy Grid/Flex",
-          gpuBackend: "vendor/wgpu v30 (Vulkan / DX12 / Metal / WebGPU)",
+          gpuBackend: "aphrody-labs/wgpu v30 (Vulkan / DX12 / Metal / WebGPU)",
           wcagContrastDark: 14.76,
           wcagContrastLight: 15.21,
           status: "Production Verified",

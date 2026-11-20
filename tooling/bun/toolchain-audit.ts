@@ -13,7 +13,6 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { parseGitmodules } from "./submodules.ts";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 
@@ -132,8 +131,9 @@ export interface ForkTargetPlan {
   upstreamRepo: string;
   upstreamDefaultBranch: string;
   forkRepo: string;
-  submodulePath: string;
-  relativeSubmoduleUrl: string;
+  gitUrl: string;
+  /** Cargo git pin: `tag = "..."` when the fork is recorded in forks-manifest.json, else the upstream default branch. */
+  pin: string;
   buildTargetBinaries: string[];
   recommendedCherryPicks: Array<{ prOrIssue: string; status: string; summary: string }>;
   patchTableSnippet: string;
@@ -145,9 +145,9 @@ export interface ForkPlanReport {
   orgConvention: {
     appForkRepo: string;
     upstreamAppRepo: string;
-    vendorForkOrg: string;
-    declaredSubmodules: number;
-    usesRelativeUrls: boolean;
+    forkOrg: string;
+    pinnedForks: number;
+    forksManifest: string;
     syncWorkflow: string;
   };
   targets: ForkTargetPlan[];
@@ -694,18 +694,21 @@ export function parseSccacheStatsOutput(raw: string, targetRepoRoot = repoRoot):
 
 export function buildForkPlan(options?: {
   root?: string;
-  gitmodulesContent?: string;
   targetFilter?: string;
 }): ForkPlanReport {
   const root = options?.root ?? repoRoot;
-  const gitmodulesText =
-    options?.gitmodulesContent ??
-    (existsSync(join(root, ".gitmodules")) ? readFileSync(join(root, ".gitmodules"), "utf8") : "");
-  const submodules = gitmodulesText ? parseGitmodules(gitmodulesText) : [];
-  const usesRelativeUrls =
-    submodules.length > 0
-      ? submodules.every((s) => s.url.startsWith("../"))
-      : existsSync(join(root, "tooling/bun/forks-manifest.json"));
+  const forksManifestRel = "tooling/bun/forks-manifest.json";
+  const forksManifestPath = join(root, forksManifestRel);
+  const manifestForks = existsSync(forksManifestPath)
+    ? ((JSON.parse(readFileSync(forksManifestPath, "utf8")) as { forks?: Array<{ name: string; tag: string }> }).forks ?? [])
+    : [];
+  const pinRef = (name: string, defaultBranch: string): { toml: string; flag: string } => {
+    const tag = manifestForks.find((f) => f.name === name)?.tag;
+    return tag
+      ? { toml: `tag = "${tag}"`, flag: `--tag ${tag}` }
+      : { toml: `branch = "${defaultBranch}"`, flag: `--branch ${defaultBranch}` };
+  };
+  const gitUrlFor = (repo: string): string => `https://github.com/${repo}.git`;
 
   const allTargets: ForkTargetPlan[] = [
     {
@@ -713,8 +716,8 @@ export function buildForkPlan(options?: {
       upstreamRepo: "rust-lang/cargo",
       upstreamDefaultBranch: "master",
       forkRepo: "aphrody-labs/cargo",
-      submodulePath: "vendor/toolchain/cargo",
-      relativeSubmoduleUrl: "../../aphrody-labs/cargo.git",
+      gitUrl: gitUrlFor("aphrody-labs/cargo"),
+      pin: pinRef("cargo", "master").toml,
       buildTargetBinaries: ["cargo"],
       recommendedCherryPicks: [
         {
@@ -738,8 +741,8 @@ export function buildForkPlan(options?: {
           summary: "Fix parallel locking contention when -Zfine-grain-locking is enabled.",
         },
       ],
-      patchTableSnippet: `# Used only when workspace crates depend on cargo / cargo-util crates:\n# cargo = { path = "vendor/toolchain/cargo" }`,
-      buildCommand: "cargo build --manifest-path vendor/toolchain/cargo/Cargo.toml --release --bin cargo",
+      patchTableSnippet: `# Used only when workspace crates depend on cargo / cargo-util crates:\n# cargo = { git = "${gitUrlFor("aphrody-labs/cargo")}", ${pinRef("cargo", "master").toml} }`,
+      buildCommand: `cargo install --git ${gitUrlFor("aphrody-labs/cargo")} ${pinRef("cargo", "master").flag} --locked --bin cargo cargo`,
       verificationGates: [
         "bun run hygiene",
         "bun run test:tooling",
@@ -752,8 +755,8 @@ export function buildForkPlan(options?: {
       upstreamRepo: "rust-lang/rust-clippy",
       upstreamDefaultBranch: "main",
       forkRepo: "aphrody-labs/rust-clippy",
-      submodulePath: "vendor/toolchain/rust-clippy",
-      relativeSubmoduleUrl: "../../aphrody-labs/rust-clippy.git",
+      gitUrl: gitUrlFor("aphrody-labs/rust-clippy"),
+      pin: pinRef("rust-clippy", "main").toml,
       buildTargetBinaries: ["clippy-driver", "cargo-clippy"],
       recommendedCherryPicks: [
         {
@@ -762,8 +765,8 @@ export function buildForkPlan(options?: {
           summary: "Align `clippy_utils` rev with custom Aphrody dylint rules (`tooling/lints`) and nsh-core lint exemptions.",
         },
       ],
-      patchTableSnippet: `# In tooling/lints/Cargo.toml (outside root workspace):\nclippy_utils = { path = "../../vendor/toolchain/rust-clippy/clippy_utils" }`,
-      buildCommand: "cargo +nightly build --manifest-path vendor/toolchain/rust-clippy/Cargo.toml --release",
+      patchTableSnippet: `# In tooling/lints/Cargo.toml (outside root workspace):\nclippy_utils = { git = "${gitUrlFor("aphrody-labs/rust-clippy")}", ${pinRef("rust-clippy", "main").toml} }`,
+      buildCommand: `cargo +nightly install --git ${gitUrlFor("aphrody-labs/rust-clippy")} ${pinRef("rust-clippy", "main").flag} --locked clippy`,
       verificationGates: [
         "cargo test --manifest-path tooling/lints/Cargo.toml",
         "cargo xtask clippy -p gpui",
@@ -775,8 +778,8 @@ export function buildForkPlan(options?: {
       upstreamRepo: "wild-linker/wild",
       upstreamDefaultBranch: "main",
       forkRepo: "aphrody-labs/wild",
-      submodulePath: "vendor/toolchain/wild",
-      relativeSubmoduleUrl: "../../aphrody-labs/wild.git",
+      gitUrl: gitUrlFor("aphrody-labs/wild"),
+      pin: pinRef("wild", "main").toml,
       buildTargetBinaries: ["wild"],
       recommendedCherryPicks: [
         {
@@ -791,9 +794,9 @@ export function buildForkPlan(options?: {
         },
       ],
       patchTableSnippet: `# Binary-only tool (excluded from root workspace via [workspace.exclude]):\n# Build on fr1 / Linux & drop ` + "`wild`" + ` in ~/.cargo/bin for -C link-arg=--ld-path=wild`,
-      buildCommand: "cargo build --manifest-path vendor/toolchain/wild/Cargo.toml --release --bin wild",
+      buildCommand: `cargo install --git ${gitUrlFor("aphrody-labs/wild")} ${pinRef("wild", "main").flag} --locked --bin wild wild-linker`,
       verificationGates: [
-        "cargo test --manifest-path vendor/toolchain/wild/Cargo.toml",
+        "wild --version reports the installed fork build",
         "hyperfine link time benchmark on `zed` / `aphrody_desktop` (fr1)",
       ],
     },
@@ -802,8 +805,8 @@ export function buildForkPlan(options?: {
       upstreamRepo: "mozilla/sccache",
       upstreamDefaultBranch: "main",
       forkRepo: "aphrody-labs/sccache",
-      submodulePath: "vendor/toolchain/sccache",
-      relativeSubmoduleUrl: "../../aphrody-labs/sccache.git",
+      gitUrl: gitUrlFor("aphrody-labs/sccache"),
+      pin: pinRef("sccache", "main").toml,
       buildTargetBinaries: ["sccache"],
       recommendedCherryPicks: [
         {
@@ -818,7 +821,7 @@ export function buildForkPlan(options?: {
         },
       ],
       patchTableSnippet: `# Standalone binary wrapper (excluded from root workspace via [workspace.exclude]):\n# Eliminates Windows RUSTC_WRAPPER="" workaround once #3026 build is deployed`,
-      buildCommand: "cargo build --manifest-path vendor/toolchain/sccache/Cargo.toml --release --bin sccache",
+      buildCommand: `cargo install --git ${gitUrlFor("aphrody-labs/sccache")} ${pinRef("sccache", "main").flag} --locked --bin sccache sccache`,
       verificationGates: [
         "bun run web:check",
         "sccache --show-stats (verify hit rate & zero os error 206)",
@@ -836,9 +839,9 @@ export function buildForkPlan(options?: {
     orgConvention: {
       appForkRepo: "aphrody-dev/aphrody",
       upstreamAppRepo: "zed-industries/zed",
-      vendorForkOrg: "aphrody-labs",
-      declaredSubmodules: submodules.length,
-      usesRelativeUrls,
+      forkOrg: "aphrody-labs",
+      pinnedForks: manifestForks.length,
+      forksManifest: forksManifestRel,
       syncWorkflow: ".github/workflows/aphrody-upstream-sync.yml",
     },
     targets,
@@ -915,7 +918,7 @@ function toolRole(bin: string): string {
     "cargo-udeps": "Nightly compiler-accurate unused dep detector",
     "cargo-shear": "Workspace unused dependency auto-cleaner",
     "cargo-dylint": "Custom GPUI/Zed/Aphrody lint runner",
-    git: "Version control & relative submodule engine",
+    git: "Version control engine",
   };
   return roles[bin] ?? "Toolchain component";
 }

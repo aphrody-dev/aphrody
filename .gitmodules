@@ -1,3 +1,0 @@
-# Zero blocking vendor/third_party submodules.
-# All 11 Aphrody upstream + Cloudflare Kitesurf forks are pinned via immutable GitHub Releases
-# in `tooling/bun/forks-manifest.json`, `Cargo.toml`, and `ghcr.io/aphrody-labs/aphrody-forks:20261120`.

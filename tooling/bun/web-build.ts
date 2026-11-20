@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 /**
  * Unified WebAssembly & WebGPU toolchain standardizer for all Aphrody Rust frameworks:
- * GPUI / OS Desktop, NSH Web, Craft Anything, COSMIC, Egui (eframe), Iced, Blitz/Dioxus, and WGPU/Vello.
+ * GPUI / OS Desktop, GPUI Kit, the Awesome GPUI Store, and NSH Web. Pinned git forks (wgpu, egui, craft-anything)
+ * are Cargo dependencies without checkouts, so their demo apps are not built here.
  *
  * Unifies and replaces per-framework ad-hoc bash scripts (`egui/scripts/*.sh`), `python3 -m http.server`,
  * `simple-http-server`, legacy `--no-modules` bindgen, and unverified `trunk` configs:
@@ -99,36 +100,6 @@ const FRAMEWORK_SPECS: FrameworkWebSpec[] = [
     features: ["browser-core"],
     legacyTooling: "nsh.js + package-size.mjs",
     wasmBackend: "DOM + WebGL/WebGPU + QuickJS bytecode",
-    coiRequired: false,
-  },
-  {
-    id: "craft",
-    label: "Craft Anything Web",
-    manifest: "vendor/craft-anything/apps/craft-anything-web/Cargo.toml",
-    packageName: "craft-anything-web",
-    features: [],
-    legacyTooling: "trunk + Trunk.toml + wasm-opt -Oz",
-    wasmBackend: "wgpu WebGPU/WebGL2 + egui",
-    coiRequired: false,
-  },
-  {
-    id: "egui",
-    label: "Egui / eframe Web",
-    manifest: "vendor/egui/crates/egui_demo_app/Cargo.toml",
-    packageName: "egui_demo_app",
-    features: ["web_app", "wgpu"],
-    legacyTooling: "bash scripts/*_web.sh + --no-modules",
-    wasmBackend: "wgpu WebGPU/WebGL2 or glow WebGL2",
-    coiRequired: false,
-  },
-  {
-    id: "wgpu",
-    label: "WGPU Core & Vello Web Tests",
-    manifest: "vendor/wgpu/examples/features/Cargo.toml",
-    packageName: "wgpu-examples",
-    features: ["webgpu"],
-    legacyTooling: "xshell + simple-http-server + wasmparser tests",
-    wasmBackend: "WebGPU + WebGL2 dual targets",
     coiRequired: false,
   },
 ];

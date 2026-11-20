@@ -1,4 +1,4 @@
-//! Unified COSMIC Epoch (`vendor/cosmic-epoch`) + Pop!_OS adapter crate
+//! Unified COSMIC Epoch (`cosmic-epoch`) + Pop!_OS adapter crate
 //! placed identically like `crates/gpui`, exposing ALL COSMIC subsystems (`cosmic-session`,
 //! `cosmic-comp`, `cosmic-panel`, `cosmic-applets`, `pop-launcher`, `cosmic-app-library`,
 //! `cosmic-osd`, `cosmic-notifications`, `cosmic-settings-daemon`, `cosmic-randr`,

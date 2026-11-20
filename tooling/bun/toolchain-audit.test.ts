@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
   analyzeProfiles,
@@ -170,16 +171,38 @@ crate-type (bin)                     47
     expect(covered.repoCoveredByBaseDirs).toBe(true);
   });
 
-  test("buildForkPlan honors Aphrody relative submodule conventions and upstream branches", () => {
+  test("buildForkPlan targets pinned aphrody-labs git forks without submodules and keeps upstream branches", () => {
     const fullPlan = buildForkPlan({ root: repoRoot });
     expect(fullPlan.orgConvention.appForkRepo).toBe("aphrody-dev/aphrody");
-    expect(fullPlan.orgConvention.vendorForkOrg).toBe("aphrody-labs");
-    expect(fullPlan.orgConvention.usesRelativeUrls).toBe(true);
+    expect(fullPlan.orgConvention.forkOrg).toBe("aphrody-labs");
+    expect(fullPlan.orgConvention.forksManifest).toBe("tooling/bun/forks-manifest.json");
+    const manifest = JSON.parse(readFileSync(join(repoRoot, "tooling/bun/forks-manifest.json"), "utf8")) as { forks: unknown[] };
+    expect(fullPlan.orgConvention.pinnedForks).toBe(manifest.forks.length);
     expect(fullPlan.targets.map((t) => t.id)).toEqual(["cargo", "clippy", "wild", "sccache"]);
 
     const cargoPlan = fullPlan.targets.find((t) => t.id === "cargo")!;
     expect(cargoPlan.upstreamDefaultBranch).toBe("master");
-    expect(cargoPlan.relativeSubmoduleUrl).toBe("../../aphrody-labs/cargo.git");
+    expect(cargoPlan.gitUrl).toBe("https://github.com/aphrody-labs/cargo.git");
+    expect(cargoPlan.pin).toBe('branch = "master"');
+    expect(cargoPlan.buildCommand).toContain("cargo install --git https://github.com/aphrody-labs/cargo.git --branch master");
+    for (const target of fullPlan.targets) {
+      expect(JSON.stringify(target)).not.toMatch(/vendor\/|submodule/i);
+    }
+
+    const pinnedRoot = mkdtempSync(join(tmpdir(), "toolchain-fork-plan-"));
+    try {
+      mkdirSync(join(pinnedRoot, "tooling/bun"), { recursive: true });
+      writeFileSync(
+        join(pinnedRoot, "tooling/bun/forks-manifest.json"),
+        JSON.stringify({ forks: [{ name: "cargo", tag: "v0.100.0-aphrody.20261120" }] }),
+      );
+      const pinnedCargo = buildForkPlan({ root: pinnedRoot, targetFilter: "cargo" }).targets[0];
+      expect(pinnedCargo.pin).toBe('tag = "v0.100.0-aphrody.20261120"');
+      expect(pinnedCargo.patchTableSnippet).toContain('tag = "v0.100.0-aphrody.20261120"');
+      expect(pinnedCargo.buildCommand).toContain("--tag v0.100.0-aphrody.20261120");
+    } finally {
+      rmSync(pinnedRoot, { recursive: true, force: true });
+    }
     expect(cargoPlan.recommendedCherryPicks.some((p) => p.prOrIssue.includes("17518"))).toBe(true);
 
     const sccacheOnly = buildForkPlan({ root: repoRoot, targetFilter: "sccache" });

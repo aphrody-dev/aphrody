@@ -214,7 +214,7 @@ export const MAQUETTE_DEFINITIONS: MaquetteDefinition[] = [
         <article class="mq-card">
           <span class="mq-badge mq-badge-ok">H0 &middot; 2026-Q4 &middot; COMPLETED</span>
           <h2>Unified Engine &amp; Fork Packages</h2>
-          <p>Upstream Zed merge, WGPU v30 + Wasm Core 2.0 AOT, 11 Cargo forks published to GHCR &amp; Releases (0 blocking submodules), material-colors 0.5 Liquid Glass.</p>
+          <p>Upstream Zed merge, WGPU v30 + Wasm Core 2.0 AOT, 11 Cargo forks published to GHCR &amp; Releases (pinned as Cargo git dependencies), material-colors 0.5 Liquid Glass.</p>
         </article>
         <article class="mq-card mq-card-focus">
           <span class="mq-badge mq-badge-primary">H1 &middot; 2027-Q1 &middot; ACTIVE</span>
@@ -244,7 +244,7 @@ export const MAQUETTE_DEFINITIONS: MaquetteDefinition[] = [
     defaultTheme: "neural",
     gpuiSurface: "aphrody_desktop::examples::web_os",
     nshComponent: "<WebLandingHero />",
-    keyPatterns: ["Centered serif/sans hero", "Interactive WebGPU shader preview card", "Submodule parity strip"],
+    keyPatterns: ["Centered serif/sans hero", "Interactive WebGPU shader preview card", "Pinned fork parity strip"],
     slots: ["stitch-web-hero-cta", "stitch-web-gpu-preview", "stitch-web-parity"],
     renderBody: () => `
       <section class="mq-hero mq-neural-aura mq-centered" data-stitch-id="stitch-web-hero-cta">

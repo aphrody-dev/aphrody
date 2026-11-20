@@ -1,7 +1,7 @@
 //! Complete Aphrody Browser + VPN + Chromium `//ui/views` in GPUI + Full WebGPU OS fusion.
 //!
 //! Unifies:
-//! - `vendor/browser` (`browser-engine`, `browser-vpn`, `browser-browse`, `browser-views`),
+//! - pinned `aphrody-labs/browser` (`browser-engine`, `browser-vpn`, `browser-browse`, `browser-views`),
 //! - Chromium `//ui/views` & `//chrome/browser/ui/views` rendered natively on GPUI (`chromium_gpui`),
 //! - Fused `ayvpn` per-tab / per-context Mullvad/WireGuard/MASQUE tunnel shield,
 //! - Absorbed `anomalyco/browse` real-browser extension pairing (`127.0.0.1:19988`), `@e1` ARIA snapshots, and WebMCP,

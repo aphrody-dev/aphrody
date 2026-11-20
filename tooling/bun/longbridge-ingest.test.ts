@@ -241,12 +241,21 @@ describe("longbridge-ingest offline Cargo centralization & Graphify fixture", ()
       mkdirSync(join(fixtureRoot, "crates/gpui"), { recursive: true });
       mkdirSync(join(fixtureRoot, "crates/nsh-core"), { recursive: true });
       mkdirSync(join(fixtureRoot, "extensions/html"), { recursive: true });
-      mkdirSync(join(fixtureRoot, "vendor/taffy"), { recursive: true });
       mkdirSync(join(fixtureRoot, "docs/aphrody/architecture"), { recursive: true });
 
+      mkdirSync(join(fixtureRoot, "tooling/bun"), { recursive: true });
       writeFileSync(
-        join(fixtureRoot, ".gitmodules"),
-        `[submodule "vendor/taffy"]\n\tpath = vendor/taffy\n\turl = ../../aphrody-labs/taffy.git\n`,
+        join(fixtureRoot, "tooling/bun/forks-manifest.json"),
+        JSON.stringify({
+          forks: [
+            {
+              name: "taffy",
+              repo: "aphrody-labs/taffy",
+              tag: "v0.15.1-aphrody.20261120",
+              gitUrl: "https://github.com/aphrody-labs/taffy.git",
+            },
+          ],
+        }),
       );
       writeFileSync(
         join(fixtureRoot, "Cargo.toml"),
@@ -260,7 +269,7 @@ serde = "1.0"
 custom_git = { git = "https://github.com/example/custom" }
 
 [patch.crates-io]
-taffy = { path = "vendor/taffy" }
+taffy = { git = "https://github.com/aphrody-labs/taffy.git", tag = "v0.15.1-aphrody.20261120" }
 async-task = { git = "https://github.com/smol-rs/async-task", rev = "abc123" }
 `,
       );
@@ -389,8 +398,8 @@ zed_extension_api = "0.2.0"
       expect(audit.workspaceDependencyBreakdown.pathCount).toBe(1);
       expect(audit.workspaceDependencyBreakdown.gitCount).toBe(1);
       expect(audit.workspaceDependencyBreakdown.registryCount).toBe(1);
-      expect(audit.patchBreakdown.pathCount).toBe(1);
-      expect(audit.patchBreakdown.gitCount).toBe(1);
+      expect(audit.patchBreakdown.pathCount).toBe(0);
+      expect(audit.patchBreakdown.gitCount).toBe(2);
       expect(audit.duplicatePackageCount).toBe(1);
       expect(audit.duplicateMajorMinorCount).toBe(1);
       expect(audit.duplicatePackages[0]?.majorMinorVersions).toEqual(["0.14", "0.15"]);
@@ -411,8 +420,7 @@ zed_extension_api = "0.2.0"
           INFRA_OUT_OF_SCOPE: 0,
         },
         localIndexSummary: {
-          gitmodulesCount: 1,
-          vendorDirsCount: 1,
+          pinnedForksCount: 1,
           crateDirsCount: 2,
           workspaceMembersCount: 3,
           workspaceDepsCount: 3,
@@ -477,6 +485,8 @@ zed_extension_api = "0.2.0"
         true,
       );
       expect(graph.mergeCandidates.length).toBe(1);
+      expect(graph.nodes.some((n) => n.id === "fork:aphrody-labs/taffy" && n.kind === "pinned_fork")).toBe(true);
+      expect(graph.edges.some((e) => e.from === "crate:gpui" && e.to === "fork:aphrody-labs/taffy" && e.kind === "PATCHED_VIA")).toBe(true);
 
       const tomlPath = join(fixtureRoot, "inventory.toml");
       writeInventoryToml(fakeScan, graph, [], [], tomlPath);

@@ -3,7 +3,7 @@
  * Audits and auto-merges all GitHub-side reference forks in `tooling/bun/forks-manifest.json`
  * (`referenceForks`) across the Multimedia, YouTube/YouTube Music, 3D WebGPU, and Google
  * official/community ecosystems (Rust, Go, TypeScript, Python, Kotlin/JVM) without adding
- * heavy local `.gitmodules` submodules.
+ * any local checkout (reference forks live on GitHub only).
  *
  * Usage:
  *   bun tooling/bun/multimedia-forks-audit.ts --check [--json]

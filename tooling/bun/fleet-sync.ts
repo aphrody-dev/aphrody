@@ -3,8 +3,9 @@
  * Reproducible Parallel Multi-VPS Fleet Synchronization, XFS/Btrfs CoW Worktree Cloning,
  * Sharded CI Verification, and End-to-End Cloudflare + VPS Deploy Runner (`fr1`, `fr2`, `prd`).
  *
- * Derives product identity from `product.toml`, submodule SHAs from `git ls-files -s vendor`,
- * and resolves SSH hosts cleanly via `~/.ssh/config`.
+ * Derives product identity from `product.toml` and resolves SSH hosts cleanly via `~/.ssh/config`.
+ * Syncs the repo itself (HEAD bundle + tracked patch + untracked files); upstream forks are pinned
+ * Cargo git dependencies fetched by cargo on the remote, never checked out.
  *
  * Usage:
  *   bun tooling/bun/fleet-sync.ts sync [--host fr1 | --hosts fr1,fr2,prd | --all]
@@ -17,7 +18,6 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { resolveWranglerCmd } from "./cloudflare-deploy.ts";
-import { parseGitmodules } from "./submodules.ts";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 export const DEFAULT_FLEET_HOSTS = ["fr1", "fr2", "prd"];
@@ -97,10 +97,9 @@ interface LocalSyncPayload {
   trackedPatch: Uint8Array;
   untrackedTar: Uint8Array | null;
   untrackedCount: number;
-  specs: Array<{ path: string; sha: string; httpsUrl: string; branch?: string }>;
 }
 
-function prepareLocalPayload(repoBaseUrl: string): LocalSyncPayload {
+function prepareLocalPayload(): LocalSyncPayload {
   const localHead = runChecked(["git", "-C", repoRoot, "rev-parse", "HEAD"]).trim();
   const diffRes = Bun.spawnSync([
     "git",
@@ -111,7 +110,6 @@ function prepareLocalPayload(repoBaseUrl: string): LocalSyncPayload {
     "--binary",
     "--",
     ".",
-    ":(exclude)vendor",
   ]);
   if (diffRes.exitCode !== 0) {
     throw new Error(`git diff HEAD failed: ${new TextDecoder().decode(diffRes.stderr)}`);
@@ -121,7 +119,7 @@ function prepareLocalPayload(repoBaseUrl: string): LocalSyncPayload {
   const untracked = untrackedRaw
     .split(/\r?\n/)
     .map((s) => s.trim())
-    .filter((p) => Boolean(p) && !p.startsWith("vendor/"));
+    .filter(Boolean);
 
   let untrackedTar: Uint8Array | null = null;
   if (untracked.length > 0) {
@@ -136,26 +134,11 @@ function prepareLocalPayload(repoBaseUrl: string): LocalSyncPayload {
     untrackedTar = tarCreate.stdout;
   }
 
-  const lsSub = runChecked(["git", "-C", repoRoot, "ls-files", "-s", "vendor"]);
-  const shaByPath = new Map<string, string>();
-  for (const line of lsSub.split(/\r?\n/)) {
-    const m = /^160000\s+([0-9a-f]{40})\s+\d+\s+(.+)$/.exec(line.trim());
-    if (m) shaByPath.set(m[2], m[1]);
-  }
-  const specs = parseGitmodules(readFileSync(join(repoRoot, ".gitmodules"), "utf8"))
-    .filter((entry) => shaByPath.has(entry.path))
-    .map((entry) => ({
-      ...entry,
-      sha: shaByPath.get(entry.path)!,
-      httpsUrl: new URL(entry.url, `${repoBaseUrl}/`).toString(),
-    }));
-
   return {
     localHead,
     trackedPatch: diffRes.stdout,
     untrackedTar,
     untrackedCount: untracked.length,
-    specs,
   };
 }
 
@@ -179,7 +162,7 @@ async function syncOneHostAsync(
     `  git clone --no-checkout "${repoBaseUrl}.git" "$TARGET_REPO" || git init "$TARGET_REPO"`,
     "fi",
     'git -C "$TARGET_REPO" reset --hard HEAD >/dev/null',
-    'git -C "$TARGET_REPO" clean -fd -e vendor >/dev/null',
+    'git -C "$TARGET_REPO" clean -fd >/dev/null',
     'HEAD_SHA=$(git -C "$TARGET_REPO" rev-parse HEAD 2>/dev/null || echo "")',
     'echo "TARGET_REPO=$TARGET_REPO"',
     'echo "HEAD_SHA=$HEAD_SHA"',
@@ -235,44 +218,6 @@ async function syncOneHostAsync(
     }
   }
 
-  const remoteSubSync =
-    [
-      "set -euo pipefail",
-      `cd ${remoteRepo}`,
-      "git rm -rfq --ignore-unmatch vendor/wgpu || true",
-      "rm -rf vendor/cosmic vendor/tauri/plugins-workspace vendor/tauri/tao",
-      "if [ -d vendor/wgpu ] && [ ! -e vendor/wgpu/.git ]; then rm -rf vendor/wgpu; fi",
-      "sync_one() {",
-      '  local path="$1" sha="$2" url="$3" branch="$4"',
-      '  mkdir -p "$(dirname "$path")"',
-      '  if [ -e "$path/.git" ]; then',
-      '    local cur; cur=$(git -C "$path" rev-parse HEAD 2>/dev/null || true)',
-      '    if [ "$cur" != "$sha" ]; then',
-      '      git -C "$path" fetch --depth 1 "$url" "$sha" >/dev/null 2>&1 || git -C "$path" fetch "$url" >/dev/null 2>&1',
-      '      git -C "$path" checkout -qf "$sha"',
-      "    fi",
-      "  else",
-      '    rm -rf "$path"',
-      '    if [ -n "$branch" ]; then git clone -q --depth 1 --branch "$branch" "$url" "$path" 2>/dev/null || git clone -q --depth 1 "$url" "$path"; else git clone -q --depth 1 "$url" "$path"; fi',
-      '    local cur; cur=$(git -C "$path" rev-parse HEAD 2>/dev/null || true)',
-      '    if [ "$cur" != "$sha" ]; then',
-      '      git -C "$path" fetch --depth 1 "$url" "$sha" >/dev/null 2>&1 || git -C "$path" fetch "$url" >/dev/null 2>&1',
-      '      git -C "$path" checkout -qf "$sha"',
-      "    fi",
-      "  fi",
-      "}",
-      "export -f sync_one",
-      `printf '%s\\n' ${payload.specs.map((s) => `"${s.path}|${s.sha}|${s.httpsUrl}|${s.branch ?? ""}"`).join(" ")} | xargs -P 8 -I {} bash -c 'IFS="|" read -r p s u b <<< "{}"; sync_one "$p" "$s" "$u" "$b"'`,
-      ...payload.specs.map((s) => `git update-index --add --cacheinfo 160000,${s.sha},${s.path}`),
-      // Keep .gitmodules clean when checking submodules recursively
-      "git submodule sync --recursive >/dev/null 2>&1 || true",
-    ].join("\n") + "\n";
-
-  const syncRes = await runSshAsync(host, "bash -s", remoteSubSync);
-  if (syncRes.exitCode !== 0) {
-    throw new Error(`[${host}] remote submodule sync failed (${syncRes.exitCode}): ${syncRes.stderr}`);
-  }
-
   return {
     ok: true,
     host,
@@ -280,7 +225,6 @@ async function syncOneHostAsync(
     syncedCommit: payload.localHead.slice(0, 10),
     patchBytes: payload.trackedPatch.length,
     untrackedCount: payload.untrackedCount,
-    submodules: payload.specs.length,
   };
 }
 
@@ -403,7 +347,7 @@ export function buildParallelShardPlans(
 
 async function runParallelBuild(hosts: string[], remoteRepo: string) {
   const { repoSlug } = readProductMeta();
-  const payload = prepareLocalPayload(repoSlug);
+  const payload = prepareLocalPayload();
   const syncResults = await Promise.all(
     hosts.map((h) => syncOneHostAsync(h, remoteRepo, repoSlug, payload)),
   );
@@ -444,7 +388,7 @@ async function runEndToEndDeploy(
   dryRun: boolean,
 ) {
   const { slug, repoSlug } = readProductMeta();
-  const payload = prepareLocalPayload(repoSlug);
+  const payload = prepareLocalPayload();
   const [buildSync] = await Promise.all([
     syncOneHostAsync(buildHost, preferredRemoteRepo, repoSlug, payload),
     syncOneHostAsync(edgeHost, preferredRemoteRepo, repoSlug, payload),
@@ -550,13 +494,13 @@ if (import.meta.main) {
   const remoteRepo = resolveRemoteDir(slug);
 
   if (cmd === "sync") {
-    const payload = prepareLocalPayload(repoSlug);
+    const payload = prepareLocalPayload();
     const results = await Promise.all(
       hosts.map((h) => syncOneHostAsync(h, remoteRepo, repoSlug, payload)),
     );
     console.log(JSON.stringify(results.length === 1 ? results[0] : results, null, 2));
   } else if (cmd === "verify") {
-    const payload = prepareLocalPayload(repoSlug);
+    const payload = prepareLocalPayload();
     const syncResults = await Promise.all(
       hosts.map((h) => syncOneHostAsync(h, remoteRepo, repoSlug, payload)),
     );

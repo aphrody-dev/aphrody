@@ -10,7 +10,7 @@ use ui::prelude::*;
 use crate::cosmic_theme::{AppearanceMode, OsTheme, contrast_ratio};
 use crate::google_design::{GoogleDesignTokens, ShapeScale};
 
-/// Embedded submodule parity & CWV matrix (`assets/os/submodule_parity_matrix.toml`).
+/// Embedded fork parity & CWV matrix (pinned git dependencies) (`assets/os/submodule_parity_matrix.toml`).
 pub const BUNDLED_SUBMODULE_PARITY_TOML: &str =
     include_str!("../../../assets/os/submodule_parity_matrix.toml");
 
@@ -57,7 +57,7 @@ pub struct SubmoduleParityEntry {
     pub role: String,
 }
 
-/// Complete parsed parity feature matrix comparing `aphrody-core` with all audited `vendor/*` submodules.
+/// Complete parsed parity feature matrix comparing `aphrody-core` with all audited pinned `aphrody-labs/*` forks.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SubmoduleParityMatrix {
     pub schema_version: u32,

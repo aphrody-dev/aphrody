@@ -8,7 +8,7 @@
  *   bun tooling/bun/repo-hygiene.ts
  */
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 const repoRoot = resolve(import.meta.dir, "../..");
 
@@ -34,29 +34,6 @@ const GUARD_ALLOWLIST = new Set([
   "tooling/bun/repo-hygiene.ts",
   "tooling/bun/tooling.test.ts",
 ]);
-
-/**
- * Submodule checkouts are optional (CI jobs that do not build vendored crates skip them), so a link into a gitlink
- * whose working tree is not initialised cannot be verified on disk; the pinned gitlink is the contract.
- */
-export function isInsideUninitialisedSubmodule(absolutePath: string, root = repoRoot): boolean {
-  const relativePath = relative(root, absolutePath).split(sep).join("/");
-  if (relativePath.startsWith("vendor/") && existsSync(join(root, "tooling/bun/forks-manifest.json"))) {
-    return true;
-  }
-  const staged = Bun.spawnSync(["git", "-C", root, "ls-files", "--stage"], { stdout: "pipe", stderr: "pipe" });
-  return new TextDecoder()
-    .decode(staged.stdout)
-    .split(/\r?\n/)
-    .filter((line) => line.startsWith("160000 "))
-    .map((line) => line.split("\t")[1])
-    .some(
-      (path) =>
-        path !== undefined &&
-        (relativePath === path || relativePath.startsWith(`${path}/`)) &&
-        !existsSync(join(root, path, ".git")),
-    );
-}
 
 export function checkRepoHygiene(root = repoRoot): HygieneReport {
   const readmePath = join(root, "README.md");
@@ -115,7 +92,7 @@ export function checkRepoHygiene(root = repoRoot): HygieneReport {
           continue;
         }
         const resolved = resolve(dirname(full), rawTarget);
-        if (!existsSync(resolved) && !isInsideUninitialisedSubmodule(resolved, root)) {
+        if (!existsSync(resolved)) {
           brokenArchLinks.push(`${rel} -> ${rawTarget}`);
         }
       }

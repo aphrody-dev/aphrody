@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 import {
   checkVpnAllowLan,
@@ -18,8 +17,8 @@ describe("vendor-lan-doctor", () => {
 anyhow = "1"
 
 [patch.crates-io]
-taffy = { path = "vendor/taffy" }
-wgpu = { path = "vendor/wgpu/wgpu" }
+taffy = { path = "local/taffy" }
+wgpu = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
 cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d" }
 
 [profile.dev]
@@ -27,8 +26,8 @@ incremental = true
 `;
     const parsed = parsePatchesSection(sample);
     expect(parsed).toEqual([
-      { crateName: "taffy", kind: "path", target: "vendor/taffy" },
-      { crateName: "wgpu", kind: "path", target: "vendor/wgpu/wgpu" },
+      { crateName: "taffy", kind: "path", target: "local/taffy" },
+      { crateName: "wgpu", kind: "git", target: "https://github.com/aphrody-labs/wgpu.git" },
       { crateName: "cpal", kind: "git", target: "https://github.com/RustAudio/cpal" },
     ]);
   });
@@ -48,7 +47,7 @@ incremental = true
     expect(parsed.inWireguardLan).toBe(true);
   });
 
-  test("offline workspace audit verifies deny.toml, patches, nested submodules, and AllowLan", () => {
+  test("offline workspace audit verifies deny.toml, pinned git patches, and AllowLan", () => {
     const deny = inspectDenyPolicy(join(repoRoot, "deny.toml"));
     expect(deny.denyTomlPresent).toBe(true);
     expect(deny.hasLicensesSection).toBe(true);
@@ -57,10 +56,9 @@ incremental = true
     expect(checkVpnAllowLan(repoRoot)).toBe(true);
 
     const report = runAudit(repoRoot, true);
-    expect(report.vendor.declaredSubmodules).toBe(0);
     expect(report.ok).toBe(true);
-    expect(report.vendor.missingPatchPaths).toEqual([]);
-    expect(report.vendor.patches.some((p) => p.kind === "git" && p.target.includes("aphrody-labs/wgpu"))).toBe(true);
-    expect(report.vendor.patches.some((p) => p.kind === "git" && p.target.includes("aphrody-labs/taffy"))).toBe(true);
+    expect(report.cargoPatches.missingPatchPaths).toEqual([]);
+    expect(report.cargoPatches.patches.some((p) => p.kind === "git" && p.target.includes("aphrody-labs/wgpu"))).toBe(true);
+    expect(report.cargoPatches.patches.some((p) => p.kind === "git" && p.target.includes("aphrody-labs/taffy"))).toBe(true);
   });
 });

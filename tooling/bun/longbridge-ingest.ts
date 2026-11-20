@@ -14,7 +14,6 @@
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
-import { parseGitmodules, type SubmoduleEntry } from "./submodules.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const INVENTORY_TOML_REL = "assets/os/longbridge_gpui_inventory.toml";
@@ -120,9 +119,16 @@ export interface ClassifiedRepo extends GitHubRepoSummary {
   enriched?: EnrichedRepoDetails;
 }
 
+/** Upstream fork pinned as a Cargo git dependency (tag) in tooling/bun/forks-manifest.json. */
+export interface PinnedFork {
+  name: string;
+  repo: string;
+  tag: string;
+  gitUrl: string;
+}
+
 export interface LocalAphrodyIndex {
-  gitmodules: SubmoduleEntry[];
-  vendorDirs: string[];
+  pinnedForks: PinnedFork[];
   crateDirs: string[];
   workspaceMembers: string[];
   workspaceExcluded: string[];
@@ -202,7 +208,7 @@ export interface CrateFeatureEntry {
 
 export interface GraphifyNode {
   id: string;
-  kind: "upstream_repo" | "workspace_crate" | "vendor_submodule" | "website_target";
+  kind: "upstream_repo" | "workspace_crate" | "pinned_fork" | "website_target";
   label: string;
   classification?: RepoClassification;
   path?: string;
@@ -312,8 +318,7 @@ export interface ScanReport {
   longbridgeTotalRepos: number;
   countsByClassification: Record<RepoClassification, number>;
   localIndexSummary: {
-    gitmodulesCount: number;
-    vendorDirsCount: number;
+    pinnedForksCount: number;
     crateDirsCount: number;
     workspaceMembersCount: number;
     workspaceDepsCount: number;
@@ -476,15 +481,11 @@ export function extractPackageJsonSummary(jsonText: string): PackageJsonSummary 
 // ---------------------------------------------------------------------------
 
 export function loadLocalAphrodyIndex(root = REPO_ROOT): LocalAphrodyIndex {
-  const gitmodulesPath = join(root, ".gitmodules");
-  const gitmodules = existsSync(gitmodulesPath) ? parseGitmodules(readFileSync(gitmodulesPath, "utf8")) : [];
-
-  const vendorRoot = join(root, "vendor");
-  const vendorDirs = existsSync(vendorRoot)
-    ? readdirSync(vendorRoot, { withFileTypes: true })
-        .filter((d) => d.isDirectory())
-        .map((d) => d.name)
-        .sort()
+  const manifestPath = join(root, "tooling/bun/forks-manifest.json");
+  const pinnedForks: PinnedFork[] = existsSync(manifestPath)
+    ? (JSON.parse(readFileSync(manifestPath, "utf8")) as { forks?: PinnedFork[] }).forks?.map(
+        ({ name, repo, tag, gitUrl }) => ({ name, repo, tag, gitUrl }),
+      ) ?? []
     : [];
 
   const cratesRoot = join(root, "crates");
@@ -501,8 +502,7 @@ export function loadLocalAphrodyIndex(root = REPO_ROOT): LocalAphrodyIndex {
   const patchSection = (rootToml.patch ?? {}) as Record<string, any>;
 
   return {
-    gitmodules,
-    vendorDirs,
+    pinnedForks,
     crateDirs,
     workspaceMembers: Array.isArray(ws.members) ? ws.members.map(String) : [],
     workspaceExcluded: Array.isArray(ws.exclude) ? ws.exclude.map(String) : [],
@@ -543,8 +543,8 @@ const KNOWN_ABSORBED_SPECS: Record<
   },
   "longbridge/wry": {
     category: "webview",
-    targets: ["vendor/tauri/wry", "Cargo.toml#wry", "crates/nsh-platform-gpui"],
-    rationale: "Deduplicated onto single relative submodule vendor/tauri/wry and root Cargo.toml workspace dependency.",
+    targets: ["aphrody-labs/wry", "Cargo.toml#wry", "crates/nsh-platform-gpui"],
+    rationale: "Deduplicated onto the single pinned aphrody-labs/wry git dependency (tag) in the root Cargo.toml workspace dependencies.",
   },
 };
 
@@ -572,9 +572,9 @@ const KNOWN_MERGE_CANDIDATES: Record<
   },
   "longbridge/wef": {
     category: "gpui-cef-webview",
-    targets: ["crates/nsh-platform-gpui", "vendor/tauri/cef-rs", "crates/aphrody_desktop"],
+    targets: ["crates/nsh-platform-gpui", "crates/aphrody_desktop"],
     score: 91,
-    rationale: "Offscreen CEF3 gpui-webview + cargo-wef complements local wry and vendor/tauri/cef-rs without OS WebView inconsistencies.",
+    rationale: "Offscreen CEF3 gpui-webview + cargo-wef complements local wry without OS WebView inconsistencies.",
   },
   "longbridge/purview": {
     category: "gpui-mcp-inspection",
@@ -684,9 +684,8 @@ export function classifyRepo(
         const dep = target.slice("Cargo.toml#".length);
         return dep in localIndex.workspaceDependencies || dep in localIndex.patchCratesIo;
       }
-      if (target.startsWith("vendor/")) {
-        const vend = target.split("/")[1];
-        return localIndex.vendorDirs.includes(vend) || localIndex.gitmodules.some((g) => g.path === target);
+      if (target.startsWith("aphrody-labs/")) {
+        return localIndex.pinnedForks.some((fork) => fork.repo === target);
       }
       if (target.startsWith("crates/")) {
         const crateDir = target.split("/")[1];
@@ -808,9 +807,9 @@ function findLocalAnchorsForRepo(shortName: string, localIndex: LocalAphrodyInde
       matches.push(`crates/${crate}`);
     }
   }
-  for (const vend of localIndex.vendorDirs) {
-    if (vend === shortName || vend === normalized) {
-      matches.push(`vendor/${vend}`);
+  for (const fork of localIndex.pinnedForks) {
+    if (fork.name === shortName || fork.name.replaceAll("-", "_") === normalized) {
+      matches.push(fork.repo);
     }
   }
   for (const dep of Object.keys(localIndex.workspaceDependencies)) {
@@ -1141,8 +1140,7 @@ export async function runScanCommand(root = REPO_ROOT): Promise<ScanReport> {
     longbridgeTotalRepos: longbridgeRepos.length,
     countsByClassification,
     localIndexSummary: {
-      gitmodulesCount: localIndex.gitmodules.length,
-      vendorDirsCount: localIndex.vendorDirs.length,
+      pinnedForksCount: localIndex.pinnedForks.length,
       crateDirsCount: localIndex.crateDirs.length,
       workspaceMembersCount: localIndex.workspaceMembers.length,
       workspaceDepsCount: Object.keys(localIndex.workspaceDependencies).length,
@@ -1506,14 +1504,15 @@ export function buildGraphifyDocument(
     if (!edgesMap.has(id)) edgesMap.set(id, { id, ...edge });
   };
 
-  // 1. Submodule nodes.
-  for (const sub of localIndex.gitmodules) {
+  // 1. Pinned fork nodes (Cargo git dependencies recorded in forks-manifest.json).
+  for (const fork of localIndex.pinnedForks) {
     addNode({
-      id: `sub:${sub.path}`,
-      kind: "vendor_submodule",
-      label: sub.path,
-      path: sub.path,
-      url: sub.url,
+      id: `fork:${fork.repo}`,
+      kind: "pinned_fork",
+      label: `${fork.repo}@${fork.tag}`,
+      path: fork.repo,
+      version: fork.tag,
+      url: fork.gitUrl,
     });
   }
 
@@ -1544,12 +1543,12 @@ export function buildGraphifyDocument(
   }
 
   for (const patch of audit.patchBreakdown.entries) {
-    if (patch.kind === "path") {
-      const sub = localIndex.gitmodules.find((g) => patch.detail.startsWith(g.path));
-      if (sub) {
+    if (patch.kind === "git") {
+      const fork = localIndex.pinnedForks.find((f) => patch.detail.replace(/\.git$/, "") === f.gitUrl.replace(/\.git$/, ""));
+      if (fork) {
         addEdge({
           from: `crate:gpui`,
-          to: `sub:${sub.path}`,
+          to: `fork:${fork.repo}`,
           kind: "PATCHED_VIA",
           note: `${patch.name} -> ${patch.detail}`,
         });
@@ -1589,9 +1588,9 @@ export function buildGraphifyDocument(
       const cleanCrate = target.replace(/^crates\//, "").split("/")[0];
       if (memberPkgMap.has(cleanCrate)) {
         addEdge({ from: repoNodeId, to: `crate:${cleanCrate}`, kind: edgeKind, note: repo.category });
-      } else if (target.startsWith("vendor/")) {
-        const sub = localIndex.gitmodules.find((g) => target.startsWith(g.path));
-        if (sub) addEdge({ from: repoNodeId, to: `sub:${sub.path}`, kind: edgeKind, note: repo.category });
+      } else if (target.startsWith("aphrody-labs/")) {
+        const fork = localIndex.pinnedForks.find((f) => f.repo === target);
+        if (fork) addEdge({ from: repoNodeId, to: `fork:${fork.repo}`, kind: edgeKind, note: repo.category });
       }
     }
 
@@ -2271,11 +2270,10 @@ export function buildMermaidTopology(graph: GraphifyDocument): string {
     "    PUR[\"longbridge/purview<br/>GPUI MCP Inspection\"]",
     "  end",
     "",
-    "  subgraph Submodules[\"Centralized Git Submodules (vendor/*)\"]",
-    "    TAFFY[\"vendor/taffy\"]",
-    "    WGPU[\"vendor/wgpu\"]",
-    "    WRY[\"vendor/tauri/wry\"]",
-    "    CEF[\"vendor/tauri/cef-rs\"]",
+    "  subgraph Forks[\"Pinned Cargo git forks (aphrody-labs/*, tag)\"]",
+    "    TAFFY[\"aphrody-labs/taffy\"]",
+    "    WGPU[\"aphrody-labs/wgpu\"]",
+    "    WRY[\"aphrody-labs/wry\"]",
     "  end",
     "",
     "  subgraph Core[\"Aphrody Flattened Workspace (Cargo.toml)\"]",
@@ -2299,7 +2297,6 @@ export function buildMermaidTopology(graph: GraphifyDocument): string {
     "  FAST -.->|MERGE_CANDIDATE| GPUI",
     "  MOB -.->|MERGE_CANDIDATE| GPUI",
     "  WEF -.->|MERGE_CANDIDATE| NSHC",
-    "  WEF -.->|aligns with| CEF",
     "  PUR -.->|MERGE_CANDIDATE| OSC",
     "  PUR -.->|MCP / rmcp| ACP",
     "  GPUIUI --> OSC",

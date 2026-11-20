@@ -23,19 +23,17 @@ export interface ToolCommandSpec {
 }
 
 export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
-  // 1. Workspace Hygiene, Submodules, Conformity & Standards
+  // 1. Workspace Hygiene, Conformity & Standards
   { domain: "workspace", action: "hygiene", scriptRel: "tooling/bun/repo-hygiene.ts", defaultArgs: [], summary: "Verify README guard, zero ephemeral path leaks, and doc link integrity" },
-  { domain: "workspace", action: "submodules", scriptRel: "tooling/bun/submodules.ts", defaultArgs: ["check"], summary: "Inspect or sync git submodules from .gitmodules" },
   { domain: "workspace", action: "vendor-doctor", scriptRel: "tooling/bun/vendor-lan-doctor.ts", defaultArgs: ["audit"], summary: "Audit Cargo patches, deny.toml licenses/sources, and WireGuard LAN" },
   { domain: "workspace", action: "i18n", scriptRel: "tooling/bun/w3c-i18n.ts", defaultArgs: ["check"], summary: "Run W3C Internationalization (BCP 47, UTF-8, Bidi, HTML/SVG) checks" },
-  { domain: "workspace", action: "standards", scriptRel: "tooling/bun/prod-standards-starterpack.ts", defaultArgs: ["all"], summary: "Verify Core Web Vitals, Submodule Parity Matrix, and TS/Rust hygiene" },
+  { domain: "workspace", action: "standards", scriptRel: "tooling/bun/prod-standards-starterpack.ts", defaultArgs: ["all"], summary: "Verify Core Web Vitals, Pinned-Fork Parity Matrix, and TS/Rust hygiene" },
   { domain: "workspace", action: "agy-audit", scriptRel: "tooling/bun/agy-config-audit.ts", defaultArgs: [], summary: "Validate Antigravity settings, MCP schemas, hooks, and plugins" },
   { domain: "workspace", action: "shell-doctor", scriptRel: "tooling/bun/shell-path-doctor.ts", defaultArgs: ["audit"], summary: "Audit modern Windows/Linux CLI PATH tiering" },
-  { domain: "workspace", action: "worktree", scriptRel: "tooling/bun/worktree.ts", defaultArgs: ["list"], summary: "Manage isolated out-of-tree Git worktrees" },
   { domain: "workspace", action: "agent-desktop", scriptRel: "tooling/bun/agent-desktop-audit.ts", defaultArgs: [], summary: "Verify aphrody_pilot zero-mod.rs & 58-tool MCP parity" },
   { domain: "workspace", action: "gpui-vs-dioxus", scriptRel: "tooling/bun/gpui-vs-dioxus-audit.ts", defaultArgs: ["all"], summary: "Audit GPUI/NSH vs Dioxus vs egui/craft-libs vs Iced/libcosmic (bench, features, conflicts)" },
   { domain: "workspace", action: "crate-skill", scriptRel: "tooling/bun/crate-to-skill.ts", defaultArgs: ["--help"], summary: "Generate portable Agent Skill bundle from a workspace crate" },
-  { domain: "workspace", action: "slim", scriptRel: "tooling/bun/disk-slim.ts", defaultArgs: ["apply"], summary: "Reclaim multi-GB target/* caches and compact bloated submodule packs" },
+  { domain: "workspace", action: "slim", scriptRel: "tooling/bun/disk-slim.ts", defaultArgs: ["apply"], summary: "Reclaim multi-GB target/* caches and compact bloated git packs" },
   { domain: "workspace", action: "r2-manifest", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["manifest"], summary: "Generate content-addressed assets/os/r2_assets_manifest.toml" },
   { domain: "workspace", action: "r2-push", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["push"], summary: "Upload content-addressed monorepo assets to R2 aphrody-assets" },
   { domain: "workspace", action: "r2-hydrate", scriptRel: "tooling/bun/r2-assets.ts", defaultArgs: ["hydrate"], summary: "Hydrate offloaded R2 assets on demand into target/r2-cache" },

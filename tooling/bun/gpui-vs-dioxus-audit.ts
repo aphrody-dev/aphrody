@@ -13,17 +13,18 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
-import { parseGitmodules, type SubmoduleEntry } from "./submodules.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
+export const FORKS_MANIFEST_REL = "tooling/bun/forks-manifest.json";
 export const AUDIT_JSON_REL = "target/gpui-vs-dioxus/audit.json";
 export const MATRIX_TOML_REL = "assets/os/gpui_vs_dioxus_matrix.toml";
 export const ARCH_DOC_REL = "docs/aphrody/architecture/gpui-vs-dioxus-audit.md";
 
 const USER_AGENT = "AphrodyEcosystemAudit/2.0 (+https://github.com/Aphrody-Dev/aphrody)";
 
-export interface SubmoduleAuditSpec {
-  path: string;
+export interface PinnedForkAuditSpec {
+  /** Entry name in `tooling/bun/forks-manifest.json`. */
+  name: string;
   forkRepo: string;
   defaultUpstream: string;
   rootUpstream?: string;
@@ -31,59 +32,59 @@ export interface SubmoduleAuditSpec {
   role: string;
 }
 
-/** Kept submodules in `.gitmodules` that back GPUI, WGPU, egui, craft-libs, libcosmic text, and WRY. */
-export const TARGET_SUBMODULES: SubmoduleAuditSpec[] = [
+/** Pinned Cargo git dependencies (`git` + `tag`) that back GPUI, WGPU, egui, craft-libs, libcosmic text, and WRY. */
+export const TARGET_FORKS: PinnedForkAuditSpec[] = [
   {
-    path: "vendor/wgpu",
+    name: "wgpu",
     forkRepo: "aphrody-labs/wgpu",
     defaultUpstream: "gfx-rs/wgpu",
     ecosystem: "shared-gpu",
     role: "Single-source WGPU v30 + Naga v30 stack shared by gpui_wgpu, egui-wgpu, iced_gpui, bevy_gpui & nsh-engine",
   },
   {
-    path: "vendor/taffy",
+    name: "taffy",
     forkRepo: "aphrody-labs/taffy",
     defaultUpstream: "DioxusLabs/taffy",
     ecosystem: "shared-layout",
     role: "Patched Flexbox/Grid/Block layout engine shared by gpui, nsh-core & aphrody_session",
   },
   {
-    path: "vendor/cosmic-text",
+    name: "cosmic-text",
     forkRepo: "aphrody-labs/cosmic-text",
     defaultUpstream: "pop-os/cosmic-text",
     ecosystem: "libcosmic-text",
     role: "Patched HarfBuzz/Swash text shaper & font fallback engine shared by gpui_wgpu",
   },
   {
-    path: "vendor/accesskit",
+    name: "accesskit",
     forkRepo: "aphrody-labs/accesskit",
     defaultUpstream: "AccessKit/accesskit",
     ecosystem: "shared-a11y",
     role: "Patched OS UIA/AT-SPI2/AX semantic tree unified across gpui, egui 0.37 & aphrody_pilot",
   },
   {
-    path: "vendor/egui",
+    name: "egui",
     forkRepo: "aphrody-labs/egui",
     defaultUpstream: "emilk/egui",
     ecosystem: "egui",
     role: "Immediate-mode GUI v0.37 embedded via crates/egui_gpui & crates/bevy_gpui on shared wgpu v30 + accesskit",
   },
   {
-    path: "vendor/craft-libs",
+    name: "craft-libs",
     forkRepo: "aphrody-labs/craft-libs",
     defaultUpstream: "storytold/craft-libs",
     ecosystem: "craft-libs",
     role: "45+ pure-Rust format/decoder/sniff crates powering crates/aphrody_craft & crates/bevy_gpui",
   },
   {
-    path: "vendor/craft-anything",
+    name: "craft-anything",
     forkRepo: "aphrody-labs/craft-anything",
     defaultUpstream: "storytold/craft-anything",
     ecosystem: "craft-libs",
     role: "Disasm/JS/Evidence/Formats inspector crates embedded into crates/aphrody_craft",
   },
   {
-    path: "vendor/tauri/wry",
+    name: "wry",
     forkRepo: "aphrody-labs/wry",
     defaultUpstream: "tauri-apps/wry",
     ecosystem: "hybrid-webview",
@@ -91,48 +92,48 @@ export const TARGET_SUBMODULES: SubmoduleAuditSpec[] = [
   },
 ];
 
-/** De-vendored upstream ecosystems tracked via GitHub + crates.io + bridge crates (no local checkout bloat). */
+/** Upstream ecosystems tracked via GitHub + crates.io + bridge crates; none is a workspace dependency. */
 export const REFERENCE_ECOSYSTEMS: Array<{
   id: string;
   forkRepo: string;
   upstreamRepo: string;
   localBridge: string;
-  reasonDeVendored: string;
+  reasonNotPinned: string;
 }> = [
   {
     id: "dioxus",
     forkRepo: "aphrody-labs/dioxus",
     upstreamRepo: "DioxusLabs/dioxus",
     localBridge: "crates/gpui/src/hot_reload.rs (subsecond =0.7.10)",
-    reasonDeVendored: "Root pulls subsecond 0.7.10 from crates.io; dioxus 0.8 alpha pulls conflicting anyrender 0.14 / vello 0.11",
+    reasonNotPinned: "Root pulls subsecond 0.7.10 from crates.io; dioxus 0.8 alpha pulls conflicting anyrender 0.14 / vello 0.11",
   },
   {
     id: "blitz",
     forkRepo: "aphrody-labs/blitz",
     upstreamRepo: "DioxusLabs/blitz",
     localBridge: "crates/aphrody_ui/src/unified_runtime.rs (FrameworkLayer::Blitz)",
-    reasonDeVendored: "HTML5/CSS Stylo reference only; pulls anyrender 0.15 / winit 0.31-beta outside Cargo.lock",
+    reasonNotPinned: "HTML5/CSS Stylo reference only; pulls anyrender 0.15 / winit 0.31-beta outside Cargo.lock",
   },
   {
     id: "anyrender",
     forkRepo: "aphrody-labs/anyrender",
     upstreamRepo: "DioxusLabs/anyrender",
     localBridge: "crates/gpui_wgpu/src/wgpu_context.rs (WgpuContext::shared_handles)",
-    reasonDeVendored: "Zero-copy shared WGPU handle target; not a workspace Cargo dep",
+    reasonNotPinned: "Zero-copy shared WGPU handle target; not a workspace Cargo dep",
   },
   {
     id: "iced",
     forkRepo: "aphrody-labs/iced",
     upstreamRepo: "iced-rs/iced",
     localBridge: "crates/iced_gpui + aphrody_ui::reactive",
-    reasonDeVendored: "Upstream iced pulls older wgpu + winit + softbuffer; superseded locally by iced_gpui on wgpu v30",
+    reasonNotPinned: "Upstream iced pulls older wgpu + winit + softbuffer; superseded locally by iced_gpui on wgpu v30",
   },
   {
     id: "libcosmic",
     forkRepo: "aphrody-labs/libcosmic",
     upstreamRepo: "pop-os/libcosmic",
     localBridge: "aphrody_ui::{cosmic_shell,cosmic_theme} + crates/iced_gpui",
-    reasonDeVendored: "Pulls iced + sctk versions conflicting with gpui_linux; vendor/cosmic-text keeps text shaping local",
+    reasonNotPinned: "Pulls iced + sctk versions conflicting with gpui_linux; the pinned cosmic-text keeps text shaping local",
   },
 ];
 
@@ -172,8 +173,7 @@ export type EcosystemGroup =
   | "aphrody-nsh"
   | "egui"
   | "craft-libs"
-  | "iced-libcosmic"
-  | "shared-foundation";
+  | "iced-libcosmic";
 
 export interface ManifestTargetSpec {
   manifestRel: string;
@@ -202,38 +202,11 @@ export const FEATURE_MANIFEST_TARGETS: ManifestTargetSpec[] = [
   { manifestRel: "crates/nsh-engine/Cargo.toml", ecosystem: "aphrody-nsh", role: "NSH reactive QuickJS + Tailwind CSS + WGPU shader engine" },
   { manifestRel: "crates/nsh-platform-gpui/Cargo.toml", ecosystem: "aphrody-nsh", role: "NSH desktop GPUI + WRY WebView host bridge" },
   { manifestRel: "crates/nsh-platform-web/Cargo.toml", ecosystem: "aphrody-nsh", role: "NSH wasm32 browser DOM + QuickJS/WebGL host" },
-  { manifestRel: "vendor/egui/Cargo.toml", ecosystem: "egui", role: "Egui 0.37 workspace root (patches & compiler profiles)" },
-  { manifestRel: "vendor/egui/crates/egui/Cargo.toml", ecosystem: "egui", role: "Egui core immediate-mode widgets & AccessKit integration" },
-  { manifestRel: "vendor/egui/crates/egui-wgpu/Cargo.toml", ecosystem: "egui", role: "Egui WGPU v30 render pass backend" },
-  { manifestRel: "vendor/egui/crates/epaint/Cargo.toml", ecosystem: "egui", role: "Egui 2D tessellator, fonts & HarfRust text layout" },
-  { manifestRel: "vendor/egui/crates/eframe/Cargo.toml", ecosystem: "egui", role: "Standalone Egui native/web shell (excluded from root Cargo.lock)" },
   { manifestRel: "crates/egui_gpui/Cargo.toml", ecosystem: "egui", role: "In-process GPUI + WGPU v30 bridge for egui 0.37 without Winit" },
   { manifestRel: "crates/bevy_gpui/Cargo.toml", ecosystem: "egui", role: "UE5.8 ECS/Solari GI + MaterialX Naga WGSL + egui inspector bridge" },
-  { manifestRel: "vendor/craft-libs/Cargo.toml", ecosystem: "craft-libs", role: "Storytold Craft Libs workspace root (pure-Rust format codecs)" },
   { manifestRel: "crates/aphrody_craft/Cargo.toml", ecosystem: "craft-libs", role: "ArtCraft + Storytold suite (45+ craft-* codecs, FigCraft, CraftAnything, MCP)" },
-  { manifestRel: "vendor/craft-anything/crates/analysis/Cargo.toml", ecosystem: "craft-libs", role: "Craft Anything binary/JS/disasm analysis engine" },
-  { manifestRel: "vendor/craft-libs/crates/sniff/Cargo.toml", ecosystem: "craft-libs", role: "Pure-Rust magic-byte format identifier (craft-sniff)" },
-  { manifestRel: "vendor/craft-libs/crates/elf/Cargo.toml", ecosystem: "craft-libs", role: "ELF64 container & symbol parser (craft-elf)" },
-  { manifestRel: "vendor/craft-libs/crates/pe/Cargo.toml", ecosystem: "craft-libs", role: "PE/COFF Windows binary parser (craft-pe)" },
-  { manifestRel: "vendor/craft-libs/crates/macho/Cargo.toml", ecosystem: "craft-libs", role: "Mach-O Apple binary parser (craft-macho)" },
-  { manifestRel: "vendor/craft-libs/crates/wasm/Cargo.toml", ecosystem: "craft-libs", role: "WebAssembly section/module inspector (craft-wasm)" },
-  { manifestRel: "vendor/craft-libs/crates/fig/Cargo.toml", ecosystem: "craft-libs", role: "Figma Kiwi .fig decoder (craft-fig)" },
-  { manifestRel: "vendor/craft-libs/crates/usd/Cargo.toml", ecosystem: "craft-libs", role: "OpenUSD stage/mesh decoder (craft-usd)" },
-  { manifestRel: "vendor/craft-libs/crates/psd/Cargo.toml", ecosystem: "craft-libs", role: "Photoshop PSD/PSB layer decoder (craft-psd)" },
   { manifestRel: "crates/iced_gpui/Cargo.toml", ecosystem: "iced-libcosmic", role: "Iced Elm runtime + libcosmic RON theme adapter on GPUI & WGPU v30" },
-  { manifestRel: "vendor/cosmic-text/Cargo.toml", ecosystem: "iced-libcosmic", role: "Pop!_OS cosmic-text shaper (0.19.0) patched into root workspace" },
-  { manifestRel: "vendor/taffy/Cargo.toml", ecosystem: "shared-foundation", role: "Patched shared Taffy layout crate (0.15.1)" },
-  { manifestRel: "vendor/wgpu/wgpu/Cargo.toml", ecosystem: "shared-foundation", role: "Patched shared WGPU v30 crate" },
-  { manifestRel: "vendor/accesskit/accesskit/Cargo.toml", ecosystem: "shared-foundation", role: "Patched shared AccessKit core (0.25.2)" },
-  { manifestRel: "vendor/tauri/wry/Cargo.toml", ecosystem: "shared-foundation", role: "Patched WRY WebView engine (0.57.3)" },
 ];
-
-export interface SubmoduleStatusRow {
-  state: "clean" | "modified" | "uninitialized" | "conflict";
-  sha: string;
-  path: string;
-  refDesc: string;
-}
 
 export interface ManifestSummary {
   manifestRel: string;
@@ -253,18 +226,17 @@ export interface ManifestSummary {
   profiles: string[];
 }
 
-export interface SubmoduleForkAudit {
-  path: string;
+export interface PinnedForkAudit {
+  name: string;
   ecosystem: string;
-  gitmodulesUrl: string;
-  gitmodulesBranch: string;
-  localSha: string;
-  localState: SubmoduleStatusRow["state"];
-  localCommitDate: string;
-  localCommitSubject: string;
+  /** Pinned Cargo git dependency: `aphrody-labs/<name>`. */
   forkRepo: string;
+  gitUrl: string;
+  pinnedTag: string;
+  pinnedSha: string;
+  /** True when the root Cargo.toml has a `git = <gitUrl>, tag = <pinnedTag>` dependency line. */
+  pinnedInCargo: boolean;
   forkDefaultBranch: string;
-  forkTargetBranch: string;
   forkSha: string;
   upstreamRepo: string;
   upstreamDefaultBranch: string;
@@ -272,13 +244,11 @@ export interface SubmoduleForkAudit {
   upstreamStars: number;
   upstreamPushedAt: string;
   upstreamLicense: string;
-  localBehindFork: number | null;
+  pinBehindFork: number | null;
   forkAheadUpstream: number | null;
   forkBehindUpstream: number | null;
   driftStatus: string;
   customCommits: Array<{ sha: string; date: string; subject: string }>;
-  patchedInRootCargo: boolean;
-  excludedFromRootWorkspace: boolean;
   role: string;
 }
 
@@ -287,7 +257,7 @@ export interface ReferenceEcosystemStatus {
   forkRepo: string;
   upstreamRepo: string;
   localBridge: string;
-  reasonDeVendored: string;
+  reasonNotPinned: string;
   upstreamStars: number;
   upstreamSha: string;
   forkSha: string;
@@ -389,11 +359,11 @@ export interface GpuiVsDioxusAuditReport {
     driftStatus: string;
     workspaceMembersCount: number;
     workspaceExcludedCount: number;
-    gitmodulesCount: number;
+    pinnedForkCount: number;
     patchCratesIoCount: number;
     gpuiCrateVersion: string;
   };
-  submodules: SubmoduleForkAudit[];
+  forks: PinnedForkAudit[];
   referenceEcosystems: ReferenceEcosystemStatus[];
   cratesIo: CratesIoSnapshot[];
   hostTools: {
@@ -407,10 +377,10 @@ export interface GpuiVsDioxusAuditReport {
   benchmarks: BenchmarkSnapshot;
   architectureMatrix: EcosystemComparisonRow[];
   summary: {
-    submoduleCount: number;
-    forkAheadSubmoduleCount: number;
-    localBehindForkSubmoduleCount: number;
-    patchedSubmoduleCount: number;
+    forkCount: number;
+    forkAheadUpstreamCount: number;
+    pinBehindForkCount: number;
+    pinnedInCargoCount: number;
     cratesIoCheckedCount: number;
     featureMatrixManifestCount: number;
     totalFeaturesCounted: number;
@@ -442,6 +412,43 @@ export function stripNullish<T>(value: T): T {
   return value;
 }
 
+export interface ForkManifestEntry {
+  name: string;
+  repo: string;
+  upstream: string;
+  branch: string;
+  tag: string;
+  sha: string;
+  gitUrl: string;
+}
+
+/** Pinned forks recorded in `tooling/bun/forks-manifest.json` (empty when the manifest is absent). */
+export function readForksManifest(root = REPO_ROOT): ForkManifestEntry[] {
+  const path = join(root, FORKS_MANIFEST_REL);
+  if (!existsSync(path)) return [];
+  const parsed = JSON.parse(readFileSync(path, "utf8")) as { forks?: Array<Partial<ForkManifestEntry>> };
+  return (parsed.forks ?? []).map((f) => ({
+    name: String(f.name ?? ""),
+    repo: String(f.repo ?? ""),
+    upstream: String(f.upstream ?? ""),
+    branch: String(f.branch ?? "main"),
+    tag: String(f.tag ?? ""),
+    sha: String(f.sha ?? ""),
+    gitUrl: String(f.gitUrl ?? ""),
+  }));
+}
+
+/** True when a Cargo.toml dependency line pins the fork's `gitUrl` at its manifest `tag`. */
+export function isForkPinnedInCargo(cargoToml: string, fork: Pick<ForkManifestEntry, "gitUrl" | "tag">): boolean {
+  if (!fork.gitUrl || !fork.tag) return false;
+  return cargoToml.split(/\r?\n/).some((line) => line.includes(fork.gitUrl) && line.includes(`tag = "${fork.tag}"`));
+}
+
+/** Crate version embedded in a fork tag, e.g. `v30.0.0-aphrody.20261120` -> `30.0.0`. */
+export function forkTagVersion(tag: string): string {
+  return tag.replace(/^v/, "").replace(/-aphrody.*$/, "");
+}
+
 function tomlStr(val: string): string {
   return JSON.stringify(val);
 }
@@ -450,48 +457,22 @@ function tomlArr(vals: string[]): string {
   return `[${vals.map(tomlStr).join(", ")}]`;
 }
 
-export function parseSubmoduleStatusOutput(raw: string): SubmoduleStatusRow[] {
-  const rows: SubmoduleStatusRow[] = [];
-  for (const rawLine of raw.split(/\r?\n/)) {
-    const line = rawLine.replace(/\r$/, "");
-    if (!line.trim()) continue;
-    const match = /^([ +U-])([0-9a-fA-F]{40})\s+(\S+)(?:\s+\(([^)]+)\))?/.exec(line);
-    if (!match) continue;
-    const prefix = match[1];
-    const state: SubmoduleStatusRow["state"] =
-      prefix === "+"
-        ? "modified"
-        : prefix === "-"
-          ? "uninitialized"
-          : prefix === "U"
-            ? "conflict"
-            : "clean";
-    rows.push({
-      state,
-      sha: match[2],
-      path: match[3].replace(/\\/g, "/"),
-      refDesc: match[4] ?? "",
-    });
-  }
-  return rows;
-}
-
 export function classifyForkDrift(input: {
-  localSha: string;
+  pinnedSha: string;
   forkSha: string;
   upstreamSha: string;
   aheadBy: number | null;
   behindBy: number | null;
-  localBehindFork: number | null;
+  pinBehindFork: number | null;
 }): string {
   if (!input.forkSha || !input.upstreamSha) {
     return "offline";
   }
-  if (input.localSha && input.forkSha && input.localSha !== input.forkSha) {
-    if (typeof input.localBehindFork === "number" && input.localBehindFork > 0) {
-      return `local-behind-fork (-${input.localBehindFork})`;
+  if (input.pinnedSha && input.forkSha && input.pinnedSha !== input.forkSha) {
+    if (typeof input.pinBehindFork === "number" && input.pinBehindFork > 0) {
+      return `pin-behind-fork (-${input.pinBehindFork})`;
     }
-    return "local-diverged-from-fork";
+    return "pin-diverged-from-fork";
   }
   if (input.aheadBy === null || input.behindBy === null) {
     return input.forkSha === input.upstreamSha ? "identical" : "diverged";
@@ -685,25 +666,25 @@ export function analyzeLockfileConflicts(
       crateName: "wgpu",
       expectUnified: true,
       impact: "Shared by gpui_wgpu, egui-wgpu, iced_gpui, nsh-engine, aphrody_cli; older upstream iced/eframe pull wgpu 24–28.",
-      resolution: "UNIFIED: Root [patch.crates-io] forces vendor/wgpu v30.0.0 across all crates; iced & libcosmic are adapted via iced_gpui.",
+      resolution: "UNIFIED: Root Cargo.toml pins aphrody-labs/wgpu (v30.0.0) as a single git tag across all crates; iced & libcosmic are adapted via iced_gpui.",
     },
     {
       crateName: "taffy",
       expectUnified: true,
       impact: "Layout engine for gpui, nsh-core, aphrody_session (vs upstream blitz-dom / dioxus).",
-      resolution: "UNIFIED: Root [patch.crates-io] forces vendor/taffy 0.15.1 single checkout.",
+      resolution: "UNIFIED: Root Cargo.toml pins aphrody-labs/taffy (0.15.1) as a single git tag.",
     },
     {
       crateName: "accesskit",
       expectUnified: true,
       impact: "Accessibility tree across gpui, gpui_{linux,macos,windows}, egui 0.37, aphrody_pilot.",
-      resolution: "UNIFIED: Root [patch.crates-io] forces vendor/accesskit 0.25.2 single version.",
+      resolution: "UNIFIED: Root Cargo.toml pins aphrody-labs/accesskit (0.25.2) as a single git tag.",
     },
     {
       crateName: "cosmic-text",
       expectUnified: true,
       impact: "Text shaper across gpui_wgpu vs libcosmic; upstream cosmic-text versions diverge on harfrust/skrifa.",
-      resolution: "UNIFIED: Root [patch.crates-io] forces vendor/cosmic-text 0.19.0 for gpui_wgpu.",
+      resolution: "UNIFIED: Root Cargo.toml pins aphrody-labs/cosmic-text (0.19.0) for gpui_wgpu.",
     },
     {
       crateName: "ropey",
@@ -712,13 +693,13 @@ export function analyzeLockfileConflicts(
     },
     {
       crateName: "harfrust",
-      impact: "epaint 0.37 (vendor/egui) requires harfrust 0.15.0 + skrifa 0.49, whereas vendor/cosmic-text 0.19 pins harfrust 0.12.0 + skrifa 0.44.",
-      resolution: "Tracked across vendor/egui vs vendor/cosmic-text; bump cosmic-text upstream or keep egui behind optional feature.",
+      impact: "epaint 0.37 (aphrody-labs/egui) requires harfrust 0.15.0 + skrifa 0.49, whereas aphrody-labs/cosmic-text 0.19 pins harfrust 0.12.0 + skrifa 0.44.",
+      resolution: "Tracked across the pinned aphrody-labs/egui vs aphrody-labs/cosmic-text tags; bump cosmic-text upstream or keep egui behind optional feature.",
     },
     {
       crateName: "skrifa",
-      impact: "Split 0.44.0 (cosmic-text) vs 0.49.0 (epaint/glifo); vendor/craft-libs workspace also references 0.47 (unused).",
-      resolution: "Aligns automatically when vendor/cosmic-text syncs upstream read-fonts 0.46 / skrifa 0.49.",
+      impact: "Split 0.44.0 (cosmic-text) vs 0.49.0 (epaint/glifo); the craft-libs workspace also references 0.47 (unused).",
+      resolution: "Aligns automatically when the pinned cosmic-text tag syncs upstream read-fonts 0.46 / skrifa 0.49.",
     },
     {
       crateName: "fontdb",
@@ -737,12 +718,12 @@ export function analyzeLockfileConflicts(
     },
     {
       crateName: "notify",
-      impact: "Zed fs, gpui-component, nsh-cli use zed-industries/notify 9.0.0-rc.4 while vendor/mullvad uses crates.io notify 8.2.2.",
+      impact: "Zed fs, gpui-component, nsh-cli use zed-industries/notify 9.0.0-rc.4 while the pinned mullvadvpn-app fork uses crates.io notify 8.2.2.",
       resolution: "Mullein/Mullvad daemon isolates notify 8.2 behind aphrody_vpn; drops when notify 9.0 stabilizes.",
     },
     {
       crateName: "dirs",
-      impact: "Workspace updated dirs 6.0 -> 7.0 across Aphrody/Mullvad crates; zed-font-kit/shellexpand still pull dirs 6.0.0; vendor/egui references directories 6.0.",
+      impact: "Workspace updated dirs 6.0 -> 7.0 across Aphrody/Mullvad crates; zed-font-kit/shellexpand still pull dirs 6.0.0; the pinned egui fork references directories 6.0.",
       resolution: "Root workspace converged on dirs 7.0; transitive 6.0 drops when zed-font-kit updates.",
     },
     {
@@ -778,18 +759,18 @@ export function analyzeLockfileConflicts(
     });
   }
 
-  // Architectural conflicts avoided by de-vendoring / adapters:
-  const craftGitLeaks = (pkgsByName.get("craft-sniff") ?? []).filter((p) => p.source.startsWith("git+"));
+  // Architectural conflicts avoided by pinning a single tag / adapters:
+  const craftGitLeaks = (pkgsByName.get("craft-sniff") ?? []).slice(1);
   conflicts.push({
     crateName: "craft-* (storytold/craft-libs)",
     status: craftGitLeaks.length === 0 ? "unified-by-patch" : "lockfile-multi-version",
     versions: [`0.1.0 (${Object.keys(patchCraftLibs).length} patched git+ overrides)`],
     consumers: ["crates/aphrody_craft", "crates/bevy_gpui"],
-    impact: "Unpatched storytold/craft-libs git URLs previously triggered duplicate git checkouts & skrifa 0.47 conflicts.",
+    impact: "Unpatched storytold/craft-libs git URLs previously triggered duplicate git sources & skrifa 0.47 conflicts.",
     resolution:
       craftGitLeaks.length === 0
-        ? `UNIFIED: All ${Object.keys(patchCraftLibs).length} craft-* crates patched via [patch."https://github.com/storytold/craft-libs"] -> 0 git duplicates.`
-        : `Duplicate git checkout detected for craft-sniff (${craftGitLeaks.length} copies).`,
+        ? `UNIFIED: All ${Object.keys(patchCraftLibs).length} craft-* crates patched via [patch."https://github.com/storytold/craft-libs"] -> 0 git duplicates (pinned at aphrody-labs/craft-libs tags).`
+        : `Duplicate git source detected for craft-sniff (${craftGitLeaks.length + 1} copies).`,
   });
   conflicts.push({
     crateName: "iced + libcosmic + dioxus/blitz/anyrender",
@@ -798,7 +779,7 @@ export function analyzeLockfileConflicts(
     consumers: ["crates/iced_gpui", "crates/aphrody_ui", "crates/gpui"],
     impact: "Upstream iced/libcosmic pull incompatible wgpu 24–28 + winit 0.30 + sctk; Dioxus/Blitz split anyrender 0.14 vs 0.15 & vello 0.11 vs 0.12.",
     resolution:
-      "ISOLATED: Excluded from root workspace & de-vendored into reference skill; capabilities live natively in iced_gpui, aphrody_ui, egui_gpui & gpui.",
+      "ISOLATED: Excluded from root workspace & kept as reference skill only; capabilities live natively in iced_gpui, aphrody_ui, egui_gpui & gpui.",
   });
 
   return {
@@ -954,7 +935,7 @@ export function scanIntegrationBridges(root = REPO_ROOT): BridgeFinding[] {
       "dioxus_devtools_types::DevserverMsg",
     ],
     summary:
-      "crates/gpui wires native hot-reload behind `feature = \"hot-reload\"` (subsecond =0.7.10 + dioxus-cli-config + dioxus-devtools-types) without requiring vendor/dioxus.",
+      "crates/gpui wires native hot-reload behind `feature = \"hot-reload\"` (subsecond =0.7.10 + dioxus-cli-config + dioxus-devtools-types) without depending on the dioxus workspace.",
     verifiedLines: gpuiHotFiles.flatMap((f) => (hitsByFile.get(f) ?? []).map((h) => ({ file: f, ...h }))).slice(0, 12),
   });
 
@@ -1015,18 +996,19 @@ export function scanIntegrationBridges(root = REPO_ROOT): BridgeFinding[] {
 
   // 6. Cargo [patch.*] Unification & Verified Version Splits
   const gpuiText = existsSync(join(root, "crates/gpui/Cargo.toml")) ? readFileSync(join(root, "crates/gpui/Cargo.toml"), "utf8") : "";
-  const taffyText = existsSync(join(root, "vendor/taffy/Cargo.toml")) ? readFileSync(join(root, "vendor/taffy/Cargo.toml"), "utf8") : "";
-  const wgpuText = existsSync(join(root, "vendor/wgpu/wgpu/Cargo.toml")) ? readFileSync(join(root, "vendor/wgpu/wgpu/Cargo.toml"), "utf8") : "";
-  const eguiText = existsSync(join(root, "vendor/egui/Cargo.toml")) ? readFileSync(join(root, "vendor/egui/Cargo.toml"), "utf8") : "";
+  const pinnedVersion = (name: string, fallback: string): string => {
+    const tag = readForksManifest(root).find((f) => f.name === name)?.tag;
+    return tag ? forkTagVersion(tag) : fallback;
+  };
   const gpuiSubVer = gpuiText.match(/subsecond\s*=\s*\{\s*version\s*=\s*"([^"]+)"/)?.[1] ?? "=0.7.10";
-  const taffyVer = taffyText.match(/^version\s*=\s*"([^"]+)"/m)?.[1] ?? "0.15.1";
-  const wgpuVer = wgpuText.match(/version\.workspace\s*=\s*true/) ? "30.0.0" : (wgpuText.match(/^version\s*=\s*"([^"]+)"/m)?.[1] ?? "30.0.0");
-  const eguiVer = eguiText.match(/^version\s*=\s*"([^"]+)"/m)?.[1] ?? "0.37.0";
+  const taffyVer = pinnedVersion("taffy", "0.15.1");
+  const wgpuVer = pinnedVersion("wgpu", "30.0.0");
+  const eguiVer = pinnedVersion("egui", "0.37.0");
 
   findings.push({
     id: "verified-version-splits",
     kind: "version-split",
-    files: ["Cargo.toml", "Cargo.lock", "crates/gpui/Cargo.toml", "vendor/taffy/Cargo.toml", "vendor/egui/Cargo.toml"].filter((f) =>
+    files: ["Cargo.toml", "Cargo.lock", FORKS_MANIFEST_REL, "crates/gpui/Cargo.toml"].filter((f) =>
       existsSync(join(root, f)),
     ),
     symbols: [
@@ -1052,7 +1034,7 @@ export function buildArchitectureComparison(report: {
   const feat = (rel: string) => report.featureMatrix.find((m) => m.manifestRel === rel)?.featureCount ?? 0;
   const gpuiFeat = feat("crates/gpui/Cargo.toml");
   const nshFeat = feat("crates/nsh-engine/Cargo.toml");
-  const eguiFeat = feat("vendor/egui/crates/egui/Cargo.toml");
+  const eguiFeat = feat("crates/egui_gpui/Cargo.toml");
   const craftFeat = feat("crates/aphrody_craft/Cargo.toml");
   const icedFeat = feat("crates/iced_gpui/Cargo.toml");
 
@@ -1068,25 +1050,25 @@ export function buildArchitectureComparison(report: {
       title: "Reactivity & State",
       gpuiAphrody: `Entity<T> slotmap + Context<T> (${gpuiFeat} features); NSH Solid-style signals (${nshFeat} features in nsh-engine)`,
       dioxusBlitzAnyrender: "GenerationalBox Signal<T> / RSX VDOM (crates.io reference)",
-      eguiCraftLibs: `Immediate-mode per-frame closure (${eguiFeat} egui features) + CraftStudioSession FigCraft history (${craftFeat} features)`,
+      eguiCraftLibs: `Immediate-mode per-frame closure (${eguiFeat} egui_gpui features) + CraftStudioSession FigCraft history (${craftFeat} features)`,
       icedLibcosmic: `Elm Message/Task batch queue (${icedFeat} features in iced_gpui) + OsConfigStore`,
       unificationPath: "Host long-lived state in GPUI Entity<T>; compose NSH TSX, egui inspectors, and Elm commands inside one window.",
     },
     {
       dimension: "layout_text",
       title: "Layout & Text Shaping",
-      gpuiAphrody: "Patched vendor/taffy 0.15.1 + gpui_wgpu CosmicTextSystem (vendor/cosmic-text 0.19)",
-      dioxusBlitzAnyrender: "Servo Stylo + stylo_taffy + Parley (de-vendored reference)",
+      gpuiAphrody: "Pinned aphrody-labs/taffy 0.15.1 + gpui_wgpu CosmicTextSystem (aphrody-labs/cosmic-text 0.19)",
+      dioxusBlitzAnyrender: "Servo Stylo + stylo_taffy + Parley (reference only)",
       eguiCraftLibs: "egui Grid/Strip layout + epaint harfrust 0.15 / skrifa 0.49; craft-fig/usd geometry decoders",
       icedLibcosmic: "Shares GPUI Taffy + M3/COSMIC breakpoints (aphrody_ui) + cosmic-text 0.19",
-      unificationPath: "Single vendor/taffy across GPUI/NSH; converge cosmic-text up to harfrust 0.15 / skrifa 0.49 to eliminate epaint split.",
+      unificationPath: "Single pinned taffy tag across GPUI/NSH; converge cosmic-text up to harfrust 0.15 / skrifa 0.49 to eliminate epaint split.",
     },
     {
       dimension: "gpu_a11y",
       title: "GPU & AccessKit Wiring",
       gpuiAphrody: "Metal/D3D11 + gpui_wgpu (wgpu 30.0.0) + AccessKit 0.25.2",
       dioxusBlitzAnyrender: "AnyRender + Vello 0.11/0.12 (WgpuContext::shared_handles target)",
-      eguiCraftLibs: "egui-wgpu 0.37 patched onto vendor/wgpu 30.0.0 + vendor/accesskit 0.25.2 + Bevy Naga WGSL",
+      eguiCraftLibs: "egui-wgpu 0.37 on the pinned wgpu 30.0.0 + accesskit 0.25.2 tags + Bevy Naga WGSL",
       icedLibcosmic: "iced_gpui runs on GPUI+wgpu 30 (avoids upstream iced wgpu 24–28 & sctk conflicts)",
       unificationPath: "Zero duplicate WGPU/AccessKit crates anywhere in Cargo.lock.",
     },
@@ -1213,43 +1195,28 @@ function inspectHostTools(root = REPO_ROOT): GpuiVsDioxusAuditReport["hostTools"
   return { tools, rustupTargets, webBuildFrameworks };
 }
 
-async function inspectSubmodulesAndForks(
+async function inspectPinnedForks(
   root: string,
-  gitmodules: SubmoduleEntry[],
-  patchKeys: Set<string>,
-  excludedList: Set<string>,
   offline: boolean,
-): Promise<{ submodules: SubmoduleForkAudit[]; referenceEcosystems: ReferenceEcosystemStatus[] }> {
-  const subPaths = TARGET_SUBMODULES.map((s) => s.path);
-  const statusRes = runCommand(["git", "-C", root, "submodule", "status", ...subPaths], root);
-  const statusRows = parseSubmoduleStatusOutput(statusRes.stdout);
-  const statusMap = new Map(statusRows.map((r) => [r.path, r]));
-  const gmMap = new Map(gitmodules.map((g) => [g.path.replace(/\\/g, "/"), g]));
+): Promise<{ forks: PinnedForkAudit[]; referenceEcosystems: ReferenceEcosystemStatus[] }> {
+  const cargoToml = readFileSync(join(root, "Cargo.toml"), "utf8");
+  const manifestForks = new Map(readForksManifest(root).map((f) => [f.name, f]));
 
-  const submodules = await Promise.all(
-    TARGET_SUBMODULES.map(async (spec) => {
-      const gm = gmMap.get(spec.path);
-      const st = statusMap.get(spec.path);
-      const subDir = join(root, spec.path);
+  const forks = await Promise.all(
+    TARGET_FORKS.map(async (spec): Promise<PinnedForkAudit> => {
+      const pin = manifestForks.get(spec.name);
+      const pinnedSha = pin?.sha ?? "";
+      const pinnedBranch = pin?.branch ?? "main";
 
-      const headShaRes = existsSync(subDir) ? runCommand(["git", "-C", subDir, "rev-parse", "HEAD"], root) : { ok: false, stdout: "" };
-      const localSha = (st?.sha || headShaRes.stdout.trim() || "").trim();
-      const logRes = existsSync(subDir)
-        ? runCommand(["git", "-C", subDir, "log", "-1", "--format=%cI%n%s"], root)
-        : { ok: false, stdout: "" };
-      const [localCommitDate = "", localCommitSubject = ""] = logRes.stdout.trim().split(/\r?\n/);
-
-      const gitmodulesBranch = gm?.branch ?? "main";
-      let forkDefaultBranch = gitmodulesBranch;
-      let forkTargetBranch = gitmodulesBranch;
-      let forkSha = localSha;
-      let upstreamRepo = spec.defaultUpstream;
+      let forkDefaultBranch = pinnedBranch;
+      let forkSha = pinnedSha;
+      let upstreamRepo = pin?.upstream || spec.defaultUpstream;
       let upstreamDefaultBranch = "main";
       let upstreamSha = "";
       let upstreamStars = 0;
       let upstreamPushedAt = "";
       let upstreamLicense = "";
-      let localBehindFork: number | null = null;
+      let pinBehindFork: number | null = null;
       let forkAheadUpstream: number | null = null;
       let forkBehindUpstream: number | null = null;
       const customCommits: Array<{ sha: string; date: string; subject: string }> = [];
@@ -1257,15 +1224,14 @@ async function inspectSubmodulesAndForks(
       if (!offline) {
         const forkMeta = await ghJsonAsync<Record<string, any>>(`repos/${spec.forkRepo}`);
         if (forkMeta) {
-          forkDefaultBranch = String(forkMeta.default_branch ?? gitmodulesBranch);
+          forkDefaultBranch = String(forkMeta.default_branch ?? pinnedBranch);
           if (forkMeta.parent?.full_name) {
             upstreamRepo = String(forkMeta.parent.full_name);
           }
         }
-        forkTargetBranch = gm?.branch ?? forkDefaultBranch;
 
         const [forkBranchCommit, upMeta] = await Promise.all([
-          ghJsonAsync<Record<string, any>>(`repos/${spec.forkRepo}/commits/${forkTargetBranch}`),
+          ghJsonAsync<Record<string, any>>(`repos/${spec.forkRepo}/commits/${pinnedBranch}`),
           ghJsonAsync<Record<string, any>>(`repos/${upstreamRepo}`),
         ]);
 
@@ -1281,17 +1247,17 @@ async function inspectSubmodulesAndForks(
         if (upCommit?.sha) upstreamSha = String(upCommit.sha);
 
         const forkOwner = spec.forkRepo.split("/")[0];
-        const [cmpLocal, cmpFork] = await Promise.all([
-          localSha && forkSha && localSha !== forkSha
-            ? ghJsonAsync<Record<string, any>>(`repos/${spec.forkRepo}/compare/${localSha}...${forkTargetBranch}`)
+        const [cmpPin, cmpFork] = await Promise.all([
+          pinnedSha && forkSha && pinnedSha !== forkSha
+            ? ghJsonAsync<Record<string, any>>(`repos/${spec.forkRepo}/compare/${pinnedSha}...${pinnedBranch}`)
             : Promise.resolve(null),
           forkSha && upstreamSha && forkSha !== upstreamSha
-            ? ghJsonAsync<Record<string, any>>(`repos/${upstreamRepo}/compare/${upstreamDefaultBranch}...${forkOwner}:${forkTargetBranch}`)
+            ? ghJsonAsync<Record<string, any>>(`repos/${upstreamRepo}/compare/${upstreamDefaultBranch}...${forkOwner}:${pinnedBranch}`)
             : Promise.resolve(null),
         ]);
 
-        if (localSha && forkSha) {
-          localBehindFork = localSha === forkSha ? 0 : typeof cmpLocal?.ahead_by === "number" ? cmpLocal.ahead_by : null;
+        if (pinnedSha && forkSha) {
+          pinBehindFork = pinnedSha === forkSha ? 0 : typeof cmpPin?.ahead_by === "number" ? cmpPin.ahead_by : null;
         }
         if (forkSha && upstreamSha) {
           if (forkSha === upstreamSha) {
@@ -1311,23 +1277,15 @@ async function inspectSubmodulesAndForks(
         }
       }
 
-      const keyCandidates = [spec.path.split("/").pop() ?? ""];
-      if (spec.path === "vendor/wgpu") keyCandidates.push("wgpu", "naga");
-      const patchedInRootCargo = keyCandidates.some((k) => patchKeys.has(k)) || spec.path === "vendor/craft-libs";
-      const excludedFromRootWorkspace = excludedList.has(spec.path);
-
       return {
-        path: spec.path,
+        name: spec.name,
         ecosystem: spec.ecosystem,
-        gitmodulesUrl: gm?.url ?? "",
-        gitmodulesBranch,
-        localSha,
-        localState: st?.state ?? (existsSync(subDir) ? "clean" : "uninitialized"),
-        localCommitDate,
-        localCommitSubject,
         forkRepo: spec.forkRepo,
+        gitUrl: pin?.gitUrl ?? "",
+        pinnedTag: pin?.tag ?? "",
+        pinnedSha,
+        pinnedInCargo: pin !== undefined && isForkPinnedInCargo(cargoToml, pin),
         forkDefaultBranch,
-        forkTargetBranch,
         forkSha,
         upstreamRepo,
         upstreamDefaultBranch,
@@ -1335,20 +1293,18 @@ async function inspectSubmodulesAndForks(
         upstreamStars,
         upstreamPushedAt,
         upstreamLicense,
-        localBehindFork,
+        pinBehindFork,
         forkAheadUpstream,
         forkBehindUpstream,
         driftStatus: classifyForkDrift({
-          localSha,
+          pinnedSha,
           forkSha,
           upstreamSha,
           aheadBy: forkAheadUpstream,
           behindBy: forkBehindUpstream,
-          localBehindFork,
+          pinBehindFork,
         }),
         customCommits,
-        patchedInRootCargo,
-        excludedFromRootWorkspace,
         role: spec.role,
       };
     }),
@@ -1378,7 +1334,7 @@ async function inspectSubmodulesAndForks(
     }),
   );
 
-  return { submodules, referenceEcosystems };
+  return { forks, referenceEcosystems };
 }
 
 export async function runAudit(
@@ -1395,9 +1351,6 @@ export async function runAudit(
   const patchCratesIo = ((rootCargo.patch ?? {}) as Record<string, any>)["crates-io"] ?? {};
   const patchKeys = new Set(Object.keys(patchCratesIo));
   const rootWsVersion = typeof rootWs.package?.version === "string" ? rootWs.package.version : "0.5.0";
-
-  const gitmodulesPath = join(root, ".gitmodules");
-  const gitmodules = existsSync(gitmodulesPath) ? parseGitmodules(readFileSync(gitmodulesPath, "utf8")) : [];
 
   const cargoMetaRes = runCommand(["cargo", "metadata", "--no-deps", "--format-version", "1"], root);
   let workspaceMembersCount = wsMembers.length;
@@ -1446,40 +1399,17 @@ export async function runAudit(
     }
   }
 
-  const [{ submodules, referenceEcosystems }, cratesIo] = await Promise.all([
-    inspectSubmodulesAndForks(root, gitmodules, patchKeys, wsExcluded, offline),
+  const [{ forks, referenceEcosystems }, cratesIo] = await Promise.all([
+    inspectPinnedForks(root, offline),
     offline ? Promise.resolve([] as CratesIoSnapshot[]) : fetchCratesIoSnapshots(),
   ]);
   const hostTools = inspectHostTools(root);
-
-  const wsVersionCache = new Map<string, string | undefined>();
-  const readWorkspacePkgVersion = (tomlRel: string): string | undefined => {
-    if (wsVersionCache.has(tomlRel)) return wsVersionCache.get(tomlRel);
-    const p = join(root, tomlRel);
-    let ver: string | undefined;
-    if (existsSync(p)) {
-      const parsed = Bun.TOML.parse(readFileSync(p, "utf8")) as Record<string, any>;
-      if (typeof parsed.workspace?.package?.version === "string") {
-        ver = parsed.workspace.package.version;
-      }
-    }
-    wsVersionCache.set(tomlRel, ver);
-    return ver;
-  };
 
   const featureMatrix: ManifestSummary[] = [];
   for (const spec of FEATURE_MANIFEST_TARGETS) {
     const full = join(root, spec.manifestRel);
     if (!existsSync(full)) continue;
-    let wsFallback = rootWsVersion;
-    if (spec.manifestRel.startsWith("vendor/egui")) {
-      wsFallback = readWorkspacePkgVersion("vendor/egui/Cargo.toml") ?? "0.37.0";
-    } else if (spec.manifestRel.startsWith("vendor/craft-libs")) {
-      wsFallback = readWorkspacePkgVersion("vendor/craft-libs/Cargo.toml") ?? "0.1.0";
-    } else if (spec.manifestRel.startsWith("vendor/craft-anything")) {
-      wsFallback = readWorkspacePkgVersion("vendor/craft-anything/Cargo.toml") ?? "0.6.1";
-    }
-    const summary = extractManifestSummary(readFileSync(full, "utf8"), spec, wsFallback);
+    const summary = extractManifestSummary(readFileSync(full, "utf8"), spec, rootWsVersion);
     const metaPkg = metaPkgMap.get(summary.packageName);
     if (metaPkg && metaPkg.features && typeof metaPkg.features === "object") {
       const metaFeatures: Record<string, string[]> = {};
@@ -1511,7 +1441,7 @@ export async function runAudit(
     driftStatus: rootDrift,
     workspaceMembersCount,
     workspaceExcludedCount: wsExcluded.size,
-    gitmodulesCount: gitmodules.length,
+    pinnedForkCount: forks.filter((f) => f.pinnedInCargo).length,
     patchCratesIoCount: patchKeys.size,
     gpuiCrateVersion: gpuiPkg?.version ?? "0.2.2",
   };
@@ -1527,7 +1457,7 @@ export async function runAudit(
     generatedAt: new Date().toISOString(),
     offlineMode: offline,
     rootRepo,
-    submodules,
+    forks,
     referenceEcosystems,
     cratesIo,
     hostTools,
@@ -1537,10 +1467,10 @@ export async function runAudit(
     benchmarks,
     architectureMatrix,
     summary: {
-      submoduleCount: submodules.length,
-      forkAheadSubmoduleCount: submodules.filter((s) => (s.forkAheadUpstream ?? 0) > 0).length,
-      localBehindForkSubmoduleCount: submodules.filter((s) => (s.localBehindFork ?? 0) > 0).length,
-      patchedSubmoduleCount: submodules.filter((s) => s.patchedInRootCargo).length,
+      forkCount: forks.length,
+      forkAheadUpstreamCount: forks.filter((f) => (f.forkAheadUpstream ?? 0) > 0).length,
+      pinBehindForkCount: forks.filter((f) => (f.pinBehindFork ?? 0) > 0).length,
+      pinnedInCargoCount: forks.filter((f) => f.pinnedInCargo).length,
       cratesIoCheckedCount: cratesIo.filter((c) => c.exists).length,
       featureMatrixManifestCount: featureMatrix.length,
       totalFeaturesCounted: featureMatrix.reduce((acc, m) => acc + m.featureCount, 0),
@@ -1567,10 +1497,10 @@ export function serializeMatrixToml(report: GpuiVsDioxusAuditReport): string {
     `offline_mode = ${clean.offlineMode}`,
     "",
     "[summary]",
-    `submodule_count = ${clean.summary.submoduleCount}`,
-    `fork_ahead_submodule_count = ${clean.summary.forkAheadSubmoduleCount}`,
-    `local_behind_fork_submodule_count = ${clean.summary.localBehindForkSubmoduleCount}`,
-    `patched_submodule_count = ${clean.summary.patchedSubmoduleCount}`,
+    `fork_count = ${clean.summary.forkCount}`,
+    `fork_ahead_upstream_count = ${clean.summary.forkAheadUpstreamCount}`,
+    `pin_behind_fork_count = ${clean.summary.pinBehindForkCount}`,
+    `pinned_in_cargo_count = ${clean.summary.pinnedInCargoCount}`,
     `crates_io_checked_count = ${clean.summary.cratesIoCheckedCount}`,
     `feature_matrix_manifest_count = ${clean.summary.featureMatrixManifestCount}`,
     `total_features_counted = ${clean.summary.totalFeaturesCounted}`,
@@ -1594,7 +1524,7 @@ export function serializeMatrixToml(report: GpuiVsDioxusAuditReport): string {
     `drift_status = ${tomlStr(clean.rootRepo.driftStatus)}`,
     `workspace_members_count = ${clean.rootRepo.workspaceMembersCount}`,
     `workspace_excluded_count = ${clean.rootRepo.workspaceExcludedCount}`,
-    `gitmodules_count = ${clean.rootRepo.gitmodulesCount}`,
+    `pinned_fork_count = ${clean.rootRepo.pinnedForkCount}`,
     `patch_crates_io_count = ${clean.rootRepo.patchCratesIoCount}`,
     `gpui_crate_version = ${tomlStr(clean.rootRepo.gpuiCrateVersion)}`,
     "",
@@ -1625,23 +1555,21 @@ export function serializeMatrixToml(report: GpuiVsDioxusAuditReport): string {
     "",
   ];
 
-  for (const s of clean.submodules) {
-    lines.push("[[submodules]]");
-    lines.push(`path = ${tomlStr(s.path)}`);
-    lines.push(`ecosystem = ${tomlStr(s.ecosystem)}`);
-    lines.push(`gitmodules_url = ${tomlStr(s.gitmodulesUrl)}`);
-    lines.push(`gitmodules_branch = ${tomlStr(s.gitmodulesBranch)}`);
-    lines.push(`local_sha = ${tomlStr(s.localSha)}`);
-    lines.push(`local_state = ${tomlStr(s.localState)}`);
-    lines.push(`fork_repo = ${tomlStr(s.forkRepo)}`);
-    lines.push(`fork_sha = ${tomlStr(s.forkSha)}`);
-    lines.push(`upstream_repo = ${tomlStr(s.upstreamRepo)}`);
-    lines.push(`upstream_sha = ${tomlStr(s.upstreamSha)}`);
-    lines.push(`upstream_stars = ${s.upstreamStars}`);
-    lines.push(`drift_status = ${tomlStr(s.driftStatus)}`);
-    lines.push(`patched_in_root_cargo = ${s.patchedInRootCargo}`);
-    lines.push(`excluded_from_root_workspace = ${s.excludedFromRootWorkspace}`);
-    lines.push(`role = ${tomlStr(s.role)}`);
+  for (const f of clean.forks) {
+    lines.push("[[forks]]");
+    lines.push(`name = ${tomlStr(f.name)}`);
+    lines.push(`ecosystem = ${tomlStr(f.ecosystem)}`);
+    lines.push(`git_url = ${tomlStr(f.gitUrl)}`);
+    lines.push(`pinned_tag = ${tomlStr(f.pinnedTag)}`);
+    lines.push(`pinned_sha = ${tomlStr(f.pinnedSha)}`);
+    lines.push(`pinned_in_cargo = ${f.pinnedInCargo}`);
+    lines.push(`fork_repo = ${tomlStr(f.forkRepo)}`);
+    lines.push(`fork_sha = ${tomlStr(f.forkSha)}`);
+    lines.push(`upstream_repo = ${tomlStr(f.upstreamRepo)}`);
+    lines.push(`upstream_sha = ${tomlStr(f.upstreamSha)}`);
+    lines.push(`upstream_stars = ${f.upstreamStars}`);
+    lines.push(`drift_status = ${tomlStr(f.driftStatus)}`);
+    lines.push(`role = ${tomlStr(f.role)}`);
     lines.push("");
   }
 
@@ -1654,7 +1582,7 @@ export function serializeMatrixToml(report: GpuiVsDioxusAuditReport): string {
     lines.push(`upstream_sha = ${tomlStr(r.upstreamSha)}`);
     lines.push(`fork_sha = ${tomlStr(r.forkSha)}`);
     lines.push(`local_bridge = ${tomlStr(r.localBridge)}`);
-    lines.push(`reason_de_vendored = ${tomlStr(r.reasonDeVendored)}`);
+    lines.push(`reason_not_pinned = ${tomlStr(r.reasonNotPinned)}`);
     lines.push("");
   }
 
@@ -1722,11 +1650,11 @@ export function serializeMatrixToml(report: GpuiVsDioxusAuditReport): string {
 }
 
 export function buildArchitectureMermaid(report: GpuiVsDioxusAuditReport): string {
-  const byPath = new Map(report.submodules.map((s) => [s.path, s]));
-  const lbl = (path: string, fallback: string) => {
-    const s = byPath.get(path);
-    if (!s) return fallback;
-    return `${s.path} (${s.localSha.slice(0, 7) || "none"} - ${s.driftStatus})`;
+  const byName = new Map(report.forks.map((f) => [f.name, f]));
+  const lbl = (name: string) => {
+    const f = byName.get(name);
+    if (!f) return `aphrody-labs/${name}`;
+    return `${f.forkRepo}@${f.pinnedTag || "unpinned"} (${f.pinnedSha.slice(0, 7) || "none"} - ${f.driftStatus})`;
   };
   const zedDelta =
     report.rootRepo.aheadBy !== null && report.rootRepo.behindBy !== null
@@ -1736,7 +1664,7 @@ export function buildArchitectureMermaid(report: GpuiVsDioxusAuditReport): strin
   return [
     "```mermaid",
     "flowchart LR",
-    '  subgraph Upstreams["Upstreams (Kept + Reference)"]',
+    '  subgraph Upstreams["Upstreams (Pinned + Reference)"]',
     `    UP_ZED["zed-industries/zed (${report.rootRepo.upstreamSha.slice(0, 7) || "main"})"]`,
     '    UP_WGPU["gfx-rs/wgpu"]',
     '    UP_TAFFY["DioxusLabs/taffy"]',
@@ -1748,14 +1676,14 @@ export function buildArchitectureMermaid(report: GpuiVsDioxusAuditReport): strin
     '    UP_ICED["iced-rs/iced + pop-os/libcosmic (ref)"]',
     "  end",
     "",
-    '  subgraph KeptVendor["Kept Vendor Submodules (.gitmodules)"]',
-    `    V_WGPU["${lbl("vendor/wgpu", "vendor/wgpu")}"]`,
-    `    V_TAFFY["${lbl("vendor/taffy", "vendor/taffy")}"]`,
-    `    V_A11Y["${lbl("vendor/accesskit", "vendor/accesskit")}"]`,
-    `    V_COSMIC["${lbl("vendor/cosmic-text", "vendor/cosmic-text")}"]`,
-    `    V_EGUI["${lbl("vendor/egui", "vendor/egui")}"]`,
-    `    V_CRAFT["${lbl("vendor/craft-libs", "vendor/craft-libs")}"]`,
-    `    V_ANY["${lbl("vendor/craft-anything", "vendor/craft-anything")}"]`,
+    '  subgraph PinnedForks["Pinned Fork Dependencies (Cargo git + tag)"]',
+    `    V_WGPU["${lbl("wgpu")}"]`,
+    `    V_TAFFY["${lbl("taffy")}"]`,
+    `    V_A11Y["${lbl("accesskit")}"]`,
+    `    V_COSMIC["${lbl("cosmic-text")}"]`,
+    `    V_EGUI["${lbl("egui")}"]`,
+    `    V_CRAFT["${lbl("craft-libs")}"]`,
+    `    V_ANY["${lbl("craft-anything")}"]`,
     "  end",
     "",
     '  subgraph Workspace["Aphrody Monorepo Bridges"]',
@@ -1813,7 +1741,7 @@ export function renderArchitectureMarkdown(report: GpuiVsDioxusAuditReport, exis
   const metricsBlock = [
     "| Audit Dimension | Live Verified Telemetry | Evidence Anchor |",
     "| :--- | :--- | :--- |",
-    `| **Aphrody Workspace** | \`${report.rootRepo.workspaceMembersCount}\` members, \`${report.rootRepo.gitmodulesCount}\` submodules, \`${report.rootRepo.patchCratesIoCount}\` \`[patch.crates-io]\` overrides (\`${report.rootRepo.driftStatus}\` vs \`zed\` ${numFmt.format(report.rootRepo.upstreamStars)}★) | [\`Cargo.toml\`](${rootPrefix}Cargo.toml), [\`.gitmodules\`](${rootPrefix}.gitmodules) |`,
+    `| **Aphrody Workspace** | \`${report.rootRepo.workspaceMembersCount}\` members, \`${report.rootRepo.pinnedForkCount}\` pinned fork git dependencies, \`${report.rootRepo.patchCratesIoCount}\` \`[patch.crates-io]\` overrides (\`${report.rootRepo.driftStatus}\` vs \`zed\` ${numFmt.format(report.rootRepo.upstreamStars)}★) | [\`Cargo.toml\`](${rootPrefix}Cargo.toml), [\`forks-manifest.json\`](${rootPrefix}tooling/bun/forks-manifest.json) |`,
     `| **Cargo.lock Graph & Splits** | \`${report.dependencyConflicts.totalLockfilePackages}\` packages across \`${report.dependencyConflicts.gitDependencyReposCount}\` git repos; \`${report.dependencyConflicts.multiVersionCrateCount}\` multi-version crates | [\`Cargo.lock\`](${rootPrefix}Cargo.lock) |`,
     `| **Feature Matrix** | \`${report.summary.featureMatrixManifestCount}\` Cargo manifests parsed across 6 ecosystems (\`${report.summary.totalFeaturesCounted}\` Cargo features) | \`cargo metadata --no-deps\` |`,
     `| **Measured Studio Bench** | GPUI tree: \`${report.benchmarks.gpuiTreeBuildAvgUs ?? "n/a"} us\`, egui 0.37: \`${report.benchmarks.eguiTessellateAvgUs ?? "n/a"} us\`, Bevy: \`${report.benchmarks.bevyViewportAvgUs ?? "n/a"} us\`, craft_sniff x100: \`${report.benchmarks.craftSniff100xUs ?? "n/a"} us\`, Iced x1000: \`${report.benchmarks.icedElm1000xUs ?? "n/a"} us\`, RON x100: \`${report.benchmarks.libcosmicRon100xUs ?? "n/a"} us\` | [\`studio_parity_report.rs\`](${rootPrefix}crates/aphrody_craft/examples/studio_parity_report.rs) |`,
@@ -1821,16 +1749,16 @@ export function renderArchitectureMarkdown(report: GpuiVsDioxusAuditReport, exis
 
   const forkGraphBlock = buildArchitectureMermaid(report);
 
-  const submodulesBlock = [
-    "| Kept Submodule / Reference | Local Pin / Bridge | Upstream Target | Drift / Role |",
+  const forksBlock = [
+    "| Pinned Fork / Reference | Pin / Bridge | Upstream Target | Drift / Role |",
     "| :--- | :--- | :--- | :--- |",
-    ...report.submodules.map(
-      (s) =>
-        `| \`${s.path}\` | \`${s.localSha.slice(0, 8)}\` (\`${s.patchedInRootCargo ? "patched" : "workspace"}\`) | \`${s.upstreamRepo}@${s.upstreamDefaultBranch}\` | \`${s.driftStatus}\` — ${s.role} |`,
+    ...report.forks.map(
+      (f) =>
+        `| \`${f.forkRepo}\` | \`${f.pinnedTag || "unpinned"}\` (\`${f.pinnedSha.slice(0, 8)}\`, \`${f.pinnedInCargo ? "cargo-pinned" : "not in Cargo.toml"}\`) | \`${f.upstreamRepo}@${f.upstreamDefaultBranch}\` | \`${f.driftStatus}\` — ${f.role} |`,
     ),
     ...report.referenceEcosystems.map(
       (r) =>
-        `| *(de-vendored)* \`${r.id}\` | \`${r.localBridge}\` | \`${r.upstreamRepo}\` (${numFmt.format(r.upstreamStars)}★) | ${r.reasonDeVendored} |`,
+        `| *(reference only)* \`${r.id}\` | \`${r.localBridge}\` | \`${r.upstreamRepo}\` (${numFmt.format(r.upstreamStars)}★) | ${r.reasonNotPinned} |`,
     ),
   ].join("\n");
 
@@ -1872,17 +1800,21 @@ export function renderArchitectureMarkdown(report: GpuiVsDioxusAuditReport, exis
     ),
   ].join("\n");
 
+  const forkTag = (name: string) => {
+    const f = report.forks.find((x) => x.name === name);
+    return f?.pinnedTag ? `\`${f.forkRepo}@${f.pinnedTag}\`` : `\`aphrody-labs/${name}\``;
+  };
   const unificationBlock = [
-    `1. **Shared GPU, Layout, Text & A11y Foundations**: \`vendor/wgpu\` (\`30.0.0\`), \`vendor/taffy\` (\`0.15.1\`), \`vendor/accesskit\` (\`0.25.2\`), and \`vendor/cosmic-text\` (\`0.19.0\`) compile as single patched checkouts shared across GPUI, NSH, \`egui 0.37\`, \`iced_gpui\`, and \`bevy_gpui\`.`,
-    `2. **Craft-Libs Zero-Duplicate Patching**: All \`17\` crates referenced upstream via \`https://github.com/storytold/craft-libs\` resolve through \`[patch."https://github.com/storytold/craft-libs"]\` to \`vendor/craft-libs/crates/*\`, leaving \`0\` duplicate git checkouts in [\`Cargo.lock\`](${rootPrefix}Cargo.lock).`,
-    `3. **Real Lockfile Splits to Target Next**: Align \`nsh-base\` onto \`ropey 2.0\` (when released), bump \`vendor/cosmic-text\` from \`harfrust 0.12 / skrifa 0.44\` to match \`epaint 0.37\` (\`0.15 / 0.49\`), and track Zed upgrades off \`lsp-types 0.95.1\`, \`notify 8.2\`, \`dirs 6.0\`, and legacy \`windows 0.56..0.61\`.`,
+    `1. **Shared GPU, Layout, Text & A11y Foundations**: ${forkTag("wgpu")}, ${forkTag("taffy")}, ${forkTag("accesskit")}, and ${forkTag("cosmic-text")} are single pinned Cargo git dependencies shared across GPUI, NSH, \`egui 0.37\`, \`iced_gpui\`, and \`bevy_gpui\`.`,
+    `2. **Craft-Libs Zero-Duplicate Patching**: All \`${report.dependencyConflicts.patchCraftLibsCount}\` crates referenced upstream via \`https://github.com/storytold/craft-libs\` resolve through \`[patch."https://github.com/storytold/craft-libs"]\` to ${forkTag("craft-libs")}, leaving \`0\` duplicate git sources in [\`Cargo.lock\`](${rootPrefix}Cargo.lock).`,
+    `3. **Real Lockfile Splits to Target Next**: Align \`nsh-base\` onto \`ropey 2.0\` (when released), bump the pinned \`cosmic-text\` fork from \`harfrust 0.12 / skrifa 0.44\` to match \`epaint 0.37\` (\`0.15 / 0.49\`), and track Zed upgrades off \`lsp-types 0.95.1\`, \`notify 8.2\`, \`dirs 6.0\`, and legacy \`windows 0.56..0.61\`.`,
   ].join("\n");
 
   if (existingDoc) {
     let doc = existingDoc;
     doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_METRICS", metricsBlock);
     doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_FORK_GRAPH", forkGraphBlock);
-    doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_SUBMODULES", submodulesBlock);
+    doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_FORKS", forksBlock);
     doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_CRATES_IO", cratesBlock);
     doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_FEATURES", featuresBlock);
     doc = replaceMarkerBlock(doc, "GPUI_DIOXUS_BRIDGES", conflictsBlock);
@@ -1900,7 +1832,7 @@ export function renderArchitectureMarkdown(report: GpuiVsDioxusAuditReport, exis
 ## 1. Automated CLI & Live Telemetry Snapshot
 
 \`\`\`bash
-bun tooling/bun/gpui-vs-dioxus-audit.ts audit   # Submodules, crates.io, Cargo.lock conflicts, features
+bun tooling/bun/gpui-vs-dioxus-audit.ts audit   # Pinned forks, crates.io, Cargo.lock conflicts, features
 bun tooling/bun/gpui-vs-dioxus-audit.ts bench   # Run measured Rust + Bun parity benchmarks
 bun tooling/bun/gpui-vs-dioxus-audit.ts all     # Full audit + benchmark + TOML + markdown refresh
 bun test tooling/bun/gpui-vs-dioxus-audit.test.ts
@@ -1920,11 +1852,11 @@ ${forkGraphBlock}
 
 ---
 
-## 3. Kept Submodules & De-Vendored Reference Ecosystems
+## 3. Pinned Fork Dependencies & Reference Ecosystems
 
-<!-- BEGIN GPUI_DIOXUS_SUBMODULES -->
-${submodulesBlock}
-<!-- END GPUI_DIOXUS_SUBMODULES -->
+<!-- BEGIN GPUI_DIOXUS_FORKS -->
+${forksBlock}
+<!-- END GPUI_DIOXUS_FORKS -->
 
 ---
 

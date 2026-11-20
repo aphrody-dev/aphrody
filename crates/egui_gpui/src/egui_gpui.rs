@@ -1,7 +1,7 @@
 //! Native Zed / Aphrody GPUI bridge for `egui 0.37`, `epaint`, `egui_extras`, `egui-wgpu` (WGPU v30),
 //! and Craft Studio immediate-mode controls styled with Google Design Material 3 Expressive tokens.
 //!
-//! Aligns `egui` onto the monorepo's `vendor/wgpu` v30, `vendor/accesskit` 0.25, and
+//! Aligns `egui` onto the monorepo's pinned `aphrody-labs/wgpu` v30, `aphrody-labs/accesskit` 0.25, and
 //! [`aphrody_ui::GoogleDesignTokens`] (`https://design.google/` Material 3 Expressive) without requiring
 //! a secondary `winit` event loop inside GPUI windows.
 

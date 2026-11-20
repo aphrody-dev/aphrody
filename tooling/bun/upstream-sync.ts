@@ -5,7 +5,7 @@
  *   1. `zed-industries/zed` -> root workspace & unified `crates/gpui`
  *   2. `longbridge/nsh` -> flattened `mod.rs`-free `crates/nsh-*` + `docs/nsh`
  *   3. `longbridge/gpui-kit` -> flattened `mod.rs`-free `crates/gpui-{kit,base,component,component-macros,kit-assets,fps}`
- *   4. `gfx-rs/wgpu` (`vendor/wgpu`) & `aphrody-labs/bun` (`vendor/bun`)
+ *   4. `gfx-rs/wgpu` (pinned Cargo git dependency `aphrody-labs/wgpu`) & `aphrody-labs/bun` (separate repo, tracked by remote HEAD SHA only)
  *   5. `aphrody-labs/agent-browser` & `aphrody-labs/agent-desktop` -> fused into `crates/aphrody_{browser,pilot,desktop}`
  *
  * Usage:

@@ -1,16 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { parseGitmodules } from "./submodules.ts";
 import { checkRepoHygiene } from "./repo-hygiene.ts";
-import { worktreePaths } from "./worktree.ts";
 import { CROSS_MATRIX } from "./cross-build.ts";
 import releaseWorker, { detectPlatform, renderDownloadPortal } from "../../.cloudflare/aphrody-worker/src/index.ts";
 
 const repoRoot = resolve(import.meta.dir, "../..");
 
 describe("aphrody repo-native bun tooling", () => {
-  test("validates pinned aphrody-labs forks manifest and zero blocking submodules", () => {
+  test("validates pinned aphrody-labs forks manifest and tags", () => {
     const manifest = JSON.parse(
       readFileSync(resolve(repoRoot, "tooling/bun/forks-manifest.json"), "utf8"),
     ) as { forks: Array<{ repo: string; tag: string; sha: string; gitUrl: string }> };
@@ -20,8 +18,6 @@ describe("aphrody repo-native bun tooling", () => {
       expect(fork.sha).toMatch(/^[0-9a-f]{40}$/);
       expect(fork.tag.length).toBeGreaterThan(0);
     }
-    const parsedSample = parseGitmodules('[submodule "vendor/example"]\n\tpath = vendor/example\n\turl = ../../aphrody-labs/example.git\n');
-    expect(parsedSample.length).toBe(1);
   });
 
   test("post-edit-check allows repo paths and flags brain/temp paths", () => {
@@ -46,14 +42,6 @@ describe("aphrody repo-native bun tooling", () => {
     expect(brainRun.exitCode).toBe(0);
     const msg = JSON.parse(new TextDecoder().decode(brainRun.stdout)) as { systemMessage?: string };
     expect(msg.systemMessage).toContain("docs/aphrody/architecture/");
-  });
-
-  test("worktreePaths isolates out-of-tree checkout and Cargo target dirs", () => {
-    const paths = worktreePaths("Feature/Zig Build", "C:/src/aphrody", "aphrody");
-    expect(paths.cleanId).toBe("feature-zig-build");
-    expect(paths.branch).toBe("wt/feature-zig-build");
-    expect(paths.worktreeDir).toContain("worktrees");
-    expect(paths.targetDir).toContain("target-worktrees");
   });
 
   test("CROSS_MATRIX covers cargo-xwin, cargo-zigbuild, android, wasm32, and wasip2", () => {
