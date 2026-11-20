@@ -780,7 +780,7 @@ export function syncNshFromClone(root: string, cloneDir: string, dryRun = false)
 
   if (!dryRun) {
     const docsSrc = join(cloneDir, "docs");
-    const canonicalNshDocs = join(root, "aphrody", "docs", "nsh");
+    const canonicalNshDocs = join(root, "docs", "aphrody", "nsh");
     if (existsSync(docsSrc) && existsSync(canonicalNshDocs)) {
       cpSync(docsSrc, canonicalNshDocs, { recursive: true });
     }

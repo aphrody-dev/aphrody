@@ -66,5 +66,5 @@ bun test tooling/bun/emscripten-crawl.test.ts
 bun tooling/bun/repo-hygiene.ts
 ```
 
-- Architecture overview: [`aphrody/docs/architecture/emscripten-ecosystem.md`](../../../../../aphrody/docs/architecture/emscripten-ecosystem.md)
-- LLM compact index: [`aphrody/docs/architecture/emscripten-llms.txt`](../../../../../aphrody/docs/architecture/emscripten-llms.txt)
+- Architecture overview: [`docs/aphrody/architecture/emscripten-ecosystem.md`](../../../../../docs/aphrody/architecture/emscripten-ecosystem.md)
+- LLM compact index: [`docs/aphrody/architecture/emscripten-llms.txt`](../../../../../docs/aphrody/architecture/emscripten-llms.txt)

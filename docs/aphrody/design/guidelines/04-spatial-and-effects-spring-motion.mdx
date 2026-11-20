@@ -1,0 +1,11 @@
+---
+title: "Spatial vs Effects Spring Motion Physics"
+source: "https://m3.material.io/"
+---
+
+# Spatial vs Effects Spring Motion Physics
+
+Implemented analytically in `aphrody_ui::google_design::SpringSpec::sample_position` and exported to CSS `linear(...)` in `docs/aphrody/design/stylesheet.css`:
+
+- **Spatial Springs (`damping_ratio = 0.9`)**: `spatial_fast` (`k=1400`), `spatial_default` (`k=700`), `spatial_slow` (`k=300`) for bounds, drawers, and corner morphing.
+- **Effects Springs (`damping_ratio = 1.0`, critically damped)**: `effects_fast` (`k=3800`), `effects_default` (`k=1600`), `effects_slow` (`k=800`) for opacity and color washes with zero overshoot.

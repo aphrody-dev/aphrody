@@ -1,6 +1,6 @@
 name: aphrody-kernel-watch
 
-# Polls the kernel sources of tooling/kernel-watch/sources.toml, regenerates aphrody/docs/watch and commits only when the output changed.
+# Polls the kernel sources of tooling/kernel-watch/sources.toml, regenerates docs/aphrody/watch and commits only when the output changed.
 # GitHub cron runs at best every 5 minutes and starts late under load, so "real time" here is minutes, not seconds.
 on:
   schedule:

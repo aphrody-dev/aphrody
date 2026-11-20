@@ -15,8 +15,8 @@ import { join, resolve } from "node:path";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 export const DEFAULT_TOML_OUT = join(repoRoot, "assets/os/webassembly_ecosystem.toml");
-export const DEFAULT_MD_OUT = join(repoRoot, "aphrody/docs/architecture/webassembly-org-ecosystem.md");
-export const DEFAULT_LLMS_OUT = join(repoRoot, "aphrody/docs/architecture/webassembly-org-llms.txt");
+export const DEFAULT_MD_OUT = join(repoRoot, "docs/aphrody/architecture/webassembly-org-ecosystem.md");
+export const DEFAULT_LLMS_OUT = join(repoRoot, "docs/aphrody/architecture/webassembly-org-llms.txt");
 export const DEFAULT_SKILL_OUT = join(
   repoRoot,
   ".agents/plugins/aphrody/skills/webassembly/SKILL.md",

@@ -32,7 +32,7 @@ if (
 ) {
   console.log(
     JSON.stringify({
-      systemMessage: `aphrody workflow guard: keep plans under aphrody/docs/architecture/ and scripts under tooling/bun/ inside the repo, never ${filePath}.`,
+      systemMessage: `aphrody workflow guard: keep plans under docs/aphrody/architecture/ and scripts under tooling/bun/ inside the repo, never ${filePath}.`,
     }),
   );
   process.exit(0);

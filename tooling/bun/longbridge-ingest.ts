@@ -18,7 +18,7 @@ import { parseGitmodules, type SubmoduleEntry } from "./submodules.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const INVENTORY_TOML_REL = "assets/os/longbridge_gpui_inventory.toml";
-export const ARCH_DOC_REL = "aphrody/docs/architecture/longbridge-gpui-unification.md";
+export const ARCH_DOC_REL = "docs/aphrody/architecture/longbridge-gpui-unification.md";
 export const GRAPH_OUT_REL = "target/longbridge-ingest/graph.json";
 export const SCAN_OUT_REL = "target/longbridge-ingest/scan.json";
 export const CENTRALIZE_OUT_REL = "target/longbridge-ingest/centralize.json";
@@ -732,7 +732,7 @@ export function classifyRepo(
       category: isBench ? "benchmark-compat" : isShowcase ? "showcase-app" : "docs-skills-reference",
       relevanceScore: isBench || isShowcase ? 78 : 55,
       localMatches: findLocalAnchorsForRepo(shortName, localIndex),
-      targetCrates: shortName.includes("bench") ? ["tooling/perf", "crates/bench_metrics"] : ["aphrody/docs/architecture", "crates/aphrody_desktop"],
+      targetCrates: shortName.includes("bench") ? ["tooling/perf", "crates/bench_metrics"] : ["docs/aphrody/architecture", "crates/aphrody_desktop"],
       rationale: isBench
         ? "Benchmark/compatibility harness retained as reference validation suite."
         : isShowcase
@@ -756,7 +756,7 @@ export function classifyRepo(
       category: isLib ? "community-gpui-lib" : "community-gpui-app",
       relevanceScore: Math.min(95, (isLib ? 74 : 58) + Math.round(Math.log10(Math.max(10, repo.stars)) * 5)),
       localMatches: localMatch,
-      targetCrates: isLib ? ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"] : ["aphrody/docs/architecture"],
+      targetCrates: isLib ? ["crates/gpui", "crates/ui", "crates/gpui_ui", "crates/aphrody_ui"] : ["docs/aphrody/architecture"],
       rationale: isLib
         ? "Community GPUI library/framework crate evaluated for widget, theme, animation, or JS/TS binding capabilities."
         : "Community GPUI production application benchmarked for UX patterns and ecosystem showcase parity.",
@@ -772,7 +772,7 @@ export function classifyRepo(
         category: "discovered-showcase-docs",
         relevanceScore: 60,
         localMatches: findLocalAnchorsForRepo(shortName, localIndex),
-        targetCrates: ["aphrody/docs/architecture"],
+        targetCrates: ["docs/aphrody/architecture"],
         rationale: "Discovered GPUI/NSH/UI showcase, benchmark, or documentation repository.",
       };
     }

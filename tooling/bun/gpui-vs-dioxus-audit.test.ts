@@ -297,7 +297,7 @@ describe("live Aphrody multi-ecosystem audit artifacts", () => {
     expect(parsed.architecture_matrix.length).toBe(6);
   });
 
-  test("aphrody/docs/architecture/gpui-vs-dioxus-audit.md has Mermaid graph, markers, and valid relative links", () => {
+  test("docs/aphrody/architecture/gpui-vs-dioxus-audit.md has Mermaid graph, markers, and valid relative links", () => {
     const docPath = join(REPO_ROOT, ARCH_DOC_REL);
     expect(existsSync(docPath)).toBe(true);
     const md = readFileSync(docPath, "utf8");

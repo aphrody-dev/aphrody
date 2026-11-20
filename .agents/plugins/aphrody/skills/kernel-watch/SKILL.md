@@ -21,7 +21,7 @@ A scheduled workflow polls the kernel sources every 5 minutes (GitHub cron: minu
 2. `versions.md`: every observed channel with cycles behind the mainline rc, rc steps, and distance to stable.
 3. `kernels/<id>.md`: per kernel, 24h and 7d activity, notable items, latest releases, organisation repositories, sites, sources. Ids: linux, asterinas, redox, libernt, android, cachyos, chromiumos, alpine, nixos, fedora, ubuntu, arch, rhel.
 4. `data/*.json`: the same data for programs (`versions.json`, `digests.json`, `kernels.json`, `sources.json`).
-5. `aphrody/docs/watch/PLAN.md` (tracked, hand-written): what is deliberately not covered (site deployment, sub-minute webhooks, full mailing-list ingestion, Phase B structure reports) and, under "Test lanes", what each lane runs on, how to rerun it, what it proves and what it does not.
+5. `docs/aphrody/watch/PLAN.md` (tracked, hand-written): what is deliberately not covered (site deployment, sub-minute webhooks, full mailing-list ingestion, Phase B structure reports) and, under "Test lanes", what each lane runs on, how to rerun it, what it proves and what it does not.
 6. `probe.md`, `lane.md`, `wsl.md`: the lane pages (host probe of the production Arch host, rc kernels booted in QEMU with their smoke results, WSL2 kernel build and merge experiment). `versions.md` links each kernel to its lane result in a Test lane column.
 
 A `≥` before a commit count means the polled feed page did not reach back to the start of the window; treat it as a lower bound.
@@ -74,4 +74,4 @@ Rules that hold for every lane:
 - Nothing is written to an upstream (no issue, PR or comment on kernel.org trees, Arch, CachyOS or Microsoft); forks go to the organisation.
 - Hosts are ssh aliases read from `lanes.toml` at run time; the lane root is passed as `--root`. No address, account or host path belongs in a tracked file.
 - Tests are hermetic: recorded fixtures under `fixtures/probe` and `fixtures/lane`, no ssh, no QEMU, no network.
-- Read `aphrody/docs/watch/PLAN.md` ("Test lanes") before claiming anything about a kernel: it lists what each lane proves and what it cannot (no real hardware, no hv_sock or dxgkrnl in the QEMU boot test, CachyOS repository packages lag its PKGBUILD).
+- Read `docs/aphrody/watch/PLAN.md` ("Test lanes") before claiming anything about a kernel: it lists what each lane proves and what it cannot (no real hardware, no hv_sock or dxgkrnl in the QEMU boot test, CachyOS repository packages lag its PKGBUILD).

@@ -5,12 +5,12 @@ description: Authoritative design system specification anchored to https://desig
 
 # Google Design Source of Truth (`https://design.google/`)
 
-Every UI surface, theme, component token table, shader palette, and studio workspace in Aphrody derives from **`https://design.google/`** and the canonical [`aphrody/docs/design/`](../../../../../aphrody/docs/design/manifest.json) package:
+Every UI surface, theme, component token table, shader palette, and studio workspace in Aphrody derives from **`https://design.google/`** and the canonical [`docs/aphrody/design/`](../../../../../docs/aphrody/design/manifest.json) package:
 
-- **Material 3 Expressive & Neural Expressive (Nov 2026)** 3-tier tokens (`assets/os/google_design_tokens.toml`, [`aphrody/docs/design/stylesheet.css`](../../../../../aphrody/docs/design/stylesheet.css), `aphrody_ui::google_design`)
+- **Material 3 Expressive & Neural Expressive (Nov 2026)** 3-tier tokens (`assets/os/google_design_tokens.toml`, [`docs/aphrody/design/stylesheet.css`](../../../../../docs/aphrody/design/stylesheet.css), `aphrody_ui::google_design`)
 - ***Code is a Design Material*** (`https://design.google/library/code-is-a-design-material`): live Rust/WGSL/TypeScript code + shaders as expressive design material
 - ***Google Sans Flex*** (`https://design.google/library/google-sans-flex-font`): 6 variable axes (`opsz`, `wght`, `wdth`, `GRAD`, `slnt`, `ROND`) paired with `JetBrains Mono` for code & hex telemetry
-- Root [`DESIGN.md`](../../../../../DESIGN.md), [`aphrody/docs/design/DESIGN.md`](../../../../../aphrody/docs/design/DESIGN.md), Figma W3C DTCG kit ([`aphrody/docs/design/kits/figma-design-kit.json`](../../../../../aphrody/docs/design/kits/figma-design-kit.json)), and Google Stitch kit ([`aphrody/docs/design/kits/stitch-design-kit.json`](../../../../../aphrody/docs/design/kits/stitch-design-kit.json))
+- Root [`DESIGN.md`](../../../../../DESIGN.md), [`docs/aphrody/design/DESIGN.md`](../../../../../docs/aphrody/design/DESIGN.md), Figma W3C DTCG kit ([`docs/aphrody/design/kits/figma-design-kit.json`](../../../../../docs/aphrody/design/kits/figma-design-kit.json)), and Google Stitch kit ([`docs/aphrody/design/kits/stitch-design-kit.json`](../../../../../docs/aphrody/design/kits/stitch-design-kit.json))
 - Dual-GUI & 3D Studio Stack ([`references/gpui-and-egui-components.md`](./references/gpui-and-egui-components.md)):
   - **Unified Single GPUI Retained Mode**: `crates/gpui` (`0.2.2`, `Path<T = Pixels>`, `taffy 0.15.1`, `wgpu v30`) + `aphrody_ui::google_design_components` (`ExpressiveOmnibar`, `CascadingPopoverCard`, `GroundingSourceCard`, `SegmentedStudioBar`, `ThinkingAuraBadge`) + `aphrody_ui::starter_pack`
   - **Native `gpui-component` / `gpui-kit` `0.10.0` M3 Kit**: [`crates/gpui-component/src/material3.rs`](../../../../../crates/gpui-component/src/material3.rs) (`gpui_kit::material3`) implements 4 `M3AppearanceMode` themes (`Light`, `Dark`, `NeuralObsidian`, `OledPitch`), `M3SpringToken`, WCAG AA verification (`m3_contrast_ratio`, `m3_meets_wcag_aa`), and 16 `RenderOnce` components (`M3FilledButton`, `M3TonalButton`, `M3OutlinedButton`, `M3Fab`, `M3ExtendedFab`, `M3SegmentedButtonBar`, `M3FilterChip`, `M3ElevatedCard`, `M3FilledCard`, `M3OutlinedCard`, `M3TopAppBar`, `M3NavigationRail`, `M3NavigationBar`, `M3SearchBar`, `M3ExpressiveSwitch`, `M3DialogSheet`), bridged with GPUI themes in [`crates/gpui_ui/src/kit.rs`](../../../../../crates/gpui_ui/src/kit.rs) (`apply_kit_m3_theme`, `sync_kit_with_gpui_theme`)
@@ -26,10 +26,10 @@ Every UI surface, theme, component token table, shader palette, and studio works
 
 ## Automation & Native Commands
 
-- Build & validate complete `aphrody/docs/design/` asset/kit/MDX/schema package: `bun run design:pack`
+- Build & validate complete `docs/aphrody/design/` asset/kit/MDX/schema package: `bun run design:pack`
 - Sync tokens, sitemap snapshot & `DESIGN.md`: `bun run design:sync`
 - Audit monorepo & templates: `bun run design:audit`
-- Lint any `DESIGN.md`: `cargo run -p aphrody_cli -- design design-md lint aphrody/docs/design/DESIGN.md`
+- Lint any `DESIGN.md`: `cargo run -p aphrody_cli -- design design-md lint docs/aphrody/design/DESIGN.md`
 - Open Studio & Parity workspaces inside Aphrody IDE ([`crates/aphrody_nsh/src/design_stitch_studio.rs`](../../../../../crates/aphrody_nsh/src/design_stitch_studio.rs)):
   - `aphrody_nsh::OpenGoogleDesignMirror`
   - `aphrody_nsh::OpenStitchStudio`

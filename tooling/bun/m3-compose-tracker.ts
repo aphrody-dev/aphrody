@@ -7,7 +7,7 @@
  * `enhance-your-component-designs-with-parametric-prototyping`), and Figma Material 3 Design Kit
  * (`1035203688168086460`), then converts canonical tokens/specs into:
  *   1. Assets & Data & Specs: `assets/os/m3_compose_tracker_lock.toml`, `assets/os/m3_compose_catalog.json`,
- *      `aphrody/docs/design/kits/figma-m3-1035203688168086460-dtcg.json`
+ *      `docs/aphrody/design/kits/figma-m3-1035203688168086460-dtcg.json`
  *   2. GPU (WGPU / Naga v30 / WGSL): `assets/shaders/m3_expressive.wgsl` + template copy
  *   3. GPUI Kit (`crates/gpui-component/src/material3/{compose15,parametric}.rs` + `crates/gpui_ui/examples/m3_compose15_showcase.rs`)
  *   4. NSH Library & Template (`templates/m3-gpui-nsh/{nsh-m3-kit.tsx,m3-tokens.css,Cargo.toml,src/main.rs,m3-parametric-preset.json,README.md}`)
@@ -26,7 +26,7 @@ export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const TOKENS_TOML_REL = "assets/os/google_design_tokens.toml";
 export const TRACKER_LOCK_REL = "assets/os/m3_compose_tracker_lock.toml";
 export const CATALOG_JSON_REL = "assets/os/m3_compose_catalog.json";
-export const FIGMA_DTCG_REL = "aphrody/docs/design/kits/figma-m3-1035203688168086460-dtcg.json";
+export const FIGMA_DTCG_REL = "docs/aphrody/design/kits/figma-m3-1035203688168086460-dtcg.json";
 export const WGSL_SHADER_REL = "assets/shaders/m3_expressive.wgsl";
 export const TEMPLATE_DIR_REL = "templates/m3-gpui-nsh";
 

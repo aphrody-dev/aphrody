@@ -6,8 +6,8 @@ const repoRoot = resolve(import.meta.dir, "../..");
 
 describe("Aphrody Figma, Stitch, Themes & Roadmap Design Pack", () => {
   test("manifest.json validates with 20+ SVGs, 12 maquettes, and WCAG AA primary contrast", async () => {
-    const manifest = JSON.parse(readFileSync(resolve(repoRoot, "aphrody/docs/design/manifest.json"), "utf8"));
-    const { validateDesignManifest } = await import("../../aphrody/docs/design/schema.ts");
+    const manifest = JSON.parse(readFileSync(resolve(repoRoot, "docs/aphrody/design/manifest.json"), "utf8"));
+    const { validateDesignManifest } = await import("../../docs/aphrody/design/schema.ts");
     const check = validateDesignManifest(manifest);
     expect(check.ok).toBe(true);
     expect(manifest.svgs.length).toBeGreaterThanOrEqual(20);
@@ -15,18 +15,18 @@ describe("Aphrody Figma, Stitch, Themes & Roadmap Design Pack", () => {
     expect(manifest.wcagContrastDarkPrimary).toBeGreaterThanOrEqual(4.5);
     expect(manifest.wcagContrastLightPrimary).toBeGreaterThanOrEqual(4.5);
     for (const s of manifest.svgs as Array<{ path: string }>) {
-      const svgText = readFileSync(resolve(repoRoot, "aphrody/docs/design", s.path.replace("./", "")), "utf8");
+      const svgText = readFileSync(resolve(repoRoot, "docs/aphrody/design", s.path.replace("./", "")), "utf8");
       expect(svgText).not.toMatch(/&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-fA-F]+;)/);
     }
   });
 
   test("Figma Design Kit v3 and Code Connect cover all 6 collections and 20 component sets", () => {
-    const figma = JSON.parse(readFileSync(resolve(repoRoot, "aphrody/docs/design/kits/figma-design-kit.json"), "utf8")) as {
+    const figma = JSON.parse(readFileSync(resolve(repoRoot, "docs/aphrody/design/kits/figma-design-kit.json"), "utf8")) as {
       version: string;
       collections: Record<string, unknown>;
       componentSets: Array<{ id: string }>;
     };
-    const codeConnect = JSON.parse(readFileSync(resolve(repoRoot, "aphrody/docs/design/kits/figma-code-connect.json"), "utf8")) as {
+    const codeConnect = JSON.parse(readFileSync(resolve(repoRoot, "docs/aphrody/design/kits/figma-code-connect.json"), "utf8")) as {
       mappings: Array<{ figmaComponentSet: string }>;
     };
     expect(figma.version).toBe("3.0.0");

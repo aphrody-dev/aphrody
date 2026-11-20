@@ -22,8 +22,8 @@ import { parseGitmodules } from "./submodules.ts";
 
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const PARITY_MATRIX_TOML_REL = "assets/os/submodule_parity_matrix.toml";
-export const PARITY_DOC_REL = "aphrody/docs/architecture/gpui-starterpack-and-parity-matrix.md";
-export const AGENT_LLMS_REL = "aphrody/docs/architecture/ai-agent-readiness-llms.txt";
+export const PARITY_DOC_REL = "docs/aphrody/architecture/gpui-starterpack-and-parity-matrix.md";
+export const AGENT_LLMS_REL = "docs/aphrody/architecture/ai-agent-readiness-llms.txt";
 export const BENCH_OUT_REL = "target/wasm-wgpu-proof/starterpack-bench.json";
 
 export interface CoreWebVitalsBudgets {

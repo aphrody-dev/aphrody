@@ -45,7 +45,7 @@ describe("aphrody repo-native bun tooling", () => {
     });
     expect(brainRun.exitCode).toBe(0);
     const msg = JSON.parse(new TextDecoder().decode(brainRun.stdout)) as { systemMessage?: string };
-    expect(msg.systemMessage).toContain("aphrody/docs/architecture/");
+    expect(msg.systemMessage).toContain("docs/aphrody/architecture/");
   });
 
   test("worktreePaths isolates out-of-tree checkout and Cargo target dirs", () => {

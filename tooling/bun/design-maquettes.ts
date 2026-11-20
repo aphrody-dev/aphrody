@@ -311,7 +311,7 @@ let spring = tokens.spring("spatial_fast"); // k=1400, zeta=0.90</code></pre>
           <h2>AI Discovery Endpoints</h2>
           <ul class="mq-list">
             <li><code>/llms.txt</code> (v2 index)</li>
-            <li><code>/aphrody/docs/wgpu/llms.txt</code></li>
+            <li><code>/docs/aphrody/wgpu/llms.txt</code></li>
             <li><code>/openapi.json</code> (Scalar 3.1)</li>
             <li><code>/.well-known/agent-skills/index.json</code></li>
           </ul>
@@ -773,7 +773,7 @@ export async function captureMaquetteScreenshots(repoRoot: string): Promise<{
     port: 0,
     async fetch(req) {
       const pathname = new URL(req.url).pathname;
-      const rel = pathname === "/" ? "/aphrody/docs/design/maquettes/index.html" : pathname;
+      const rel = pathname === "/" ? "/docs/aphrody/design/maquettes/index.html" : pathname;
       const filePath = resolve(repoRoot, `.${rel}`);
       if (!filePath.startsWith(repoRoot) || !existsSync(filePath)) {
         return new Response("Not Found", { status: 404 });
@@ -791,13 +791,13 @@ export async function captureMaquetteScreenshots(repoRoot: string): Promise<{
     height: number;
     themeOverride?: string;
   }> = [
-    { name: "maquettes-index-neural-1440x900.png", route: "/aphrody/docs/design/maquettes/index.html", width: 1440, height: 900, themeOverride: "neural" },
-    { name: "maquettes-index-light-1440x900.png", route: "/aphrody/docs/design/maquettes/index.html", width: 1440, height: 900, themeOverride: "light" },
-    { name: "web-landing-hero-1440x900.png", route: "/aphrody/docs/design/maquettes/03-web-landing-hero.html", width: 1440, height: 900 },
-    { name: "desktop-aphrody-ide-1440x900.png", route: "/aphrody/docs/design/maquettes/06-desktop-aphrody-ide.html", width: 1440, height: 900 },
-    { name: "desktop-aphrody-os-1440x900.png", route: "/aphrody/docs/design/maquettes/07-desktop-aphrody-os-cosmic.html", width: 1440, height: 900 },
-    { name: "mobile-companion-home-390x844.png", route: "/aphrody/docs/design/maquettes/10-mobile-companion-home.html", width: 390, height: 844 },
-    { name: "mobile-code-diff-390x844.png", route: "/aphrody/docs/design/maquettes/11-mobile-code-diff-review.html", width: 390, height: 844 },
+    { name: "maquettes-index-neural-1440x900.png", route: "/docs/aphrody/design/maquettes/index.html", width: 1440, height: 900, themeOverride: "neural" },
+    { name: "maquettes-index-light-1440x900.png", route: "/docs/aphrody/design/maquettes/index.html", width: 1440, height: 900, themeOverride: "light" },
+    { name: "web-landing-hero-1440x900.png", route: "/docs/aphrody/design/maquettes/03-web-landing-hero.html", width: 1440, height: 900 },
+    { name: "desktop-aphrody-ide-1440x900.png", route: "/docs/aphrody/design/maquettes/06-desktop-aphrody-ide.html", width: 1440, height: 900 },
+    { name: "desktop-aphrody-os-1440x900.png", route: "/docs/aphrody/design/maquettes/07-desktop-aphrody-os-cosmic.html", width: 1440, height: 900 },
+    { name: "mobile-companion-home-390x844.png", route: "/docs/aphrody/design/maquettes/10-mobile-companion-home.html", width: 390, height: 844 },
+    { name: "mobile-code-diff-390x844.png", route: "/docs/aphrody/design/maquettes/11-mobile-code-diff-review.html", width: 390, height: 844 },
   ];
 
   const profileDir = mkdtempSync(join(tmpdir(), "aphrody-maquettes-"));
@@ -811,7 +811,7 @@ export async function captureMaquetteScreenshots(repoRoot: string): Promise<{
       "--window-size=1440,900",
       "--no-first-run",
       "--no-default-browser-check",
-      `http://127.0.0.1:${server.port}/aphrody/docs/design/maquettes/index.html`,
+      `http://127.0.0.1:${server.port}/docs/aphrody/design/maquettes/index.html`,
     ],
     { stdout: "pipe", stderr: "pipe" },
   );

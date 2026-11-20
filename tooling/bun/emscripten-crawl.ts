@@ -28,8 +28,8 @@ export const SITEMAP_XML_REL = "target/emscripten-crawl/sitemap.xml";
 export const GITINGEST_DIR_REL = "target/gitingest/emscripten-core";
 export const ORG_MANIFEST_REL = "target/gitingest/emscripten-core/org-manifest.json";
 
-export const LLMS_TXT_REL = "aphrody/docs/architecture/emscripten-llms.txt";
-export const ARCH_DOC_REL = "aphrody/docs/architecture/emscripten-ecosystem.md";
+export const LLMS_TXT_REL = "docs/aphrody/architecture/emscripten-llms.txt";
+export const ARCH_DOC_REL = "docs/aphrody/architecture/emscripten-ecosystem.md";
 export const SKILL_DIR_REL = ".agents/plugins/aphrody/skills/emscripten";
 export const SKILL_MD_REL = ".agents/plugins/aphrody/skills/emscripten/SKILL.md";
 export const REF_REPOS_REL = ".agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md";
@@ -1540,7 +1540,7 @@ ${renderRepoMatrixRows(manifest)}
 
 ## 3. \`wasm32-unknown-emscripten\` vs \`wasm32-unknown-unknown\` vs \`wasm32-wasip2\` in Aphrody
 
-Aphrody targets three complementary WebAssembly ABIs documented across [\`rust-toolchain.toml\`](../../../rust-toolchain.toml), [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts), and [\`aphrody/docs/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md):
+Aphrody targets three complementary WebAssembly ABIs documented across [\`rust-toolchain.toml\`](../../../rust-toolchain.toml), [\`tooling/bun/web-build.ts\`](../../../tooling/bun/web-build.ts), and [\`docs/aphrody/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md):
 
 | Dimension | \`wasm32-unknown-unknown\` (Aphrody Browser UI) | \`wasm32-wasip2\` (Aphrody Extensions) | \`wasm32-unknown-emscripten\` (C/C++ POSIX & Emscripten) |
 | :--- | :--- | :--- | :--- |
@@ -1597,13 +1597,13 @@ xh --ignore-stdin --check-status --headers --follow GET https://emscripten.org/
 
 ### Progressive-Disclosure Skill & Companion Artifacts
 
-- **\`llms.txt\` Index**: [\`aphrody/docs/architecture/emscripten-llms.txt\`](./emscripten-llms.txt)
+- **\`llms.txt\` Index**: [\`docs/aphrody/architecture/emscripten-llms.txt\`](./emscripten-llms.txt)
 - **Agent Skill Entrypoint**: [\`.agents/plugins/aphrody/skills/emscripten/SKILL.md\`](../../../.agents/plugins/aphrody/skills/emscripten/SKILL.md)
 - **Skill Reference — Repos & \`emsdk\`**: [\`references/repos-and-emsdk.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/repos-and-emsdk.md)
 - **Skill Reference — Sitemap & APIs**: [\`references/sitemap-and-api-reference.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/sitemap-and-api-reference.md)
 - **Skill Reference — \`emcc\` & Wasm Best Practices**: [\`references/emcc-wasm-best-practices.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/emcc-wasm-best-practices.md)
 - **Skill Reference — C/C++ & WebGPU Interop**: [\`references/c-cpp-webgpu-interop.md\`](../../../.agents/plugins/aphrody/skills/emscripten/references/c-cpp-webgpu-interop.md)
-- **Cross-Compilation Context**: [\`aphrody/docs/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md) & [\`aphrody/docs/architecture/production-guide.md\`](./production-guide.md)
+- **Cross-Compilation Context**: [\`docs/aphrody/architecture/cross-compile-and-depot-tools.md\`](./cross-compile-and-depot-tools.md) & [\`docs/aphrody/architecture/production-guide.md\`](./production-guide.md)
 `;
 }
 
@@ -1693,8 +1693,8 @@ bun test tooling/bun/emscripten-crawl.test.ts
 bun tooling/bun/repo-hygiene.ts
 \`\`\`
 
-- Architecture overview: [\`aphrody/docs/architecture/emscripten-ecosystem.md\`](../../../../../aphrody/docs/architecture/emscripten-ecosystem.md)
-- LLM compact index: [\`aphrody/docs/architecture/emscripten-llms.txt\`](../../../../../aphrody/docs/architecture/emscripten-llms.txt)
+- Architecture overview: [\`docs/aphrody/architecture/emscripten-ecosystem.md\`](../../../../../docs/aphrody/architecture/emscripten-ecosystem.md)
+- LLM compact index: [\`docs/aphrody/architecture/emscripten-llms.txt\`](../../../../../docs/aphrody/architecture/emscripten-llms.txt)
 `;
 }
 

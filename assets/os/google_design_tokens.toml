@@ -522,7 +522,7 @@ wgsl_shader_path = "assets/shaders/m3_expressive.wgsl"
 file_id = "1035203688168086460"
 name = "Material 3 Design Kit"
 url = "https://www.figma.com/community/file/1035203688168086460/material-3-design-kit"
-dtcg_kit_path = "aphrody/docs/design/kits/figma-design-kit.json"
+dtcg_kit_path = "docs/aphrody/design/kits/figma-design-kit.json"
 
 [parametric_prototyping]
 published_date = "2026-11-16"

@@ -44,7 +44,7 @@ export const TOOLING_REGISTRY: readonly ToolCommandSpec[] = [
   // 2. Google Design System & Stitch Studio (`https://design.google/`)
   { domain: "design", action: "sync", scriptRel: "tooling/bun/google-design-sync.ts", defaultArgs: ["sync"], summary: "Synchronize 3-tier Material 3 Expressive tokens, sitemap, and root DESIGN.md" },
   { domain: "design", action: "audit", scriptRel: "tooling/bun/google-design-sync.ts", defaultArgs: ["audit"], summary: "Verify WCAG 2.2 AA contrast ratios and Google Design token integrity" },
-  { domain: "design", action: "pack", scriptRel: "tooling/bun/design-docs-pack.ts", defaultArgs: ["build"], summary: "Build & validate complete aphrody/docs/design SVGs, CSS, Figma DTCG, Stitch & MDX pack" },
+  { domain: "design", action: "pack", scriptRel: "tooling/bun/design-docs-pack.ts", defaultArgs: ["build"], summary: "Build & validate complete docs/aphrody/design SVGs, CSS, Figma DTCG, Stitch & MDX pack" },
 
   // 3. Storytold 82-Repository Ecosystem (`craft-libs` + `craft-anything` + `egui` + `bevy`)
   { domain: "storytold", action: "sync", scriptRel: "tooling/bun/storytold-unify.ts", defaultArgs: ["sync"], summary: "Generate assets/os/storytold_ecosystem.toml across all 82 repositories" },

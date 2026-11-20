@@ -22,7 +22,7 @@ Resolve `references/` relative to `.agents/skills/wgpu/`:
 | Vendored Crates, v30 APIs & `wgpu-hal` Backends | [references/architecture-and-crates.md](references/architecture-and-crates.md) | Creating `Instance`/`Adapter`/`Device`, using v30 API signatures (`PollType`, `CurrentSurfaceTexture`, `TexelCopy*`), debugging DX12/Vulkan/Metal/GLES backends, or modifying `vendor/wgpu` |
 | Naga IR, WGSL Layouts & Cross-Compilation | [references/naga-and-wgsl.md](references/naga-and-wgsl.md) | Writing WGSL, checking `std140`/`std430` struct alignments with `Layouter`, validating shaders, handling uniformity rules, or transpiling to HLSL/MSL/SPIR-V/GLSL |
 | GPUI & NSH GPU Integration | [references/gpui-and-nsh-integration.md](references/gpui-and-nsh-integration.md) | Editing `crates/gpui_wgpu` (pipelines, `WgpuAtlas`, dual-source subpixel blending, WebGL2 fallback, headless rendering, device recovery) or `nsh-core`/`nsh-engine` custom shaders |
-| Full Exhaustive Spec | `aphrody/docs/wgpu/llms-full.txt` | Complete limits/features tables, full copy-paste Rust recipes, and troubleshooting catalog |
+| Full Exhaustive Spec | `docs/aphrody/wgpu/llms-full.txt` | Complete limits/features tables, full copy-paste Rust recipes, and troubleshooting catalog |
 
 ## Non-Negotiable Rules & Traps to Avoid
 

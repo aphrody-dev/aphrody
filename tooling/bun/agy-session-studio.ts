@@ -4,7 +4,7 @@
  * + Storytold 82-Repository & GPUI / egui 0.37 / Unreal Bevy 5.8 Parity Telemetry.
  *
  * Anchored to https://design.google/ (Material 3 Neural Expressive + Code is a Design Material)
- * and aphrody/docs/design/stylesheet.css.
+ * and docs/aphrody/design/stylesheet.css.
  *
  * Usage:
  *   bun tooling/bun/agy-session-studio.ts [--port 4789] [--sessions-dir <dir>]

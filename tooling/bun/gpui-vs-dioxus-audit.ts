@@ -18,7 +18,7 @@ import { parseGitmodules, type SubmoduleEntry } from "./submodules.ts";
 export const REPO_ROOT = resolve(import.meta.dir, "../..");
 export const AUDIT_JSON_REL = "target/gpui-vs-dioxus/audit.json";
 export const MATRIX_TOML_REL = "assets/os/gpui_vs_dioxus_matrix.toml";
-export const ARCH_DOC_REL = "aphrody/docs/architecture/gpui-vs-dioxus-audit.md";
+export const ARCH_DOC_REL = "docs/aphrody/architecture/gpui-vs-dioxus-audit.md";
 
 const USER_AGENT = "AphrodyEcosystemAudit/2.0 (+https://github.com/Aphrody-Dev/aphrody)";
 

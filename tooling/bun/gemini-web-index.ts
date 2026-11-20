@@ -32,7 +32,7 @@ const DEFAULT_DB_PATH = resolve(process.cwd(), "target/gemini-web/index.db");
 const DEFAULT_MAP_PATH = resolve(process.cwd(), "target/gemini-web/map.json");
 const DEFAULT_DOC_PATH = resolve(
   process.cwd(),
-  "aphrody/docs/architecture/gemini-web-sitemap.md",
+  "docs/aphrody/architecture/gemini-web-sitemap.md",
 );
 
 const PRIVATE_WORKSPACE_ROUTES: Omit<GeminiRoute, "updated_at">[] = [

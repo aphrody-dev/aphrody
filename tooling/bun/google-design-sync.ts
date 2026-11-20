@@ -840,9 +840,9 @@ const DEFAULT_ARTICLES: DesignArticleSnapshot[] = [
   {
     url: "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
     title: "Material 3 Design Kit (Community)",
-    description: "Official Material 3 Figma kit, file key vEr6T5SQaJfMpLxjMUfD55, node 11:1833; local archive aphrody/docs/design/Material 3 Design Kit (Community).zip.",
+    description: "Official Material 3 Figma kit, file key vEr6T5SQaJfMpLxjMUfD55, node 11:1833; local archive docs/aphrody/design/Material 3 Design Kit (Community).zip.",
     headings: ["Styles", "Components", "Variables"],
-    summary: "Figma column of MaterialComponentMatrix and figmaFileHint for Code Connect mappings in aphrody/docs/design.",
+    summary: "Figma column of MaterialComponentMatrix and figmaFileHint for Code Connect mappings in docs/aphrody/design.",
   },
 ];
 
@@ -1122,7 +1122,7 @@ export async function syncGoogleDesignTokens(
         repo: "Figma Material 3 Design Kit (Community)",
         url: "https://www.figma.com/design/vEr6T5SQaJfMpLxjMUfD55/Material-3-Design-Kit--Community-?node-id=11-1833",
         license: "CC BY 4.0",
-        role: "Figma variables and component sets referenced by aphrody/docs/design figma kit and Code Connect mappings",
+        role: "Figma variables and component sets referenced by docs/aphrody/design figma kit and Code Connect mappings",
       },
     ],
     stitch_routes: [

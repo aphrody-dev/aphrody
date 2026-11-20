@@ -1,0 +1,702 @@
+{
+  "schemaVersion": 2,
+  "name": "aphrody-google-neural-expressive-design-pack",
+  "sourceOfTruth": "https://design.google/",
+  "homeUrl": "https://design.google/?home",
+  "codeAsMaterialUrl": "https://design.google/library/code-is-a-design-material",
+  "stitchUrl": "https://stitch.withgoogle.com/",
+  "stylesheetPath": "./stylesheet.css",
+  "designMdPath": "./DESIGN.md",
+  "wcagContrastDarkPrimary": 7.92,
+  "wcagContrastLightPrimary": 6.47,
+  "referenceCaptures": [
+    {
+      "id": "gemini-home",
+      "path": "https://assets.aphrody.app/v1/design-reference/7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2.png",
+      "bytes": 631827,
+      "sha256": "7e0e1157d986e1ba6030d15d621d64d207d19dc889a8667d0e945ddc5295e5f2",
+      "surfaceFamily": "gemini-neural-home",
+      "keyPatterns": [
+        "260px rail",
+        "indigo radial glow",
+        "Account preferences 20px popover",
+        "Carbon High selector"
+      ]
+    },
+    {
+      "id": "gemini-opions",
+      "path": "https://assets.aphrody.app/v1/design-reference/b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0.png",
+      "bytes": 560591,
+      "sha256": "b139054f522621cf5db65f1c97ba0b3169c170a7f2398aaeff7e7ddf581894d0",
+      "surfaceFamily": "gemini-cascading-menu",
+      "keyPatterns": [
+        "Cascading + attachment menu",
+        "Import code & Notebooks submenu"
+      ]
+    },
+    {
+      "id": "google-ai-mode",
+      "path": "https://assets.aphrody.app/v1/design-reference/b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9.png",
+      "bytes": 121621,
+      "sha256": "b2eee9f3fcf8c19b54d5873d39c8402d1f059d91469bb601caa8749218b75af9",
+      "surfaceFamily": "google-ai-mode",
+      "keyPatterns": [
+        "48px collapsed rail",
+        "Mode IA segmented bar",
+        "4-color thinking aura"
+      ]
+    },
+    {
+      "id": "google-in-chrome",
+      "path": "https://assets.aphrody.app/v1/design-reference/5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75.png",
+      "bytes": 61310,
+      "sha256": "5edf77bbc77a791f261f6f09985f1370e035fdd6cd39a55dafe89f24720e8b75",
+      "surfaceFamily": "chrome-omnibar",
+      "keyPatterns": [
+        "Pill attachment composer",
+        "Thumbnail chips",
+        "Primary circular submit"
+      ]
+    },
+    {
+      "id": "win11-chrome157",
+      "path": "https://assets.aphrody.app/v1/design-reference/648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa.png",
+      "r2Url": "https://assets.aphrody.app/v1/design-reference/648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa.png",
+      "bytes": 631406,
+      "sha256": "648338d8c84b57d2cfebab3423282a2acbd7902826fe1640962838c5ab570faa",
+      "surfaceFamily": "chrome-157-grounding",
+      "keyPatterns": [
+        "24px source grounding card stack",
+        "64x64 rounded media thumb",
+        "Modern Web Guidance 1.0"
+      ]
+    }
+  ],
+  "svgs": [
+    {
+      "id": "google-g-4color",
+      "title": "Google 4-Color Neural Mark",
+      "path": "./svg/google-g-4color.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 706,
+      "sha256": "34ee1a25fde3b33d6952d858a635e4873d024ef5c2963bbfa478fe08e295f95c",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "gemini-neural-spark",
+      "title": "Gemini Neural Expressive Four-Point Spark",
+      "path": "./svg/gemini-neural-spark.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 483,
+      "sha256": "ee059920e19a7b8af4be1a9db518680b17e511e406f944f5113fb36f2e578f1c",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "code-as-material",
+      "title": "Code is a Design Material Emblem",
+      "path": "./svg/code-as-material.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 418,
+      "sha256": "58287ea9475b3c6a45ddbca0caadede053fe8f6f5e5f1795281569f2e24c01d3",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "figcraft-stitch-frame",
+      "title": "Google FigCraft & Stitch Auto-Layout Frame",
+      "path": "./svg/figcraft-stitch-frame.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 468,
+      "sha256": "93d01e0297e495dff8349cebe98da3fb7935c8163487382f5af08baccc9f15ed",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "craft-anything-hex",
+      "title": "Google Craft Anything Clean-Room Disassembly & Wasm",
+      "path": "./svg/craft-anything-hex.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 372,
+      "sha256": "683b0673e9b0e6ae78bc0a20b1b3d20e1593e9adb5d45e0723ccc9ea2e7c16ac",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "bevy-unreal-solari",
+      "title": "Unreal Engine 5.8 Bevy Solari GI & Nanite Meshlets",
+      "path": "./svg/bevy-unreal-solari.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 380,
+      "sha256": "189d6a709a8094a20e091b9b8e743ebb3170254fc097c5fbe54298b2eec53341",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "parity-split-compare",
+      "title": "GPUI Google Design vs egui 0.37 Side-by-Side Split",
+      "path": "./svg/parity-split-compare.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 349,
+      "sha256": "8831034bd8d8687ad0c6fd40e62a567844ce471407aaeaff2b6a1b79f0586bf3",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "omnibar-plus",
+      "title": "Neural Omnibar Attachment Trigger",
+      "path": "./svg/omnibar-plus.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 249,
+      "sha256": "a71a2421693ea230d012b76450d7a76413f84a406d488b5bb7837687de887a9f",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-monogram-neural",
+      "title": "Aphrody Neural Expressive Monogram",
+      "path": "./svg/aphrody-monogram-neural.svg",
+      "viewBox": "0 0 96 96",
+      "bytes": 622,
+      "sha256": "0eb079fc9f5cb2469aa9d89254246bb825a70183a1ef2b2e3f3f3bca889b11a1",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-monogram-mono",
+      "title": "Aphrody Monochrome Monogram",
+      "path": "./svg/aphrody-monogram-mono.svg",
+      "viewBox": "0 0 96 96",
+      "bytes": 344,
+      "sha256": "ff9fb6a833613b1e0859c6c5eca7dc820a7a04848a6b10d92c7e8b582b3112ac",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-mobile-adaptive-fg",
+      "title": "Aphrody Mobile Adaptive Icon Foreground (66dp Safe Zone)",
+      "path": "./svg/aphrody-mobile-adaptive-fg.svg",
+      "viewBox": "0 0 108 108",
+      "bytes": 379,
+      "sha256": "d6ca2b9e67eff742d2c982b0cdd95872790a8d47d9e2f54988221485c7f1f484",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-mobile-adaptive-bg",
+      "title": "Aphrody Mobile Adaptive Icon Background",
+      "path": "./svg/aphrody-mobile-adaptive-bg.svg",
+      "viewBox": "0 0 108 108",
+      "bytes": 349,
+      "sha256": "afd5fc908147e0956f95e3df3054db192f119f21e1089b46ca1ae78439594f29",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-os-compositor",
+      "title": "Aphrody COSMIC Epoch Compositor Tiling Glyph",
+      "path": "./svg/aphrody-os-compositor.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 337,
+      "sha256": "fe0877928c4b536ba4572493a88ce363b85d222fbea3061cfe1b4df2c66bc907",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-ide-studio",
+      "title": "Aphrody Studio IDE Multi-Pane Glyph",
+      "path": "./svg/aphrody-ide-studio.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 404,
+      "sha256": "7b3524a1e2fa9e075ab990182ef708d16e89e58d3d505a13b47eae01159715de",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-webgpu-prism",
+      "title": "WebGPU & WGSL Compute Prism",
+      "path": "./svg/aphrody-webgpu-prism.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 365,
+      "sha256": "a14aa83ebcfbc7cb96cf7aeab88daafe8d4eb115ab65099c08190b99dd69db7a",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-wasm-cube",
+      "title": "WebAssembly Core 2.0 & WASI P2 Cube",
+      "path": "./svg/aphrody-wasm-cube.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 461,
+      "sha256": "edfc69258909970a854875b61865f6c4621c97f2e6dc80720f35849d206faa9a",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-vpn-shield",
+      "title": "Aphrody Sovereign WireGuard VPN Shield",
+      "path": "./svg/aphrody-vpn-shield.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 432,
+      "sha256": "79a3587dccbd66ce8d0eadcc8f3b08ca0581580636ab45e2520ed5f0a8cf73c7",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-ai-agent-orbit",
+      "title": "Multi-Agent MCP / ACP / A2A Control Orbit",
+      "path": "./svg/aphrody-ai-agent-orbit.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 485,
+      "sha256": "5b62facdc9a4b29091aa78c856452316b3ae3d22014f571f035fc9059c55086f",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-figma-tokens",
+      "title": "W3C DTCG & Figma Variable Token Grid",
+      "path": "./svg/aphrody-figma-tokens.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 530,
+      "sha256": "47ca6d50b05a151767457fa3991d0df8d041af8958dd862259848a5713bea0b5",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "aphrody-store-22targets",
+      "title": "Aphrody 22-Target Store Distribution",
+      "path": "./svg/aphrody-store-22targets.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 370,
+      "sha256": "991d31e061d4ebef63a96524efb2cc8c907447005bf4c05011ccdcf62f2a0e09",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-1",
+      "title": "Google Design Home Vector (design-google-1)",
+      "path": "./svg/design-google-1.svg",
+      "viewBox": "0 0 130 22",
+      "bytes": 10176,
+      "sha256": "083ba7e43ff1ef9659269bda6fdd475c1d5f00b641c8531c4df1f4f1a6832b9d",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-2",
+      "title": "Google Design Home Vector (design-google-2)",
+      "path": "./svg/design-google-2.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 881,
+      "sha256": "9f60bb3a9d6c95ff6fb85f56f63e9ceea1864718f21bbe8f989c535f7fdde555",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-3",
+      "title": "Google Design Home Vector (design-google-3)",
+      "path": "./svg/design-google-3.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 283,
+      "sha256": "e92b73c94c15e7487690dd8917dda498e90c065e2b211acc81927865517aad94",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-4",
+      "title": "Google Design Home Vector (design-google-4)",
+      "path": "./svg/design-google-4.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 294,
+      "sha256": "e53e5d3fbcbd28dde74b9f2b15e33e4fe42dc820f1d7bc836bdf0ae1da47dcfa",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-5",
+      "title": "Google Design Home Vector (design-google-5)",
+      "path": "./svg/design-google-5.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 881,
+      "sha256": "7307db7ff80a6741a9e73ff78eee45abd6f1f396364b65e5afef392c123a0994",
+      "a11yRoleImg": true
+    },
+    {
+      "id": "design-google-6",
+      "title": "Google Design Home Vector (design-google-6)",
+      "path": "./svg/design-google-6.svg",
+      "viewBox": "0 0 24 24",
+      "bytes": 519,
+      "sha256": "145f1bbdc831d8553813c8a8982b5acbde55ff8ff48373da77e78befb2f1075b",
+      "a11yRoleImg": true
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "01-code-is-a-design-material",
+      "title": "Code is a Design Material",
+      "path": "./guidelines/01-code-is-a-design-material.mdx",
+      "sourceUrl": "https://design.google/library/code-is-a-design-material",
+      "bytes": 838,
+      "sha256": "3fb9f435bea75f47ab3da1efb2201f6b321bed17fe3a8e0fb6cf4c6341e3fd15"
+    },
+    {
+      "id": "02-material-3-expressive-and-neural-surfaces",
+      "title": "Material 3 Expressive & Neural Surfaces",
+      "path": "./guidelines/02-material-3-expressive-and-neural-surfaces.mdx",
+      "sourceUrl": "https://design.google/?home",
+      "bytes": 796,
+      "sha256": "737a30c3c11ab18971152801546357bcb636a8ac06fdf22ff3ea0d5dfaa2a6aa"
+    },
+    {
+      "id": "03-google-sans-flex-and-code-typography",
+      "title": "Google Sans Flex & Monospace Code Pairing",
+      "path": "./guidelines/03-google-sans-flex-and-code-typography.mdx",
+      "sourceUrl": "https://design.google/library/google-sans-flex-font",
+      "bytes": 542,
+      "sha256": "687b8ef65ad47a66259c6a478c6d7e92e5f05e392120f44420420b47ab5274d4"
+    },
+    {
+      "id": "04-spatial-and-effects-spring-motion",
+      "title": "Spatial vs Effects Spring Motion Physics",
+      "path": "./guidelines/04-spatial-and-effects-spring-motion.mdx",
+      "sourceUrl": "https://m3.material.io/",
+      "bytes": 666,
+      "sha256": "4a4ff278a7180a45c632011b98395c1bc144eb20192cb6466c3c2530711e9948"
+    },
+    {
+      "id": "05-modern-web-and-wasm-webgpu-baseline",
+      "title": "Modern Web Guidance & Wasm/WebGPU Baseline",
+      "path": "./guidelines/05-modern-web-and-wasm-webgpu-baseline.mdx",
+      "sourceUrl": "https://github.com/GoogleChrome/modern-web-guidance-src",
+      "bytes": 600,
+      "sha256": "dbe567767f476ac218fe15581af91bb4c16675e19308438637716fefb320bc9d"
+    },
+    {
+      "id": "06-gpui-egui-bevy-component-catalog",
+      "title": "Unified GPUI, NSH, egui 0.37 & Bevy UE5.8 Component Catalog",
+      "path": "./guidelines/06-gpui-egui-bevy-component-catalog.mdx",
+      "sourceUrl": "https://design.google/?home",
+      "bytes": 950,
+      "sha256": "0e00145845151a266d9d5178781916e74780d781c823d8c37569baf6b3db2916"
+    },
+    {
+      "id": "07-mirrored-google-references",
+      "title": "Mirrored Google References & Material 3 Matrix",
+      "path": "./guidelines/07-mirrored-google-references.mdx",
+      "sourceUrl": "https://design.google/library/transparent-screens",
+      "bytes": 1979,
+      "sha256": "8831afe5736a95a09d8f35a2f21db2c51e60bc8998395234d85a70b00da234fe"
+    }
+  ],
+  "kits": {
+    "figma": {
+      "path": "./kits/figma-design-kit.json",
+      "sha256": "d3ad0e3de386c4187e6540148dc43abd968568ea3a8e7c2af26d6f59624a58ad",
+      "collectionCount": 6,
+      "componentCount": 20
+    },
+    "figmaCodeConnect": {
+      "path": "./kits/figma-code-connect.json",
+      "sha256": "af269525f2efa21429c4d6d81ad24606a0d99f7518483dadd2437759dba20f03",
+      "mappingCount": 20
+    },
+    "stitch": {
+      "path": "./kits/stitch-design-kit.json",
+      "sha256": "0ddb62d247f7f390c5a5c3add82dd05ae7eb49d9fcd21f624b08b0184cdfc3e6",
+      "screenCount": 4,
+      "preserveDataStitchId": true
+    }
+  },
+  "maquettes": [
+    {
+      "id": "01-labs-ecosystem-architecture",
+      "file": "01-labs-ecosystem-architecture.html",
+      "path": "./maquettes/01-labs-ecosystem-architecture.html",
+      "stitchId": "stitch-labs-architecture",
+      "surface": "labs",
+      "deviceType": "DESKTOP",
+      "title": "Aphrody Pure-Rust Desktop OS & Google Cloud Ecosystem Architecture",
+      "defaultTheme": "neural",
+      "bytes": 6987
+    },
+    {
+      "id": "02-labs-roadmap-2026-2027",
+      "file": "02-labs-roadmap-2026-2027.html",
+      "path": "./maquettes/02-labs-roadmap-2026-2027.html",
+      "stitchId": "stitch-labs-roadmap",
+      "surface": "labs",
+      "deviceType": "DESKTOP",
+      "title": "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)",
+      "defaultTheme": "neural",
+      "bytes": 5457
+    },
+    {
+      "id": "03-web-landing-hero",
+      "file": "03-web-landing-hero.html",
+      "path": "./maquettes/03-web-landing-hero.html",
+      "stitchId": "stitch-web-landing",
+      "surface": "website",
+      "deviceType": "DESKTOP",
+      "title": "aphrody.com — Website Landing & Live WebGPU Playground",
+      "defaultTheme": "neural",
+      "bytes": 5344
+    },
+    {
+      "id": "04-web-docs-llms-portal",
+      "file": "04-web-docs-llms-portal.html",
+      "path": "./maquettes/04-web-docs-llms-portal.html",
+      "stitchId": "stitch-web-docs",
+      "surface": "website",
+      "deviceType": "DESKTOP",
+      "title": "docs.aphrody.com — Fumadocs v16, Twoslash & llms.txt Portal",
+      "defaultTheme": "dark",
+      "bytes": 4882
+    },
+    {
+      "id": "05-web-store-and-downloads",
+      "file": "05-web-store-and-downloads.html",
+      "path": "./maquettes/05-web-store-and-downloads.html",
+      "stitchId": "stitch-web-store",
+      "surface": "website",
+      "deviceType": "DESKTOP",
+      "title": "releases.aphrody.com & Store — 22-Target Distribution Portal",
+      "defaultTheme": "neural",
+      "bytes": 4761
+    },
+    {
+      "id": "06-desktop-aphrody-ide",
+      "file": "06-desktop-aphrody-ide.html",
+      "path": "./maquettes/06-desktop-aphrody-ide.html",
+      "stitchId": "stitch-desktop-ide",
+      "surface": "desktop",
+      "deviceType": "DESKTOP",
+      "title": "Desktop: Aphrody Studio IDE (`crates/zed` + Stitch Dock)",
+      "defaultTheme": "dark",
+      "bytes": 4773
+    },
+    {
+      "id": "07-desktop-aphrody-os-cosmic",
+      "file": "07-desktop-aphrody-os-cosmic.html",
+      "path": "./maquettes/07-desktop-aphrody-os-cosmic.html",
+      "stitchId": "stitch-desktop-cosmic-os",
+      "surface": "desktop",
+      "deviceType": "DESKTOP",
+      "title": "Desktop: Aphrody Pure-Rust OS (Wayland, Windows, Wasm & Chromium)",
+      "defaultTheme": "neural",
+      "bytes": 5130
+    },
+    {
+      "id": "08-desktop-agy-neural-session",
+      "file": "08-desktop-agy-neural-session.html",
+      "path": "./maquettes/08-desktop-agy-neural-session.html",
+      "stitchId": "stitch-desktop-neural-agy",
+      "surface": "desktop",
+      "deviceType": "DESKTOP",
+      "title": "Desktop: Neural Expressive Home, Headless Agents & Grounding Stack",
+      "defaultTheme": "neural",
+      "bytes": 5497
+    },
+    {
+      "id": "09-desktop-browser-vpn-shield",
+      "file": "09-desktop-browser-vpn-shield.html",
+      "path": "./maquettes/09-desktop-browser-vpn-shield.html",
+      "stitchId": "stitch-desktop-browser-vpn",
+      "surface": "desktop",
+      "deviceType": "DESKTOP",
+      "title": "Desktop: Aphrody Browser + Per-Tab Mullvad WireGuard VPN",
+      "defaultTheme": "dark",
+      "bytes": 4421
+    },
+    {
+      "id": "10-mobile-companion-home",
+      "file": "10-mobile-companion-home.html",
+      "path": "./maquettes/10-mobile-companion-home.html",
+      "stitchId": "stitch-mobile-home",
+      "surface": "mobile",
+      "deviceType": "MOBILE",
+      "title": "Mobile (Android 17/18 412px & iOS 390px): Companion Home & YouTube Music",
+      "defaultTheme": "neural",
+      "bytes": 4663
+    },
+    {
+      "id": "11-mobile-code-diff-review",
+      "file": "11-mobile-code-diff-review.html",
+      "path": "./maquettes/11-mobile-code-diff-review.html",
+      "stitchId": "stitch-mobile-diff",
+      "surface": "mobile",
+      "deviceType": "MOBILE",
+      "title": "Mobile: Code Diff Review & Snap-Point Bottom Sheet",
+      "defaultTheme": "dark",
+      "bytes": 4457
+    },
+    {
+      "id": "12-mobile-pocket-craft-vpn",
+      "file": "12-mobile-pocket-craft-vpn.html",
+      "path": "./maquettes/12-mobile-pocket-craft-vpn.html",
+      "stitchId": "stitch-mobile-craft-oled",
+      "surface": "mobile",
+      "deviceType": "TABLET",
+      "title": "Mobile / Tablet OLED Pitch: Pocket Studio, VPN & Foldable 834px View",
+      "defaultTheme": "oled",
+      "bytes": 4039
+    }
+  ],
+  "components": [
+    {
+      "id": "youtube-gradient-scrubber",
+      "category": "data_display",
+      "gpuiSymbol": "aphrody_ui::google_design_mirror::YoutubeGradientScrubber",
+      "eguiEquivalentSymbol": "egui::Slider",
+      "nshElement": "MediaScrubber",
+      "stitchSlotId": "stitch-media-scrubber",
+      "tokensConsumed": [
+        "--md-ref-palette-youtube-red",
+        "--md-ref-palette-youtube-magenta",
+        "--md-sys-color-surface-container"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "disabled"
+      ]
+    },
+    {
+      "id": "quire-glass-note",
+      "category": "overlay",
+      "gpuiSymbol": "aphrody_ui::google_design_mirror::QuireGlassNote",
+      "eguiEquivalentSymbol": "egui::Window",
+      "nshElement": "QuireNote",
+      "stitchSlotId": "stitch-quire-note",
+      "tokensConsumed": [
+        "--md-ref-palette-quire-folio-light",
+        "--md-ref-palette-quire-folio-dark",
+        "--md-sys-color-error"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "disabled"
+      ]
+    },
+    {
+      "id": "expressive-app-shell",
+      "category": "shell",
+      "gpuiSymbol": "aphrody_ui::cosmic_shell::render_nav_rail",
+      "eguiEquivalentSymbol": "egui::SidePanel",
+      "nshElement": "AppShell",
+      "stitchSlotId": "stitch-agy-rail",
+      "tokensConsumed": [
+        "--md-sys-color-surface",
+        "--md-sys-color-surface-container-low"
+      ],
+      "states": [
+        "default",
+        "selected",
+        "focused"
+      ]
+    },
+    {
+      "id": "expressive-pill-button",
+      "category": "navigation",
+      "gpuiSymbol": "aphrody_ui::starter_pack::StarterButton",
+      "eguiEquivalentSymbol": "egui::Button",
+      "nshElement": "PillButton",
+      "stitchSlotId": "stitch-figcraft-cta",
+      "tokensConsumed": [
+        "--md-sys-color-primary",
+        "--md-sys-color-on-primary",
+        "--md-sys-shape-corner-full"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "pressed",
+        "focused",
+        "disabled"
+      ]
+    },
+    {
+      "id": "neural-omnibar-composer",
+      "category": "composer",
+      "gpuiSymbol": "ui_input::InputField",
+      "eguiEquivalentSymbol": "egui::TextEdit::singleline",
+      "nshElement": "NeuralOmnibar",
+      "stitchSlotId": "stitch-figcraft-omnibar",
+      "tokensConsumed": [
+        "--md-sys-color-surface-container",
+        "--md-sys-shape-corner-full"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "focused"
+      ]
+    },
+    {
+      "id": "cascading-menu-popover",
+      "category": "overlay",
+      "gpuiSymbol": "ui::ContextMenu",
+      "eguiEquivalentSymbol": "egui::MenuBar",
+      "nshElement": "CascadingPopover",
+      "stitchSlotId": "stitch-menu-popover",
+      "tokensConsumed": [
+        "--md-sys-color-surface-container-high",
+        "--md-sys-shape-corner-lg-inc"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "selected",
+        "focused"
+      ]
+    },
+    {
+      "id": "grounding-card-stack",
+      "category": "data_display",
+      "gpuiSymbol": "aphrody_ui::starter_pack::StarterCard",
+      "eguiEquivalentSymbol": "egui::Frame",
+      "nshElement": "GroundingCard",
+      "stitchSlotId": "stitch-grounding-stack",
+      "tokensConsumed": [
+        "--md-sys-color-surface-container-low",
+        "--md-sys-shape-corner-xl"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "selected"
+      ]
+    },
+    {
+      "id": "telemetry-kpi-strip",
+      "category": "data_display",
+      "gpuiSymbol": "aphrody_ui::starter_pack::StarterKpiCard",
+      "eguiEquivalentSymbol": "egui_gpui::EguiFrameStats",
+      "nshElement": "KpiTile",
+      "stitchSlotId": "stitch-agy-kpis",
+      "tokensConsumed": [
+        "--md-sys-color-primary",
+        "--md-ref-typeface-mono"
+      ],
+      "states": [
+        "default"
+      ]
+    },
+    {
+      "id": "figcraft-auto-layout-frame",
+      "category": "data_display",
+      "gpuiSymbol": "aphrody_craft::FigCraftFrameNode",
+      "eguiEquivalentSymbol": "egui_gpui::EguiGpuiHost",
+      "nshElement": "FigCraftGoogleScreen",
+      "stitchSlotId": "stitch-figcraft-root",
+      "tokensConsumed": [
+        "--md-sys-color-surface",
+        "--md-sys-color-primary-container"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "selected"
+      ]
+    },
+    {
+      "id": "unreal-bevy-solari-viewport",
+      "category": "viewport_3d",
+      "gpuiSymbol": "bevy_gpui::render_viewport_rgba8",
+      "eguiEquivalentSymbol": "bevy_gpui::render_bevy_egui_inspector",
+      "nshElement": "ViewportCanvas",
+      "stitchSlotId": "stitch-bevy-viewport",
+      "tokensConsumed": [
+        "--md-sys-color-surface-dim",
+        "--md-sys-color-tertiary"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "selected"
+      ]
+    }
+  ]
+}

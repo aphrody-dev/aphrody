@@ -43,4 +43,4 @@ Every repository below had **zero `path = "vendor/..."` Cargo consumers** in `cr
 | `vendor/smithay` | `aphrody-labs/smithay` (`master`) | `33323a917af13676875c27fb7748ffdaea5f4c2f` | `Smithay/smithay` | Wayland compositor reference; `crates/gpui_linux` + `crates/aphrody_desktop` run as native clients/shells |
 | `vendor/new-cli-installer` | `aphrody-labs/New-Cli-Installer` (`master`) | `2037b04f9ce1e62ce34b2191fb58a22075e428a7` | `aphrody-labs/New-Cli-Installer` | Installer UX absorbed into `crates/aphrody_installer` (`src/`) & `crates/aphrody_store` (`upt`) |
 
-See [`aphrody/docs/architecture/vendor-reference-ecosystem.md`](../../../../../aphrody/docs/architecture/vendor-reference-ecosystem.md) for architecture notes and upstream sync commands.
+See [`docs/aphrody/architecture/vendor-reference-ecosystem.md`](../../../../../docs/aphrody/architecture/vendor-reference-ecosystem.md) for architecture notes and upstream sync commands.
