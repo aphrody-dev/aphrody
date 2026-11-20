@@ -87,6 +87,7 @@ pub struct OsDesktopShell {
     _settings_obs: Subscription,
     pub settings_daemon: aphrody_session::CosmicSettingsDaemon,
     pub notifications: aphrody_session::NotificationCenter,
+    pub notifications_open: bool,
     pub osd: Option<aphrody_session::OsdBanner>,
     pub overview_open: bool,
     pub app_library_open: bool,
@@ -278,6 +279,7 @@ impl OsDesktopShell {
             _settings_obs: settings_obs,
             settings_daemon,
             notifications,
+            notifications_open: false,
             osd: None,
             overview_open: false,
             app_library_open: false,
@@ -658,6 +660,29 @@ impl OsDesktopShell {
                 AppletSlot::Center => center_pills.push(pill),
                 AppletSlot::Right => right_pills.push(pill),
             }
+        }
+        let notif_entity = cx.entity();
+        if !self.notifications.items.is_empty() {
+            let notif_count = self.notifications.items.len();
+            right_pills.insert(
+                0,
+                aphrody_ui::focusable_action_chip(
+                    "panel-toggle-notifications",
+                    IconName::Bell,
+                    SharedString::default(),
+                    Some(SharedString::from(notif_count.to_string())),
+                    SharedString::from(format!("Toggle notifications ({notif_count})")),
+                    self.notifications_open,
+                    48,
+                    &self.theme,
+                    move |_ev, _w, cx| {
+                        notif_entity.update(cx, |shell, cx| {
+                            shell.notifications_open = !shell.notifications_open;
+                            cx.notify();
+                        });
+                    },
+                ),
+            );
         }
         let compact_pilot = f32::from(window.viewport_size().width) < 1400.0;
         right_pills.insert(
@@ -1575,7 +1600,7 @@ impl Render for OsDesktopShell {
                         .child(render_cosmic_osd_pill(&self.theme, banner)),
                 )
             })
-            .when(!self.notifications.items.is_empty(), |el| {
+            .when(self.notifications_open && !self.notifications.items.is_empty(), |el| {
                 let d_ent = cx.entity();
                 let c_ent = cx.entity();
                 let drawer_w = if self.drawer_open {
@@ -1586,7 +1611,7 @@ impl Render for OsDesktopShell {
                 el.child(
                     div()
                         .absolute()
-                        .top(px(54.0))
+                        .bottom(px(76.0))
                         .right(px(drawer_w + 16.0))
                         .child(render_cosmic_notifications_stack(
                             &self.theme,

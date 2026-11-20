@@ -31,85 +31,17 @@ pub const M3_FONT_MONO: &str = "JetBrains Mono";
 /// Minimum WCAG 2.2 AA normal-text contrast ratio.
 pub const WCAG_AA_MIN_CONTRAST: f32 = brand::design::WCAG_AA_MIN_CONTRAST;
 
-/// Four Material 3 Expressive surface modes synchronized with `assets/os/google_design_tokens.toml`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum M3Mode {
-    /// High-clarity light surface (`#F7F9FF`).
-    Light,
-    /// Standard M3 dark slate surface (`#0E141B`).
-    #[default]
-    Dark,
-    /// Deep neural obsidian surface (`#0B0E14`).
-    NeuralObsidian,
-    /// True zero-emission OLED pitch black surface (`#000000`).
-    OledPitch,
-}
+/// Four Material 3 Expressive surface modes synchronized with `assets/os/google_design_tokens.toml`,
+/// unified directly onto [`brand::design::ThemeModeSlug`].
+pub use brand::design::ThemeModeSlug as M3Mode;
 
-impl M3Mode {
-    /// All 4 supported Material 3 Expressive modes in canonical order.
-    pub const ALL: [Self; 4] = [
-        Self::Light,
-        Self::Dark,
-        Self::NeuralObsidian,
-        Self::OledPitch,
-    ];
-
-    /// Machine-readable token key matching `[sys.color.<slug>]` in `google_design_tokens.toml`.
-    pub const fn slug(self) -> &'static str {
-        match self {
-            Self::Light => "light",
-            Self::Dark => "dark",
-            Self::NeuralObsidian => "neural_obsidian",
-            Self::OledPitch => "oled_pitch",
-        }
-    }
-
-    /// Human-readable display name.
-    pub const fn label(self) -> &'static str {
-        match self {
-            Self::Light => "Light",
-            Self::Dark => "Dark",
-            Self::NeuralObsidian => "Neural Obsidian",
-            Self::OledPitch => "OLED Pitch",
-        }
-    }
-
-    /// Returns `true` when the mode uses a dark surface polarity.
-    pub const fn is_dark(self) -> bool {
-        !matches!(self, Self::Light)
-    }
-
-    /// Maps this 4-mode variant to NSH's binary [`Appearance`].
-    pub const fn nsh_appearance(self) -> Appearance {
-        if self.is_dark() {
-            Appearance::Dark
-        } else {
-            Appearance::Light
-        }
-    }
-
-    /// Parses a mode slug or display alias (case-insensitive).
-    pub fn from_name(name: &str) -> Option<Self> {
-        let normalized = name.trim().to_ascii_lowercase();
-        match normalized.as_str() {
-            "light" | "material_light" | "material-light" => Some(Self::Light),
-            "dark" | "material_dark" | "material-dark" => Some(Self::Dark),
-            "neural_obsidian" | "neural-obsidian" | "neural" | "neural obsidian" => {
-                Some(Self::NeuralObsidian)
-            }
-            "oled_pitch" | "oled-pitch" | "oled" | "oled pitch" => Some(Self::OledPitch),
-            _ => None,
-        }
-    }
-
-    /// Cycles to the next mode (`Light -> Dark -> NeuralObsidian -> OledPitch -> Light`).
-    pub const fn next(self) -> Self {
-        match self {
-            Self::Light => Self::Dark,
-            Self::Dark => Self::NeuralObsidian,
-            Self::NeuralObsidian => Self::OledPitch,
-            Self::OledPitch => Self::Light,
-        }
+/// Maps a 4-mode [`M3Mode`] onto NSH's binary [`Appearance`].
+#[must_use]
+pub const fn m3_nsh_appearance(mode: M3Mode) -> Appearance {
+    if mode.is_dark() {
+        Appearance::Dark
+    } else {
+        Appearance::Light
     }
 }
 

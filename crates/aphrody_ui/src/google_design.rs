@@ -16,28 +16,8 @@ pub const DESIGN_SOURCE_OF_TRUTH: &str = brand::DESIGN_SOURCE_OF_TRUTH;
 /// Embedded 3-tier Material 3 Expressive + Google Sans Flex token manifest (`assets/os/google_design_tokens.toml`).
 pub use brand::design::BUNDLED_GOOGLE_DESIGN_TOKENS_TOML;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum WindowSizeClass {
-    Compact,
-    Medium,
-    Expanded,
-    Large,
-    ExtraLarge,
-}
-
-impl WindowSizeClass {
-    #[must_use]
-    pub fn from_width_px(width_px: f32) -> Self {
-        match brand::design::classify_window_width(width_px) {
-            brand::design::WindowSizeTier::Compact => Self::Compact,
-            brand::design::WindowSizeTier::Medium => Self::Medium,
-            brand::design::WindowSizeTier::Expanded => Self::Expanded,
-            brand::design::WindowSizeTier::Large => Self::Large,
-            brand::design::WindowSizeTier::ExtraLarge => Self::ExtraLarge,
-        }
-    }
-}
+/// Responsive Material 3 window size class unified directly onto [`brand::design::WindowSizeTier`].
+pub use brand::design::WindowSizeTier as WindowSizeClass;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct SpringSpec {

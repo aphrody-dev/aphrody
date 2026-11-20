@@ -10,7 +10,8 @@ autoexamples = false
 workspace = true
 
 [features]
-default = []
+default = ["webgl-fallback"]
+webgl-fallback = ["gpui_wgpu/webgl-fallback"]
 multithreaded = ["dep:wasm_thread", "scheduler/wasm-threads"]
 
 [lib]
@@ -26,7 +27,7 @@ unicode-segmentation.workspace = true
 gpui.workspace = true
 scheduler.workspace = true
 parking_lot = { workspace = true, features = ["nightly"] }
-gpui_wgpu.workspace = true
+gpui_wgpu = { workspace = true, default-features = false }
 http_client.workspace = true
 anyhow.workspace = true
 async-channel.workspace = true

@@ -31,6 +31,8 @@ const keepDebug = args.includes("--keep-debug");
 const serveCoi = args.includes("--coi");
 const withThreads = args.includes("--threads") || serveCoi;
 const buildSimdCohort = !args.includes("--no-simd");
+const useSlim = args.includes("--slim");
+const webgpuOnly = args.includes("--webgpu-only");
 const port = Number(opt("--port") ?? "4195");
 const brotliBudget = opt("--brotli-budget") ? Number(opt("--brotli-budget")) : null;
 const outRoot = resolve(opt("--out-dir") ?? "target/web-dist");
@@ -324,7 +326,7 @@ function generateCohortHtml(pkg: string, entryName: string, wgVersion: string, c
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: Canvas; color: CanvasText; font-family: system-ui, -apple-system, sans-serif; }
     #app-root { display: contents; }
-    #a11y-status { position: fixed; inset-block-end: 8px; inset-inline-end: 12px; z-index: 10; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: rgba(15, 23, 42, 0.82); color: #e2e8f0; border: 1px solid rgba(148, 163, 184, 0.35); }
+    #a11y-status { position: fixed; inset-block-end: 10px; inset-inline-start: 14px; z-index: 10; font-size: 11px; line-height: 1.2; padding: 4px 10px; border-radius: 999px; background: rgba(11, 14, 20, 0.78); backdrop-filter: blur(12px); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.24); pointer-events: none; }
     canvas { position: fixed; inset: 0; display: block; width: 100%; height: 100%; }
   </style>
   <script>
@@ -426,7 +428,22 @@ function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditR
   const wgVersion = verifyBindgenVersion();
   const entryName = targetPkg === "aphrody_desktop" ? "web_os" : targetPkg;
   const cargoArgs = targetPkg === "aphrody_desktop" ? ["--example", "web_os"] : [];
-  const features = targetPkg === "gpui_web" ? [] : ["web"];
+  let features: string[];
+  if (targetPkg === "aphrody_desktop") {
+    if (useSlim && webgpuOnly) {
+      features = ["web-slim"];
+    } else if (useSlim) {
+      features = ["web-slim-webgl"];
+    } else if (webgpuOnly) {
+      features = [];
+    } else {
+      features = ["web"];
+    }
+  } else if (targetPkg === "gpui_web") {
+    features = webgpuOnly ? [] : ["webgl-fallback"];
+  } else {
+    features = ["web"];
+  }
   const profileDir = useLto ? "web-lto" : release ? "web" : "debug";
   const cargoTargetDir = resolveCargoTargetDir();
   const wasmSrc = targetPkg === "aphrody_desktop"
@@ -483,6 +500,15 @@ function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditR
       }
     }
     const report = inspectWasmBinary(bgWasm);
+    if (runOpt) {
+      for (const artifact of [bgWasm, join(cohortDir, `${entryName}.js`)]) {
+        if (existsSync(artifact)) {
+          const raw = readFileSync(artifact);
+          writeFileSync(`${artifact}.br`, brotliCompressSync(raw, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } }));
+          writeFileSync(`${artifact}.gz`, gzipSync(raw, { level: 9 }));
+        }
+      }
+    }
     if (plan.name === "baseline" && report.importsSharedMemory) {
       throw new Error(`baseline cohort unexpectedly imports shared memory/TLS`);
     }
@@ -502,6 +528,8 @@ function buildCohorts(): { entryName: string; cohorts: Record<string, WasmAuditR
       wasmBindgen: wgVersion,
       profile: profileDir,
       optimized: runOpt,
+      slim: useSlim,
+      webgpuOnly,
       cohorts: reports,
     }, null, 2),
     "utf8",

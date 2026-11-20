@@ -133,14 +133,15 @@ impl RenderOnce for NavRail {
             .flex_shrink_0()
             .h_full()
             .when(self.compact, |el| el.w(rems_from_px(64.0_f32)))
-            .when(!self.compact, |el| el.w(rems_from_px(212.0_f32)))
-            .p_2()
+            .when(!self.compact, |el| el.w(rems_from_px(208.0_f32)))
+            .px_2p5()
+            .py_3()
             .pb_5()
-            .gap_2()
+            .gap_1p5()
             .overflow_y_scroll()
             .bg(self.theme.colors.surface_container_low)
             .border_r_1()
-            .border_color(self.theme.colors.outline_variant);
+            .border_color(self.theme.colors.outline_variant.opacity(0.45));
 
         for (idx, item) in self.items.into_iter().enumerate() {
             let selected = item.id == self.active_id;

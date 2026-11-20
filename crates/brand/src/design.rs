@@ -16,16 +16,35 @@ pub const WCAG_AA_MIN_CONTRAST: f32 = 4.5;
 /// Minimum WCAG 2.2 AA contrast ratio for large text, icons, and UI focus rings (`3.0:1`).
 pub const WCAG_AA_LARGE_CONTRAST: f32 = 3.0;
 
-/// Four Material 3 Expressive surface modes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+/// Four authoritative Aphrody Material 3 Expressive + Neural Expressive surface modes.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Serialize, serde::Deserialize),
+    serde(rename_all = "snake_case")
+)]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 pub enum ThemeModeSlug {
+    /// High-clarity light surface (`#F7F9FF`).
     Light,
+    /// Standard M3 dark slate surface (`#0E141B`).
+    #[default]
     Dark,
+    /// Deep neural obsidian surface (`#0B0E14`).
     NeuralObsidian,
+    /// True zero-emission OLED pitch black surface (`#000000`).
     OledPitch,
 }
 
 impl ThemeModeSlug {
+    /// All four Material 3 Expressive surface modes in canonical order.
+    pub const ALL: [Self; 4] = [
+        Self::Light,
+        Self::Dark,
+        Self::NeuralObsidian,
+        Self::OledPitch,
+    ];
+
     /// Canonical TOML key under `[sys.color.*]`.
     #[must_use]
     pub const fn slug(self) -> &'static str {
@@ -37,17 +56,62 @@ impl ThemeModeSlug {
         }
     }
 
+    /// Alias of [`Self::slug`] matching `gpui-component` conventions.
+    #[must_use]
+    pub const fn as_str(&self) -> &'static str {
+        self.slug()
+    }
+
+    /// Concise human-readable label (`Light`, `Dark`, `Neural Obsidian`, `OLED Pitch`).
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Light => "Light",
+            Self::Dark => "Dark",
+            Self::NeuralObsidian => "Neural Obsidian",
+            Self::OledPitch => "OLED Pitch",
+        }
+    }
+
+    /// Full theme display name (`Google Design Light`, `Google Design Dark`, etc.).
+    #[must_use]
+    pub const fn display_name(&self) -> &'static str {
+        match self {
+            Self::Light => "Google Design Light",
+            Self::Dark => "Google Design Dark",
+            Self::NeuralObsidian => "Google Neural Obsidian",
+            Self::OledPitch => "Google OLED Pitch",
+        }
+    }
+
+    /// Returns `true` when the mode uses dark surface polarity (`Dark`, `NeuralObsidian`, `OledPitch`).
+    #[must_use]
+    pub const fn is_dark(&self) -> bool {
+        !matches!(self, Self::Light)
+    }
+
     /// Parses mode aliases (`"light"`, `"dark"`, `"neural_obsidian"`, `"oled_pitch"`, etc.).
     #[must_use]
     pub fn from_name(name: &str) -> Option<Self> {
         match name.trim().to_ascii_lowercase().as_str() {
             "light" | "material_light" | "material-light" => Some(Self::Light),
             "dark" | "material_dark" | "material-dark" => Some(Self::Dark),
-            "neural_obsidian" | "neural-obsidian" | "neural" | "obsidian" => {
+            "neural_obsidian" | "neural-obsidian" | "neural obsidian" | "neural" | "obsidian" => {
                 Some(Self::NeuralObsidian)
             }
-            "oled_pitch" | "oled-pitch" | "oled" | "pitch" => Some(Self::OledPitch),
+            "oled_pitch" | "oled-pitch" | "oled pitch" | "oled" | "pitch" => Some(Self::OledPitch),
             _ => None,
+        }
+    }
+
+    /// Cycles to the next surface mode (`Light -> Dark -> NeuralObsidian -> OledPitch -> Light`).
+    #[must_use]
+    pub const fn next(self) -> Self {
+        match self {
+            Self::Light => Self::Dark,
+            Self::Dark => Self::NeuralObsidian,
+            Self::NeuralObsidian => Self::OledPitch,
+            Self::OledPitch => Self::Light,
         }
     }
 }
@@ -110,12 +174,25 @@ pub struct WindowSizeThresholds {
 
 /// Responsive viewport size tier.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Serialize, serde::Deserialize),
+    serde(rename_all = "snake_case")
+)]
 pub enum WindowSizeTier {
     Compact,
     Medium,
     Expanded,
     Large,
     ExtraLarge,
+}
+
+impl WindowSizeTier {
+    /// Classifies a logical viewport width in pixels into its Material 3 window size class.
+    #[must_use]
+    pub fn from_width_px(width_px: f32) -> Self {
+        classify_window_width(width_px)
+    }
 }
 
 /// Spring oscillator parameters from `[sys.motion.springs.*]`.

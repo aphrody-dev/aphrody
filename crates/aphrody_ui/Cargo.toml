@@ -19,7 +19,7 @@ test-support = ["gpui/test-support", "theme/test-support"]
 
 [dependencies]
 anyhow.workspace = true
-brand.workspace = true
+brand = { workspace = true, features = ["serde"] }
 dirs.workspace = true
 aphrody_design.workspace = true
 gpui.workspace = true

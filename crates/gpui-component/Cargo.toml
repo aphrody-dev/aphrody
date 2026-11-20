@@ -124,7 +124,7 @@ unicode-segmentation.workspace = true
 similar = { workspace = true, features = ["unicode"] }
 regex.workspace = true
 anyhow.workspace = true
-brand.workspace = true
+brand = { workspace = true, features = ["serde", "schemars"] }
 gpui.workspace = true
 gpui_macros.workspace = true
 gpui-base.workspace = true

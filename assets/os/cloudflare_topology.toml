@@ -8,6 +8,7 @@ zone_name = "aphrody.com"
 name = "aphrody-assets"
 prefixes = [
   { prefix = "v1/", owner = "aphrody-worker", purpose = "Immutable design, font, and media blobs" },
+  { prefix = "web/", owner = "aphrody-worker", purpose = "Pre-compressed WebAssembly/WebGPU cohorts (baseline, simd-baseline, multithreaded)" },
   { prefix = "fleet/", owner = "aphrody-worker", purpose = "Live VPS load/disk telemetry snapshot" },
   { prefix = "learn/", owner = "aphrody-learn", purpose = "Autonomous multi-agent brain/memory/skills/MCP bundle" },
   { prefix = "auto/assets/", owner = "auto", purpose = "Company files and tenant media for Auto" },
@@ -42,6 +43,13 @@ routes = [
   "aphrody.com/r2-assets/*",
 ]
 bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET", "EVENTS"]
+
+[[workers]]
+name = "aphrody-web"
+config = ".cloudflare/aphrody-worker/wrangler.toml"
+env = "web"
+routes = ["web.aphrody.com/*", "aphrody.com/web*"]
+bindings = ["RELEASES_BUCKET", "ASSETS_BUCKET"]
 
 [[workers]]
 name = "aphrody-learn"

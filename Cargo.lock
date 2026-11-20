@@ -2866,6 +2866,8 @@ dependencies = [
 name = "brand"
 version = "0.1.0"
 dependencies = [
+ "schemars 1.0.4",
+ "serde",
  "toml 0.9.8",
 ]
 

@@ -11,6 +11,7 @@ import {
   loadFleetManifest,
   type NodeProbeTelemetry,
   parseLinuxProbeOutput,
+  parseMacosVmStatAvailGb,
   parseSshConfigHosts,
   probeLocalHost,
   publishBeacon,
@@ -388,5 +389,19 @@ Host *
     expect(routeRes.status).toBe(200);
     const routeJson = (await routeRes.json()) as { selected: { alias: string } | null };
     expect(routeJson.selected?.alias).toBe("local");
+  });
+
+  test("parses macOS vm_stat reclaimable pages cleanly for available memory", () => {
+    const sample = [
+      "Mach Virtual Memory Statistics: (page size of 16384 bytes)",
+      "Pages free:                               10240.",
+      "Pages active:                            180000.",
+      "Pages inactive:                          250000.",
+      "Pages speculative:                        12000.",
+      "Pages purgeable:                          55440.",
+    ].join("\n");
+    const availGb = parseMacosVmStatAvailGb(sample);
+    expect(availGb).not.toBeNull();
+    expect(availGb!).toBeCloseTo((327680 * 16384) / 1024 ** 3, 2);
   });
 });

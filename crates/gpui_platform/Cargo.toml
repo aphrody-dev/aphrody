@@ -13,7 +13,8 @@ path = "src/gpui_platform.rs"
 doctest = false
 
 [features]
-default = []
+default = ["webgl-fallback"]
+webgl-fallback = ["gpui_web/webgl-fallback"]
 # Threads in the browser: needs a nightly toolchain and a cross-origin-isolated
 # page. Off, gpui_web builds on stable.
 multithreaded = ["gpui_web/multithreaded"]
@@ -77,5 +78,5 @@ gpui_linux.workspace = true
 gpui_wgpu = { workspace = true, optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-gpui_web.workspace = true
+gpui_web = { workspace = true, default-features = false }
 console_error_panic_hook.workspace = true

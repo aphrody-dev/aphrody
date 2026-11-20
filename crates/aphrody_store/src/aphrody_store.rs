@@ -11,7 +11,19 @@ pub mod nsh_store;
 pub mod packagers;
 
 /// Embedded live-synced Awesome GPUI catalog (`assets/os/awesome_gpui_store.toml`).
+#[cfg(not(feature = "slim"))]
 pub const BUNDLED_STORE_TOML: &str = include_str!("../../../assets/os/awesome_gpui_store.toml");
+
+/// Slim Wasm starter catalog hydrated from R2 at runtime (`web-slim` saves ~193 KiB `.rodata`).
+#[cfg(feature = "slim")]
+pub const BUNDLED_STORE_TOML: &str = r#"schema_version = 1
+source_repo = "aphrody-dev/aphrody"
+source_url = "https://aphrody.com"
+synced_at = "2026-11-20"
+upstream_stars = 0
+total_entries = 0
+entries = []
+"#;
 
 #[derive(Debug, Error)]
 pub enum StoreError {

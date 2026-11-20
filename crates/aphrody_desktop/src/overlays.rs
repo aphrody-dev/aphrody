@@ -278,7 +278,7 @@ pub fn render_cosmic_osd_pill(
         .into_any_element()
 }
 
-/// Renders interactive `cosmic-notifications` toast stack in the top-right corner.
+/// Renders interactive `cosmic-notifications` toast stack anchored above the bottom dock.
 pub fn render_cosmic_notifications_stack(
     theme: &OsTheme,
     center: &aphrody_session::NotificationCenter,
@@ -291,8 +291,14 @@ pub fn render_cosmic_notifications_stack(
     let cb_dismiss = std::rc::Rc::new(on_dismiss);
     let mut stack = v_flex()
         .id("cosmic-notifications-stack")
-        .w(px(320.0))
+        .w(px(312.0))
+        .p_2p5()
         .gap_2()
+        .rounded(px(theme.layout.window_radius))
+        .border_1()
+        .border_color(theme.colors.outline_variant)
+        .bg(theme.colors.surface_container_highest)
+        .shadow_md()
         .child(
             h_flex()
                 .justify_between()

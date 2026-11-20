@@ -222,9 +222,9 @@ impl RenderOnce for FocusableActionChip {
             self.theme.colors.on_surface
         };
         let border = if self.selected {
-            self.theme.colors.primary
+            self.theme.colors.primary.opacity(0.65)
         } else {
-            self.theme.colors.outline_variant
+            self.theme.colors.outline_variant.opacity(0.32)
         };
         let hover_bg = if self.selected {
             self.theme.colors.primary_container
@@ -238,10 +238,10 @@ impl RenderOnce for FocusableActionChip {
             .id(self.id)
             .min_w_0()
             .min_h(rems_from_px(self.theme.layout.min_control_height))
-            .px_2p5()
+            .px_3()
             .gap_2()
             .items_center()
-            .rounded(rems_from_px(8.0_f32))
+            .rounded_full()
             .bg(bg)
             .border_1()
             .border_color(border)
@@ -282,12 +282,10 @@ impl RenderOnce for FocusableActionChip {
                 el.child(
                     div()
                         .flex_shrink_0()
-                        .px_1p5()
+                        .px_2()
                         .py_0p5()
-                        .rounded(rems_from_px(6.0_f32))
-                        .bg(self.theme.colors.surface_container_lowest)
-                        .border_1()
-                        .border_color(self.theme.colors.outline_variant)
+                        .rounded_full()
+                        .bg(self.theme.colors.surface_container_lowest.opacity(0.85))
                         .child(
                             Label::new(badge_text)
                                 .size(LabelSize::XSmall)

@@ -14,7 +14,8 @@ path = "src/gpui_ui.rs"
 doctest = false
 
 [features]
-default = ["desktop"]
+default = ["desktop", "webgl-fallback"]
+webgl-fallback = ["gpui_platform/webgl-fallback"]
 desktop = [
     "gpui/font-kit",
     "gpui/wayland",
@@ -102,7 +103,7 @@ component.workspace = true
 file_icons.workspace = true
 gpui.workspace = true
 gpui_macros.workspace = true
-gpui_platform.workspace = true
+gpui_platform = { workspace = true, default-features = false }
 gpui_shared_string.workspace = true
 gpui_util.workspace = true
 icons.workspace = true

@@ -13,6 +13,7 @@ import {
 } from "./learn.ts";
 import { detectPlatform, handleReleasesRequest, renderDownloadPortal, VALID_CHANNELS } from "./releases.ts";
 import type { ExecutionContextLike, ScheduledControllerLike, WorkerEnv } from "./types.ts";
+import { handleWebRequest, resolveWebR2Key, shouldEnableCrossOriginIsolation } from "./web.ts";
 
 export {
   buildLearnManifest,
@@ -28,6 +29,8 @@ export {
   markdownPathFor,
   OWNERS,
   renderDownloadPortal,
+  resolveWebR2Key,
+  shouldEnableCrossOriginIsolation,
   signFleetPayload,
   VALID_CHANNELS,
   verify,
@@ -35,12 +38,20 @@ export {
 };
 export type { ExecutionContextLike, ScheduledControllerLike, WorkerEnv };
 
-export type SurfaceKind = "releases" | "docs" | "assets" | "github" | "learn";
+export type SurfaceKind = "releases" | "docs" | "assets" | "github" | "learn" | "web";
 
 export function routeSurface(url: URL): SurfaceKind {
   const host = url.hostname.toLowerCase();
   const path = url.pathname;
   if (path === "/github") return "github";
+  if (
+    host === "web.aphrody.com" ||
+    host === "web.aphrody.app" ||
+    path === "/web" ||
+    path.startsWith("/web/")
+  ) {
+    return "web";
+  }
   if (
     host === "learn.aphrody.com" ||
     host === "learn.aphrody.app" ||
@@ -70,7 +81,7 @@ export default {
           ok: true,
           service: "aphrody-worker",
           surface,
-          surfaces: ["releases", "docs", "assets", "github", "learn"],
+          surfaces: ["releases", "docs", "assets", "github", "learn", "web"],
           channels: [...VALID_CHANNELS],
           buckets: { releases: "aphrody-releases", assets: "aphrody-assets" },
         },
@@ -88,12 +99,12 @@ export default {
           ok: true,
           zone: "aphrody.com",
           workers: [
-            { name: "aphrody-worker", surfaces: ["releases", "docs", "assets", "github", "fleet", "learn"], cron: "*/15 * * * *" },
+            { name: "aphrody-worker", surfaces: ["releases", "docs", "assets", "github", "fleet", "learn", "web"], cron: "*/15 * * * *" },
             { name: "aphrody-learn", routes: ["learn.aphrody.com/*"], cron: "*/15 * * * *" },
             { name: "auto", routes: ["auto.aphrody.com"], cron: "0 6 * * *" },
           ],
           buckets: {
-            "aphrody-assets": ["v1/", "fleet/", "learn/", "auto/assets/"],
+            "aphrody-assets": ["v1/", "web/", "fleet/", "learn/", "auto/assets/"],
             "aphrody-releases": ["scripts/", "channels/", "manifests/", "auto/releases/"],
             "aphrody-backups": ["auto/archives/"],
           },
@@ -109,6 +120,12 @@ export default {
     switch (surface) {
       case "github":
         return handleGithubRequest(request, env);
+      case "web":
+        return handleWebRequest(
+          request,
+          env,
+          path === "/web" || path.startsWith("/web/") ? "/web" : "",
+        );
       case "assets":
         return handleAssetsRequest(
           request,

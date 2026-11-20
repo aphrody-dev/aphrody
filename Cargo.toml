@@ -1892,7 +1892,7 @@ opt-level = "z"
 lto = "fat"
 codegen-units = 1
 debug = false
-strip = "symbols"
+strip = "debuginfo"
 panic = "abort"
 
 [profile.aot]

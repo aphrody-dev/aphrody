@@ -56,99 +56,17 @@ type IdSelectHandler = Rc<dyn Fn(&SharedString, &mut Window, &mut App) + 'static
 type ActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 type QueryHandler = Rc<dyn Fn(&SharedString, &mut Window, &mut App) + 'static>;
 
-/// Four authoritative Aphrody Material 3 Expressive + Neural Expressive appearance modes.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Default,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Serialize,
-    Deserialize,
-    JsonSchema,
-)]
-#[serde(rename_all = "snake_case")]
-pub enum M3AppearanceMode {
-    Light,
-    #[default]
-    Dark,
-    NeuralObsidian,
-    OledPitch,
-}
+/// Four authoritative Aphrody Material 3 Expressive + Neural Expressive appearance modes,
+/// unified directly onto [`brand::design::ThemeModeSlug`].
+pub use brand::design::ThemeModeSlug as M3AppearanceMode;
 
-impl M3AppearanceMode {
-    /// All four Material 3 Expressive surface modes in canonical order.
-    pub const ALL: [Self; 4] = [
-        Self::Light,
-        Self::Dark,
-        Self::NeuralObsidian,
-        Self::OledPitch,
-    ];
-
-    /// TOML section key suffix (`light`, `dark`, `neural_obsidian`, `oled_pitch`).
-    #[must_use]
-    pub const fn as_str(&self) -> &'static str {
-        match self {
-            Self::Light => "light",
-            Self::Dark => "dark",
-            Self::NeuralObsidian => "neural_obsidian",
-            Self::OledPitch => "oled_pitch",
-        }
-    }
-
-    #[must_use]
-    const fn to_brand_mode(self) -> brand::design::ThemeModeSlug {
-        match self {
-            Self::Light => brand::design::ThemeModeSlug::Light,
-            Self::Dark => brand::design::ThemeModeSlug::Dark,
-            Self::NeuralObsidian => brand::design::ThemeModeSlug::NeuralObsidian,
-            Self::OledPitch => brand::design::ThemeModeSlug::OledPitch,
-        }
-    }
-
-    /// Human-readable theme label used in [`ThemeConfig::name`].
-    #[must_use]
-    pub const fn display_name(&self) -> &'static str {
-        match self {
-            Self::Light => "Google Design Light",
-            Self::Dark => "Google Design Dark",
-            Self::NeuralObsidian => "Google Neural Obsidian",
-            Self::OledPitch => "Google OLED Pitch",
-        }
-    }
-
-    /// Parses mode aliases (`"light"`, `"dark"`, `"neural_obsidian"`, `"oled_pitch"`, etc.).
-    #[must_use]
-    pub fn from_name(name: &str) -> Option<Self> {
-        match name.trim().to_ascii_lowercase().as_str() {
-            "light" | "material_light" | "material-light" => Some(Self::Light),
-            "dark" | "material_dark" | "material-dark" => Some(Self::Dark),
-            "neural_obsidian" | "neural-obsidian" | "neural" | "obsidian" => {
-                Some(Self::NeuralObsidian)
-            }
-            "oled_pitch" | "oled-pitch" | "oled" | "pitch" => Some(Self::OledPitch),
-            _ => None,
-        }
-    }
-
-    /// Whether this mode uses dark polarity surfaces (`Dark`, `NeuralObsidian`, `OledPitch`).
-    #[must_use]
-    pub const fn is_dark(&self) -> bool {
-        !matches!(self, Self::Light)
-    }
-
-    /// Maps to `gpui-component`'s binary [`ThemeMode`].
-    #[must_use]
-    pub const fn theme_mode(&self) -> ThemeMode {
-        if self.is_dark() {
-            ThemeMode::Dark
-        } else {
-            ThemeMode::Light
-        }
+/// Maps an [`M3AppearanceMode`] onto `gpui-component`'s binary [`ThemeMode`].
+#[must_use]
+pub const fn m3_theme_mode(mode: M3AppearanceMode) -> ThemeMode {
+    if mode.is_dark() {
+        ThemeMode::Dark
+    } else {
+        ThemeMode::Light
     }
 }
 
@@ -163,7 +81,7 @@ impl From<ThemeMode> for M3AppearanceMode {
 
 impl From<M3AppearanceMode> for ThemeMode {
     fn from(mode: M3AppearanceMode) -> Self {
-        mode.theme_mode()
+        m3_theme_mode(mode)
     }
 }
 
@@ -854,7 +772,7 @@ impl M3ColorRoles {
     /// Resolves all 30 color roles for `mode` directly from compile-time `brand::design` palettes.
     #[must_use]
     pub fn for_mode(mode: M3AppearanceMode) -> Self {
-        let p = brand::design::palette_rgb(mode.to_brand_mode());
+        let p = brand::design::palette_rgb(mode);
         let color = |rgb_u32: u32| -> Hsla { gpui::rgb(rgb_u32).into() };
         Self {
             background: color(p.background),
@@ -1285,7 +1203,7 @@ pub fn try_m3_theme_config(mode: M3AppearanceMode) -> Result<ThemeConfig> {
     let mut config = ThemeConfig::default();
     config.is_default = matches!(mode, M3AppearanceMode::Light | M3AppearanceMode::Dark);
     config.name = mode.display_name().into();
-    config.mode = mode.theme_mode();
+    config.mode = ThemeMode::from(mode);
     config.font_size = Some(typography.body_medium.size_sp);
     config.font_family = Some(typography.typeface.brand_family());
     config.mono_font_family = Some(typography.typeface.mono_family());
@@ -1304,7 +1222,7 @@ pub fn m3_theme_config(mode: M3AppearanceMode) -> ThemeConfig {
     try_m3_theme_config(mode).unwrap_or_else(|_| {
         let mut fallback = ThemeConfig::default();
         fallback.name = mode.display_name().into();
-        fallback.mode = mode.theme_mode();
+        fallback.mode = ThemeMode::from(mode);
         fallback.font_family = Some("Google Sans Flex".into());
         fallback.mono_font_family = Some("JetBrains Mono".into());
         fallback.font_size = Some(14.0);
@@ -4662,7 +4580,7 @@ mod tests {
 
             let config = try_m3_theme_config(mode)?;
             assert_eq!(config.name.as_ref(), mode.display_name());
-            assert_eq!(config.mode, mode.theme_mode());
+            assert_eq!(config.mode, ThemeMode::from(mode));
             assert_eq!(config.font_family.as_deref(), Some("Google Sans Flex"));
             assert_eq!(config.mono_font_family.as_deref(), Some("JetBrains Mono"));
         }
@@ -4743,7 +4661,7 @@ mod tests {
                 apply_m3_theme(mode, cx);
                 let active = active_m3_theme(cx);
                 assert_eq!(active.mode, mode);
-                assert_eq!(Theme::global(cx).mode, mode.theme_mode());
+                assert_eq!(Theme::global(cx).mode, ThemeMode::from(mode));
                 assert_eq!(Theme::global(cx).primary, active.colors.primary);
                 assert_eq!(
                     gpui_base::Theme::global(cx).tokens.colors.background,

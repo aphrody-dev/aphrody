@@ -795,6 +795,34 @@ function readLocalLinuxMemAvailGb(): number | null {
   return null;
 }
 
+export function parseMacosVmStatAvailGb(raw: string): number | null {
+  const pageMatch = /page size of (\d+) bytes/i.exec(raw);
+  const pageSize = pageMatch ? Number.parseInt(pageMatch[1], 10) : 16384;
+  const grab = (label: string): number => {
+    const re = new RegExp(`^${label}:\\s+(\\d+)\\.?`, "mi");
+    const m = re.exec(raw);
+    return m ? Number.parseInt(m[1], 10) : 0;
+  };
+  const pages =
+    grab("Pages free") +
+    grab("Pages inactive") +
+    grab("Pages speculative") +
+    grab("Pages purgeable");
+  if (pages <= 0) return null;
+  return round2((pages * pageSize) / 1024 ** 3);
+}
+
+function readLocalMacosMemAvailGb(): number | null {
+  if (process.platform !== "darwin") return null;
+  try {
+    const res = Bun.spawnSync(["vm_stat"], { stdout: "pipe", stderr: "pipe", timeout: 2000 });
+    if (res.exitCode !== 0) return null;
+    return parseMacosVmStatAvailGb(new TextDecoder().decode(res.stdout));
+  } catch {
+    return null;
+  }
+}
+
 export async function probeLocalHost(manifest: FleetClusterManifest): Promise<NodeProbeTelemetry> {
   const t0 = performance.now();
   const cpuList = os.cpus();
@@ -802,7 +830,10 @@ export async function probeLocalHost(manifest: FleetClusterManifest): Promise<No
   const [load1, load5, load15] = await sampleLocalLoad(cpus);
 
   const memTotalGb = round2(os.totalmem() / 1024 ** 3);
-  const memAvailGb = readLocalLinuxMemAvailGb() ?? round2(os.freemem() / 1024 ** 3);
+  const memAvailGb =
+    readLocalLinuxMemAvailGb() ??
+    readLocalMacosMemAvailGb() ??
+    round2(os.freemem() / 1024 ** 3);
 
   let workTotalGb = 0;
   let workAvailGb = 0;

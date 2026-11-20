@@ -8,12 +8,29 @@ use serde::{Deserialize, Serialize};
 use crate::StoreError;
 
 /// Embedded live-synced Zed Extensions registry (`assets/os/zed_extensions_catalog.toml`).
+#[cfg(not(feature = "slim"))]
 pub const BUNDLED_EXTENSIONS_TOML: &str =
     include_str!("../../../assets/os/zed_extensions_catalog.toml");
 
+/// Slim Wasm extensions placeholder (`web-slim` saves ~265 KiB `.rodata`).
+#[cfg(feature = "slim")]
+pub const BUNDLED_EXTENSIONS_TOML: &str = r#"schema_version = 1
+source_repo = "zed-industries/extensions"
+source_url = "https://github.com/zed-industries/extensions"
+synced_at = "2026-11-20"
+total_extensions = 0
+total_submodules = 0
+entries = []
+[category_counts]
+"#;
+
 /// Embedded upstream WinGet manifest baseline (`assets/os/winget_upstream_baseline.toml`).
+#[cfg(not(feature = "slim"))]
 pub const BUNDLED_WINGET_BASELINE_TOML: &str =
     include_str!("../../../assets/os/winget_upstream_baseline.toml");
+
+#[cfg(feature = "slim")]
+pub const BUNDLED_WINGET_BASELINE_TOML: &str = "schema_version = 1\nentries = []\n";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ZedExtensionEntry {

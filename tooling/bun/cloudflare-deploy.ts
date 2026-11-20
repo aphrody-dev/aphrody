@@ -11,9 +11,10 @@
  *   bun tooling/bun/cloudflare-deploy.ts smoke [--base-url https://releases.aphrody.com] [--json]
  *   bun tooling/bun/cloudflare-deploy.ts mcp-stdio
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { extname, join, relative, resolve } from "node:path";
+import { brotliCompressSync, constants, gzipSync } from "node:zlib";
 
 export const repoRoot = resolve(import.meta.dir, "../..");
 
@@ -231,7 +232,7 @@ async function ensureInfra(): Promise<Record<string, unknown>> {
   if (!zoneId) throw new Error("Cloudflare zone aphrody.com not found");
 
   let dnsCreated = false;
-  for (const host of ["releases.aphrody.com", "learn.aphrody.com"]) {
+  for (const host of ["releases.aphrody.com", "learn.aphrody.com", "web.aphrody.com"]) {
     const dnsResp = await fetch(
       `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${host}`,
       { headers: { Authorization: `Bearer ${token}` } },
@@ -301,10 +302,106 @@ function publishInstallScripts(dryRun: boolean): { uploaded: string[]; dryRun: b
   return { uploaded, dryRun };
 }
 
-function deployWorkers(dryRun: boolean, allWorkers: boolean): Array<{ worker: string; env: string; exitCode: number }> {
+const WEB_MIME_TYPES: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".wasm": "application/wasm",
+  ".json": "application/json; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+};
+
+const WEB_COMPRESSIBLE_EXTS = new Set([".wasm", ".js", ".mjs", ".html", ".json", ".css", ".svg"]);
+
+function walkFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    const abs = join(dir, entry);
+    const st = statSync(abs);
+    if (st.isDirectory()) {
+      out.push(...walkFiles(abs));
+    } else if (st.isFile()) {
+      out.push(abs);
+    }
+  }
+  return out;
+}
+
+export function publishWebDist(
+  distDir = join(repoRoot, "target", "web-dist"),
+  appName = "aphrody_desktop",
+  dryRun = false,
+): { app: string; distDir: string; uploaded: Array<{ key: string; bytes: number; encoding?: string }>; dryRun: boolean } {
+  const absDist = resolve(distDir);
+  if (!existsSync(absDist)) {
+    throw new Error(`Web dist directory not found: ${absDist}`);
+  }
+  const wrangler = resolveWranglerCmd();
+  const baseFiles = walkFiles(absDist).filter((f) => !f.endsWith(".br") && !f.endsWith(".gz"));
+  const uploaded: Array<{ key: string; bytes: number; encoding?: string }> = [];
+
+  for (const file of baseFiles) {
+    const rel = relative(absDist, file).replace(/\\/g, "/");
+    const ext = extname(file).toLowerCase();
+    const contentType = WEB_MIME_TYPES[ext] ?? "application/octet-stream";
+    const rawBytes = readFileSync(file);
+    const items: Array<{ key: string; filePath: string; bytes: number; encoding?: string }> = [
+      { key: `aphrody-assets/web/${appName}/${rel}`, filePath: file, bytes: rawBytes.length },
+    ];
+    if (WEB_COMPRESSIBLE_EXTS.has(ext)) {
+      const brPath = `${file}.br`;
+      const gzPath = `${file}.gz`;
+      const brBytes = existsSync(brPath)
+        ? readFileSync(brPath)
+        : brotliCompressSync(rawBytes, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } });
+      if (!existsSync(brPath)) writeFileSync(brPath, brBytes);
+      const gzBytes = existsSync(gzPath) ? readFileSync(gzPath) : gzipSync(rawBytes, { level: 9 });
+      if (!existsSync(gzPath)) writeFileSync(gzPath, gzBytes);
+      items.push(
+        { key: `aphrody-assets/web/${appName}/${rel}.br`, filePath: brPath, bytes: brBytes.length, encoding: "br" },
+        { key: `aphrody-assets/web/${appName}/${rel}.gz`, filePath: gzPath, bytes: gzBytes.length, encoding: "gzip" },
+      );
+    }
+
+    for (const item of items) {
+      if (!dryRun) {
+        const putArgs = [
+          ...wrangler,
+          "r2",
+          "object",
+          "put",
+          item.key,
+          "--file",
+          item.filePath,
+          "--content-type",
+          contentType,
+          "--remote",
+        ];
+        if (item.encoding) {
+          putArgs.push("--content-encoding", item.encoding);
+        }
+        const res = Bun.spawnSync(putArgs, { cwd: repoRoot, stdout: "pipe", stderr: "pipe" });
+        if (res.exitCode !== 0) {
+          throw new Error(`Failed R2 web upload ${item.key}: ${new TextDecoder().decode(res.stderr)}`);
+        }
+      }
+      uploaded.push({ key: item.key, bytes: item.bytes, ...(item.encoding ? { encoding: item.encoding } : {}) });
+    }
+  }
+
+  return { app: appName, distDir: absDist, uploaded, dryRun };
+}
+
+function deployWorkers(
+  dryRun: boolean,
+  allWorkers: boolean,
+  onlyEnv?: string,
+): Array<{ worker: string; env: string; exitCode: number }> {
   const wrangler = resolveWranglerCmd();
   const dirs = [".cloudflare/aphrody-worker"];
-  const envs = allWorkers ? ["", "learn"] : [""];
+  const envs = onlyEnv !== undefined ? [onlyEnv] : allWorkers ? ["", "learn", "web"] : [""];
   const results: Array<{ worker: string; env: string; exitCode: number }> = [];
   for (const rel of dirs) {
     for (const envName of envs) {
@@ -454,10 +551,19 @@ if (import.meta.main) {
   } else if (cmd === "publish-scripts") {
     const res = publishInstallScripts(dryRun);
     console.log(JSON.stringify(res, null, 2));
+  } else if (cmd === "publish-web") {
+    const distIdx = args.indexOf("--dist");
+    const appIdx = args.indexOf("--app");
+    const distDir = (distIdx >= 0 ? args[distIdx + 1] : undefined) ?? join(repoRoot, "target", "web-dist");
+    const appName = (appIdx >= 0 ? args[appIdx + 1] : undefined) ?? "aphrody_desktop";
+    const res = publishWebDist(distDir, appName, dryRun);
+    console.log(JSON.stringify(res, null, 2));
   } else if (cmd === "deploy") {
+    const envIdx = args.indexOf("--env");
+    const onlyEnv = envIdx >= 0 ? args[envIdx + 1] : undefined;
     const infra = dryRun ? { skipped: true } : await ensureInfra();
-    const scripts = publishInstallScripts(dryRun);
-    const workers = deployWorkers(dryRun, allWorkers);
+    const scripts = onlyEnv === "web" ? { skipped: true } : publishInstallScripts(dryRun);
+    const workers = deployWorkers(dryRun, allWorkers, onlyEnv);
     console.log(JSON.stringify({ ok: true, infra, scripts, workers }, null, 2));
   } else if (cmd === "smoke") {
     const res = await smokeTest(baseUrl);
@@ -467,7 +573,7 @@ if (import.meta.main) {
     await runMcpStdioBridge(args[1] ?? "https://mcp.cloudflare.com/mcp");
   } else {
     console.error(
-      "Usage: bun tooling/bun/cloudflare-deploy.ts [audit|ensure-infra|publish-scripts|deploy|smoke|mcp-stdio] [--dry-run] [--all] [--base-url <url>]",
+      "Usage: bun tooling/bun/cloudflare-deploy.ts [audit|ensure-infra|publish-scripts|publish-web|deploy|smoke|mcp-stdio] [--dry-run] [--all] [--dist <dir>] [--app <name>] [--base-url <url>]",
     );
     process.exit(1);
   }

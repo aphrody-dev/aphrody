@@ -30,6 +30,25 @@ impl From<AppearanceMode> for Appearance {
     }
 }
 
+impl From<brand::design::ThemeModeSlug> for AppearanceMode {
+    fn from(value: brand::design::ThemeModeSlug) -> Self {
+        if value.is_dark() {
+            Self::Dark
+        } else {
+            Self::Light
+        }
+    }
+}
+
+impl From<AppearanceMode> for brand::design::ThemeModeSlug {
+    fn from(value: AppearanceMode) -> Self {
+        match value {
+            AppearanceMode::Light => Self::Light,
+            AppearanceMode::Dark => Self::Dark,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OsLayoutTokens {
     #[serde(default = "default_gap")]

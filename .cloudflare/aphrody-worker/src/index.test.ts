@@ -54,12 +54,15 @@ describe("unified aphrody-worker (releases + docs + r2-assets + github)", () => 
     },
   };
 
-  test("routes all 4 surfaces cleanly by hostname and path", () => {
+  test("routes all 6 surfaces cleanly by hostname and path", () => {
     expect(routeSurface(new URL("https://releases.aphrody.com/download"))).toBe("releases");
     expect(routeSurface(new URL("https://docs.aphrody.com/"))).toBe("docs");
     expect(routeSurface(new URL("https://assets.aphrody.app/v1/design-reference/abc.png"))).toBe("assets");
     expect(routeSurface(new URL("https://aphrody.com/r2-assets/v1/design-reference/abc.png"))).toBe("assets");
     expect(routeSurface(new URL("https://aphrody.com/github"))).toBe("github");
+    expect(routeSurface(new URL("https://web.aphrody.com/"))).toBe("web");
+    expect(routeSurface(new URL("https://aphrody.com/web/baseline/web_os_bg.wasm"))).toBe("web");
+    expect(routeSurface(new URL("https://learn.aphrody.com/api/learn/status"))).toBe("learn");
   });
 
   test("releases portal, channels, and healthz work identically", async () => {
@@ -72,7 +75,7 @@ describe("unified aphrody-worker (releases + docs + r2-assets + github)", () => 
     expect(health.status).toBe(200);
     const json = (await health.json()) as { service: string; surfaces: string[] };
     expect(json.service).toBe("aphrody-worker");
-    expect(json.surfaces).toEqual(["releases", "docs", "assets", "github", "learn"]);
+    expect(json.surfaces).toEqual(["releases", "docs", "assets", "github", "learn", "web"]);
   });
 
   test("docs surface negotiates markdown for AI agents", async () => {
@@ -534,5 +537,65 @@ describe("unified aphrody-worker (releases + docs + r2-assets + github)", () => 
     };
     expect(statusJson.revision).toBe(2);
     expect(statusJson.counts.memoryTopics).toBeGreaterThanOrEqual(3);
+  });
+
+  test("web surface serves Wasm/WebGPU cohorts with Brotli negotiation, MIME types, caching, and conditional COOP/COEP", async () => {
+    const webObjects = new Map<string, { body: string; httpEtag: string }>([
+      ["web/aphrody_desktop/index.html", { body: "<!doctype html><html></html>", httpEtag: '"idx-1"' }],
+      ["web/aphrody_desktop/simd-baseline/web_os_bg.wasm.br", { body: "br-wasm-bytes", httpEtag: '"wasm-br-1"' }],
+      ["web/aphrody_desktop/simd-baseline/web_os_bg.wasm", { body: "raw-wasm-bytes", httpEtag: '"wasm-raw-1"' }],
+      ["web/aphrody_desktop/multithreaded/web_os_bg.wasm.br", { body: "mt-br-wasm", httpEtag: '"mt-br-1"' }],
+    ]);
+    const webEnv: WorkerEnv = {
+      ASSETS_BUCKET: {
+        async get(key: string) {
+          return webObjects.get(key) ?? null;
+        },
+      },
+    };
+
+    const badTraversal = await worker.fetch(new Request("https://web.aphrody.com/../secret"), webEnv);
+    expect(badTraversal.status).toBe(404);
+
+    const wasmBr = await worker.fetch(
+      new Request("https://web.aphrody.com/simd-baseline/web_os_bg.wasm", {
+        headers: { "Accept-Encoding": "gzip, br" },
+      }),
+      webEnv,
+    );
+    expect(wasmBr.status).toBe(200);
+    expect(wasmBr.headers.get("content-type")).toBe("application/wasm");
+    expect(wasmBr.headers.get("content-encoding")).toBe("br");
+    expect(wasmBr.headers.get("vary")).toBe("Accept-Encoding");
+    expect(wasmBr.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
+    expect(wasmBr.headers.get("cross-origin-opener-policy")).toBeNull();
+    expect(await wasmBr.text()).toBe("br-wasm-bytes");
+
+    const notMod = await worker.fetch(
+      new Request("https://web.aphrody.com/simd-baseline/web_os_bg.wasm", {
+        headers: { "Accept-Encoding": "br", "If-None-Match": '"wasm-br-1"' },
+      }),
+      webEnv,
+    );
+    expect(notMod.status).toBe(304);
+
+    const mtRes = await worker.fetch(
+      new Request("https://aphrody.com/web/multithreaded/web_os_bg.wasm", {
+        headers: { "Accept-Encoding": "br" },
+      }),
+      webEnv,
+    );
+    expect(mtRes.status).toBe(200);
+    expect(mtRes.headers.get("cross-origin-opener-policy")).toBe("same-origin");
+    expect(mtRes.headers.get("cross-origin-embedder-policy")).toBe("require-corp");
+
+    const coiIndex = await worker.fetch(new Request("https://web.aphrody.com/?coi=1"), webEnv);
+    expect(coiIndex.status).toBe(200);
+    expect(coiIndex.headers.get("content-type")).toBe("text/html; charset=utf-8");
+    expect(coiIndex.headers.get("cross-origin-opener-policy")).toBe("same-origin");
+    expect(coiIndex.headers.get("cross-origin-embedder-policy")).toBe("require-corp");
+
+    const missing = await worker.fetch(new Request("https://web.aphrody.com/"), { ASSETS_BUCKET: { async get() { return null; } } });
+    expect(missing.status).toBe(503);
   });
 });

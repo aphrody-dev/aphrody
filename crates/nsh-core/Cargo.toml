@@ -17,7 +17,7 @@ unicode-linebreak.workspace = true
 unicode-properties.workspace = true
 rustc-hash.workspace = true
 slab.workspace = true
-taffy.workspace = true
+taffy = { workspace = true, features = ["std", "block_layout", "flexbox", "grid", "taffy_tree", "content_size", "detailed_layout_info"] }
 serde.workspace = true
 serde_json.workspace = true
 rust-i18n.workspace = true

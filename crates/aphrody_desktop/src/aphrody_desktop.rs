@@ -12,7 +12,6 @@ pub mod comp_viewport;
 pub mod dock;
 pub mod launcher;
 pub mod overlays;
-pub mod panel;
 pub mod pilot_hud;
 pub mod shell;
 pub mod studio_view;

@@ -167,7 +167,7 @@ pub fn nsh_theme_from_gpui(gpui_theme: &GpuiTheme, cx: &App) -> nsh_base::Theme 
 
 /// Convert [`M3Mode`] into NSH's binary [`NshAppearance`].
 pub const fn nsh_appearance_from_m3_mode(mode: M3Mode) -> NshAppearance {
-    mode.nsh_appearance()
+    nsh_base::material3::m3_nsh_appearance(mode)
 }
 
 /// Convert [`M3Mode`] into GPUI's [`GpuiAppearance`].

@@ -239,7 +239,17 @@ fn render_center_workspace(
     let on_wasm = Arc::clone(&cb.on_sample_wasm);
     let on_bin = Arc::clone(&cb.on_sample_self_bin);
 
-    let mut tools_bar = h_flex().w_full().gap_1p5().flex_wrap().items_center();
+    let mut tools_bar = h_flex()
+        .w_full()
+        .px_1p5()
+        .py_1()
+        .gap_1p5()
+        .flex_wrap()
+        .items_center()
+        .rounded_full()
+        .bg(theme.colors.surface_container_low)
+        .border_1()
+        .border_color(theme.colors.outline_variant.opacity(0.35));
     if let Some(app) = active_app {
         for (idx, tool_name) in app.tools.iter().enumerate() {
             let selected = idx == state.active_tool_idx;
@@ -283,23 +293,40 @@ fn render_center_workspace(
                 .flex_wrap()
                 .justify_between()
                 .items_center()
-                .gap_2()
+                .gap_x_3()
+                .gap_y_2()
                 .child(
                     h_flex()
-                        .min_w(px(160.0))
+                        .min_w(px(300.0))
                         .flex_1()
-                        .gap_2()
+                        .gap_2p5()
                         .items_center()
-                        .child(Icon::new(app_icon).size(IconSize::Medium))
+                        .child(
+                            div()
+                                .w(px(36.0))
+                                .h(px(36.0))
+                                .flex_shrink_0()
+                                .flex()
+                                .items_center()
+                                .justify_center()
+                                .rounded(px(12.0))
+                                .bg(theme.colors.primary_container)
+                                .text_color(theme.colors.on_primary_container)
+                                .child(
+                                    Icon::new(app_icon)
+                                        .size(IconSize::Medium)
+                                        .color(ui::Color::Custom(theme.colors.on_primary_container)),
+                                ),
+                        )
                         .child(
                             v_flex()
-                                .min_w(rems_from_px(120.0_f32))
+                                .min_w(px(0.0))
                                 .flex_1()
                                 .overflow_hidden()
                                 .gap_0p5()
                                 .child(
                                     Label::new(app_name.to_owned())
-                                        .size(LabelSize::Default)
+                                        .size(LabelSize::Large)
                                         .truncate(),
                                 )
                                 .when(!compact, |el| {
@@ -307,13 +334,14 @@ fn render_center_workspace(
                                         Label::new(app_tagline.to_owned())
                                             .size(LabelSize::XSmall)
                                             .color(ui::Color::Muted)
-                                            .truncate_middle(),
+                                            .truncate(),
                                     )
                                 }),
                         ),
                 )
                 .child(
                     h_flex()
+                        .flex_shrink_0()
                         .gap_1p5()
                         .flex_wrap()
                         .items_center()
@@ -361,11 +389,11 @@ fn render_center_workspace(
                 .flex_1()
                 .w_full()
                 .min_h(px(180.0))
-                .rounded(px(10.0))
+                .rounded(px(16.0))
                 .overflow_hidden()
                 .bg(theme.colors.surface_container_lowest)
                 .border_1()
-                .border_color(theme.colors.outline_variant)
+                .border_color(theme.colors.outline_variant.opacity(0.45))
                 .child(canvas_widget),
         )
         .child(
@@ -425,7 +453,7 @@ fn render_parametric_canvas(state: &StudioState, category: &str, theme: &OsTheme
                         window.paint_path(
                             path,
                             Hsla {
-                                a: 0.28,
+                                a: 0.14,
                                 ..grid_color
                             },
                         );
@@ -441,7 +469,7 @@ fn render_parametric_canvas(state: &StudioState, category: &str, theme: &OsTheme
                         window.paint_path(
                             path,
                             Hsla {
-                                a: 0.28,
+                                a: 0.14,
                                 ..grid_color
                             },
                         );
@@ -454,13 +482,28 @@ fn render_parametric_canvas(state: &StudioState, category: &str, theme: &OsTheme
                 bounds.origin.x + bounds.size.width * 0.5,
                 bounds.origin.y + bounds.size.height * 0.5,
             );
-            let art_w = px((240.0 * zoom).min(f32::from(bounds.size.width) * 0.82));
-            let art_h = px((160.0 * zoom).min(f32::from(bounds.size.height) * 0.82));
+            let art_w = px((320.0 * zoom).min(f32::from(bounds.size.width) * 0.84));
+            let art_h = px((200.0 * zoom).min(f32::from(bounds.size.height) * 0.80));
             let art_bounds = Bounds::new(
                 point(center.x - art_w * 0.5, center.y - art_h * 0.5),
                 size(art_w, art_h),
             );
-            window.paint_quad(gpui::fill(art_bounds, card_bg));
+            let shadow_bounds = Bounds::new(
+                point(art_bounds.origin.x + px(4.0), art_bounds.origin.y + px(8.0)),
+                art_bounds.size,
+            );
+            window.paint_quad(
+                gpui::fill(shadow_bounds, gpui::black().opacity(0.32)).corner_radii(px(16.0)),
+            );
+            window.paint_quad(
+                gpui::fill(art_bounds, card_bg)
+                    .corner_radii(px(14.0))
+                    .border_widths(px(1.0))
+                    .border_color(Hsla {
+                        a: 0.35,
+                        ..grid_color
+                    }),
+            );
 
             let lum_shift = (exposure * 0.08).clamp(-0.25, 0.25);
             let tone_primary = Hsla {
@@ -546,26 +589,78 @@ fn render_parametric_canvas(state: &StudioState, category: &str, theme: &OsTheme
                 _ => {
                     let layer_a = Bounds::new(
                         point(
-                            art_bounds.origin.x + art_w * 0.12,
-                            art_bounds.origin.y + art_h * 0.18,
+                            art_bounds.origin.x + art_w * 0.08,
+                            art_bounds.origin.y + art_h * 0.14,
                         ),
-                        size(art_w * 0.48, art_h * 0.54),
+                        size(art_w * 0.48, art_h * 0.56),
                     );
                     let layer_b = Bounds::new(
                         point(
-                            art_bounds.origin.x + art_w * 0.42,
-                            art_bounds.origin.y + art_h * 0.30,
+                            art_bounds.origin.x + art_w * 0.36,
+                            art_bounds.origin.y + art_h * 0.26,
                         ),
-                        size(art_w * 0.44, art_h * 0.52),
+                        size(art_w * 0.44, art_h * 0.50),
                     );
-                    window.paint_quad(gpui::fill(layer_a, tone_primary));
-                    window.paint_quad(gpui::fill(
-                        layer_b,
-                        Hsla {
-                            a: 0.88,
-                            ..secondary
-                        },
+                    let layer_c = Bounds::new(
+                        point(
+                            art_bounds.origin.x + art_w * 0.64,
+                            art_bounds.origin.y + art_h * 0.12,
+                        ),
+                        size(art_w * 0.26, art_h * 0.34),
+                    );
+                    window.paint_quad(
+                        gpui::fill(layer_a, tone_primary).corner_radii(px(14.0)),
+                    );
+                    window.paint_quad(
+                        gpui::fill(
+                            layer_b,
+                            Hsla {
+                                a: 0.84,
+                                ..secondary
+                            },
+                        )
+                        .corner_radii(px(18.0)),
+                    );
+                    window.paint_quad(
+                        gpui::fill(
+                            layer_c,
+                            Hsla {
+                                a: 0.78,
+                                ..tertiary
+                            },
+                        )
+                        .corner_radii(px(28.0)),
+                    );
+                    // Expressive tone-curve spline overlay across the artboard
+                    let mut spline = PathBuilder::stroke(px(2.0));
+                    spline.move_to(point(
+                        art_bounds.origin.x + art_w * 0.08,
+                        art_bounds.origin.y + art_h * 0.82,
                     ));
+                    spline.curve_to(
+                        point(
+                            art_bounds.origin.x + art_w * 0.92,
+                            art_bounds.origin.y + art_h * 0.20,
+                        ),
+                        point(
+                            art_bounds.origin.x + art_w * 0.42,
+                            art_bounds.origin.y + art_h * 0.18,
+                        ),
+                    );
+                    if let Ok(path) = spline.build() {
+                        window.paint_path(path, Hsla { a: 0.72, ..on_bg });
+                    }
+                    // Bottom chromatic exposure swatch ribbon
+                    for (idx, swatch) in [tone_primary, secondary, tertiary].into_iter().enumerate() {
+                        let sw = Bounds::new(
+                            point(
+                                art_bounds.origin.x + art_w * (0.08 + idx as f32 * 0.10),
+                                art_bounds.origin.y + art_h * 0.86,
+                            ),
+                            size(art_w * 0.08, px(6.0)),
+                        );
+                        window.paint_quad(gpui::fill(sw, swatch).corner_radii(px(3.0)));
+                    }
                 }
             }
 

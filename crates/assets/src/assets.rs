@@ -6,6 +6,7 @@ use gpui::{App, AssetSource, Result, SharedString};
 // runtime so edits show up on the next launch without a rebuild and no
 // build-time path is baked in (which corgi's sandbox rejects). See
 // `util::fs_embed!`.
+#[cfg(not(feature = "web-slim"))]
 util::fs_embed! {
     pub struct Assets,
     crate_relative = "../../assets",
@@ -21,6 +22,26 @@ util::fs_embed! {
         "*.md",
     ],
     exclude = ["themes/src/*", "*.DS_Store"],
+}
+
+// Slim Wasm bundle: keep core Regular sans + monospace fonts, vector icons, and
+// runtime design/theme/craft manifests while omitting ~2.7 MiB of extra font
+// weights, desktop themes, sounds, prompts, and offline catalog snapshots.
+#[cfg(feature = "web-slim")]
+util::fs_embed! {
+    pub struct Assets,
+    crate_relative = "../../assets",
+    root_relative = "assets",
+    include = [
+        "fonts/ibm-plex-sans/IBMPlexSans-Regular.ttf",
+        "fonts/google-sans-code/GoogleSansCode-Variable.ttf",
+        "icons/**/*",
+        "os/themes.json",
+        "os/google_design_tokens.toml",
+        "os/craft_catalog.toml",
+        "os/m3_compose_catalog.json",
+    ],
+    exclude = ["*.DS_Store"],
 }
 
 impl AssetSource for Assets {

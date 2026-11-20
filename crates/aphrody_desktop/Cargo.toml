@@ -23,9 +23,20 @@ name = "web_os"
 path = "examples/web_os.rs"
 
 [features]
-default = ["desktop", "cli"]
-desktop = ["gpui_ui/desktop"]
-web = []
+default = ["desktop", "cli", "webgl-fallback"]
+desktop = [
+    "gpui_ui/desktop",
+    "aphrody_craft/storytold-suite",
+    "aphrody_craft/native-inspect",
+]
+webgl-fallback = [
+    "gpui_platform/webgl-fallback",
+    "gpui_ui/webgl-fallback",
+    "aphrody_store/webgl-fallback",
+]
+web = ["webgl-fallback"]
+web-slim = ["assets/web-slim", "aphrody_store/slim"]
+web-slim-webgl = ["web-slim", "webgl-fallback"]
 mobile = []
 cli = ["dep:clap", "dep:env_logger"]
 shell-module = ["dep:gpui_app_shell"]
@@ -41,11 +52,11 @@ chrono.workspace = true
 env_logger = { workspace = true, optional = true }
 gpui.workspace = true
 gpui_app_shell = { workspace = true, optional = true }
-gpui_platform.workspace = true
-gpui_ui.workspace = true
+gpui_platform = { workspace = true, default-features = false }
+gpui_ui = { workspace = true, default-features = false }
 icons.workspace = true
 log.workspace = true
-aphrody_craft.workspace = true
+aphrody_craft = { workspace = true, default-features = false, features = ["codecs", "wasm-inspect"] }
 aphrody_browser.workspace = true
 aphrody_installer.workspace = true
 aphrody_pilot.workspace = true

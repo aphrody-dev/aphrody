@@ -13,5 +13,14 @@ workspace = true
 path = "src/brand.rs"
 doctest = false
 
+[features]
+default = []
+serde = ["dep:serde"]
+schemars = ["dep:schemars"]
+
+[dependencies]
+serde = { workspace = true, features = ["derive"], optional = true }
+schemars = { workspace = true, optional = true }
+
 [build-dependencies]
 toml.workspace = true

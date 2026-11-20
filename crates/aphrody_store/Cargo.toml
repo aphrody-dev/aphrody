@@ -14,12 +14,14 @@ path = "src/aphrody_store.rs"
 doctest = false
 
 [features]
-default = ["desktop", "nsh-ui"]
+default = ["desktop", "nsh-ui", "webgl-fallback"]
+webgl-fallback = ["gpui_ui/webgl-fallback"]
 desktop = ["gpui_ui/desktop", "gpui_ui/nsh", "nsh-ui"]
 nsh-ui = ["dep:nsh-core", "dep:nsh-base"]
 nsh-js = ["desktop", "gpui_ui/nsh-js", "dep:nsh-engine"]
 nsh-dev = ["nsh-js", "gpui_ui/nsh-dev", "dep:nsh-bundler"]
 web = ["nsh-ui"]
+slim = []
 mobile = ["nsh-ui"]
 test-support = ["gpui/test-support", "aphrody_ui/test-support", "gpui_ui/test-support"]
 
@@ -27,7 +29,7 @@ test-support = ["gpui/test-support", "aphrody_ui/test-support", "gpui_ui/test-su
 brand.workspace = true
 dirs.workspace = true
 gpui.workspace = true
-gpui_ui.workspace = true
+gpui_ui = { workspace = true, default-features = false }
 nsh-base = { workspace = true, optional = true }
 nsh-bundler = { workspace = true, optional = true }
 nsh-core = { workspace = true, optional = true }

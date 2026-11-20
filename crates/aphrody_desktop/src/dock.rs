@@ -172,12 +172,13 @@ pub fn render_cosmic_dock(
     let mut dock_row = h_flex()
         .px_3()
         .py_1p5()
-        .gap_2()
+        .gap_1p5()
         .items_center()
-        .rounded(px(16.0))
-        .bg(theme.colors.surface_container_high)
+        .rounded_full()
+        .bg(theme.colors.surface_container_high.opacity(0.94))
         .border_1()
-        .border_color(theme.colors.outline_variant);
+        .border_color(theme.colors.outline_variant.opacity(0.42))
+        .shadow_lg();
 
     for (idx, item) in items.into_iter().enumerate() {
         let is_active = match (item.kind, item.craft_id) {
@@ -192,7 +193,12 @@ pub fn render_cosmic_dock(
         let bg = if is_active {
             theme.colors.primary_container
         } else {
-            theme.colors.surface_container
+            theme.colors.surface_container.opacity(0.55)
+        };
+        let hover_bg = if is_active {
+            theme.colors.primary_container
+        } else {
+            theme.colors.surface_container_highest
         };
         let fg = if is_active {
             theme.colors.on_primary_container
@@ -200,9 +206,9 @@ pub fn render_cosmic_dock(
             theme.colors.on_surface
         };
         let border = if is_active {
-            theme.colors.primary
+            theme.colors.primary.opacity(0.70)
         } else {
-            theme.colors.outline_variant
+            gpui::transparent_black()
         };
         let kind_opt = item.kind;
         let craft_id = item.craft_id;
@@ -218,11 +224,12 @@ pub fn render_cosmic_dock(
                 .items_center()
                 .justify_center()
                 .gap_0p5()
-                .rounded(px(12.0))
+                .rounded_full()
                 .bg(bg)
                 .text_color(fg)
                 .border_1()
                 .border_color(border)
+                .hover(move |s| s.bg(hover_bg))
                 .cursor_pointer()
                 .focusable()
                 .tab_index((700 + idx) as isize)
@@ -246,9 +253,9 @@ pub fn render_cosmic_dock(
                 .when(is_active, |el| {
                     el.child(
                         div()
-                            .w(px(10.0))
-                            .h(px(2.5))
-                            .rounded(px(2.0))
+                            .w(px(12.0))
+                            .h(px(3.0))
+                            .rounded_full()
                             .bg(theme.colors.primary),
                     )
                 }),

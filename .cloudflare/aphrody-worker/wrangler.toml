@@ -97,3 +97,43 @@ bucket_name = "aphrody-assets"
 [[env.learn.queues.producers]]
 binding = "EVENTS"
 queue = "github-events"
+
+[env.web]
+name = "aphrody-web"
+compatibility_date = "2026-11-18"
+workers_dev = false
+preview_urls = false
+
+[env.web.limits]
+cpu_ms = 50
+
+[env.web.triggers]
+crons = []
+
+[env.web.observability]
+enabled = true
+
+[env.web.observability.logs]
+enabled = true
+head_sampling_rate = 0.1
+invocation_logs = true
+
+[env.web.observability.traces]
+enabled = true
+head_sampling_rate = 0.05
+
+[[env.web.routes]]
+pattern = "web.aphrody.com/*"
+zone_name = "aphrody.com"
+
+[[env.web.routes]]
+pattern = "aphrody.com/web*"
+zone_name = "aphrody.com"
+
+[[env.web.r2_buckets]]
+binding = "RELEASES_BUCKET"
+bucket_name = "aphrody-releases"
+
+[[env.web.r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "aphrody-assets"
