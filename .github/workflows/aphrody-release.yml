@@ -50,6 +50,12 @@ jobs:
       version: ${{ steps.meta.outputs.version }}
       tag: ${{ steps.meta.outputs.tag }}
     steps:
+      # fw-m3 (Material 3 tokens) is a path dependency on the sibling fw checkout.
+      - name: Check out fw beside aphrody
+        shell: bash
+        run: |
+          fw="$GITHUB_WORKSPACE/../fw"
+          if [ -d "$fw/.git" ]; then git -C "$fw" fetch --depth 1 origin main && git -C "$fw" checkout --force FETCH_HEAD; else git clone --depth 1 https://github.com/aphrody-labs/fw.git "$fw"; fi
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
       - name: Resolve channel and version
@@ -114,6 +120,12 @@ jobs:
             asset: Aphrody-arm64.dmg
     runs-on: ${{ matrix.os }}
     steps:
+      # fw-m3 (Material 3 tokens) is a path dependency on the sibling fw checkout.
+      - name: Check out fw beside aphrody
+        shell: bash
+        run: |
+          fw="$GITHUB_WORKSPACE/../fw"
+          if [ -d "$fw/.git" ]; then git -C "$fw" fetch --depth 1 origin main && git -C "$fw" checkout --force FETCH_HEAD; else git clone --depth 1 https://github.com/aphrody-labs/fw.git "$fw"; fi
       - uses: actions/checkout@v7
       - uses: Swatinem/rust-cache@v2
       - uses: mlugg/setup-zig@v2
@@ -217,6 +229,12 @@ jobs:
     if: ${{ !cancelled() && needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      # fw-m3 (Material 3 tokens) is a path dependency on the sibling fw checkout.
+      - name: Check out fw beside aphrody
+        shell: bash
+        run: |
+          fw="$GITHUB_WORKSPACE/../fw"
+          if [ -d "$fw/.git" ]; then git -C "$fw" fetch --depth 1 origin main && git -C "$fw" checkout --force FETCH_HEAD; else git clone --depth 1 https://github.com/aphrody-labs/fw.git "$fw"; fi
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:

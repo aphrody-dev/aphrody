@@ -2453,7 +2453,7 @@ fn build_palette_for_mode(mode: FigCraftDesignMode, design_md: &DesignMdDocument
 fn fallback_hex_for_mode(mode: FigCraftDesignMode, role: &str) -> &'static str {
     match mode {
         FigCraftDesignMode::Light => match role {
-            "surface" | "background" => "#F7F9FF",
+            "surface" | "background" => "#FAF9F9",
             "surface-container-lowest" => "#FFFFFF",
             "surface-container-low" => "#EEF3FA",
             "surface-container" => "#E7EDF6",
@@ -2477,7 +2477,7 @@ fn fallback_hex_for_mode(mode: FigCraftDesignMode, role: &str) -> &'static str {
             _ => "#E7EDF6",
         },
         FigCraftDesignMode::NeuralObsidian => match role {
-            "surface" | "background" => "#0B0E14",
+            "surface" | "background" => "#0E0E0E",
             "surface-container-lowest" => "#06080C",
             "surface-container-low" => "#13161F",
             "surface-container" => "#181C26",
@@ -2485,7 +2485,7 @@ fn fallback_hex_for_mode(mode: FigCraftDesignMode, role: &str) -> &'static str {
             "surface-container-highest" => "#262C3A",
             "on-surface" | "on-background" => "#E4EAF4",
             "on-surface-variant" => "#BAC4D6",
-            "primary" => "#8FD0FF",
+            "primary" => "#A8C7FA",
             "on-primary" => "#003352",
             "primary-container" => "#004B75",
             "on-primary-container" => "#CEE5FF",
@@ -2509,7 +2509,7 @@ fn fallback_hex_for_mode(mode: FigCraftDesignMode, role: &str) -> &'static str {
             "surface-container-highest" => "#252E3D",
             "on-surface" | "on-background" => "#EDF2FA",
             "on-surface-variant" => "#C2CCDC",
-            "primary" => "#8FD0FF",
+            "primary" => "#A8C7FA",
             "on-primary" => "#003352",
             "primary-container" => "#004B75",
             "on-primary-container" => "#CEE5FF",
@@ -2525,7 +2525,7 @@ fn fallback_hex_for_mode(mode: FigCraftDesignMode, role: &str) -> &'static str {
             _ => "#121720",
         },
         FigCraftDesignMode::Dark => match role {
-            "surface" | "background" => "#0E141B",
+            "surface" | "background" => "#131314",
             "surface-container-lowest" => "#080D13",
             "surface-container-low" => "#161D25",
             "surface-container" => "#1B222B",
@@ -2533,7 +2533,7 @@ fn fallback_hex_for_mode(mode: FigCraftDesignMode, role: &str) -> &'static str {
             "surface-container-highest" => "#303843",
             "on-surface" | "on-background" => "#E0E6F0",
             "on-surface-variant" => "#C0CAD7",
-            "primary" => "#8FD0FF",
+            "primary" => "#A8C7FA",
             "on-primary" => "#003352",
             "primary-container" => "#004B75",
             "on-primary-container" => "#CEE5FF",
@@ -2847,9 +2847,9 @@ pub fn export_to_lighthouse100_html(doc: &FigCraftDocument, design_md: &DesignMd
             .unwrap_or_else(|| fallback.to_owned())
     };
 
-    let surface = pick_mode_color("surface", "#0E141B");
+    let surface = pick_mode_color("surface", "#131314");
     let on_surface = pick_mode_color("on-surface", "#E0E6F0");
-    let primary = pick_mode_color("primary", "#8FD0FF");
+    let primary = pick_mode_color("primary", "#A8C7FA");
     let on_primary = pick_mode_color("on-primary", "#003352");
     let container = pick_mode_color("surface-container", "#1B222B");
     let outline_variant = pick_mode_color("outline-variant", "#404956");

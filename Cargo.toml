@@ -1325,6 +1325,7 @@ aphrody_google = { path = "crates/aphrody_google", default-features = false }
 aphrody_media = { path = "crates/aphrody_media", default-features = false }
 backdrop-blur-core = "0.2.0"
 lucide-static-svg = "1.76.0"
+fw-m3 = { path = "../fw/crates/fw-m3" }
 material-colors = { version = "0.5.0", default-features = false, features = ["std"] }
 md-icons = "0.4.0"
 window-vibrancy = "0.8.1"

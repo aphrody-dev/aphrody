@@ -1020,9 +1020,9 @@ mod tests {
     #[test]
     fn all_four_modes_produce_valid_themes_and_pass_wcag_aa() {
         let expected_backgrounds = [
-            (M3Mode::Light, 0xF7F9FF_u32, false),
-            (M3Mode::Dark, 0x0E141B_u32, true),
-            (M3Mode::NeuralObsidian, 0x0B0E14_u32, true),
+            (M3Mode::Light, 0xFAF9F9_u32, false),
+            (M3Mode::Dark, 0x131314_u32, true),
+            (M3Mode::NeuralObsidian, 0x0E0E0E_u32, true),
             (M3Mode::OledPitch, 0x000000_u32, true),
         ];
 
@@ -1068,14 +1068,14 @@ mod tests {
         }
 
         // Individual convenience factories
-        assert_eq!(hex24(m3_light_theme().background.light), 0xF7F9FF);
-        assert_eq!(hex24(m3_dark_theme().background.dark), 0x0E141B);
-        assert_eq!(hex24(m3_neural_obsidian_theme().background.dark), 0x0B0E14);
+        assert_eq!(hex24(m3_light_theme().background.light), 0xFAF9F9);
+        assert_eq!(hex24(m3_dark_theme().background.dark), 0x131314);
+        assert_eq!(hex24(m3_neural_obsidian_theme().background.dark), 0x0E0E0E);
         assert_eq!(hex24(m3_oled_pitch_theme().background.dark), 0x000000);
 
         // Adaptive factory preserves Light in .light and chosen dark variant in .dark
         let adaptive_oled = m3_adaptive_theme(M3Mode::OledPitch);
-        assert_eq!(hex24(adaptive_oled.background.light), 0xF7F9FF);
+        assert_eq!(hex24(adaptive_oled.background.light), 0xFAF9F9);
         assert_eq!(hex24(adaptive_oled.background.dark), 0x000000);
     }
 

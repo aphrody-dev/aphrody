@@ -5,23 +5,23 @@ system: Material 3 Expressive
 stitch_url: https://stitch.withgoogle.com/
 sans_flex_family: Google Sans Flex
 colors:
-  surface: "#0E141B"
-  surface-dim: "#0B1016"
-  surface-bright: "#343B44"
-  surface-container-lowest: "#080D13"
-  surface-container-low: "#161D25"
-  surface-container: "#1B222B"
-  surface-container-high: "#252C36"
-  surface-container-highest: "#303843"
-  on-surface: "#E0E6F0"
-  on-surface-variant: "#C0CAD7"
-  outline: "#8A94A2"
-  outline-variant: "#404956"
-  primary: "#8FD0FF"
+  surface: "#131314"
+  surface-dim: "#0F0F0F"
+  surface-bright: "#3A3A3A"
+  surface-container-lowest: "#0C0C0C"
+  surface-container-low: "#1C1C1C"
+  surface-container: "#1E1F20"
+  surface-container-high: "#282A2C"
+  surface-container-highest: "#333537"
+  on-surface: "#E3E3E3"
+  on-surface-variant: "#C4C7C5"
+  outline: "#8E918F"
+  outline-variant: "#444746"
+  primary: "#A8C7FA"
   on-primary: "#003352"
   primary-container: "#004B75"
   on-primary-container: "#CEE5FF"
-  secondary: "#B4C9E5"
+  secondary: "#7FCFFF"
   on-secondary: "#1D3248"
   secondary-container: "#34485F"
   on-secondary-container: "#D2E4FF"
@@ -33,11 +33,11 @@ colors:
   on-error: "#690005"
   error-container: "#93000A"
   on-error-container: "#FFDAD6"
-  background: "#0E141B"
-  on-background: "#E0E6F0"
-  light-surface: "#F7F9FF"
-  light-on-surface: "#161C24"
-  light-primary: "#006399"
+  background: "#0F0F0F"
+  on-background: "#E3E3E3"
+  light-surface: "#FAF9F9"
+  light-on-surface: "#1F1F1F"
+  light-primary: "#1A73E8"
   light-on-primary: "#FFFFFF"
 typography:
   display-lg:
@@ -95,7 +95,7 @@ Derived from [*Google Sans: Evolving Google's Typeface*](https://design.google/l
 
 ## Mirrored References (native GPUI)
 
-Each reference resolves to tokens in `assets/os/google_design_tokens.toml` and a `RenderOnce` component in `crates/aphrody_ui/src/google_design_components.rs`:
+Each reference resolves to tokens in `fw/crates/fw-m3/tokens/google_design_tokens.toml` and a `RenderOnce` component in `crates/aphrody_ui/src/google_design_components.rs`:
 
 | Reference | Tokens | GPUI component |
 | --- | --- | --- |

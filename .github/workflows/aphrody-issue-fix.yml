@@ -75,6 +75,12 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      # fw-m3 (Material 3 tokens) is a path dependency on the sibling fw checkout.
+      - name: Check out fw beside aphrody
+        shell: bash
+        run: |
+          fw="$GITHUB_WORKSPACE/../fw"
+          if [ -d "$fw/.git" ]; then git -C "$fw" fetch --depth 1 origin main && git -C "$fw" checkout --force FETCH_HEAD; else git clone --depth 1 https://github.com/aphrody-labs/fw.git "$fw"; fi
       - uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -114,6 +120,12 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'issues'
     runs-on: ubuntu-latest
     steps:
+      # fw-m3 (Material 3 tokens) is a path dependency on the sibling fw checkout.
+      - name: Check out fw beside aphrody
+        shell: bash
+        run: |
+          fw="$GITHUB_WORKSPACE/../fw"
+          if [ -d "$fw/.git" ]; then git -C "$fw" fetch --depth 1 origin main && git -C "$fw" checkout --force FETCH_HEAD; else git clone --depth 1 https://github.com/aphrody-labs/fw.git "$fw"; fi
       - uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

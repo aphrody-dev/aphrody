@@ -113,7 +113,7 @@ impl StitchClient {
             .colors
             .get("surface")
             .map(String::as_str)
-            .unwrap_or("#0E141B");
+            .unwrap_or("#131314");
         let on_surface = design_md
             .colors
             .get("on-surface")
@@ -123,7 +123,7 @@ impl StitchClient {
             .colors
             .get("primary")
             .map(String::as_str)
-            .unwrap_or("#8FD0FF");
+            .unwrap_or("#A8C7FA");
         let container = design_md
             .colors
             .get("surface-container")

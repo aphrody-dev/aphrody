@@ -476,7 +476,7 @@ pub struct M3DensityTokens {
     pub compact_1: i32,
     pub compact_2: i32,
     pub compact_3: i32,
-    pub touch_target_min_px: f32,
+    pub pointer_target_min_px: f32,
     pub control_height_min_px: f32,
 }
 
@@ -498,7 +498,7 @@ impl M3DensityTokens {
             compact_1: brand::design::DENSITY.compact_1,
             compact_2: brand::design::DENSITY.compact_2,
             compact_3: brand::design::DENSITY.compact_3,
-            touch_target_min_px: brand::design::DENSITY.touch_target_min_px,
+            pointer_target_min_px: brand::design::DENSITY.pointer_target_min_px,
             control_height_min_px: brand::design::DENSITY.control_height_min_px,
         }
     }
@@ -1181,7 +1181,7 @@ pub fn try_m3_theme_config(mode: M3AppearanceMode) -> Result<ThemeConfig> {
     colors.overlay = Some(if mode.is_dark() {
         "#00000066".into()
     } else {
-        "#0E141B52".into()
+        "#13131452".into()
     });
     colors.window_border = Some(hex(roles.outline_variant));
     colors.drag_border = Some(hex(roles.primary));
@@ -3330,7 +3330,7 @@ impl RenderOnce for M3NavigationRail {
                 .when_some((!disabled).then_some(on_select).flatten(), |this, handler| {
                     this.on_click(move |_, window, cx| handler(&domain_id, window, cx))
                 })
-                .min_h(px(m3.density.touch_target_min_px))
+                .min_h(px(m3.density.pointer_target_min_px))
                 .w_full()
                 .cursor(if disabled {
                     gpui::CursorStyle::OperationNotAllowed
@@ -3577,8 +3577,8 @@ impl RenderOnce for M3NavigationBar {
                 .flex()
                 .flex_col()
                 .flex_1()
-                .min_w(px(m3.density.touch_target_min_px))
-                .min_h(px(m3.density.touch_target_min_px))
+                .min_w(px(m3.density.pointer_target_min_px))
+                .min_h(px(m3.density.pointer_target_min_px))
                 .items_center()
                 .justify_center()
                 .gap_1()
@@ -4167,7 +4167,7 @@ impl RenderOnce for M3ExpressiveSwitch {
                 })
                 .h_flex()
                 .flex_row_dir(cx)
-                .min_h(px(m3.density.touch_target_min_px))
+                .min_h(px(m3.density.pointer_target_min_px))
                 .gap_3()
                 .cursor(if disabled {
                     gpui::CursorStyle::OperationNotAllowed
@@ -4546,7 +4546,7 @@ mod tests {
         assert_eq!(shape.medium_px, 12.0);
         assert_eq!(shape.large_px, 16.0);
         assert_eq!(shape.extra_large_px, 28.0);
-        assert_eq!(density.touch_target_min_px, 44.0);
+        assert_eq!(density.pointer_target_min_px, 44.0);
 
         for axis in ["opsz", "wght", "wdth", "GRAD", "slnt", "ROND"] {
             assert!(

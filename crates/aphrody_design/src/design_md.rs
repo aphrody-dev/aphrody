@@ -276,16 +276,16 @@ pub fn export_shadcn_tailwind_css(doc: &DesignMdDocument) -> String {
             .unwrap_or_else(|| fallback.to_owned())
     };
 
-    let bg_light = pick("light-surface", "#F7F9FF");
+    let bg_light = pick("light-surface", "#FAF9F9");
     let fg_light = pick("light-on-surface", "#161C24");
     let primary_light = pick("light-primary", "#006399");
     let on_primary_light = pick("light-on-primary", "#FFFFFF");
 
-    let bg_dark = pick("surface", "#0E141B");
+    let bg_dark = pick("surface", "#131314");
     let fg_dark = pick("on-surface", "#E0E6F0");
     let card_dark = pick("surface-container-low", "#161D25");
     let popover_dark = pick("surface-container-high", "#252C36");
-    let primary_dark = pick("primary", "#8FD0FF");
+    let primary_dark = pick("primary", "#A8C7FA");
     let on_primary_dark = pick("on-primary", "#003352");
     let secondary_dark = pick("secondary-container", "#34485F");
     let on_secondary_dark = pick("on-secondary-container", "#D2E4FF");
@@ -296,7 +296,7 @@ pub fn export_shadcn_tailwind_css(doc: &DesignMdDocument) -> String {
     let destructive_dark = pick("error", "#FFB4AB");
     let on_destructive_dark = pick("on-error", "#690005");
     let border_dark = pick("outline-variant", "#404956");
-    let ring_dark = pick("primary", "#8FD0FF");
+    let ring_dark = pick("primary", "#A8C7FA");
     let radius_md = doc
         .rounded
         .get("md")

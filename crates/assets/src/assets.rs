@@ -37,7 +37,6 @@ util::fs_embed! {
         "fonts/google-sans-code/GoogleSansCode-Variable.ttf",
         "icons/**/*",
         "os/themes.json",
-        "os/google_design_tokens.toml",
         "os/craft_catalog.toml",
         "os/m3_compose_catalog.json",
     ],

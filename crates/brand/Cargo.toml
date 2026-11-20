@@ -15,10 +15,11 @@ doctest = false
 
 [features]
 default = []
-serde = ["dep:serde"]
-schemars = ["dep:schemars"]
+serde = ["dep:serde", "fw-m3/serde"]
+schemars = ["dep:schemars", "fw-m3/schemars"]
 
 [dependencies]
+fw-m3.workspace = true
 serde = { workspace = true, features = ["derive"], optional = true }
 schemars = { workspace = true, optional = true }
 
