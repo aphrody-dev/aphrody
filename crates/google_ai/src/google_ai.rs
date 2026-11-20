@@ -148,11 +148,19 @@ pub async fn list_models(
         if let Some(token) = &page_token {
             url.query_pairs_mut().append_pair("pageToken", token);
         }
-        let request = HttpRequest::builder()
+        let trimmed_key = api_key.trim();
+        let mut builder = HttpRequest::builder()
             .method(Method::GET)
             .uri(url.as_str())
-            .header("x-goog-api-key", api_key.trim())
-            .header("Accept", "application/json")
+            .header("Accept", "application/json");
+        if trimmed_key.starts_with("ya29.") {
+            builder = builder.header("Authorization", format!("Bearer {trimmed_key}"));
+        } else if let Some(token) = trimmed_key.strip_prefix("Bearer ") {
+            builder = builder.header("Authorization", format!("Bearer {}", token.trim()));
+        } else {
+            builder = builder.header("x-goog-api-key", trimmed_key);
+        }
+        let request = builder
             .extra_headers(extra_headers)
             .body(AsyncBody::empty())
             .map_err(|error| LanguageModelCompletionError::BuildRequestBody {

@@ -59,6 +59,15 @@ pub(crate) fn builtin_tools() -> Vec<Value> {
         json!({ "name": "zed_headless_parse_ast", "description": "Parse Rust/TS/TSX/Python/JSON source using workspace Tree-sitter grammars headlessly.", "inputSchema": {"type": "object", "properties": {"language": {"type": "string"}, "source": {"type": "string"}}, "required": ["source"], "additionalProperties": false} }),
         json!({ "name": "browser_validate_url", "description": "Validate URL against absorbed agent-browser SSRF / non-public IP / IMDS security policy.", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}}, "required": ["url"], "additionalProperties": false} }),
         json!({ "name": "aphrody_suite_status", "description": "Return the consolidated Aphrody fork capability matrix across all 12 pillars, Material 3 modes, and target surfaces.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
+        json!({ "name": "google_auth_status", "description": "Inspect Google OAuth 2.0 / gcloud / ADC authentication readiness without leaking tokens.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
+        json!({ "name": "google_sdk_parity", "description": "Return pure-Rust SDK parity matrix covering Google Kotlin, Go, Python, TypeScript, and Rust SDKs.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
+        json!({ "name": "google_workspace_call", "description": "Invoke a Google Workspace Discovery API endpoint (drive, gmail, calendar, docs, sheets, slides, tasks, chat).", "inputSchema": {"type": "object", "properties": {"service": {"type": "string"}, "path": {"type": "string"}, "method": {"type": "string"}}, "required": ["service", "path"], "additionalProperties": false} }),
+        json!({ "name": "yt_search", "description": "Headless pure-Rust YouTube InnerTube (WEB) search.", "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"], "additionalProperties": false} }),
+        json!({ "name": "yt_video_info", "description": "Headless pure-Rust YouTube player metadata, adaptive streams, captions, and SponsorBlock segments.", "inputSchema": {"type": "object", "properties": {"video_id": {"type": "string"}}, "required": ["video_id"], "additionalProperties": false} }),
+        json!({ "name": "ytm_search", "description": "Headless pure-Rust YouTube Music (WEB_REMIX) search.", "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}, "filter": {"type": "string"}}, "required": ["query"], "additionalProperties": false} }),
+        json!({ "name": "ytm_lyrics", "description": "Headless pure-Rust YouTube Music lyrics lookup by video_id.", "inputSchema": {"type": "object", "properties": {"video_id": {"type": "string"}}, "required": ["video_id"], "additionalProperties": false} }),
+        json!({ "name": "media_capabilities", "description": "Return pure-Rust zero-FFmpeg multimedia capabilities and supported codecs.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
+        json!({ "name": "media_validate_shaders", "description": "Validate all built-in media WGSL shaders (YUV->RGB, AgX HDR, scopes, motion transitions) with Naga v30.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
     ]
 }
 
@@ -334,6 +343,106 @@ fn call_tool(params: &Value) -> Result<Value, (i32, String)> {
         }
         "aphrody_suite_status" => serde_json::to_value(aphrody::AphrodySuiteProfile::current())
             .map_err(|e| (-32000, e.to_string()))?,
+        "google_auth_status" => serde_json::to_value(aphrody_google::GoogleAuthManager::default().status())
+            .map_err(|e| (-32000, e.to_string()))?,
+        "google_sdk_parity" => serde_json::to_value(aphrody_google::sdk_parity_matrix())
+            .map_err(|e| (-32000, e.to_string()))?,
+        "google_workspace_call" => {
+            let service = args
+                .get("service")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing 'service' argument".to_owned()))?;
+            let path = args
+                .get("path")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing 'path' argument".to_owned()))?;
+            let method = args
+                .get("method")
+                .and_then(Value::as_str)
+                .unwrap_or("GET");
+            let client =
+                aphrody_google::GoogleWorkspaceClient::new(aphrody_google::GoogleAuthManager::default());
+            client
+                .call(&aphrody_google::WorkspaceDiscoveryRequest {
+                    service: service.to_owned(),
+                    method: method.to_owned(),
+                    path: path.to_owned(),
+                    query: Vec::new(),
+                    body: None,
+                })
+                .map_err(|e| (-32002, e.to_string()))?
+        }
+        "yt_search" => {
+            let query = args
+                .get("query")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing 'query' argument".to_owned()))?;
+            let client = aphrody_google::InnerTubeClient::discover(
+                aphrody_google::InnerTubeClientProfile::Web,
+            )
+            .map_err(|e| (-32002, e.to_string()))?;
+            let items = client
+                .search(query, None)
+                .map_err(|e| (-32002, e.to_string()))?;
+            serde_json::to_value(items).map_err(|e| (-32000, e.to_string()))?
+        }
+        "yt_video_info" => {
+            let video_id = args
+                .get("video_id")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing 'video_id' argument".to_owned()))?;
+            let client = aphrody_google::InnerTubeClient::discover(
+                aphrody_google::InnerTubeClientProfile::Web,
+            )
+            .map_err(|e| (-32002, e.to_string()))?;
+            let info = client
+                .player(video_id)
+                .map_err(|e| (-32002, e.to_string()))?;
+            let segments = aphrody_google::InnerTubeClient::sponsorblock_segments(video_id)
+                .unwrap_or_default();
+            json!({ "details": info, "sponsorblock": segments })
+        }
+        "ytm_search" => {
+            let query = args
+                .get("query")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing 'query' argument".to_owned()))?;
+            let filter = args.get("filter").and_then(Value::as_str).and_then(|f| {
+                match f.to_ascii_lowercase().as_str() {
+                    "songs" => Some(aphrody_google::YtMusicSearchFilter::Songs),
+                    "videos" => Some(aphrody_google::YtMusicSearchFilter::Videos),
+                    "albums" => Some(aphrody_google::YtMusicSearchFilter::Albums),
+                    "artists" => Some(aphrody_google::YtMusicSearchFilter::Artists),
+                    "playlists" => Some(aphrody_google::YtMusicSearchFilter::Playlists),
+                    _ => None,
+                }
+            });
+            let client = aphrody_google::YouTubeMusicClient::discover()
+                .map_err(|e| (-32002, e.to_string()))?;
+            let tracks = client
+                .search(query, filter)
+                .map_err(|e| (-32002, e.to_string()))?;
+            serde_json::to_value(tracks).map_err(|e| (-32000, e.to_string()))?
+        }
+        "ytm_lyrics" => {
+            let video_id = args
+                .get("video_id")
+                .and_then(Value::as_str)
+                .ok_or((-32602, "missing 'video_id' argument".to_owned()))?;
+            let client = aphrody_google::YouTubeMusicClient::discover()
+                .map_err(|e| (-32002, e.to_string()))?;
+            let lyrics = client
+                .lyrics_for_video(video_id)
+                .map_err(|e| (-32002, e.to_string()))?;
+            serde_json::to_value(lyrics).map_err(|e| (-32000, e.to_string()))?
+        }
+        "media_capabilities" => serde_json::to_value(aphrody_media::capabilities())
+            .map_err(|e| (-32000, e.to_string()))?,
+        "media_validate_shaders" => {
+            let report = aphrody_media::validate_all_media_shaders()
+                .map_err(|e| (-32002, e.to_string()))?;
+            serde_json::to_value(report).map_err(|e| (-32000, e.to_string()))?
+        }
         unknown => return Err((-32601, format!("unknown tool '{unknown}'"))),
     };
 
@@ -441,6 +550,19 @@ mod tests {
         )
         .context("installer_switch_de_plan should respond")?;
         assert!(switch_res.contains("cosmic-session"));
+
+        let parity_google = dispatch_json_rpc_line(
+            r#"{"jsonrpc":"2.0","id":12,"method":"tools/call","params":{"name":"google_sdk_parity","arguments":{}}}"#,
+        )
+        .context("google_sdk_parity should respond")?;
+        assert!(parity_google.contains("go-genai"));
+        assert!(parity_google.contains("java-genai"));
+
+        let media_shaders = dispatch_json_rpc_line(
+            r#"{"jsonrpc":"2.0","id":13,"method":"tools/call","params":{"name":"media_validate_shaders","arguments":{}}}"#,
+        )
+        .context("media_validate_shaders should respond")?;
+        assert!(media_shaders.contains("fs_yuv_to_rgba"));
         Ok(())
     }
 }

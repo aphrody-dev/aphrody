@@ -10,7 +10,7 @@ on:
         required: false
         default: all
         type: choice
-        options: [all, gpui-kit, nsh, bun, zed, wgpu, store, agent-browser, agent-desktop]
+        options: [all, gpui-kit, nsh, bun, zed, wgpu, store, agent-browser, agent-desktop, multimedia-forks]
 
 permissions:
   contents: write
@@ -45,7 +45,12 @@ jobs:
             bun tooling/bun/upstream-sync.ts status --json
             exit 0
           fi
+          if [ "$TARGET" = "multimedia-forks" ]; then
+            bun tooling/bun/multimedia-forks-audit.ts --sync
+            exit 0
+          fi
           bun tooling/bun/upstream-sync.ts sync --target "$TARGET"
+          bun tooling/bun/multimedia-forks-audit.ts --sync
       - name: Verify repo hygiene and workflow integrity
         run: bun tooling/bun/repo-hygiene.ts
       - name: Open or update automated upstream-sync PR

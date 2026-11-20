@@ -10,6 +10,7 @@ mod bench;
 mod compute;
 mod design_cli;
 mod doctor;
+mod google_media_cli;
 mod mcp;
 mod render;
 mod shader;
@@ -98,6 +99,31 @@ enum Command {
     },
     /// Inspect the consolidated Aphrody fork feature suite (12 pillars, M3 modes, WebGPU/Wasm status)
     Suite(unified::SuiteArgs),
+    /// Headless Google OAuth / gcloud auth, Gemini & Vertex AI, and Kotlin/Go/Python/TS Rust SDK parity
+    Google {
+        #[command(subcommand)]
+        cmd: google_media_cli::GoogleSubcommand,
+    },
+    /// Headless Google Workspace Discovery CLI (Drive, Gmail, Calendar, Docs, Sheets, Slides, Tasks, Chat)
+    Ws {
+        #[command(subcommand)]
+        cmd: google_media_cli::WorkspaceSubcommand,
+    },
+    /// Headless YouTube agent client (InnerTube WEB + official Data API v3 + SponsorBlock)
+    Yt {
+        #[command(subcommand)]
+        cmd: google_media_cli::YouTubeSubcommand,
+    },
+    /// Headless YouTube Music agent client (InnerTube WEB_REMIX search, home, lyrics)
+    Ytm {
+        #[command(subcommand)]
+        cmd: google_media_cli::YouTubeMusicSubcommand,
+    },
+    /// Headless pure-Rust multimedia probe, WGSL shader validation, HLS/DASH & subtitle inspection
+    Media {
+        #[command(subcommand)]
+        cmd: google_media_cli::MediaSubcommand,
+    },
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, ValueEnum)]
@@ -258,5 +284,10 @@ pub fn run_main() -> Result<()> {
         Command::Zed { cmd } => unified::run_zed(cmd),
         Command::Install { cmd } => unified::run_install(cmd),
         Command::Suite(args) => unified::run_suite(args),
+        Command::Google { cmd } => google_media_cli::run_google(cmd),
+        Command::Ws { cmd } => google_media_cli::run_workspace(cmd),
+        Command::Yt { cmd } => google_media_cli::run_youtube(cmd),
+        Command::Ytm { cmd } => google_media_cli::run_ytmusic(cmd),
+        Command::Media { cmd } => google_media_cli::run_media(cmd),
     }
 }

@@ -10,7 +10,7 @@ sans_flex_family = "Google Sans Flex"
 synced_at = "2026-11-18T12:23:58.092Z"
 seed_hex = "#135B82"
 variant = "expressive"
-principles = ["Code is a design material: interactive software bridges intent and visual craft", "Google Sans Flex optical size, weight, width, grade, slant, and roundness tune hierarchy", "Strict 3-tier design tokens (reference -> system -> component) exported via DESIGN.md", "Physics-based spring motion separated cleanly into spatial vs effects springs", "WCAG 2.2 AA contrast >= 4.5:1 across all surface and action foregrounds"]
+principles = ["Code is a design material: interactive software bridges intent and visual clarity", "Material 3 Expressive (Android 17/18 + Compose M3 1.5.0) unifies Wayland, Windows, Wasm, Chromium, iOS, and Android surfaces", "Google Sans Flex optical size, weight, width, grade, slant, and roundness tune hierarchy", "Strict 3-tier design tokens (reference -> system -> component) exported via DESIGN.md", "Physics-based spring motion separated cleanly into spatial vs effects springs", "WCAG 2.2 AA contrast >= 4.5:1 across all surface and action foregrounds"]
 
 [ref.palette]
 primary0 = "#000000"
@@ -529,3 +529,17 @@ published_date = "2026-11-16"
 blog_url = "https://m3.material.io/blog/enhance-your-component-designs-with-parametric-prototyping"
 strategies = ["map_sweet_spots", "fine_tune_parameters", "group_and_tether_parameters", "spec_overlays", "presets_and_json_export", "seeded_randomize"]
 flagship_targets = ["vibrant_time_picker", "scroll_field", "toggle_button", "split_button", "floating_toolbar", "segmented_list_item", "wavy_progress"]
+
+[android_m3_expressive]
+android_targets = ["Android 17 (API 37)", "Android 18 (API 38)"]
+desktop_targets = ["Wayland", "Windows DX12", "macOS Metal", "WebAssembly Core 2.0", "Chromium WebGPU"]
+dynamic_color_engine = "material-colors 0.5 (Spec2025 HCT)"
+liquid_glass_blur_dp = 28
+liquid_glass_specular_rim_px = 1.0
+predictive_back_scale = 0.92
+desktop_window_corner_radius_px = 24
+floating_toolbar_height_px = 56
+dock_height_px = 64
+workspace_rail_width_px = 76
+ytmusic_artwork_seed_enabled = true
+sdk_rust_parity = ["google-cloud-rust", "google-workspace-cli", "adk-rust", "a2a-rs", "gemini-rust", "ytmapi-rs", "rustypipe"]

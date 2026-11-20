@@ -25,7 +25,9 @@ anyhow.workspace = true
 aphrody = { workspace = true, features = ["minimal", "craft", "pilot", "store", "installer", "cosmic"] }
 aphrody_craft.workspace = true
 aphrody_design.workspace = true
+aphrody_google = { workspace = true, features = ["native"] }
 aphrody_installer.workspace = true
+aphrody_media.workspace = true
 aphrody_pilot.workspace = true
 aphrody_session.workspace = true
 aphrody_store.workspace = true

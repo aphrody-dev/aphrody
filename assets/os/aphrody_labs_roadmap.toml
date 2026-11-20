@@ -7,33 +7,33 @@ stitch_url = "https://stitch.withgoogle.com/"
 primary_monorepo = "aphrody-dev/aphrody"
 
 [vision]
-thesis = "Local-first GPU-native OS, code engine, and AI workspace where Code is a Design Material"
-tagline = "120 FPS GPUI + WGPU v30 + WebAssembly Core 2.0 AOT + Local-First AI OS"
+thesis = "Pure-Rust Desktop OS, Chromium WebGPU browser, Google Workspace & Cloud AI runtime, and multimedia studio running natively on Wayland, Windows, macOS, and WebAssembly"
+tagline = "120 FPS GPUI + WGPU v30 + Material 3 Expressive (Android 17/18) + Pure-Rust Google Workspace, Cloud AI & Media"
 principles = [
-  "One token graph across Rust GPUI, NSH TSX, egui 0.37, Bevy 0.20, Web, iOS, and Android",
-  "100% Zed ecosystem compatibility with modular zero-bloat crate boundaries",
-  "WebAssembly Core 2.0 & WASI Preview 2 AOT first, native speed without Electron overhead",
-  "$0 Vercel distribution via Cloudflare Workers/R2 + XFS bare-metal fleet (fr1/fr2/prd)",
-  "Accessible AI-native control plane across MCP, ACP, A2A, and AccessKit UI trees",
+  "One Material 3 Expressive (Android 17/18 + Compose M3 1.5.0) token graph across GPUI, NSH TSX, egui 0.37, Bevy 0.20, Wayland, Windows, Wasm, Chromium, iOS, and Android",
+  "100% Zed ecosystem compatibility with modular zero-bloat crate boundaries and zero blocking submodules",
+  "Complete Google Workspace, YouTube/YouTube Music (headless agents + GPUI humans), and official Google Cloud AI (Gemini, Vertex, Imagen, Veo, Lyria, STT/TTS) in pure Rust with Kotlin/Go/Python/TS SDK parity",
+  "WebAssembly Core 2.0 & WASI Preview 2 AOT first, native speed on Wayland, Windows, and Chromium WebGPU without Electron or FFmpeg overhead",
+  "Accessible AI-native control plane across MCP, ACP, A2A 1.0, ADK, A2UI, and AccessKit UI trees",
 ]
 
 [[domains]]
 id = "aphrody"
 org = "aphrody-dev"
 repo = "aphrody-dev/aphrody"
-category = "Core OS, Studio IDE & UI Framework"
-surfaces = ["Desktop", "Web", "iOS", "Android", "Headless MCP"]
+category = "Pure-Rust Desktop OS, Studio IDE & Material 3 Expressive UI"
+surfaces = ["Wayland", "Windows", "macOS", "Wasm/Chromium", "iOS", "Android", "Headless MCP"]
 owner_paths = ["crates/zed", "crates/aphrody_desktop", "crates/aphrody_ui", "crates/gpui"]
-summary = "Unified GPU-native Studio IDE, COSMIC Epoch desktop shell, creative apps, NSH framework, and 22-target packager."
+summary = "Pure-Rust desktop shell (Wayland, Windows, Wasm/Chromium), Material 3 Expressive (Android 17/18) Liquid Glass UI, Studio IDE, Google Workspace apps, YouTube/YouTube Music, Media Studio, and 22-target packager."
 
 [[domains]]
 id = "ai-os"
 org = "aphrody-dev"
 repo = "aphrody-dev/ai-os"
-category = "Multi-Agent Control Plane"
-surfaces = ["Desktop", "Cloudflare Edge", "CLI"]
-owner_paths = ["crates/aphrody_pilot"]
-summary = "Relay, MCP, ACP, A2A, and AccessKit semantic OS pilotage unifying native UI automation and headless Tree-sitter tooling."
+category = "Multi-Agent Control Plane (MCP, A2A 1.0, ADK, Computer Use)"
+surfaces = ["Desktop", "Cloudflare Edge", "CLI", "Headless"]
+owner_paths = ["crates/aphrody_pilot", "crates/aphrody_google"]
+summary = "Relay, MCP, ACP, A2A 1.0, ADK-Rust, Gemini Computer Use, Google Workspace MCP, and AccessKit semantic OS pilotage."
 
 [[domains]]
 id = "ay"
@@ -49,25 +49,25 @@ id = "anu"
 org = "aphrody-dev"
 repo = "aphrody-dev/anu"
 category = "Pure-Rust System Userspace"
-surfaces = ["Linux", "WASI"]
+surfaces = ["Linux/Wayland", "WASI"]
 owner_paths = ["crates/aphrody_session", "crates/aphrody_installer"]
-summary = "Pure-Rust POSIX/GNU coreutils, rubash shell, Btrfs/LUKS2 installer, and Linux userspace."
+summary = "Pure-Rust POSIX/GNU coreutils, shell, Btrfs/LUKS2 installer, and Wayland Linux userspace."
 
 [[domains]]
 id = "bun"
 org = "aphrody-labs"
 repo = "aphrody-labs/bun"
-category = "TypeScript & Systems Runtime"
+category = "TypeScript, NSH & Tooling Runtime"
 surfaces = ["Desktop", "Web", "CLI"]
-owner_paths = ["vendor/bun", "tooling/bun"]
-summary = "High-speed JS/TS/TSX/Zig/Rust runtime with native NGINX, Mullvad VPN, SQLite, Video, and NSH bundler pipelines."
+owner_paths = ["tooling/bun", "crates/aphrody_nsh"]
+summary = "High-speed JS/TS/TSX/Zig/Rust runtime powering NSH TSX hot-reload, A2UI rendering, programmatic video compositions, and fork audits."
 
 [[domains]]
 id = "browser"
 org = "aphrody-labs"
 repo = "aphrody-labs/browser"
 category = "GPUI Chromium & WebGPU Engine"
-surfaces = ["Desktop", "Web"]
+surfaces = ["Wayland", "Windows", "Wasm/Chromium"]
 owner_paths = ["crates/aphrody_browser"]
 summary = "Native Chromium //ui/views shell in GPUI with Servo/Blitz escalation, WebGPU OS host, and per-tab WireGuard routing."
 
@@ -78,83 +78,83 @@ repo = "aphrody-labs/open"
 category = "Browser CDP, TUI & Tunnel"
 surfaces = ["Desktop", "CLI", "Extension"]
 owner_paths = ["crates/aphrody_pilot/src/browser.rs"]
-summary = "Live CDP browser control, OpenTUI terminal UI, encrypted tunnels, and AI model router."
+summary = "Live CDP browser control, OpenTUI terminal UI, encrypted tunnels, and multi-provider AI model router."
 
 [[domains]]
 id = "auto"
 org = "aphrody-dev"
 repo = "aphrody-dev/ay"
-category = "Autonomous Workflows & Productivity"
-surfaces = ["Website", "Desktop", "Mobile"]
-owner_paths = ["tooling/bun/prod-standards-starterpack.ts", ".cloudflare"]
-summary = "Automated CI/CD release orchestration, document/sheet/slide apps, and Cloudflare edge distribution."
+category = "Google Workspace, Cloud AI & Edge Distribution"
+surfaces = ["Desktop", "Web", "Headless CLI", "Cloudflare Edge"]
+owner_paths = ["crates/aphrody_google", "tooling/bun/multimedia-forks-audit.ts", ".cloudflare"]
+summary = "Pure-Rust Google OAuth 2.0/gcloud, Drive/Gmail/Calendar/Docs/Sheets Discovery APIs, official Google Cloud AI (Gemini/Vertex/Imagen/Veo/Lyria/STT/TTS), and Cloudflare edge hosting."
 
 [[domains]]
 id = "nie"
 org = "aphrody-labs"
 repo = "aphrody-labs/nie"
-category = "3D Engine & Gaming Runtime"
-surfaces = ["Desktop", "WebGPU", "Linux"]
-owner_paths = ["crates/bevy_gpui", "crates/aphrody_craft"]
-summary = "Bevy 0.20 + Unreal Engine 5.8 Nanite meshlets, Solari GI, MaterialX -> Naga v30 WGSL shaders, and Steam runtime."
+category = "Pure-Rust Multimedia Studio & 3D WebGPU Engine"
+surfaces = ["Wayland", "Windows", "Wasm/Chromium", "Headless"]
+owner_paths = ["crates/aphrody_media", "crates/bevy_gpui"]
+summary = "Zero-FFmpeg video/audio/RAW/HDR player and studio, programmatic TSX motion, video intelligence FTS5, and Bevy 0.20 + glTF/Gaussian Splatting/WGSL node 3D engine."
 
 [[domains]]
 id = "shenron"
 org = "aphrody-labs"
 repo = "aphrody-labs/shenron"
-category = "Multimodal AI & Voice Surfaces"
-surfaces = ["Desktop", "Mobile", "Web"]
-owner_paths = ["crates/aphrody_ui/src/google_design_components.rs"]
-summary = "Neural Expressive voice/multimodal assistant surfaces, thinking aura indicators, and grounded citation cards."
+category = "YouTube, YouTube Music & Multimodal Voice Surfaces"
+surfaces = ["Wayland", "Windows", "Wasm/Chromium", "Mobile", "Headless"]
+owner_paths = ["crates/aphrody_google", "crates/aphrody_ui/src/google_design_components.rs"]
+summary = "Dual headless agent + GPUI human clients for YouTube & YouTube Music, Gemini Live bidirectional voice/video, dynamic HCT artwork themes, and Neural Expressive surfaces."
 
 [[horizons]]
 id = "H0"
 window = "2026-Q4"
 status = "completed"
-title = "Unified Rust Engine, Upstream Zed Merge & Material 3 Foundation"
+title = "Unified Rust Engine, Upstream Zed Merge & Pinned Fork Packages"
 surfaces = ["Project", "Desktop", "Website"]
 milestones = [
   "Upstream zed-industries/zed merge with zero package-conformity warnings and 0 license gaps",
   "WGPU v30 + Naga v30 + WebAssembly Core 2.0 / WASI Preview 2 AOT pipeline",
-  "Storytold 82-repo unification (craft-libs, craft-anything, egui_gpui, bevy_gpui UE5.8)",
-  "Pure-Rust https://design.google/ mirror (crates/aphrody_design) and 22-target aphrody_store",
+  "11 Cargo forks merged with upstream + Cloudflare Kitesurf patches and published to GHCR & GitHub Releases (0 blocking submodules)",
+  "Pure-Rust https://design.google/ mirror (crates/aphrody_design), material-colors 0.5 Liquid Glass, and 22-target aphrody_store",
 ]
 exit_kpis = [
-  "100% WCAG 2.2 AA contrast >= 4.5:1 across Material Light & Dark",
-  "Lighthouse 100/100/100/100 on all 5 standalone Wasm/WebGPU starter templates",
+  "100% WCAG 2.2 AA contrast >= 4.5:1 across Material Light, Dark, Neural Obsidian & OLED Pitch",
+  "Zero blocking local submodules and green native + wasm32-unknown-unknown + wasm32-wasip2 builds",
 ]
 
 [[horizons]]
 id = "H1"
 window = "2027-Q1"
 status = "active"
-title = "Figma DTCG v3, Google Stitch Studio GA, 4-Mode Themes & Edge Portal"
-surfaces = ["Project", "Website", "Desktop"]
+title = "Pure-Rust Desktop OS, Google Workspace/Cloud AI, YouTube & Multimedia Studio"
+surfaces = ["Wayland", "Windows", "Wasm/Chromium", "Headless"]
 milestones = [
-  "4-mode token system (Neural Obsidian, Material Dark, Material Light, OLED Pitch)",
-  "Bundled Google Sans Code + JetBrains Mono + 6-axis Google Sans Flex variable typography",
-  "W3C DTCG v3 Figma Variables + Code Connect JSON & 12-screen Google Stitch maquette collection",
-  "Fumadocs v16 + Twoslash + llms.txt portal and upgraded Cloudflare R2 download portal",
+  "Material 3 Expressive (Android 17/18 + Compose M3 1.5.0) 4-mode token system, 6-axis Google Sans Flex, Liquid Glass & 12 refactored maquettes",
+  "crates/aphrody_google: OAuth 2.0 PKCE + Device Flow + gcloud/ADC, complete Google Cloud AI (Gemini/Vertex/Imagen/Veo/Lyria/STT/TTS/Vision), Workspace Discovery APIs, and dual YouTube/YouTube Music (headless agents + GPUI humans)",
+  "crates/aphrody_media + bevy_gpui: zero-FFmpeg player & studio (video/audio/RAW/HDR/scopes/HLS+DASH ingest/watch FTS5/TSX programmatic motion/3D Gaussian Splatting)",
+  "45 auto-merged reference forks across Rust, Go, TypeScript, Python, and Kotlin Google & media ecosystems synced via CI",
 ]
 exit_kpis = [
-  "20 Figma Auto-Layout component sets synced with Rust/NSH/Web Code Connect",
-  "12 HTML5/CSS maquettes verified headless via CDP at Desktop (1440px) & Mobile (390px)",
+  "Headless CLI + MCP tools operational for Google Auth/AI, Workspace, YouTube, YouTube Music, and Media Watch",
+  "12 HTML5/CSS maquettes & GPUI desktop apps verified headless via CDP & WGPU across Wayland/Windows/Wasm",
 ]
 
 [[horizons]]
 id = "H2"
 window = "2027-Q2"
 status = "planned"
-title = "Aphrody Mobile Companion GA (iOS Metal & Android Vulkan / NSH)"
-surfaces = ["Mobile", "Project", "Website"]
+title = "Aphrody Mobile Companion GA (Android 17/18 Vulkan & iOS Metal)"
+surfaces = ["Mobile", "Desktop", "Web"]
 milestones = [
+  "Android 17/18 Vulkan/JNI .aar with Material 3 Expressive adaptive navigation, predictive back, and edge-to-edge system bars",
   "iOS gpui_ios Metal + NativeShell.xcframework release pipeline and TestFlight / App Store target",
-  "Android nsh-platform-android Vulkan/JNI .aar release pipeline and Play Store / APK target",
-  "Mobile Companion App: remote fr1 build monitor, Tree-sitter diff review, Agent omnibar, WireGuard toggle",
-  "Ed25519 NshTrust OTA signed bundle signing & rollout across mobile clients",
+  "Mobile Companion App: YouTube Music gapless player, Google Workspace quick actions, remote fr1 build monitor, Tree-sitter diff review, WireGuard toggle",
+  "Ed25519 NshTrust OTA signed bundle rollout across mobile and WebAssembly clients",
 ]
 exit_kpis = [
-  "44x44pt minimum touch targets and Compact (<600px) / Medium (600..839px) M3 adaptive breakpoints",
+  "44x44pt minimum touch targets and Compact (<600px) / Medium (600..839px) / Expanded (>=840px) M3 adaptive breakpoints",
   "120Hz ProMotion & LTPO OLED Pitch power profile under <2% idle frame budget",
 ]
 
@@ -162,15 +162,15 @@ exit_kpis = [
 id = "H3"
 window = "2027-Q3..Q4"
 status = "planned"
-title = "Aphrody AI OS 1.0 & Collaborative 3D/Spatial Studio"
-surfaces = ["Project", "Desktop", "Mobile", "Website"]
+title = "Aphrody Pure-Rust Desktop OS 1.0 (Wayland, Windows, Wasm & Chromium)"
+surfaces = ["Wayland", "Windows", "Wasm/Chromium", "Mobile"]
 milestones = [
-  "Bootable Linux ISO via aphrody_installer (Btrfs/LUKS2 + COSMIC Epoch DE switcher)",
-  "Hardware-accelerated Wayland Smithay compositor + multi-monitor Pop-Shell stacking",
-  "Local NPU/GPU voice & vision pilotage integrated with aphrody_pilot AccessKit trees",
-  "Real-time collaborative Unreal/Bevy 5.8 + vector canvas multiplayer via CRDT sync",
+  "Bootable Linux ISO via aphrody_installer (Btrfs/LUKS2 + hardware-accelerated Wayland compositor + Pop-Shell stacking)",
+  "First-class Windows DX12/DirectComposition + Chromium WebGPU parity running identical GPUI desktop workspaces",
+  "Local NPU/GPU + Gemini Live voice & vision pilotage integrated with aphrody_pilot AccessKit, A2A 1.0, and A2UI streaming surfaces",
+  "Real-time collaborative 3D WebGPU (bevy_gpui), NLE video timeline, and vector canvas multiplayer via CRDT sync",
 ]
 exit_kpis = [
-  "End-to-end 120 FPS desktop compositing across AMD/NVIDIA/Intel/Apple Silicon/WebGPU",
-  "Zero-cloud offline mode for IDE, AI routing, docs (llms.txt), and creative apps",
+  "End-to-end 120 FPS desktop compositing across Wayland, Windows, macOS, and Chromium WebGPU",
+  "Seamless hybrid offline/Google Cloud mode across IDE, Workspace, YouTube/Media, and AI agents",
 ]

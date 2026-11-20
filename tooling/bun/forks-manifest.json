@@ -126,5 +126,457 @@
       "releaseUrl": "https://github.com/aphrody-labs/kitesurf/releases/tag/v2026.11.20-aphrody",
       "tarballUrl": "https://github.com/aphrody-labs/kitesurf/archive/refs/tags/v2026.11.20-aphrody.tar.gz"
     }
+  ],
+  "referenceForks": [
+    {
+      "repo": "aphrody-labs/filmcraft",
+      "name": "filmcraft",
+      "upstream": "storytold/filmcraft",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media",
+      "sha": "0afb2cf22f19d722686ca39145b4239c29b8beee",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/photocraft",
+      "name": "photocraft",
+      "upstream": "storytold/photocraft",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::photo_dev",
+      "sha": "abad0deaea6c1223ea7daa4109112b3711f10f4a",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/lightcraft",
+      "name": "lightcraft",
+      "upstream": "storytold/lightcraft",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::photo_dev",
+      "sha": "368855cd1ec386da72c542932229997c3a1519f3",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/effectcraft",
+      "name": "effectcraft",
+      "upstream": "storytold/effectcraft",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::motion",
+      "sha": "5a0dde4e62f62c872cb4d0c0c5e5f455a754ed65",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/soundcraft",
+      "name": "soundcraft",
+      "upstream": "storytold/soundcraft",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::audio_out",
+      "sha": "b13c84da07371e64fb1b8f5f574af77beca3240f",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/yt-dlp",
+      "name": "yt-dlp",
+      "upstream": "yt-dlp/yt-dlp",
+      "branch": "master",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::ingest",
+      "sha": "4adbf698d9a7d79d67a7d11669d04efde3722951",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/hyperframes",
+      "name": "hyperframes",
+      "upstream": "heygen-com/hyperframes",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::motion",
+      "sha": "468ab907ee9836e076abdd7d0e0611c475dc1271",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/remotion",
+      "name": "remotion",
+      "upstream": "remotion-dev/remotion",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_nsh",
+      "sha": "5e61f9ac09f46f140b65622f6b5c21c37b9533e0",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/watch-skill",
+      "name": "watch-skill",
+      "upstream": "oxbshw/watch-skill",
+      "branch": "main",
+      "domain": "media",
+      "migrationTarget": "crates/aphrody_media::watch",
+      "sha": "f1317c8fe64744a606c31867b05fbbe3144268c6",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/three.js",
+      "name": "three.js",
+      "upstream": "mrdoob/three.js",
+      "branch": "dev",
+      "domain": "media",
+      "migrationTarget": "crates/bevy_gpui",
+      "sha": "10004949bd2b03b2f5fecf4d34ceb47f598c1f20",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/google-workspace-cli",
+      "name": "google-workspace-cli",
+      "upstream": "googleworkspace/cli",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_google::workspace",
+      "sha": "cd3697e07eb520056dcf142d0c7439bbb9ba32e9",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/google-cloud-rust",
+      "name": "google-cloud-rust",
+      "upstream": "googleapis/google-cloud-rust",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_google",
+      "sha": "e8ade96c0fe3fcc84510177181d484359f3016bc",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/adk-rust",
+      "name": "adk-rust",
+      "upstream": "zavora-ai/adk-rust",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "65c15c06492d72beb3d8bd968b326e335831e757",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/gemini-rust",
+      "name": "gemini-rust",
+      "upstream": "flachesis/gemini-rust",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "6ac5aa4a550ec7420636cc2d146b50028a21dd48",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/a2a-rs",
+      "name": "a2a-rs",
+      "upstream": "EmilLindfors/a2a-rs",
+      "branch": "master",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "30a43800cd6fd6190e616b38c29cee1682c0245c",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/google-apis-rs",
+      "name": "google-apis-rs",
+      "upstream": "Byron/google-apis-rs",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_google::youtube_data",
+      "sha": "78b8ced0f9dd66a7673f45de74d5768f1bfc67c2",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/youtui",
+      "name": "youtui",
+      "upstream": "nick42d/youtui",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_google::ytmusic",
+      "sha": "c489567ef2d1a49a005018d1f9974d81165bb6d8",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/omniget",
+      "name": "omniget",
+      "upstream": "tonhowtf/omniget",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_media::ingest",
+      "sha": "dfdfd44327f9bb94a51445f373b384513be1938c",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/libreget",
+      "name": "libreget",
+      "upstream": "OpenSelena/libreget",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_media::ingest",
+      "sha": "ac92a9f8105bf50b3b811fba9fa2ee83454043c2",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/sonora",
+      "name": "sonora",
+      "upstream": "sonorahq/sonora",
+      "branch": "main",
+      "domain": "google-rust",
+      "migrationTarget": "crates/aphrody_desktop",
+      "sha": "1043df66123e582a8b9d036693e75057fe83c952",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/go-genai",
+      "name": "go-genai",
+      "upstream": "googleapis/go-genai",
+      "branch": "main",
+      "domain": "google-go",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "3454baa68563b7ca1e4ada9e84d379d972fd3899",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/adk-go",
+      "name": "adk-go",
+      "upstream": "google/adk-go",
+      "branch": "main",
+      "domain": "google-go",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "ae3b8c4e2dbf0441e0e7f80556460b570d71caff",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/mcp-toolbox",
+      "name": "mcp-toolbox",
+      "upstream": "googleapis/mcp-toolbox",
+      "branch": "main",
+      "domain": "google-go",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "a5dc5d4bb03ad2c724f9d6b2a2452307a593a29f",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/gogcli",
+      "name": "gogcli",
+      "upstream": "openclaw/gogcli",
+      "branch": "main",
+      "domain": "google-go",
+      "migrationTarget": "crates/aphrody_google::workspace",
+      "sha": "351e62175513a89e53e4d14084dcbd6cc605437c",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/rclone",
+      "name": "rclone",
+      "upstream": "rclone/rclone",
+      "branch": "master",
+      "domain": "google-go",
+      "migrationTarget": "crates/aphrody_google::workspace",
+      "sha": "ca22e4e5507739a799df599012b62c0cf75cd5f6",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/youtube",
+      "name": "youtube",
+      "upstream": "kkdai/youtube",
+      "branch": "master",
+      "domain": "google-go",
+      "migrationTarget": "crates/aphrody_google::innertube",
+      "sha": "d3292dc6531049059bd0e907803654f105ae7227",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/gemini-cli",
+      "name": "gemini-cli",
+      "upstream": "google-gemini/gemini-cli",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_google::auth",
+      "sha": "d4cb1713fd7fc30f1c03f9ca7cbfed341c97dffd",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/js-genai",
+      "name": "js-genai",
+      "upstream": "googleapis/js-genai",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "f5834e097ec19dfa49501b6be91e3af6dd2532c5",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/adk-js",
+      "name": "adk-js",
+      "upstream": "google/adk-js",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_nsh",
+      "sha": "281670ea771ee4e9a63441039bda4e676b7c3128",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/a2ui",
+      "name": "a2ui",
+      "upstream": "a2ui-project/a2ui",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_nsh",
+      "sha": "496df0e76e2ad9aba4cc2a12abe066f43d4f171d",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/genkit",
+      "name": "genkit",
+      "upstream": "genkit-ai/genkit",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "9a7d0b65f8bddeafbbc16678b75a4e36fde42305",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/live-api-web-console",
+      "name": "live-api-web-console",
+      "upstream": "google-gemini/live-api-web-console",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "0a4542fe0e39d07956ea7af5de45d7c81fde8960",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/stitch-sdk",
+      "name": "stitch-sdk",
+      "upstream": "google-labs-code/stitch-sdk",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_design",
+      "sha": "f6aa86cde10c3f490acf09a63cc044582a50821d",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/YouTube.js",
+      "name": "YouTube.js",
+      "upstream": "LuanRT/YouTube.js",
+      "branch": "main",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_google::innertube",
+      "sha": "77703faa19e0214735be8db905e262c9e4a43a63",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/pear-desktop",
+      "name": "pear-desktop",
+      "upstream": "pear-devs/pear-desktop",
+      "branch": "master",
+      "domain": "google-ts",
+      "migrationTarget": "crates/aphrody_desktop",
+      "sha": "dbddad1e7fb1c6e307838d3378debbbbab8c504d",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/python-genai",
+      "name": "python-genai",
+      "upstream": "googleapis/python-genai",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "88864800f987115f5328c948e3bf52fc1938f7ce",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/adk-python",
+      "name": "adk-python",
+      "upstream": "google/adk-python",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "c81876a49911745248f2b774c02770ed211ff460",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/A2A",
+      "name": "A2A",
+      "upstream": "a2aproject/A2A",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "6cda26da3a4cdc15bbd5304e01671db9cf672f80",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/gemini-skills",
+      "name": "gemini-skills",
+      "upstream": "google-gemini/gemini-skills",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": ".agents/plugins/aphrody",
+      "sha": "c4d0c62c1240e08a90546186bf320600ab6a039a",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/computer-use-preview",
+      "name": "computer-use-preview",
+      "upstream": "google-gemini/computer-use-preview",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "77c9797e943aad63bbc963b7fd092a9e51c07863",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/ytmusicapi",
+      "name": "ytmusicapi",
+      "upstream": "sigma67/ytmusicapi",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": "crates/aphrody_google::ytmusic",
+      "sha": "86fcd17ee3ff0d19bc807558d4e1a637df395143",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/google_workspace_mcp",
+      "name": "google_workspace_mcp",
+      "upstream": "taylorwilsdon/google_workspace_mcp",
+      "branch": "main",
+      "domain": "google-python",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "21ad3daa6562ee09c6f39ab6a8b0e9150c449c69",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/java-genai",
+      "name": "java-genai",
+      "upstream": "googleapis/java-genai",
+      "branch": "main",
+      "domain": "google-kotlin",
+      "migrationTarget": "crates/aphrody_google::ai",
+      "sha": "cd173282e8cd4f18253bfafdad56a2c73e324602",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/adk-java",
+      "name": "adk-java",
+      "upstream": "google/adk-java",
+      "branch": "main",
+      "domain": "google-kotlin",
+      "migrationTarget": "crates/aphrody_pilot",
+      "sha": "86296cb02d10fd5be6d5256592018345e047ee50",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    },
+    {
+      "repo": "aphrody-labs/material-components-android",
+      "name": "material-components-android",
+      "upstream": "material-components/material-components-android",
+      "branch": "master",
+      "domain": "google-kotlin",
+      "migrationTarget": "crates/aphrody_ui",
+      "sha": "6061a69915d04f11230dbf6f417bc27d9c3056ad",
+      "syncedAt": "2026-11-20T12:07:06.336Z"
+    }
   ]
 }

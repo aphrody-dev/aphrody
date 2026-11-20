@@ -9,6 +9,7 @@ use ui::{Label, LabelCommon as _, LabelSize, v_flex};
 pub mod cosmic_settings;
 pub mod design_gallery;
 pub mod edit;
+pub mod google_hub;
 pub mod installer;
 pub mod store;
 pub mod term;

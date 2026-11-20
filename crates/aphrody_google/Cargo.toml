@@ -1,0 +1,32 @@
+[package]
+name = "aphrody_google"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "Apache-2.0 OR GPL-3.0-or-later"
+description = "Pure-Rust Google Cloud, OAuth 2.0/gcloud, Vertex AI & Gemini multimodal, Google Workspace Discovery, and dual YouTube / YouTube Music (InnerTube + Data API v3) engine."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_google.rs"
+doctest = false
+
+[features]
+default = ["native"]
+native = ["dep:ureq", "dep:oauth_callback_server"]
+wasm = []
+
+[dependencies]
+anyhow.workspace = true
+base64.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+sha2.workspace = true
+url.workspace = true
+web-time.workspace = true
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+oauth_callback_server = { workspace = true, optional = true }
+ureq = { workspace = true, optional = true }

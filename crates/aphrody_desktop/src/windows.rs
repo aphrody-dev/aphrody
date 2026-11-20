@@ -22,6 +22,9 @@ pub enum WindowKind {
     Studio,
     Browser,
     Vpn,
+    GoogleWorkspace,
+    YouTube,
+    YouTubeMusic,
     Files,
     Settings,
     Monitor,
@@ -33,10 +36,13 @@ pub enum WindowKind {
 }
 
 impl WindowKind {
-    pub const ALL: [Self; 11] = [
+    pub const ALL: [Self; 14] = [
         Self::Studio,
         Self::Browser,
         Self::Vpn,
+        Self::GoogleWorkspace,
+        Self::YouTube,
+        Self::YouTubeMusic,
         Self::Files,
         Self::Settings,
         Self::Monitor,
@@ -50,9 +56,12 @@ impl WindowKind {
     #[must_use]
     pub const fn app_id(self) -> &'static str {
         match self {
-            Self::Studio => "artcraft-studio",
+            Self::Studio => "aphrody-studio",
             Self::Browser => "aphrody-browser",
             Self::Vpn => "aphrody-vpn",
+            Self::GoogleWorkspace => "google-workspace",
+            Self::YouTube => "aphrody-youtube",
+            Self::YouTubeMusic => "aphrody-youtube-music",
             Self::Files => "cosmic-files",
             Self::Settings => "cosmic-settings",
             Self::Monitor => "system-monitor",
@@ -70,12 +79,15 @@ impl WindowKind {
             Self::Studio => "Studio",
             Self::Browser => "Aphrody Browser",
             Self::Vpn => "WireGuard VPN",
-            Self::Files => "COSMIC Files",
-            Self::Settings => "COSMIC Settings",
+            Self::GoogleWorkspace => "Google Workspace & Cloud AI",
+            Self::YouTube => "YouTube & Media Player",
+            Self::YouTubeMusic => "YouTube Music",
+            Self::Files => "Files",
+            Self::Settings => "Settings",
             Self::Monitor => "System Monitor",
-            Self::Term => "COSMIC Terminal",
-            Self::Edit => "COSMIC Edit",
-            Self::Store => "COSMIC Store",
+            Self::Term => "Terminal",
+            Self::Edit => "Editor",
+            Self::Store => "Store",
             Self::Installer => "OS Installer & DE Switcher",
             Self::Design => "Design & Hub",
         }
@@ -87,6 +99,9 @@ impl WindowKind {
             Self::Studio => IconName::Image,
             Self::Browser => IconName::ToolWeb,
             Self::Vpn => IconName::VpnShield,
+            Self::GoogleWorkspace => IconName::Sparkle,
+            Self::YouTube => IconName::PlayFilled,
+            Self::YouTubeMusic => IconName::AudioOn,
             Self::Files => IconName::FolderOpen,
             Self::Settings => IconName::Settings,
             Self::Monitor => IconName::Server,

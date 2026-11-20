@@ -384,7 +384,7 @@
     },
     "stitch": {
       "path": "./kits/stitch-design-kit.json",
-      "sha256": "fd47ffb6f2411fa52804b3fe21db5798a5973c58b301e91c9e348ccac1406c44",
+      "sha256": "0ddb62d247f7f390c5a5c3add82dd05ae7eb49d9fcd21f624b08b0184cdfc3e6",
       "screenCount": 4,
       "preserveDataStitchId": true
     }
@@ -397,9 +397,9 @@
       "stitchId": "stitch-labs-architecture",
       "surface": "labs",
       "deviceType": "DESKTOP",
-      "title": "Aphrody Labs 10-Domain Ecosystem Architecture",
+      "title": "Aphrody Pure-Rust Desktop OS & Google Cloud Ecosystem Architecture",
       "defaultTheme": "neural",
-      "bytes": 6574
+      "bytes": 6987
     },
     {
       "id": "02-labs-roadmap-2026-2027",
@@ -410,7 +410,7 @@
       "deviceType": "DESKTOP",
       "title": "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)",
       "defaultTheme": "neural",
-      "bytes": 5232
+      "bytes": 5457
     },
     {
       "id": "03-web-landing-hero",
@@ -463,9 +463,9 @@
       "stitchId": "stitch-desktop-cosmic-os",
       "surface": "desktop",
       "deviceType": "DESKTOP",
-      "title": "Desktop: aphrody-os COSMIC Compositor & Dual Craft Studio",
+      "title": "Desktop: Aphrody Pure-Rust OS (Wayland, Windows, Wasm & Chromium)",
       "defaultTheme": "neural",
-      "bytes": 4950
+      "bytes": 5130
     },
     {
       "id": "08-desktop-agy-neural-session",
@@ -474,9 +474,9 @@
       "stitchId": "stitch-desktop-neural-agy",
       "surface": "desktop",
       "deviceType": "DESKTOP",
-      "title": "Desktop: Neural Expressive Home & Grounding Stack",
+      "title": "Desktop: Neural Expressive Home, Headless Agents & Grounding Stack",
       "defaultTheme": "neural",
-      "bytes": 5366
+      "bytes": 5497
     },
     {
       "id": "09-desktop-browser-vpn-shield",
@@ -487,7 +487,7 @@
       "deviceType": "DESKTOP",
       "title": "Desktop: Aphrody Browser + Per-Tab Mullvad WireGuard VPN",
       "defaultTheme": "dark",
-      "bytes": 4417
+      "bytes": 4421
     },
     {
       "id": "10-mobile-companion-home",
@@ -496,9 +496,9 @@
       "stitchId": "stitch-mobile-home",
       "surface": "mobile",
       "deviceType": "MOBILE",
-      "title": "Mobile (iOS 390px & Android 412px): Companion Home & Agent",
+      "title": "Mobile (Android 17/18 412px & iOS 390px): Companion Home & YouTube Music",
       "defaultTheme": "neural",
-      "bytes": 4582
+      "bytes": 4663
     },
     {
       "id": "11-mobile-code-diff-review",
@@ -518,9 +518,9 @@
       "stitchId": "stitch-mobile-craft-oled",
       "surface": "mobile",
       "deviceType": "TABLET",
-      "title": "Mobile / Tablet OLED Pitch: Pocket Craft, VPN & Foldable 834px View",
+      "title": "Mobile / Tablet OLED Pitch: Pocket Studio, VPN & Foldable 834px View",
       "defaultTheme": "oled",
-      "bytes": 4008
+      "bytes": 4039
     }
   ],
   "components": [

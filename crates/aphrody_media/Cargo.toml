@@ -1,0 +1,74 @@
+[package]
+name = "aphrody_media"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "Apache-2.0 OR GPL-3.0-or-later"
+description = "Zero-FFmpeg pure-Rust multimedia player, studio, WGSL GPU YUV/HDR/scopes pipeline, HLS/DASH ingest, programmatic video motion engine, and video intelligence index."
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/aphrody_media.rs"
+doctest = false
+
+[features]
+default = ["player", "ingest", "watch", "motion"]
+player = []
+studio = ["player", "motion", "watch"]
+ingest = []
+watch = []
+motion = []
+craft-codecs = [
+    "dep:craft-aaf",
+    "dep:craft-aep",
+    "dep:craft-media",
+    "dep:craft-video",
+    "dep:craft-audio",
+    "dep:craft-audio-dsp",
+    "dep:craft-captions",
+    "dep:craft-time",
+    "dep:craft-timeline",
+    "dep:craft-raw",
+    "dep:craft-image-codecs",
+    "dep:craft-raster-codecs",
+    "dep:craft-color-transform",
+    "dep:craft-cms",
+    "dep:craft-gainmap",
+    "dep:craft-metadata",
+    "dep:craft-print",
+]
+audio-native = ["dep:cpal"]
+wasm = []
+
+[dependencies]
+anyhow.workspace = true
+brand.workspace = true
+bytemuck = { workspace = true, features = ["derive"] }
+naga.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+sha2.workspace = true
+unicode-bidi.workspace = true
+
+craft-aaf = { workspace = true, optional = true }
+craft-aep = { workspace = true, optional = true }
+craft-audio = { workspace = true, optional = true }
+craft-audio-dsp = { workspace = true, optional = true }
+craft-captions = { workspace = true, optional = true }
+craft-cms = { workspace = true, optional = true }
+craft-color-transform = { workspace = true, optional = true }
+craft-gainmap = { workspace = true, optional = true }
+craft-image-codecs = { workspace = true, optional = true }
+craft-media = { workspace = true, optional = true }
+craft-metadata = { workspace = true, optional = true }
+craft-print = { workspace = true, optional = true }
+craft-raster-codecs = { workspace = true, optional = true }
+craft-raw = { workspace = true, optional = true }
+craft-time = { workspace = true, optional = true }
+craft-timeline = { workspace = true, optional = true }
+craft-video = { workspace = true, optional = true }
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+cpal = { workspace = true, optional = true }

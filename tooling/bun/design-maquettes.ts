@@ -132,55 +132,55 @@ export const MAQUETTE_DEFINITIONS: MaquetteDefinition[] = [
     stitchId: "stitch-labs-architecture",
     surface: "labs",
     deviceType: "DESKTOP",
-    title: "Aphrody Labs 10-Domain Ecosystem Architecture",
-    subtitle: "Sovereign Rust OS, Bun Runtime, Browser, Craft Suite, and AI Control Plane",
+    title: "Aphrody Pure-Rust Desktop OS & Google Cloud Ecosystem Architecture",
+    subtitle: "Wayland, Windows, Wasm & Chromium Desktop + Google Workspace, Cloud AI, YouTube & Multimedia in Pure Rust",
     defaultTheme: "neural",
     gpuiSurface: "aphrody_nsh::StudioMode::GoogleDesignMirror",
     nshComponent: "<LabsArchitectureScreen />",
-    keyPatterns: ["10 sovereign domains", "3-tier token pipeline", "Zed 100% compatibility matrix"],
+    keyPatterns: ["10 modular Rust domains", "Material 3 Expressive (Android 17/18)", "Pure-Rust Google SDK parity (Kotlin/Go/Python/TS)"],
     slots: ["stitch-labs-arch-hero", "stitch-labs-domains-grid", "stitch-labs-token-flow"],
     renderBody: () => `
       <section class="mq-hero mq-neural-aura" data-stitch-id="stitch-labs-arch-hero">
-        <div class="mq-pill-eyebrow">Aphrody Labs Architecture &middot; 1,169 Consolidated Repositories</div>
-        <h1 class="mq-display-title">Code Is a Design Material Across One Sovereign Stack</h1>
-        <p class="mq-lead">Unified GPUI 120 FPS compositor, WGPU v30 + Naga shaders, Wasm Core 2.0 / WASI P2 AOT, Bun 1.4.5, and Google Material 3 Neural Expressive design tokens across Desktop, Web, iOS, and Android.</p>
+        <div class="mq-pill-eyebrow">Aphrody Pure-Rust Desktop OS &middot; Wayland &bull; Windows &bull; Wasm &bull; Chromium WebGPU</div>
+        <h1 class="mq-display-title">One Pure-Rust Desktop OS &amp; Google Ecosystem</h1>
+        <p class="mq-lead">Unified GPUI 120 FPS compositor, WGPU v30 + Naga shaders, Wasm Core 2.0 / WASI P2 AOT, Material 3 Expressive (Android 17/18 + Compose M3 1.5.0), full Google Workspace, official Google Cloud AI, YouTube/YouTube Music, and zero-FFmpeg multimedia studio.</p>
         <div class="mq-kpi-row">
           <article class="mq-kpi-card"><span class="mq-kpi-label">Active Domains</span><strong class="mq-kpi-value gd-tabular">10</strong><span class="mq-kpi-meta">aphrody-dev + aphrody-labs</span></article>
-          <article class="mq-kpi-card"><span class="mq-kpi-label">Figma Modes</span><strong class="mq-kpi-value gd-tabular">4</strong><span class="mq-kpi-meta">Neural, Dark, Light, OLED</span></article>
-          <article class="mq-kpi-card"><span class="mq-kpi-label">Lighthouse Target</span><strong class="mq-kpi-value gd-tabular">400/400</strong><span class="mq-kpi-meta">CWV + A11y + SEO</span></article>
-          <article class="mq-kpi-card"><span class="mq-kpi-label">Store Targets</span><strong class="mq-kpi-value gd-tabular">22</strong><span class="mq-kpi-meta">Desktop, Mobile &amp; OCI</span></article>
+          <article class="mq-kpi-card"><span class="mq-kpi-label">M3 Expressive Modes</span><strong class="mq-kpi-value gd-tabular">4</strong><span class="mq-kpi-meta">Neural, Dark, Light, OLED</span></article>
+          <article class="mq-kpi-card"><span class="mq-kpi-label">Auto-Merged Forks</span><strong class="mq-kpi-value gd-tabular">45</strong><span class="mq-kpi-meta">Rust, Go, TS, Python, Kotlin</span></article>
+          <article class="mq-kpi-card"><span class="mq-kpi-label">Store Targets</span><strong class="mq-kpi-value gd-tabular">22</strong><span class="mq-kpi-meta">Wayland, Windows, Wasm, Mobile</span></article>
         </div>
       </section>
       <section class="mq-grid-2" data-stitch-id="stitch-labs-domains-grid">
         <div class="mq-card">
-          <h2>Core Rust &amp; OS Pillars (aphrody-dev)</h2>
+          <h2>Pure-Rust Desktop OS &amp; Control Plane (aphrody-dev)</h2>
           <ul class="mq-list">
-            <li><strong>aphrody</strong> &mdash; Zed-compatible Studio IDE, GPUI, NSH, ArtCraft 17 apps, 22-target Store</li>
-            <li><strong>ai-os</strong> &mdash; MCP, ACP, A2A &amp; AccessKit semantic OS pilot daemon</li>
+            <li><strong>aphrody</strong> &mdash; Pure-Rust Desktop OS (Wayland/Windows/Wasm/Chromium), Studio IDE, GPUI, NSH, 22-target Store</li>
+            <li><strong>ai-os</strong> &mdash; MCP, ACP, A2A 1.0, ADK-Rust, Gemini Computer Use &amp; AccessKit semantic OS pilotage</li>
             <li><strong>ay</strong> &mdash; SSH fleet orchestration &amp; WireGuard mesh (fr1 / fr2 / prd)</li>
-            <li><strong>anu</strong> &mdash; Pure-Rust POSIX coreutils, rubash shell &amp; Btrfs installer</li>
+            <li><strong>anu</strong> &mdash; Pure-Rust POSIX coreutils, shell &amp; Btrfs/LUKS2 Wayland userspace</li>
           </ul>
         </div>
         <div class="mq-card">
-          <h2>Runtime, Web, 3D &amp; AI Pillars (aphrody-labs)</h2>
+          <h2>Google Workspace, Cloud AI, Media &amp; Browser (aphrody-labs)</h2>
           <ul class="mq-list">
-            <li><strong>bun</strong> &mdash; JS/TS/TSX/Zig runtime, NGINX, Mullvad VPN, Video &amp; NSH bundler</li>
-            <li><strong>browser &amp; open</strong> &mdash; Chromium Views GPUI shell, CDP, OpenTUI &amp; WebGPU OS</li>
-            <li><strong>nie</strong> &mdash; Bevy 0.20 + Unreal 5.8 Nanite meshlets, Solari GI &amp; MaterialX</li>
-            <li><strong>auto &amp; shenron</strong> &mdash; Zero-Vercel Cloudflare edge + multimodal voice UI</li>
+            <li><strong>aphrody_google</strong> &mdash; OAuth 2.0/gcloud, Drive/Gmail/Calendar/Docs/Sheets, Gemini/Vertex/Imagen/Veo/Lyria/STT/TTS, YouTube &amp; YouTube Music</li>
+            <li><strong>aphrody_media &amp; bevy_gpui</strong> &mdash; Zero-FFmpeg video/audio/RAW/HDR studio, TSX motion, Watch FTS5 &amp; 3D WebGPU Gaussian Splatting</li>
+            <li><strong>browser &amp; open</strong> &mdash; Chromium Views GPUI shell, CDP, OpenTUI &amp; WebGPU OS host</li>
+            <li><strong>bun &amp; auto</strong> &mdash; NSH TSX + A2UI runtime and Cloudflare edge distribution</li>
           </ul>
         </div>
       </section>
       <section class="mq-card" data-stitch-id="stitch-labs-token-flow">
         <h2>Single Source of Truth Pipeline</h2>
         <div class="mq-flow-strip">
-          <span class="mq-flow-node">product.toml + google_design_tokens.toml</span>
+          <span class="mq-flow-node">product.toml + google_design_tokens.toml (Android 17/18 M3E)</span>
           <span class="mq-flow-arrow" aria-hidden="true">&rarr;</span>
           <span class="mq-flow-node">DESIGN.md + W3C DTCG Figma Variables</span>
           <span class="mq-flow-arrow" aria-hidden="true">&rarr;</span>
-          <span class="mq-flow-node">Google Stitch Screen Synthesis</span>
+          <span class="mq-flow-node">Google Stitch + A2UI Streaming UI</span>
           <span class="mq-flow-arrow" aria-hidden="true">&rarr;</span>
-          <span class="mq-flow-node">GPUI / NSH / Web / iOS / Android</span>
+          <span class="mq-flow-node">Wayland / Windows / Wasm / Chromium / Android / iOS</span>
         </div>
       </section>`,
   },
@@ -191,15 +191,15 @@ export const MAQUETTE_DEFINITIONS: MaquetteDefinition[] = [
     surface: "labs",
     deviceType: "DESKTOP",
     title: "Aphrody Labs Roadmap (2026-Q4 to 2027-Q4)",
-    subtitle: "Four-Horizon Execution Plan Across Project, Website, Desktop & Mobile",
+    subtitle: "Four-Horizon Execution Plan: Pure-Rust Desktop OS, Google Cloud/Workspace, YouTube, Media & Android 17/18 M3E",
     defaultTheme: "neural",
     gpuiSurface: "aphrody_ui::RoadmapHorizonCard",
     nshComponent: "<RoadmapTimelineScreen />",
-    keyPatterns: ["H0-H3 horizon cards", "6 release channel color chips", "Surface readiness matrix"],
+    keyPatterns: ["H0-H3 horizon cards", "6 release channel color chips", "Pure-Rust Google SDK parity"],
     slots: ["stitch-roadmap-horizons", "stitch-roadmap-channels"],
     renderBody: () => `
       <section class="mq-hero" data-stitch-id="stitch-roadmap-channels">
-        <div class="mq-pill-eyebrow">Multi-Horizon Strategy &middot; H0 (Completed) &rarr; H3 (OS 1.0)</div>
+        <div class="mq-pill-eyebrow">Multi-Horizon Strategy &middot; H0 (Completed) &rarr; H3 (Pure-Rust Desktop OS 1.0)</div>
         <h1 class="mq-display-title">2026&ndash;2027 Platform &amp; Product Roadmap</h1>
         <div class="mq-chip-row">
           <span class="mq-chip mq-chip-done">LTS &bull; Sky</span>
@@ -213,23 +213,23 @@ export const MAQUETTE_DEFINITIONS: MaquetteDefinition[] = [
       <section class="mq-grid-4" data-stitch-id="stitch-roadmap-horizons">
         <article class="mq-card">
           <span class="mq-badge mq-badge-ok">H0 &middot; 2026-Q4 &middot; COMPLETED</span>
-          <h2>Unified Engine</h2>
-          <p>Upstream Zed merge, Longbridge NSH v0.5, Storytold 82-repo unification, WGPU v30 + Wasm Core 2.0 AOT, 22-target store.</p>
+          <h2>Unified Engine &amp; Fork Packages</h2>
+          <p>Upstream Zed merge, WGPU v30 + Wasm Core 2.0 AOT, 11 Cargo forks published to GHCR &amp; Releases (0 blocking submodules), material-colors 0.5 Liquid Glass.</p>
         </article>
         <article class="mq-card mq-card-focus">
           <span class="mq-badge mq-badge-primary">H1 &middot; 2027-Q1 &middot; ACTIVE</span>
-          <h2>Design &amp; Edge Portal</h2>
-          <p>4-mode themes, bundled Google Sans Code + JetBrains Mono, Figma DTCG v3 + Code Connect, 12 Stitch maquettes, Fumadocs v16 portal.</p>
+          <h2>Google Workspace, Cloud AI &amp; Media Studio</h2>
+          <p>Material 3 Expressive (Android 17/18), crates/aphrody_google (OAuth/gcloud, Workspace, Vertex/Gemini, YouTube &amp; YouTube Music headless+GPUI), crates/aphrody_media &amp; 3D WebGPU.</p>
         </article>
         <article class="mq-card">
           <span class="mq-badge">H2 &middot; 2027-Q2 &middot; PLANNED</span>
-          <h2>Mobile GA</h2>
-          <p>iOS Metal (gpui_ios + NativeShell.xcframework) &amp; Android Vulkan (.aar), NshTrust OTA bundles, Diff/SSH/Agent Companion, WireGuard tile.</p>
+          <h2>Android 17/18 &amp; iOS Mobile GA</h2>
+          <p>Android 17/18 Vulkan M3 Expressive (.aar) &amp; iOS Metal (.xcframework), gapless YouTube Music, Google Workspace quick actions, NshTrust OTA bundles.</p>
         </article>
         <article class="mq-card">
           <span class="mq-badge">H3 &middot; 2027-Q3..Q4 &middot; PLANNED</span>
-          <h2>Sovereign AI OS 1.0</h2>
-          <p>Bootable Btrfs/LUKS2 Linux ISO, Smithay COSMIC compositor, offline NPU/GPU pilotage, collaborative Bevy UE5.8 + FigCraft multiplayer.</p>
+          <h2>Pure-Rust Desktop OS 1.0</h2>
+          <p>Bootable Btrfs/LUKS2 Wayland Linux ISO, first-class Windows DX12 &amp; Chromium WebGPU desktop parity, Gemini Live + A2A 1.0 + A2UI pilotage, multiplayer 3D &amp; NLE.</p>
         </article>
       </section>`,
   },
@@ -399,36 +399,36 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
     stitchId: "stitch-desktop-cosmic-os",
     surface: "desktop",
     deviceType: "DESKTOP",
-    title: "Desktop: aphrody-os COSMIC Compositor & Dual Craft Studio",
-    subtitle: "TopPanel Applets, Pop-Shell Tiling Stage, Dual GPUI vs egui 0.37 Split & Unreal Bevy 5.8",
+    title: "Desktop: Aphrody Pure-Rust OS (Wayland, Windows, Wasm & Chromium)",
+    subtitle: "Material 3 Expressive (Android 17/18) Liquid Glass Shell, Google Workspace, YouTube/Music & Media Studio",
     defaultTheme: "neural",
     gpuiSurface: "aphrody_desktop::OsDesktopShell",
-    nshComponent: "<CosmicOsDesktopShell />",
-    keyPatterns: ["44px TopPanel", "50/50 GPUI vs egui parity split", "64px floating DockBar"],
+    nshComponent: "<AphrodyOsDesktopShell />",
+    keyPatterns: ["44px Material 3 Expressive TopPanel", "Google Workspace + YouTube/Music + 3D WebGPU stage", "64px Liquid Glass floating DockBar"],
     slots: ["stitch-os-toppanel", "stitch-os-stage", "stitch-os-dock"],
     renderBody: () => `
       <section class="mq-os-panel" data-stitch-id="stitch-os-toppanel">
-        <span>Workspaces: [1 IDE] [2 Studio] [3 Browser]</span>
-        <strong class="gd-tabular">10:42 &middot; GPU 120Hz</strong>
-        <span>WireGuard: FR-PAR-01 &bull; Battery 98%</span>
+        <span>Workspaces: [1 IDE] [2 Workspace] [3 Media &amp; YouTube] [4 Browser]</span>
+        <strong class="gd-tabular">10:42 &middot; Wayland / DX12 / WebGPU 120Hz</strong>
+        <span>gcloud OAuth ON &bull; WireGuard: FR-PAR-01</span>
       </section>
       <section class="mq-grid-2" data-stitch-id="stitch-os-stage">
         <article class="mq-card">
-          <div class="mq-card-header"><h2>FigCraft Google Design (GPUI Native)</h2><span class="mq-badge">0.42ms/frame</span></div>
-          <p>Vector canvas, Figma DTCG Variables inspector, and live NSH signal bindings over shared <code>wgpu v30</code> device.</p>
-          <img src="../svg/parity-split-compare.svg" width="32" height="32" alt="GPUI vs egui parity" />
+          <div class="mq-card-header"><h2>Google Workspace &amp; Cloud AI (Pure Rust)</h2><span class="mq-badge">gcloud / OAuth 2.0</span></div>
+          <p>Drive, Gmail, Calendar, Docs, Sheets via Discovery Service + Gemini/Vertex AI, Imagen, Veo, Lyria, STT v2 &amp; TTS over <code>aphrody_google</code>.</p>
+          <img src="../svg/parity-split-compare.svg" width="32" height="32" alt="Pure-Rust Google Workspace" />
         </article>
         <article class="mq-card">
-          <div class="mq-card-header"><h2>Unreal Engine 5.8 &times; Bevy Solari Viewport</h2><span class="mq-badge">WGPU SM 6.7</span></div>
-          <p>Nanite virtualized meshlets, Solari GI diffuse probes, and MaterialX compiled to WGSL via Naga v30.</p>
-          <img src="../svg/bevy-unreal-solari.svg" width="32" height="32" alt="Bevy Solari Viewport" />
+          <div class="mq-card-header"><h2>YouTube, YouTube Music &amp; Media Studio</h2><span class="mq-badge">WGPU 30 + Zero FFmpeg</span></div>
+          <p>Gapless Opus/AAC playback, dynamic HCT artwork palette, WGSL YUV-&gt;RGB scopes, TSX motion, and <code>bevy_gpui</code> 3D Gaussian Splatting.</p>
+          <img src="../svg/bevy-unreal-solari.svg" width="32" height="32" alt="Media Studio &amp; 3D Viewport" />
         </article>
       </section>
-      <nav class="mq-os-dock" aria-label="COSMIC Application Dock" data-stitch-id="stitch-os-dock">
+      <nav class="mq-os-dock" aria-label="Aphrody Desktop Dock" data-stitch-id="stitch-os-dock">
         <img src="../svg/aphrody-monogram-neural.svg" width="36" height="36" alt="Launcher" />
         <img src="../svg/aphrody-ide-studio.svg" width="32" height="32" alt="Aphrody IDE" />
-        <img src="../svg/figcraft-stitch-frame.svg" width="32" height="32" alt="FigCraft" />
-        <img src="../svg/craft-anything-hex.svg" width="32" height="32" alt="Craft Anything" />
+        <img src="../svg/figcraft-stitch-frame.svg" width="32" height="32" alt="Google Workspace" />
+        <img src="../svg/craft-anything-hex.svg" width="32" height="32" alt="Media Studio" />
         <img src="../svg/aphrody-vpn-shield.svg" width="32" height="32" alt="Mullvad VPN" />
       </nav>`,
   },
@@ -438,40 +438,40 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
     stitchId: "stitch-desktop-neural-agy",
     surface: "desktop",
     deviceType: "DESKTOP",
-    title: "Desktop: Neural Expressive Home & Grounding Stack",
-    subtitle: "260px Sidebar, 'Where should we start?' Hero, Cascading + Menu & 28px Grounding Stack",
+    title: "Desktop: Neural Expressive Home, Headless Agents & Grounding Stack",
+    subtitle: "260px Sidebar, Gemini/Vertex Omnibar, ADK/A2A/MCP Headless Controls & 28px Grounding Stack",
     defaultTheme: "neural",
     gpuiSurface: "aphrody_ui::google_design_components",
     nshComponent: "<NeuralExpressiveSessionScreen />",
-    keyPatterns: ["gemini-home 260px rail", "gemini-opions 20px cascading popover", "win11-chrome157 28px grounding stack"],
+    keyPatterns: ["gemini-home 260px rail", "ADK-Rust + A2A 1.0 + A2UI streaming", "win11-chrome157 28px grounding stack"],
     slots: ["stitch-neural-rail", "stitch-neural-omnibar", "stitch-neural-grounding"],
     renderBody: () => `
       <div class="mq-shell-3col">
         <aside class="mq-sidebar" aria-label="Sessions Sidebar" data-stitch-id="stitch-neural-rail">
           <a class="gd-pill-button mq-btn-primary" href="#new-session">+ New Session</a>
-          <div class="mq-side-item mq-side-active">Aphrody Labs Architecture IA</div>
-          <div class="mq-side-item">Figma &amp; Stitch DTCG Kit</div>
-          <div class="mq-side-item">fr1 Kernel 7.3 Build Fleet</div>
-          <div class="mq-side-item">Mobile Metal / Vulkan Audit</div>
+          <div class="mq-side-item mq-side-active">Google Workspace &amp; Cloud AI</div>
+          <div class="mq-side-item">YouTube &amp; Music Headless Agent</div>
+          <div class="mq-side-item">Media Watch FTS5 &amp; Render</div>
+          <div class="mq-side-item">Android 17/18 M3 Expressive</div>
         </aside>
         <section class="mq-card mq-neural-aura mq-centered" data-stitch-id="stitch-neural-omnibar">
-          <div class="mq-thinking-aura"><img src="../svg/gemini-neural-spark.svg" width="16" height="16" alt="" /> Thinking Deeply &middot; Carbon High</div>
+          <div class="mq-thinking-aura"><img src="../svg/gemini-neural-spark.svg" width="16" height="16" alt="" /> Vertex AI + Gemini Live &middot; gcloud Auth</div>
           <h1 class="mq-display-title">Where should we start?</h1>
           <div class="mq-omnibar-pill">
             <span class="mq-plus-btn" aria-label="Attachment Menu">+</span>
-            <span>Ask Aphrody Agent, inspect a FigCraft frame, or run gpui-wgpu...</span>
+            <span>Query Drive/Gmail, play YouTube Music, analyze video, or run gpui-wgpu...</span>
             <span class="mq-badge">Ctrl+K</span>
           </div>
           <div class="mq-popover-card" aria-label="Cascading Attachment Popover">
             <strong>More Tools &amp; Uploads (20px Radius)</strong>
-            <span>Upload files &bull; Import code &bull; Notebooks &bull; Stitch Canvas</span>
+            <span>Google Workspace &bull; YouTube Watch &bull; Imagen / Veo &bull; Stitch Canvas</span>
           </div>
         </section>
         <aside class="mq-grounding-stack" aria-label="Grounded Sources" data-stitch-id="stitch-neural-grounding">
           <h2>Grounded Context (28px Stack)</h2>
-          <article class="mq-ground-item"><span class="mq-badge">design.google</span><h3>Code is a Design Material</h3><p>Semantic 3-tier tokens shared across runtime code &amp; Figma.</p></article>
-          <article class="mq-ground-item"><span class="mq-badge">fonts.google</span><h3>Google Sans Flex (6 Axes)</h3><p>opsz, wght, wdth, GRAD, slnt, ROND across display &amp; controls.</p></article>
-          <article class="mq-ground-item"><span class="mq-badge">stitch.withgoogle.com</span><h3>Stitch data-stitch-id Preservation</h3><p>Zero-drift DOM/GPUI slot binding for automated regeneration.</p></article>
+          <article class="mq-ground-item"><span class="mq-badge">design.google</span><h3>Material 3 Expressive (Android 17/18)</h3><p>Semantic 3-tier tokens shared across Wayland, Windows, Wasm, Chromium &amp; Mobile.</p></article>
+          <article class="mq-ground-item"><span class="mq-badge">cloud.google</span><h3>Official Google Cloud in Pure Rust</h3><p>Kotlin, Go, Python &amp; TS SDK parity via google-cloud-rust, ADK, A2A 1.0 &amp; MCP.</p></article>
+          <article class="mq-ground-item"><span class="mq-badge">stitch.withgoogle.com</span><h3>Stitch + A2UI Slot Binding</h3><p>Zero-drift DOM/GPUI slot binding for deterministic regeneration.</p></article>
         </aside>
       </div>`,
   },
@@ -482,7 +482,7 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
     surface: "desktop",
     deviceType: "DESKTOP",
     title: "Desktop: Aphrody Browser + Per-Tab Mullvad WireGuard VPN",
-    subtitle: "Chromium //ui/views in GPUI, Escalation Engine & Sovereign Per-Tab Tunnel Routing",
+    subtitle: "Chromium //ui/views in GPUI, WebGPU Wasm Host & Per-Tab Tunnel Routing",
     defaultTheme: "dark",
     gpuiSurface: "aphrody_browser::ChromiumBrowserView + aphrody_vpn",
     nshComponent: "<BrowserVpnShell />",
@@ -492,7 +492,7 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
       <section class="mq-card" data-stitch-id="stitch-browser-tabs">
         <div class="mq-tab-strip">
           <span class="mq-tab mq-tab-active">design.google [FR-PAR WireGuard]</span>
-          <span class="mq-tab">stitch.withgoogle.com [CH-ZRH]</span>
+          <span class="mq-tab">music.youtube.com [GPUI Native]</span>
           <span class="mq-tab">fr1-xfs.internal [WG LAN Direct]</span>
         </div>
         <div class="mq-omnibar-pill" data-stitch-id="stitch-browser-vpn-bar">
@@ -503,7 +503,7 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
       </section>
       <section class="mq-grid-2" data-stitch-id="stitch-browser-viewport">
         <article class="mq-card"><h2>Mullvad Tunnel Split Routing</h2><p>Per-tab isolation routes workstation LAN builds to <code>fr1/fr2</code> directly while pinning external research tabs through encrypted WireGuard hops.</p></article>
-        <article class="mq-card"><h2>MCP Browser Relay (agent-browser)</h2><p>Deterministic AccessKit + ARIA tree inspection, DOM WebGPU checks, and headless PNG verification built directly into <code>aphrody_pilot</code>.</p></article>
+        <article class="mq-card"><h2>MCP Browser Relay &amp; Computer Use</h2><p>Deterministic AccessKit + ARIA tree inspection, DOM WebGPU checks, and headless PNG verification built directly into <code>aphrody_pilot</code>.</p></article>
       </section>`,
   },
   {
@@ -512,33 +512,33 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
     stitchId: "stitch-mobile-home",
     surface: "mobile",
     deviceType: "MOBILE",
-    title: "Mobile (iOS 390px & Android 412px): Companion Home & Agent",
-    subtitle: "Safe-Area Telemetry, Compact Breakpoint Cards, Thumb-Zone Omnibar & 64px Bottom Nav",
+    title: "Mobile (Android 17/18 412px & iOS 390px): Companion Home & YouTube Music",
+    subtitle: "Material 3 Expressive Safe-Area Telemetry, Compact Cards, Predictive Back & 64px Bottom Nav",
     defaultTheme: "neural",
-    gpuiSurface: "gpui_ios + nsh-platform-android (examples/nsh/mobile-companion)",
+    gpuiSurface: "nsh-platform-android + gpui_ios (examples/nsh/mobile-companion)",
     nshComponent: "<MobileCompanionApp />",
-    keyPatterns: ["390x844 iPhone + 412x915 Android frames", "44x44pt minimum touch targets", "64px pill BottomNavBar"],
+    keyPatterns: ["Android 17/18 M3 Expressive + iOS frames", "44x44pt minimum touch targets", "64px pill BottomNavBar"],
     slots: ["stitch-mobile-status", "stitch-mobile-cards", "stitch-mobile-bottom-nav"],
     renderBody: () => `
       <div class="mq-device-showcase">
-        <section class="mq-phone-frame" aria-label="iOS 390px Companion Maquette" data-stitch-id="stitch-mobile-status">
-          <div class="mq-phone-notch">9:41 &middot; iOS Metal 120Hz</div>
+        <section class="mq-phone-frame" aria-label="Android 17/18 Companion Maquette" data-stitch-id="stitch-mobile-status">
+          <div class="mq-phone-notch">9:41 &middot; Android 17/18 Vulkan 120Hz</div>
           <div class="mq-phone-content" data-stitch-id="stitch-mobile-cards">
             <div class="mq-card">
-              <div class="mq-card-header"><strong>Aphrody Companion</strong><span class="mq-badge">WG Connected</span></div>
-              <p>fr1 XFS Build: <code>cargo check -p aphrody_nsh</code> green in 4.2s</p>
+              <div class="mq-card-header"><strong>Aphrody Companion</strong><span class="mq-badge">gcloud + WG ON</span></div>
+              <p>fr1 XFS Build: <code>cargo check -p aphrody_google</code> green</p>
             </div>
             <div class="mq-card">
-              <strong>Pending Agent Hunks (2)</strong>
-              <p>Tap to review Tree-sitter Rust &amp; WGSL diff on go.</p>
+              <strong>YouTube Music &middot; Gapless Opus</strong>
+              <p>Dynamic Material 3 Expressive HCT palette active with synced lyrics.</p>
             </div>
-            <div class="mq-omnibar-pill"><span>+</span><span>Ask mobile agent or dispatch fr1 job...</span></div>
+            <div class="mq-omnibar-pill"><span>+</span><span>Ask Gemini Live, search Drive, or dispatch fr1 job...</span></div>
           </div>
           <nav class="mq-bottom-nav" aria-label="Mobile Navigation" data-stitch-id="stitch-mobile-bottom-nav">
             <a class="mq-bottom-tab mq-bottom-active" href="./10-mobile-companion-home.html">Agent</a>
             <a class="mq-bottom-tab" href="./11-mobile-code-diff-review.html">Diffs</a>
-            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Fleet</a>
-            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Craft</a>
+            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Media</a>
+            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Cloud</a>
           </nav>
         </section>
       </div>`,
@@ -572,8 +572,8 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
           <nav class="mq-bottom-nav" aria-label="Mobile Navigation">
             <a class="mq-bottom-tab" href="./10-mobile-companion-home.html">Agent</a>
             <a class="mq-bottom-tab mq-bottom-active" href="./11-mobile-code-diff-review.html">Diffs</a>
-            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Fleet</a>
-            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Craft</a>
+            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Media</a>
+            <a class="mq-bottom-tab" href="./12-mobile-pocket-craft-vpn.html">Cloud</a>
           </nav>
         </section>
       </div>`,
@@ -584,23 +584,23 @@ gh attestation verify Aphrody-Setup-x64.exe --owner aphrody-dev</code></pre>
     stitchId: "stitch-mobile-craft-oled",
     surface: "mobile",
     deviceType: "TABLET",
-    title: "Mobile / Tablet OLED Pitch: Pocket Craft, VPN & Foldable 834px View",
-    subtitle: "True-Black OLED Mode, Ed25519 NshTrust OTA Packages & WireGuard Quick-Tile",
+    title: "Mobile / Tablet OLED Pitch: Pocket Studio, VPN & Foldable 834px View",
+    subtitle: "True-Black Android 17/18 OLED Mode, Ed25519 NshTrust OTA & WireGuard Quick-Tile",
     defaultTheme: "oled",
-    gpuiSurface: "nsh-platform-ios + nsh-platform-android OLED",
-    nshComponent: "<MobilePocketCraftScreen />",
+    gpuiSurface: "nsh-platform-android + nsh-platform-ios OLED",
+    nshComponent: "<MobilePocketStudioScreen />",
     keyPatterns: ["#000000 OLED battery saver", "Medium 600-839px foldable 2-pane", "Ed25519 NshTrust OTA badge"],
     slots: ["stitch-mobile-oled-vpn", "stitch-mobile-oled-ota"],
     renderBody: () => `
       <section class="mq-grid-2" data-stitch-id="stitch-mobile-oled-vpn">
         <article class="mq-card">
-          <div class="mq-card-header"><h1>Aphrody VPN Quick-Tile (OLED)</h1><span class="mq-badge">0% Gray Bleed</span></div>
-          <p>Uses true <code>#000000</code> surface planes with <code>#8FD0FF</code> active controls and 44x44pt touch hit targets.</p>
+          <div class="mq-card-header"><h1>Aphrody VPN &amp; Cloud Quick-Tile (OLED)</h1><span class="mq-badge">0% Gray Bleed</span></div>
+          <p>Uses true <code>#000000</code> surface planes with <code>#8FD0FF</code> active controls and 44x44pt Material 3 Expressive hit targets.</p>
           <img src="../svg/aphrody-mobile-adaptive-fg.svg" width="52" height="52" alt="Adaptive App Icon" />
         </article>
         <article class="mq-card" data-stitch-id="stitch-mobile-oled-ota">
           <h2>Ed25519 NshTrust Signed OTA Bundles</h2>
-          <p>Every mobile JS/Wasm bundle verifies Ed25519 signatures off the UI thread before hot-swapping screens in <code>NshAppView</code> / <code>NshView</code>.</p>
+          <p>Every mobile and Wasm bundle verifies Ed25519 signatures off the UI thread before hot-swapping screens in <code>NshAppView</code> / <code>NshView</code>.</p>
         </article>
       </section>`,
   },

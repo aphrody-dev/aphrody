@@ -109,6 +109,7 @@ pub struct OsDesktopShell {
     pub vpn_connected: bool,
     pub vpn_allow_lan: bool,
     pub vpn_kill_switch: bool,
+    pub media_player: aphrody_media::MediaPlayerState,
     glass_dirty: bool,
     pub launcher_folder: LauncherFolder,
     pub launcher_open: bool,
@@ -336,6 +337,11 @@ impl OsDesktopShell {
             vpn_connected: true,
             vpn_allow_lan: true,
             vpn_kill_switch: true,
+            media_player: aphrody_media::MediaPlayerState {
+                title: "Aphrody Pure-Rust Media & YouTube".to_owned(),
+                duration_ms: 215_000,
+                ..Default::default()
+            },
             glass_dirty: false,
             launcher_folder: LauncherFolder::default(),
             launcher_open: false,
@@ -1043,6 +1049,153 @@ impl OsDesktopShell {
                     },
                 )
             }
+            WindowKind::GoogleWorkspace => {
+                let entity_yt = cx.entity();
+                let entity_ytm = cx.entity();
+                let entity_browser = cx.entity();
+                crate::apps::google_hub::render_google_workspace_window(
+                    &self.theme,
+                    crate::apps::google_hub::GoogleHubCallbacks {
+                        on_open_youtube: Box::new(move |cx| {
+                            entity_yt.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    WindowKind::YouTube,
+                                    WindowKind::YouTube.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                        on_open_ytmusic: Box::new(move |cx| {
+                            entity_ytm.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    WindowKind::YouTubeMusic,
+                                    WindowKind::YouTubeMusic.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                        on_open_browser: Box::new(move |cx| {
+                            entity_browser.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    WindowKind::Browser,
+                                    WindowKind::Browser.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                    },
+                )
+            }
+            WindowKind::YouTube => {
+                let entity_play = cx.entity();
+                let entity_sb = cx.entity();
+                let entity_seek = cx.entity();
+                let entity_seed = cx.entity();
+                let entity_switch = cx.entity();
+                crate::apps::google_hub::render_youtube_window(
+                    &self.theme,
+                    &self.media_player,
+                    crate::apps::google_hub::MediaSurfaceCallbacks {
+                        on_toggle_play: Box::new(move |cx| {
+                            entity_play.update(cx, |s, cx| {
+                                s.media_player.playing = !s.media_player.playing;
+                                cx.notify();
+                            });
+                        }),
+                        on_toggle_sponsorblock: Box::new(move |cx| {
+                            entity_sb.update(cx, |s, cx| {
+                                s.media_player.sponsorblock_enabled =
+                                    !s.media_player.sponsorblock_enabled;
+                                cx.notify();
+                            });
+                        }),
+                        on_seek_relative_ms: Box::new(move |delta, cx| {
+                            entity_seek.update(cx, |s, cx| {
+                                let target = if delta < 0 {
+                                    s.media_player
+                                        .position_ms
+                                        .saturating_sub(delta.unsigned_abs())
+                                } else {
+                                    s.media_player.position_ms.saturating_add(delta as u64)
+                                };
+                                s.media_player.seek_ms(target);
+                                cx.notify();
+                            });
+                        }),
+                        on_apply_artwork_seed: Box::new(move |rgb, cx| {
+                            entity_seed.update(cx, |s, cx| {
+                                let mut prefs = s.prefs_store.value.clone();
+                                prefs.m3_seed_rgb = Some(rgb);
+                                s.apply_preferences(prefs, cx);
+                            });
+                        }),
+                        on_switch_app: Box::new(move |cx| {
+                            entity_switch.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    WindowKind::YouTubeMusic,
+                                    WindowKind::YouTubeMusic.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                    },
+                )
+            }
+            WindowKind::YouTubeMusic => {
+                let entity_play = cx.entity();
+                let entity_sb = cx.entity();
+                let entity_seek = cx.entity();
+                let entity_seed = cx.entity();
+                let entity_switch = cx.entity();
+                crate::apps::google_hub::render_youtube_music_window(
+                    &self.theme,
+                    &self.media_player,
+                    crate::apps::google_hub::MediaSurfaceCallbacks {
+                        on_toggle_play: Box::new(move |cx| {
+                            entity_play.update(cx, |s, cx| {
+                                s.media_player.playing = !s.media_player.playing;
+                                cx.notify();
+                            });
+                        }),
+                        on_toggle_sponsorblock: Box::new(move |cx| {
+                            entity_sb.update(cx, |s, cx| {
+                                s.media_player.sponsorblock_enabled =
+                                    !s.media_player.sponsorblock_enabled;
+                                cx.notify();
+                            });
+                        }),
+                        on_seek_relative_ms: Box::new(move |delta, cx| {
+                            entity_seek.update(cx, |s, cx| {
+                                let target = if delta < 0 {
+                                    s.media_player
+                                        .position_ms
+                                        .saturating_sub(delta.unsigned_abs())
+                                } else {
+                                    s.media_player.position_ms.saturating_add(delta as u64)
+                                };
+                                s.media_player.seek_ms(target);
+                                cx.notify();
+                            });
+                        }),
+                        on_apply_artwork_seed: Box::new(move |rgb, cx| {
+                            entity_seed.update(cx, |s, cx| {
+                                let mut prefs = s.prefs_store.value.clone();
+                                prefs.m3_seed_rgb = Some(rgb);
+                                s.apply_preferences(prefs, cx);
+                            });
+                        }),
+                        on_switch_app: Box::new(move |cx| {
+                            entity_switch.update(cx, |s, cx| {
+                                s.open_or_focus_window(
+                                    WindowKind::YouTube,
+                                    WindowKind::YouTube.default_title(),
+                                    cx,
+                                );
+                            });
+                        }),
+                    },
+                )
+            }
             WindowKind::Files => self.build_files_body(cx),
             WindowKind::Settings => {
                 let entity_page = cx.entity();
@@ -1730,6 +1883,21 @@ impl Render for OsDesktopShell {
                                             ":vpn" => s.open_or_focus_window(
                                                 WindowKind::Vpn,
                                                 WindowKind::Vpn.default_title(),
+                                                cx,
+                                            ),
+                                            ":google" => s.open_or_focus_window(
+                                                WindowKind::GoogleWorkspace,
+                                                WindowKind::GoogleWorkspace.default_title(),
+                                                cx,
+                                            ),
+                                            ":yt" => s.open_or_focus_window(
+                                                WindowKind::YouTube,
+                                                WindowKind::YouTube.default_title(),
+                                                cx,
+                                            ),
+                                            ":ytm" => s.open_or_focus_window(
+                                                WindowKind::YouTubeMusic,
+                                                WindowKind::YouTubeMusic.default_title(),
                                                 cx,
                                             ),
                                             ":design" => s.open_or_focus_window(
