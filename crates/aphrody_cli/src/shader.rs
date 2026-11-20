@@ -592,6 +592,7 @@ pub(crate) fn transpile_wgsl_source(
             };
             let pipeline_options = naga::back::hlsl::PipelineOptions {
                 entry_point: selected_entry,
+                multisampled: false,
             };
             let mut text = String::new();
             let mut writer = naga::back::hlsl::Writer::new(&mut text, &options, &pipeline_options);

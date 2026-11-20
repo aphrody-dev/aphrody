@@ -57,14 +57,10 @@ incremental = true
     expect(checkVpnAllowLan(repoRoot)).toBe(true);
 
     const report = runAudit(repoRoot, true);
-    expect(report.vendor.declaredSubmodules).toBe(10);
-    // In shallow `submodules: false` CI jobs (e.g. `plugin-and-config`), vendor working trees
-    // are intentionally not checked out; validate disk manifests only when initialized.
-    const submodulesInitialized = existsSync(join(repoRoot, "vendor/wgpu/Cargo.toml"));
-    if (submodulesInitialized) {
-      expect(report.ok).toBe(true);
-      expect(report.vendor.missingPatchPaths).toEqual([]);
-      expect(report.vendor.nestedCargoSubmodules.every((n) => n.manifestPresent)).toBe(true);
-    }
+    expect(report.vendor.declaredSubmodules).toBe(0);
+    expect(report.ok).toBe(true);
+    expect(report.vendor.missingPatchPaths).toEqual([]);
+    expect(report.vendor.patches.some((p) => p.kind === "git" && p.target.includes("aphrody-labs/wgpu"))).toBe(true);
+    expect(report.vendor.patches.some((p) => p.kind === "git" && p.target.includes("aphrody-labs/taffy"))).toBe(true);
   });
 });

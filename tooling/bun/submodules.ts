@@ -55,8 +55,10 @@ function runGit(args: string[], inherit = false): { exitCode: number; stdout: st
 }
 
 export function listReferencedPaths(): string[] {
+  const gitmodulesPath = join(repoRoot, ".gitmodules");
+  if (!existsSync(gitmodulesPath)) return [];
   const raw = readFileSync(join(repoRoot, "Cargo.toml"), "utf8");
-  const all = parseGitmodules(readFileSync(join(repoRoot, ".gitmodules"), "utf8"));
+  const all = parseGitmodules(readFileSync(gitmodulesPath, "utf8"));
   return all
     .map((entry) => entry.path)
     .filter((p) => raw.includes(`"${p}"`) || raw.includes(`"${p}/`));

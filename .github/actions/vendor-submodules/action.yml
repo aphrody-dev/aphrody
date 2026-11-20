@@ -8,6 +8,10 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
+        if [ ! -f .gitmodules ] || ! grep -q '\[submodule' .gitmodules; then
+          echo "Zero blocking vendor submodules — forks are resolved via pinned aphrody-labs/* GitHub Release tags."
+          exit 0
+        fi
         manifests=$(find . -name Cargo.toml -not -path './vendor/*' -not -path '*/target/*' -not -path './.git/*')
         paths=$(git config -f .gitmodules --get-regexp '\.path$' | awk '{print $2}' | while read -r p; do
           if echo "$manifests" | xargs grep -lE "path *= *\"$p[/\"]" > /dev/null 2>&1; then echo "$p"; fi

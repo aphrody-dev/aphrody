@@ -405,6 +405,7 @@ fn slot(device: &wgpu::Device, raw: &ID3D12Device, width: u32, height: u32) -> O
                     | wgpu::TextureUsages::TEXTURE_BINDING
                     | wgpu::TextureUsages::COPY_SRC,
                 view_formats: &[],
+                texture_binding_view_dimension: None,
             },
             wgpu::TextureUses::UNINITIALIZED,
             false,

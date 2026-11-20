@@ -27,5 +27,8 @@ rustflags = ["-C", "link-arg=-fuse-ld=lld"]
 MACOSX_DEPLOYMENT_TARGET = "12.0"
 RUSTC_BOOTSTRAP = "1"
 
+[net]
+git-fetch-with-cli = true
+
 [cache]
 auto-clean-frequency = "1 day"

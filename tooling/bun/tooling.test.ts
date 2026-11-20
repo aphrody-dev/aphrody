@@ -10,12 +10,18 @@ import releaseWorker, { detectPlatform, renderDownloadPortal } from "../../.clou
 const repoRoot = resolve(import.meta.dir, "../..");
 
 describe("aphrody repo-native bun tooling", () => {
-  test("parses .gitmodules and preserves relative aphrody-labs submodule URLs", () => {
-    const entries = parseGitmodules(readFileSync(resolve(repoRoot, ".gitmodules"), "utf8"));
-    expect(entries.length).toBe(10);
-    for (const entry of entries) {
-      expect(entry.url.startsWith("../../aphrody-labs/") || entry.url.startsWith("../")).toBe(true);
+  test("validates pinned aphrody-labs forks manifest and zero blocking submodules", () => {
+    const manifest = JSON.parse(
+      readFileSync(resolve(repoRoot, "tooling/bun/forks-manifest.json"), "utf8"),
+    ) as { forks: Array<{ repo: string; tag: string; sha: string; gitUrl: string }> };
+    expect(manifest.forks.length).toBe(11);
+    for (const fork of manifest.forks) {
+      expect(fork.repo.startsWith("aphrody-labs/")).toBe(true);
+      expect(fork.sha).toMatch(/^[0-9a-f]{40}$/);
+      expect(fork.tag.length).toBeGreaterThan(0);
     }
+    const parsedSample = parseGitmodules('[submodule "vendor/example"]\n\tpath = vendor/example\n\turl = ../../aphrody-labs/example.git\n');
+    expect(parsedSample.length).toBe(1);
   });
 
   test("post-edit-check allows repo paths and flags brain/temp paths", () => {

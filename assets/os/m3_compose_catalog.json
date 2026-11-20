@@ -129,8 +129,8 @@
   },
   "wgsl": {
     "path": "assets/shaders/m3_expressive.wgsl",
-    "bytes": 7127,
-    "sha256": "cf49e9abed4ef84c2209aed5c05b0a3f07826d1025bf1bb396651e0900c78523"
+    "bytes": 8044,
+    "sha256": "14a9e654a33d71e4057cfd3e07fead32eb1d8ac1053138ea9eb21b76f7076c19"
   },
   "components": [
     {

@@ -341,16 +341,6 @@ members = [
 ]
 # === APHRODY_ISOLATED_WORKSPACE_CONFIG START ===
 exclude = [
-    "vendor/accesskit",
-    "vendor/browser",
-    "vendor/cosmic-text",
-    "vendor/craft-anything",
-    "vendor/craft-libs",
-    "vendor/egui",
-    "vendor/mullvad",
-    "vendor/taffy",
-    "vendor/tauri",
-    "vendor/wgpu",
     "templates/wasm-wgpu/*",
 ]
 default-members = [
@@ -639,10 +629,10 @@ ztracing_macro = { path = "crates/ztracing_macro" }
 # External crates
 #
 
-accesskit = { path = "vendor/accesskit/accesskit", features = ["enumn"] }
-accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
-accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
-accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
+accesskit = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120", features = ["enumn"] }
+accesskit_macos = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+accesskit_unix = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+accesskit_windows = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
 agent-client-protocol = { version = "=5.4.0", features = ["schemars", "unstable", "unstable_protocol_v2"] }
 aho-corasick = "1.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
@@ -1228,7 +1218,7 @@ swash = "0.2.6"
 syn = { version = "2.0", default-features = false, features = ["proc-macro"] }
 sys-locale = "0.3.1"
 sysinfo = { version = "0.39", default-features = false, features = ["system"] }
-taffy = { path = "vendor/taffy", default-features = false }
+taffy = { git = "https://github.com/aphrody-labs/taffy.git", tag = "v0.15.1-aphrody.20261120", default-features = false }
 tempfile = "3.20.0"
 tendril = "0.5"
 thiserror = "2.0.12"
@@ -1308,7 +1298,7 @@ web-time = "1.1.0"
 webpki-roots = "1.0.10"
 webrtc-sys = "0.3.23"
 # 30.0.1 lacks the Vulkan surface-drop fix (wgpu#10230) and WebGL resize fix (wgpu#10348).
-wgpu = { path = "vendor/wgpu/wgpu", default-features = false }
+wgpu = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120", default-features = false }
 which = "8"
 windows-core = "0.62"
 windows-registry = "0.6.0"
@@ -1371,77 +1361,77 @@ aphrody_ui = { path = "crates/aphrody_ui" }
 tauri_gpui = { path = "crates/tauri_gpui" }
 aphrody_vpn = { path = "crates/aphrody_vpn" }
 ayvpn-daemon = { path = "crates/ayvpn_daemon" }
-mullvad-api = { path = "vendor/mullvad/mullvad-api" }
-mullvad-daemon = { path = "vendor/mullvad/mullvad-daemon", default-features = false, features = ["embedded"] }
-mullvad-management-interface = { path = "vendor/mullvad/mullvad-management-interface" }
-mullvad-paths = { path = "vendor/mullvad/mullvad-paths" }
-mullvad-types = { path = "vendor/mullvad/mullvad-types" }
-browser-browse = { path = "vendor/browser/components/browser-browse" }
-browser-detect = { path = "vendor/browser/components/browser-detect", default-features = false }
-browser-engine = { path = "vendor/browser/components/browser-engine" }
-browser-views = { path = "vendor/browser/components/browser-views" }
-browser-vpn = { path = "vendor/browser/components/browser-vpn" }
-cosmic-text = { path = "vendor/cosmic-text" }
-craft-anicraft-format = { path = "vendor/craft-libs/crates/anicraft-format" }
-craft-anything-analysis = { path = "vendor/craft-anything/crates/analysis" }
-craft-anything-disasm = { path = "vendor/craft-anything/crates/disasm" }
-craft-anything-evidence = { path = "vendor/craft-anything/crates/evidence" }
-craft-anything-formats = { path = "vendor/craft-anything/crates/formats" }
-craft-anything-js = { path = "vendor/craft-anything/crates/js" }
-craft-color = { path = "vendor/craft-libs/crates/color" }
-craft-csv = { path = "vendor/craft-libs/crates/csv" }
-craft-dds = { path = "vendor/craft-libs/crates/dds" }
-craft-deckcraft-format = { path = "vendor/craft-libs/crates/deckcraft-format" }
-craft-docx = { path = "vendor/craft-libs/crates/docx" }
-craft-dxf = { path = "vendor/craft-libs/crates/dxf" }
-craft-ecproj-format = { path = "vendor/craft-libs/crates/ecproj-format" }
-craft-elf = { path = "vendor/craft-libs/crates/elf" }
-craft-exr = { path = "vendor/craft-libs/crates/exr" }
-craft-fcproj-format = { path = "vendor/craft-libs/crates/fcproj-format" }
-craft-fig = { path = "vendor/craft-libs/crates/fig" }
-craft-figcraft-format = { path = "vendor/craft-libs/crates/figcraft-format" }
-craft-figma-rest = { path = "vendor/craft-libs/crates/figma-rest" }
-craft-gcode = { path = "vendor/craft-libs/crates/gcode" }
-craft-gridcraft-format = { path = "vendor/craft-libs/crates/gridcraft-format" }
-craft-hdr = { path = "vendor/craft-libs/crates/hdr" }
-craft-i18n = { path = "vendor/craft-libs/crates/i18n" }
-craft-kiwi = { path = "vendor/craft-libs/crates/kiwi" }
-craft-kra = { path = "vendor/craft-libs/crates/kra" }
-craft-lottie = { path = "vendor/craft-libs/crates/lottie" }
-craft-macho = { path = "vendor/craft-libs/crates/macho" }
-craft-materialx = { path = "vendor/craft-libs/crates/materialx" }
-craft-math = { path = "vendor/craft-libs/crates/math" }
-craft-mcmat = { path = "vendor/craft-libs/crates/mcmat" }
-craft-mesh = { path = "vendor/craft-libs/crates/mesh" }
-craft-midi = { path = "vendor/craft-libs/crates/midi" }
-craft-ora = { path = "vendor/craft-libs/crates/ora" }
-craft-pcraft-format = { path = "vendor/craft-libs/crates/pcraft-format" }
-craft-pe = { path = "vendor/craft-libs/crates/pe" }
-craft-penpot = { path = "vendor/craft-libs/crates/penpot" }
-craft-plist = { path = "vendor/craft-libs/crates/plist" }
-craft-pptx = { path = "vendor/craft-libs/crates/pptx" }
-craft-psd = { path = "vendor/craft-libs/crates/psd" }
-craft-sf2 = { path = "vendor/craft-libs/crates/sf2" }
-craft-sheet = { path = "vendor/craft-libs/crates/sheet" }
-craft-sketch = { path = "vendor/craft-libs/crates/sketch" }
-craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
-craft-tar = { path = "vendor/craft-libs/crates/tar" }
-craft-tcraft = { path = "vendor/craft-libs/crates/tcraft" }
-craft-tga = { path = "vendor/craft-libs/crates/tga" }
-craft-timeline = { path = "vendor/craft-libs/crates/timeline" }
-craft-usd = { path = "vendor/craft-libs/crates/usd" }
-craft-vectorcraft-format = { path = "vendor/craft-libs/crates/vectorcraft-format" }
-craft-wordmodel = { path = "vendor/craft-libs/crates/wordmodel" }
-craft-xcf = { path = "vendor/craft-libs/crates/xcf" }
-craft-xlsx = { path = "vendor/craft-libs/crates/xlsx" }
-craft-xml = { path = "vendor/craft-libs/crates/xml" }
-craft-zip = { path = "vendor/craft-libs/crates/zip" }
-ecolor = { path = "vendor/egui/crates/ecolor", default-features = false }
-egui = { path = "vendor/egui/crates/egui", default-features = false }
-egui-wgpu = { path = "vendor/egui/crates/egui-wgpu", default-features = false }
-egui_extras = { path = "vendor/egui/crates/egui_extras", default-features = false }
-emath = { path = "vendor/egui/crates/emath", default-features = false }
-epaint = { path = "vendor/egui/crates/epaint", default-features = false }
+mullvad-api = { git = "https://github.com/aphrody-labs/mullvadvpn-app.git", tag = "v2026.11.20-aphrody.3" }
+mullvad-daemon = { git = "https://github.com/aphrody-labs/mullvadvpn-app.git", tag = "v2026.11.20-aphrody.3", default-features = false, features = ["embedded"] }
+mullvad-management-interface = { git = "https://github.com/aphrody-labs/mullvadvpn-app.git", tag = "v2026.11.20-aphrody.3" }
+mullvad-paths = { git = "https://github.com/aphrody-labs/mullvadvpn-app.git", tag = "v2026.11.20-aphrody.3" }
+mullvad-types = { git = "https://github.com/aphrody-labs/mullvadvpn-app.git", tag = "v2026.11.20-aphrody.3" }
+browser-browse = { git = "https://github.com/aphrody-labs/browser.git", tag = "v2026.11.20-aphrody.3" }
+browser-detect = { git = "https://github.com/aphrody-labs/browser.git", tag = "v2026.11.20-aphrody.3", default-features = false }
+browser-engine = { git = "https://github.com/aphrody-labs/browser.git", tag = "v2026.11.20-aphrody.3" }
+browser-views = { git = "https://github.com/aphrody-labs/browser.git", tag = "v2026.11.20-aphrody.3" }
+browser-vpn = { git = "https://github.com/aphrody-labs/browser.git", tag = "v2026.11.20-aphrody.3" }
+cosmic-text = { git = "https://github.com/aphrody-labs/cosmic-text.git", tag = "v0.19.0-aphrody.20261120" }
+craft-anicraft-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-anything-analysis = { git = "https://github.com/aphrody-labs/craft-anything.git", tag = "v0.6.1-aphrody.20261120" }
+craft-anything-disasm = { git = "https://github.com/aphrody-labs/craft-anything.git", tag = "v0.6.1-aphrody.20261120" }
+craft-anything-evidence = { git = "https://github.com/aphrody-labs/craft-anything.git", tag = "v0.6.1-aphrody.20261120" }
+craft-anything-formats = { git = "https://github.com/aphrody-labs/craft-anything.git", tag = "v0.6.1-aphrody.20261120" }
+craft-anything-js = { git = "https://github.com/aphrody-labs/craft-anything.git", tag = "v0.6.1-aphrody.20261120" }
+craft-color = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-csv = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-dds = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-deckcraft-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-docx = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-dxf = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-ecproj-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-elf = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-exr = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-fcproj-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-fig = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-figcraft-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-figma-rest = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-gcode = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-gridcraft-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-hdr = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-i18n = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-kiwi = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-kra = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-lottie = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-macho = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-materialx = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-math = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-mcmat = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-mesh = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-midi = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-ora = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-pcraft-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-pe = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-penpot = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-plist = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-pptx = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-psd = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sf2 = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sheet = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sketch = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sniff = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-tar = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-tcraft = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-tga = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-timeline = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-usd = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-vectorcraft-format = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-wordmodel = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-xcf = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-xlsx = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-xml = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-zip = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+ecolor = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120", default-features = false }
+egui = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120", default-features = false }
+egui-wgpu = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120", default-features = false }
+egui_extras = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120", default-features = false }
+emath = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120", default-features = false }
+epaint = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120", default-features = false }
 lsp_types_kit = { package = "lsp-types", version = "0.97", features = ["proposed"] }
 objc2-image-io = { version = "0.3.2", default-features = false, features = [
     "std",
@@ -1477,7 +1467,7 @@ object = { version = "0.37.3", default-features = false, features = ["read", "st
 roxmltree = "0.21"
 serde_ignored = "0.1.14"
 upt = "0.9.0"
-accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
+accesskit_consumer = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
 axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "ws"] }
 brotli = { version = "9", default-features = false, features = ["std"] }
 cap-std = "4.0.3"
@@ -1508,7 +1498,7 @@ jni = "0.21"
 jni-verifier = { package = "jni", version = "0.22" }
 markdown-rs = { package = "markdown", version = "1.0.0", features = ["serde"] }
 md-5 = "0.10"
-naga = { path = "vendor/wgpu/naga", default-features = false, features = ["wgsl-in"] }
+naga = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120", default-features = false, features = ["wgsl-in"] }
 notify = "9.0.0-rc.4"
 oxc = { version = "=0.153.0", features = ["transformer", "codegen", "semantic", "ast_visit"] }
 oxc_sourcemap = "9"
@@ -1550,7 +1540,7 @@ webkit6 = "0.6"
 webview2-com = "0.39"
 windows-numerics = "0.3"
 windows-sys = "0.61"
-wry = { path = "vendor/tauri/wry" }
+wry = { git = "https://github.com/aphrody-labs/wry.git", tag = "v0.57.3-aphrody.20261120" }
 wuff = "0.2.9"
 x11rb = { version = "0.13", default-features = false, features = ["composite", "dri3", "present"] }
 zbus = { version = "5.13", default-features = false, features = ["async-io", "blocking-api"] }
@@ -1706,46 +1696,49 @@ crash-context = { git = "https://github.com/rust-minidump/minidump-writer", rev 
 scratch = { path = "tooling/corgi/patches/scratch" }
 
 # === APHRODY_ISOLATED_PATCHES START ===
-taffy = { path = "vendor/taffy" }
-cosmic-text = { path = "vendor/cosmic-text" }
-wgpu = { path = "vendor/wgpu/wgpu" }
-wgpu-core = { path = "vendor/wgpu/wgpu-core" }
-wgpu-hal = { path = "vendor/wgpu/wgpu-hal" }
-wgpu-types = { path = "vendor/wgpu/wgpu-types" }
-wgpu-naga-bridge = { path = "vendor/wgpu/wgpu-naga-bridge" }
-naga = { path = "vendor/wgpu/naga" }
-accesskit = { path = "vendor/accesskit/accesskit" }
-accesskit_consumer = { path = "vendor/accesskit/accesskit_consumer" }
-accesskit_macos = { path = "vendor/accesskit/adapters/macos" }
-accesskit_unix = { path = "vendor/accesskit/adapters/unix" }
-accesskit_windows = { path = "vendor/accesskit/adapters/windows" }
-ecolor = { path = "vendor/egui/crates/ecolor" }
-emath = { path = "vendor/egui/crates/emath" }
-epaint = { path = "vendor/egui/crates/epaint" }
-epaint_default_fonts = { path = "vendor/egui/crates/epaint_default_fonts" }
-egui = { path = "vendor/egui/crates/egui" }
-egui-wgpu = { path = "vendor/egui/crates/egui-wgpu" }
-egui_extras = { path = "vendor/egui/crates/egui_extras" }
+taffy = { git = "https://github.com/aphrody-labs/taffy.git", tag = "v0.15.1-aphrody.20261120" }
+cosmic-text = { git = "https://github.com/aphrody-labs/cosmic-text.git", tag = "v0.19.0-aphrody.20261120" }
+wgpu = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
+wgpu-core = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
+wgpu-hal = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
+wgpu-types = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
+wgpu-naga-bridge = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
+naga = { git = "https://github.com/aphrody-labs/wgpu.git", tag = "v30.0.0-aphrody.20261120" }
+accesskit = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+accesskit_consumer = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+accesskit_macos = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+accesskit_unix = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+accesskit_windows = { git = "https://github.com/aphrody-labs/accesskit.git", tag = "v0.25.2-aphrody.20261120" }
+ecolor = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
+emath = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
+epaint = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
+epaint_default_fonts = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
+egui = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
+egui-wgpu = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
+egui_extras = { git = "https://github.com/aphrody-labs/egui.git", tag = "v0.37.0-aphrody.20261120" }
 msvc_spectre_libs = { path = "tooling/corgi/patches/msvc_spectre_libs" }
 
 [patch."https://github.com/storytold/craft-libs"]
-craft-codepage = { path = "vendor/craft-libs/crates/codepage" }
-craft-dex = { path = "vendor/craft-libs/crates/dex" }
-craft-elf = { path = "vendor/craft-libs/crates/elf" }
-craft-evm = { path = "vendor/craft-libs/crates/evm" }
-craft-har = { path = "vendor/craft-libs/crates/har" }
-craft-java-class = { path = "vendor/craft-libs/crates/java-class" }
-craft-jsonc = { path = "vendor/craft-libs/crates/jsonc" }
-craft-macho = { path = "vendor/craft-libs/crates/macho" }
-craft-mime = { path = "vendor/craft-libs/crates/mime" }
-craft-pcap = { path = "vendor/craft-libs/crates/pcap" }
-craft-pe = { path = "vendor/craft-libs/crates/pe" }
-craft-plist = { path = "vendor/craft-libs/crates/plist" }
-craft-sniff = { path = "vendor/craft-libs/crates/sniff" }
-craft-sourcemap = { path = "vendor/craft-libs/crates/sourcemap" }
-craft-tar = { path = "vendor/craft-libs/crates/tar" }
-craft-wasm = { path = "vendor/craft-libs/crates/wasm" }
-craft-zip = { path = "vendor/craft-libs/crates/zip" }
+craft-codepage = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-dex = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-elf = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-evm = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-har = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-java-class = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-jsonc = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-macho = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-mime = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-pcap = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-pe = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-plist = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sniff = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sourcemap = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-tar = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-wasm = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-zip = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-dds = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-pkcs7 = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
+craft-sqlite = { git = "https://github.com/aphrody-labs/craft-libs.git", tag = "v0.1.0-aphrody.20261120.2" }
 # === APHRODY_ISOLATED_PATCHES END ===
 
 [profile.dev]

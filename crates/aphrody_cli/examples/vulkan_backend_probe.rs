@@ -98,7 +98,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 fn read_mapped_buffer_helper(
     device: &wgpu::Device,
     buffer: &wgpu::Buffer,
-    submission_index: wgpu::SubmissionIndex,
+    submission_index: Option<wgpu::SubmissionIndex>,
 ) -> Result<Vec<u8>> {
     let map_status: Arc<Mutex<Option<Result<(), wgpu::BufferAsyncError>>>> =
         Arc::new(Mutex::new(None));
@@ -115,7 +115,7 @@ fn read_mapped_buffer_helper(
 
     device
         .poll(wgpu::PollType::Wait {
-            submission_index: Some(submission_index),
+            submission_index,
             timeout: Some(Duration::from_secs(30)),
         })
         .context("timed out or failed polling device while waiting for buffer map")?;
@@ -354,6 +354,7 @@ fn main() -> Result<()> {
         format: wgpu::TextureFormat::Rgba8Unorm,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
         view_formats: &[],
+        texture_binding_view_dimension: None,
     });
 
     let render_texture_view = render_texture.create_view(&wgpu::TextureViewDescriptor::default());

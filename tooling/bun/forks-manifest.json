@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "releaseDate": "2026-11-20",
+  "ociPackage": "ghcr.io/aphrody-labs/aphrody-forks:20261120",
+  "forks": [
+    {
+      "repo": "aphrody-labs/wgpu",
+      "name": "wgpu",
+      "upstream": "gfx-rs/wgpu",
+      "branch": "main",
+      "tag": "v30.0.0-aphrody.20261120",
+      "sha": "3d3f41fd568b7b742b758a219a4f5a850d9e2e3f",
+      "gitUrl": "https://github.com/aphrody-labs/wgpu.git",
+      "releaseUrl": "https://github.com/aphrody-labs/wgpu/releases/tag/v30.0.0-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/wgpu/archive/refs/tags/v30.0.0-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/taffy",
+      "name": "taffy",
+      "upstream": "DioxusLabs/taffy",
+      "branch": "main",
+      "tag": "v0.15.1-aphrody.20261120",
+      "sha": "7261eb2d46a05c4b0fb37278829d85ee6bf9fb66",
+      "gitUrl": "https://github.com/aphrody-labs/taffy.git",
+      "releaseUrl": "https://github.com/aphrody-labs/taffy/releases/tag/v0.15.1-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/taffy/archive/refs/tags/v0.15.1-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/accesskit",
+      "name": "accesskit",
+      "upstream": "AccessKit/accesskit",
+      "branch": "main",
+      "tag": "v0.25.2-aphrody.20261120",
+      "sha": "432d06659e0a6708fb206e266d65752dd372deeb",
+      "gitUrl": "https://github.com/aphrody-labs/accesskit.git",
+      "releaseUrl": "https://github.com/aphrody-labs/accesskit/releases/tag/v0.25.2-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/accesskit/archive/refs/tags/v0.25.2-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/cosmic-text",
+      "name": "cosmic-text",
+      "upstream": "pop-os/cosmic-text",
+      "branch": "main",
+      "tag": "v0.19.0-aphrody.20261120",
+      "sha": "b07cb90a872cb9fec7fea1c72d734f81907fe3ad",
+      "gitUrl": "https://github.com/aphrody-labs/cosmic-text.git",
+      "releaseUrl": "https://github.com/aphrody-labs/cosmic-text/releases/tag/v0.19.0-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/cosmic-text/archive/refs/tags/v0.19.0-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/egui",
+      "name": "egui",
+      "upstream": "emilk/egui",
+      "branch": "main",
+      "tag": "v0.37.0-aphrody.20261120",
+      "sha": "2b238731ca969f32470386bcb990c6616c30d78d",
+      "gitUrl": "https://github.com/aphrody-labs/egui.git",
+      "releaseUrl": "https://github.com/aphrody-labs/egui/releases/tag/v0.37.0-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/egui/archive/refs/tags/v0.37.0-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/craft-libs",
+      "name": "craft-libs",
+      "upstream": "storytold/craft-libs",
+      "branch": "main",
+      "tag": "v0.1.0-aphrody.20261120.2",
+      "sha": "487e4e882d293f4b2c38b3f867e2c03d0b32d925",
+      "gitUrl": "https://github.com/aphrody-labs/craft-libs.git",
+      "releaseUrl": "https://github.com/aphrody-labs/craft-libs/releases/tag/v0.1.0-aphrody.20261120.2",
+      "tarballUrl": "https://github.com/aphrody-labs/craft-libs/archive/refs/tags/v0.1.0-aphrody.20261120.2.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/craft-anything",
+      "name": "craft-anything",
+      "upstream": "storytold/craft-anything",
+      "branch": "main",
+      "tag": "v0.6.1-aphrody.20261120",
+      "sha": "1631c57f722c4dc84865ec8966bdbc93be775f59",
+      "gitUrl": "https://github.com/aphrody-labs/craft-anything.git",
+      "releaseUrl": "https://github.com/aphrody-labs/craft-anything/releases/tag/v0.6.1-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/craft-anything/archive/refs/tags/v0.6.1-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/wry",
+      "name": "wry",
+      "upstream": "tauri-apps/wry",
+      "branch": "dev",
+      "tag": "v0.57.3-aphrody.20261120",
+      "sha": "259b0969f367b69ee2a54dbdaef033e24719afdd",
+      "gitUrl": "https://github.com/aphrody-labs/wry.git",
+      "releaseUrl": "https://github.com/aphrody-labs/wry/releases/tag/v0.57.3-aphrody.20261120",
+      "tarballUrl": "https://github.com/aphrody-labs/wry/archive/refs/tags/v0.57.3-aphrody.20261120.tar.gz"
+    },
+    {
+      "repo": "aphrody-labs/mullvadvpn-app",
+      "name": "mullvadvpn-app",
+      "upstream": "mullvad/mullvadvpn-app",
+      "branch": "main",
+      "tag": "v2026.11.20-aphrody.3",
+      "sha": "585b1af2eedb341c397c391250687ad974320f99",
+      "gitUrl": "https://github.com/aphrody-labs/mullvadvpn-app.git",
+      "releaseUrl": "https://github.com/aphrody-labs/mullvadvpn-app/releases/tag/v2026.11.20-aphrody.3",
+      "tarballUrl": "https://github.com/aphrody-labs/mullvadvpn-app/archive/refs/tags/v2026.11.20-aphrody.3.tar.gz",
+      "sourceMainSha": "9b74b54ba930c0d6250d390e4645aaca58b2a7c1"
+    },
+    {
+      "repo": "aphrody-labs/browser",
+      "name": "browser",
+      "upstream": "aphrody-labs/browser",
+      "branch": "main",
+      "tag": "v2026.11.20-aphrody.3",
+      "sha": "05525fd5c98192a3b0fee42282ab27310df09772",
+      "gitUrl": "https://github.com/aphrody-labs/browser.git",
+      "releaseUrl": "https://github.com/aphrody-labs/browser/releases/tag/v2026.11.20-aphrody.3",
+      "tarballUrl": "https://github.com/aphrody-labs/browser/archive/refs/tags/v2026.11.20-aphrody.3.tar.gz",
+      "sourceMainSha": "132613475cba031b5a291e4e9df14224a181d38a"
+    },
+    {
+      "repo": "aphrody-labs/kitesurf",
+      "name": "kitesurf",
+      "upstream": "cloudflare/kitesurf",
+      "branch": "main",
+      "tag": "v2026.11.20-aphrody",
+      "sha": "01d22668179931e9d0ba086fbaba96ebb7e7630a",
+      "gitUrl": "https://github.com/aphrody-labs/kitesurf.git",
+      "releaseUrl": "https://github.com/aphrody-labs/kitesurf/releases/tag/v2026.11.20-aphrody",
+      "tarballUrl": "https://github.com/aphrody-labs/kitesurf/archive/refs/tags/v2026.11.20-aphrody.tar.gz"
+    }
+  ]
+}

@@ -97,6 +97,7 @@ fn main() -> Result<()> {
     };
     let pipeline_options = naga::back::hlsl::PipelineOptions {
         entry_point: Some((naga::ShaderStage::Compute, "main".to_string())),
+        multisampled: false,
     };
 
     let mut hlsl_out = String::new();
@@ -210,7 +211,7 @@ fn main() -> Result<()> {
 
     device
         .poll(wgpu::PollType::Wait {
-            submission_index: Some(submission_index),
+            submission_index,
             timeout: Some(Duration::from_secs(10)),
         })
         .context("timeout or failure while polling DirectX 12 queue submission")?;

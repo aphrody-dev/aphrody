@@ -194,7 +194,7 @@ pub(crate) fn request_headless_device(
 pub(crate) fn read_mapped_buffer(
     device: &wgpu::Device,
     buffer: &wgpu::Buffer,
-    submission_index: wgpu::SubmissionIndex,
+    submission_index: Option<wgpu::SubmissionIndex>,
 ) -> Result<Vec<u8>> {
     let map_status: Arc<Mutex<Option<Result<(), wgpu::BufferAsyncError>>>> =
         Arc::new(Mutex::new(None));
@@ -211,7 +211,7 @@ pub(crate) fn read_mapped_buffer(
 
     device
         .poll(wgpu::PollType::Wait {
-            submission_index: Some(submission_index),
+            submission_index,
             timeout: Some(Duration::from_secs(30)),
         })
         .context("failed while polling GPU device for buffer readback")?;

@@ -702,7 +702,10 @@ export function buildForkPlan(options?: {
     options?.gitmodulesContent ??
     (existsSync(join(root, ".gitmodules")) ? readFileSync(join(root, ".gitmodules"), "utf8") : "");
   const submodules = gitmodulesText ? parseGitmodules(gitmodulesText) : [];
-  const usesRelativeUrls = submodules.length > 0 && submodules.every((s) => s.url.startsWith("../"));
+  const usesRelativeUrls =
+    submodules.length > 0
+      ? submodules.every((s) => s.url.startsWith("../"))
+      : existsSync(join(root, "tooling/bun/forks-manifest.json"));
 
   const allTargets: ForkTargetPlan[] = [
     {

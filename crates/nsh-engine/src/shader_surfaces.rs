@@ -262,6 +262,7 @@ fn slot(device: &wgpu::Device, width: u32, height: u32) -> Option<Slot> {
                     | wgpu::TextureUsages::TEXTURE_BINDING
                     | wgpu::TextureUsages::COPY_SRC,
                 view_formats: &[],
+                texture_binding_view_dimension: None,
             },
             wgpu::TextureUses::UNINITIALIZED,
             false,

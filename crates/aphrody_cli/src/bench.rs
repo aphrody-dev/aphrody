@@ -198,11 +198,11 @@ pub(crate) fn run(args: BenchArgs) -> Result<()> {
 
 fn wait_for_submission(
     device: &wgpu::Device,
-    submission_index: wgpu::SubmissionIndex,
+    submission_index: Option<wgpu::SubmissionIndex>,
 ) -> Result<()> {
     device
         .poll(wgpu::PollType::Wait {
-            submission_index: Some(submission_index),
+            submission_index,
             timeout: Some(Duration::from_secs(30)),
         })
         .context("GPU device poll timed out during benchmark")?;
@@ -410,6 +410,7 @@ fn bench_offscreen_render(
         format: wgpu::TextureFormat::Rgba8Unorm,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
         view_formats: &[],
+        texture_binding_view_dimension: None,
     });
     let target_view = target_texture.create_view(&wgpu::TextureViewDescriptor::default());
 

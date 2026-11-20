@@ -5,6 +5,7 @@ version = 4
 [[package]]
 name = "accesskit"
 version = "0.25.2"
+source = "git+https://github.com/aphrody-labs/accesskit.git?tag=v0.25.2-aphrody.20261120#432d06659e0a6708fb206e266d65752dd372deeb"
 dependencies = [
  "enumn",
  "serde",
@@ -14,6 +15,7 @@ dependencies = [
 [[package]]
 name = "accesskit_atspi_common"
 version = "0.21.1"
+source = "git+https://github.com/aphrody-labs/accesskit.git?tag=v0.25.2-aphrody.20261120#432d06659e0a6708fb206e266d65752dd372deeb"
 dependencies = [
  "accesskit",
  "accesskit_consumer",
@@ -26,6 +28,7 @@ dependencies = [
 [[package]]
 name = "accesskit_consumer"
 version = "0.39.2"
+source = "git+https://github.com/aphrody-labs/accesskit.git?tag=v0.25.2-aphrody.20261120#432d06659e0a6708fb206e266d65752dd372deeb"
 dependencies = [
  "accesskit",
  "hashbrown 0.17.1",
@@ -34,6 +37,7 @@ dependencies = [
 [[package]]
 name = "accesskit_macos"
 version = "0.27.2"
+source = "git+https://github.com/aphrody-labs/accesskit.git?tag=v0.25.2-aphrody.20261120#432d06659e0a6708fb206e266d65752dd372deeb"
 dependencies = [
  "accesskit",
  "accesskit_consumer",
@@ -46,6 +50,7 @@ dependencies = [
 [[package]]
 name = "accesskit_unix"
 version = "0.24.1"
+source = "git+https://github.com/aphrody-labs/accesskit.git?tag=v0.25.2-aphrody.20261120#432d06659e0a6708fb206e266d65752dd372deeb"
 dependencies = [
  "accesskit",
  "accesskit_atspi_common",
@@ -62,6 +67,7 @@ dependencies = [
 [[package]]
 name = "accesskit_windows"
 version = "0.35.2"
+source = "git+https://github.com/aphrody-labs/accesskit.git?tag=v0.25.2-aphrody.20261120#432d06659e0a6708fb206e266d65752dd372deeb"
 dependencies = [
  "accesskit",
  "accesskit_consumer",
@@ -2884,6 +2890,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "bp256"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46f98c2d9e8e0796b24f84b7ae14159b91ae6ae4b85f74f7655a678a56ad5e1e"
+dependencies = [
+ "ecdsa 0.17.0",
+ "elliptic-curve 0.14.3",
+ "primefield",
+ "primeorder 0.14.0",
+]
+
+[[package]]
+name = "bp384"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc61f3a96b44a33fbb971e9917b81f4207d6dae9a6b0715845c785a48e73d9c2"
+dependencies = [
+ "ecdsa 0.17.0",
+ "elliptic-curve 0.14.3",
+ "primefield",
+ "primeorder 0.14.0",
+]
+
+[[package]]
 name = "brand"
 version = "0.1.0"
 dependencies = [
@@ -2925,6 +2955,7 @@ dependencies = [
 [[package]]
 name = "browser-browse"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
 dependencies = [
  "parking_lot",
  "serde",
@@ -2935,6 +2966,7 @@ dependencies = [
 [[package]]
 name = "browser-detect"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -2944,10 +2976,12 @@ dependencies = [
 [[package]]
 name = "browser-engine"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
 
 [[package]]
 name = "browser-views"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
 dependencies = [
  "browser-browse",
  "browser-engine",
@@ -2959,6 +2993,7 @@ dependencies = [
 [[package]]
 name = "browser-vpn"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/browser.git?tag=v2026.11.20-aphrody.3#05525fd5c98192a3b0fee42282ab27310df09772"
 dependencies = [
  "browser-detect",
  "parking_lot",
@@ -4520,6 +4555,7 @@ dependencies = [
 [[package]]
 name = "cosmic-text"
 version = "0.19.0"
+source = "git+https://github.com/aphrody-labs/cosmic-text.git?tag=v0.19.0-aphrody.20261120#b07cb90a872cb9fec7fea1c72d734f81907fe3ad"
 dependencies = [
  "bitflags 2.13.1",
  "fontdb 0.24.0",
@@ -4620,6 +4656,7 @@ dependencies = [
 [[package]]
 name = "craft-anicraft-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -4628,6 +4665,7 @@ dependencies = [
 [[package]]
 name = "craft-anything-analysis"
 version = "0.6.1"
+source = "git+https://github.com/aphrody-labs/craft-anything.git?tag=v0.6.1-aphrody.20261120#1631c57f722c4dc84865ec8966bdbc93be775f59"
 dependencies = [
  "craft-anything-disasm",
  "craft-anything-evidence",
@@ -4640,6 +4678,7 @@ dependencies = [
 [[package]]
 name = "craft-anything-disasm"
 version = "0.6.1"
+source = "git+https://github.com/aphrody-labs/craft-anything.git?tag=v0.6.1-aphrody.20261120#1631c57f722c4dc84865ec8966bdbc93be775f59"
 dependencies = [
  "craft-anything-formats",
  "iced-x86",
@@ -4653,6 +4692,7 @@ dependencies = [
 [[package]]
 name = "craft-anything-evidence"
 version = "0.6.1"
+source = "git+https://github.com/aphrody-labs/craft-anything.git?tag=v0.6.1-aphrody.20261120#1631c57f722c4dc84865ec8966bdbc93be775f59"
 dependencies = [
  "hex",
  "serde",
@@ -4664,8 +4704,10 @@ dependencies = [
 [[package]]
 name = "craft-anything-formats"
 version = "0.6.1"
+source = "git+https://github.com/aphrody-labs/craft-anything.git?tag=v0.6.1-aphrody.20261120#1631c57f722c4dc84865ec8966bdbc93be775f59"
 dependencies = [
  "bzip2-rs",
+ "craft-dds",
  "craft-dex",
  "craft-elf",
  "craft-evm",
@@ -4676,8 +4718,10 @@ dependencies = [
  "craft-mime",
  "craft-pcap",
  "craft-pe",
+ "craft-pkcs7",
  "craft-plist",
  "craft-sourcemap",
+ "craft-sqlite",
  "craft-tar",
  "craft-wasm",
  "craft-zip",
@@ -4700,6 +4744,7 @@ dependencies = [
 [[package]]
 name = "craft-anything-js"
 version = "0.6.1"
+source = "git+https://github.com/aphrody-labs/craft-anything.git?tag=v0.6.1-aphrody.20261120#1631c57f722c4dc84865ec8966bdbc93be775f59"
 dependencies = [
  "craft-anything-formats",
  "hex",
@@ -4720,14 +4765,17 @@ dependencies = [
 [[package]]
 name = "craft-cfb"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 
 [[package]]
 name = "craft-codepage"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 
 [[package]]
 name = "craft-color"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
 ]
@@ -4735,6 +4783,7 @@ dependencies = [
 [[package]]
 name = "craft-csv"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -4742,10 +4791,12 @@ dependencies = [
 [[package]]
 name = "craft-dds"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 
 [[package]]
 name = "craft-deckcraft-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-zip",
  "serde",
@@ -4757,6 +4808,7 @@ dependencies = [
 [[package]]
 name = "craft-dex"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -4765,6 +4817,7 @@ dependencies = [
 [[package]]
 name = "craft-docx"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -4784,6 +4837,7 @@ dependencies = [
 [[package]]
 name = "craft-drawingml"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-xml",
  "kurbo",
@@ -4794,6 +4848,7 @@ dependencies = [
 [[package]]
 name = "craft-dxf"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-codepage",
  "encoding_rs",
@@ -4805,6 +4860,7 @@ dependencies = [
 [[package]]
 name = "craft-ecproj-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -4814,6 +4870,7 @@ dependencies = [
 [[package]]
 name = "craft-elf"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -4822,6 +4879,7 @@ dependencies = [
 [[package]]
 name = "craft-evm"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -4831,6 +4889,7 @@ dependencies = [
 [[package]]
 name = "craft-exr"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "exr",
  "flate2",
@@ -4842,6 +4901,7 @@ dependencies = [
 [[package]]
 name = "craft-fcproj-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -4851,6 +4911,7 @@ dependencies = [
 [[package]]
 name = "craft-fig"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-figma-rest",
  "craft-kiwi",
@@ -4865,6 +4926,7 @@ dependencies = [
 [[package]]
 name = "craft-figcraft-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-zip",
  "serde",
@@ -4876,6 +4938,7 @@ dependencies = [
 [[package]]
 name = "craft-figma-rest"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -4885,6 +4948,7 @@ dependencies = [
 [[package]]
 name = "craft-gcode"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -4892,6 +4956,7 @@ dependencies = [
 [[package]]
 name = "craft-gridcraft-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -4901,6 +4966,7 @@ dependencies = [
 [[package]]
 name = "craft-har"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde_json",
  "thiserror 2.0.21",
@@ -4909,6 +4975,7 @@ dependencies = [
 [[package]]
 name = "craft-hdr"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -4916,6 +4983,7 @@ dependencies = [
 [[package]]
 name = "craft-i18n"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "fixed_decimal",
  "icu_decimal",
@@ -4938,6 +5006,7 @@ dependencies = [
 [[package]]
 name = "craft-java-class"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -4946,6 +5015,7 @@ dependencies = [
 [[package]]
 name = "craft-jsonc"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde_json",
 ]
@@ -4953,10 +5023,12 @@ dependencies = [
 [[package]]
 name = "craft-kiwi"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 
 [[package]]
 name = "craft-kra"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-xml",
  "craft-zip",
@@ -4966,6 +5038,7 @@ dependencies = [
 [[package]]
 name = "craft-lottie"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-zip",
  "serde_json",
@@ -4975,6 +5048,7 @@ dependencies = [
 [[package]]
 name = "craft-macho"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -4983,6 +5057,7 @@ dependencies = [
 [[package]]
 name = "craft-materialx"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-xml",
  "thiserror 2.0.21",
@@ -4991,14 +5066,17 @@ dependencies = [
 [[package]]
 name = "craft-math"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-xml",
+ "roxmltree 0.21.2",
  "serde",
 ]
 
 [[package]]
 name = "craft-mcmat"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-zip",
  "serde",
@@ -5009,6 +5087,7 @@ dependencies = [
 [[package]]
 name = "craft-mesh"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-opc",
  "craft-xml",
@@ -5020,6 +5099,7 @@ dependencies = [
 [[package]]
 name = "craft-midi"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -5027,6 +5107,7 @@ dependencies = [
 [[package]]
 name = "craft-mime"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "chrono",
  "craft-codepage",
@@ -5036,6 +5117,7 @@ dependencies = [
 [[package]]
 name = "craft-offcrypto"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "aes 0.9.4",
  "base64 0.23.1",
@@ -5052,6 +5134,7 @@ dependencies = [
 [[package]]
 name = "craft-opc"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-xml",
  "craft-zip",
@@ -5062,6 +5145,7 @@ dependencies = [
 [[package]]
 name = "craft-ora"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-xml",
  "craft-zip",
@@ -5071,6 +5155,7 @@ dependencies = [
 [[package]]
 name = "craft-pcap"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "chrono",
  "serde",
@@ -5080,6 +5165,7 @@ dependencies = [
 [[package]]
 name = "craft-pcraft-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "flate2",
  "serde",
@@ -5090,6 +5176,7 @@ dependencies = [
 [[package]]
 name = "craft-pe"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -5098,6 +5185,7 @@ dependencies = [
 [[package]]
 name = "craft-penpot"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-zip",
  "serde",
@@ -5106,8 +5194,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-pkcs7"
+version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
+dependencies = [
+ "aes 0.9.4",
+ "aws-lc-rs",
+ "base64 0.23.1",
+ "bp256",
+ "bp384",
+ "cbc 0.2.1",
+ "chrono",
+ "crypto-bigint 0.7.11",
+ "des",
+ "ecdsa 0.17.0",
+ "ed25519-dalek 3.0.0",
+ "getrandom 0.4.1",
+ "hmac 0.13.0",
+ "p256 0.14.0",
+ "p384 0.14.0",
+ "p521",
+ "pbkdf2 0.13.0",
+ "rc2",
+ "ripemd",
+ "rsa 0.10.0-rc.19",
+ "sha1 0.11.0",
+ "sha2 0.11.1",
+ "sha3",
+ "thiserror 2.0.21",
+ "zeroize",
+]
+
+[[package]]
 name = "craft-plist"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -5115,6 +5236,7 @@ dependencies = [
 [[package]]
 name = "craft-pptx"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-drawingml",
  "craft-opc",
@@ -5129,6 +5251,7 @@ dependencies = [
 [[package]]
 name = "craft-psd"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "encoding_rs",
  "flate2",
@@ -5139,6 +5262,7 @@ dependencies = [
 [[package]]
 name = "craft-sf2"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -5146,10 +5270,12 @@ dependencies = [
 [[package]]
 name = "craft-sheet"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 
 [[package]]
 name = "craft-sketch"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-figma-rest",
  "craft-zip",
@@ -5161,10 +5287,12 @@ dependencies = [
 [[package]]
 name = "craft-sniff"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 
 [[package]]
 name = "craft-sourcemap"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "serde_json",
@@ -5172,8 +5300,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "craft-sqlite"
+version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
+
+[[package]]
 name = "craft-tar"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
 ]
@@ -5181,6 +5315,7 @@ dependencies = [
 [[package]]
 name = "craft-tcraft"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-zip",
  "serde",
@@ -5191,6 +5326,7 @@ dependencies = [
 [[package]]
 name = "craft-tga"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -5198,6 +5334,7 @@ dependencies = [
 [[package]]
 name = "craft-time"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -5206,6 +5343,7 @@ dependencies = [
 [[package]]
 name = "craft-timeline"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-time",
 ]
@@ -5213,7 +5351,9 @@ dependencies = [
 [[package]]
 name = "craft-usd"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
+ "half",
  "lz4_flex",
  "thiserror 2.0.21",
 ]
@@ -5221,6 +5361,7 @@ dependencies = [
 [[package]]
 name = "craft-vectorcraft-format"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "flate2",
  "serde",
@@ -5231,6 +5372,7 @@ dependencies = [
 [[package]]
 name = "craft-wasm"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -5241,6 +5383,7 @@ dependencies = [
 [[package]]
 name = "craft-wordmodel"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "base64 0.23.1",
  "craft-math",
@@ -5254,6 +5397,7 @@ dependencies = [
 [[package]]
 name = "craft-xcf"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "flate2",
  "thiserror 2.0.21",
@@ -5262,6 +5406,7 @@ dependencies = [
 [[package]]
 name = "craft-xlsx"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "craft-drawingml",
  "craft-opc",
@@ -5273,6 +5418,7 @@ dependencies = [
 [[package]]
 name = "craft-xml"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "quick-xml 0.41.0",
  "serde",
@@ -5282,6 +5428,7 @@ dependencies = [
 [[package]]
 name = "craft-zip"
 version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/craft-libs.git?tag=v0.1.0-aphrody.20261120.2#487e4e882d293f4b2c38b3f867e2c03d0b32d925"
 dependencies = [
  "bzip2-rs",
  "flate2",
@@ -5681,6 +5828,7 @@ checksum = "914c195c4d7fbc5ed7f88d14cbf85914d5c664967658d43404b263913a477e82"
 dependencies = [
  "cpubits",
  "ctutils",
+ "getrandom 0.4.1",
  "hybrid-array",
  "num-traits",
  "rand_core 0.10.1",
@@ -6483,6 +6631,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "des"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "916a94e407b54f9034d71dd748234cd1e516ced6284009906ae246f177eafe5a"
+dependencies = [
+ "cipher 0.5.2",
+]
+
+[[package]]
 name = "dev_container"
 version = "0.1.0"
 dependencies = [
@@ -6765,9 +6922,9 @@ dependencies = [
 
 [[package]]
 name = "dom_query"
-version = "0.29.0"
+version = "0.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "498c698ac51127148a3984450e51fca7f01805a91d7a1f7a24af0a5f761e3385"
+checksum = "b35b4f772a1a8b88e5545a67c2d3a62a93d4edccc5a68f2145fe52e39c96d275"
 dependencies = [
  "bit-set 0.11.1",
  "cssparser",
@@ -6970,6 +7127,7 @@ dependencies = [
 [[package]]
 name = "ecolor"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 dependencies = [
  "bytemuck",
  "emath",
@@ -7371,6 +7529,7 @@ dependencies = [
 [[package]]
 name = "egui"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 dependencies = [
  "accesskit",
  "ahash",
@@ -7389,6 +7548,7 @@ dependencies = [
 [[package]]
 name = "egui-wgpu"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 dependencies = [
  "ahash",
  "bytemuck",
@@ -7405,6 +7565,7 @@ dependencies = [
 [[package]]
 name = "egui_extras"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 dependencies = [
  "ahash",
  "egui",
@@ -7504,6 +7665,7 @@ dependencies = [
 [[package]]
 name = "emath"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 dependencies = [
  "bytemuck",
  "serde",
@@ -7756,6 +7918,7 @@ dependencies = [
 [[package]]
 name = "epaint"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 dependencies = [
  "ahash",
  "bytemuck",
@@ -7781,6 +7944,7 @@ dependencies = [
 [[package]]
 name = "epaint_default_fonts"
 version = "0.37.0"
+source = "git+https://github.com/aphrody-labs/egui.git?tag=v0.37.0-aphrody.20261120#2b238731ca969f32470386bcb990c6616c30d78d"
 
 [[package]]
 name = "equator"
@@ -12356,6 +12520,7 @@ dependencies = [
 [[package]]
 name = "intersection-derive"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -15129,6 +15294,7 @@ checksum = "956787520e75e9bd233246045d19f42fb73242759cc57fba9611d940ae96d4b0"
 [[package]]
 name = "mullvad-api"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -15170,10 +15336,15 @@ dependencies = [
 [[package]]
 name = "mullvad-api-constants"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
+dependencies = [
+ "http 1.3.1",
+]
 
 [[package]]
 name = "mullvad-daemon"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -15235,6 +15406,7 @@ dependencies = [
 [[package]]
 name = "mullvad-daemon-relay-selector"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "futures 0.3.34",
  "log",
@@ -15253,6 +15425,7 @@ dependencies = [
 [[package]]
 name = "mullvad-encrypted-dns-proxy"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "hickory-resolver",
  "log",
@@ -15265,6 +15438,7 @@ dependencies = [
 [[package]]
 name = "mullvad-fs"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "log",
  "talpid-error",
@@ -15275,6 +15449,7 @@ dependencies = [
 [[package]]
 name = "mullvad-leak-checker"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "clap",
@@ -15291,6 +15466,7 @@ dependencies = [
 [[package]]
 name = "mullvad-logging"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "tracing-subscriber",
 ]
@@ -15298,11 +15474,13 @@ dependencies = [
 [[package]]
 name = "mullvad-management-interface"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "chrono",
  "futures 0.3.34",
  "hyper-util",
  "log",
+ "mullvad-api-constants",
  "mullvad-paths",
  "mullvad-types",
  "nix 0.31.3",
@@ -15323,6 +15501,7 @@ dependencies = [
 [[package]]
 name = "mullvad-masque-proxy"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "bytes 1.12.1",
@@ -15345,6 +15524,7 @@ dependencies = [
 [[package]]
 name = "mullvad-paths"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "dirs 7.0.0",
  "log",
@@ -15357,6 +15537,7 @@ dependencies = [
 [[package]]
 name = "mullvad-relay-selector"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "either",
  "ipnetwork",
@@ -15372,6 +15553,7 @@ dependencies = [
 [[package]]
 name = "mullvad-tls-client"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "rustls",
  "rustls-pki-types",
@@ -15380,6 +15562,7 @@ dependencies = [
 [[package]]
 name = "mullvad-types"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "chrono",
  "either",
@@ -15397,6 +15580,7 @@ dependencies = [
 [[package]]
 name = "mullvad-update"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "chrono",
@@ -15419,6 +15603,7 @@ dependencies = [
 [[package]]
 name = "mullvad-version"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "regex-lite",
  "serde",
@@ -15468,6 +15653,7 @@ checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
 [[package]]
 name = "naga"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "arrayvec",
  "bit-set 0.11.1",
@@ -15492,11 +15678,12 @@ dependencies = [
 [[package]]
 name = "naga-types"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
+ "bytemuck",
  "hashbrown 0.17.1",
  "indexmap 2.14.2",
  "rustc-hash 1.1.0",
- "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -18536,6 +18723,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "112d82ceb8c5bf524d9af484d4e4970c9fd5a0cc15ba14ad93dccd28873b0629"
 dependencies = [
  "digest 0.11.3",
+ "hmac 0.13.0",
 ]
 
 [[package]]
@@ -19870,6 +20058,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c9f42978c78a00e3d68f69fc03e57a234debae69da4020a4fb588fcdcd07b06"
 dependencies = [
  "elliptic-curve 0.14.3",
+ "once_cell",
  "primefield",
  "serdect",
  "wnaf",
@@ -21139,6 +21328,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rc2"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ceda21af1ae61033b63175653a1af86cae399d79cd03ca80ba347eb3a6c4a7fe"
+dependencies = [
+ "cipher 0.5.2",
+]
+
+[[package]]
 name = "rdrand"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -21678,6 +21876,15 @@ dependencies = [
  "libc",
  "untrusted 0.9.0",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "ripemd"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4dd4211456b4172d7e44261920c25acf07367c4f04bb5f5d54fc21b090d9b159"
+dependencies = [
+ "digest 0.11.3",
 ]
 
 [[package]]
@@ -24941,6 +25148,7 @@ dependencies = [
 [[package]]
 name = "taffy"
 version = "0.15.1"
+source = "git+https://github.com/aphrody-labs/taffy.git?tag=v0.15.1-aphrody.20261120#7261eb2d46a05c4b0fb37278829d85ee6bf9fb66"
 dependencies = [
  "rustc-hash 2.1.3",
  "serde",
@@ -24957,6 +25165,7 @@ checksum = "7b2093cf4c8eb1e67749a6762251bc9cd836b6fc171623bd0a9d324d37af2417"
 [[package]]
 name = "talpid-cgroup"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "log",
@@ -24967,6 +25176,7 @@ dependencies = [
 [[package]]
 name = "talpid-core"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -25020,6 +25230,7 @@ dependencies = [
 [[package]]
 name = "talpid-dbus"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "dbus",
  "libc",
@@ -25032,6 +25243,7 @@ dependencies = [
 [[package]]
 name = "talpid-dns"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "futures 0.3.34",
  "inotify",
@@ -25057,6 +25269,7 @@ dependencies = [
 [[package]]
 name = "talpid-error"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "log",
 ]
@@ -25064,6 +25277,7 @@ dependencies = [
 [[package]]
 name = "talpid-future"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "rand 0.9.4",
  "talpid-time",
@@ -25072,6 +25286,7 @@ dependencies = [
 [[package]]
 name = "talpid-logging"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "chrono",
@@ -25087,6 +25302,7 @@ dependencies = [
 [[package]]
 name = "talpid-macos"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "anyhow",
  "libc",
@@ -25097,6 +25313,7 @@ dependencies = [
 [[package]]
 name = "talpid-net"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "libc",
  "log",
@@ -25109,6 +25326,7 @@ dependencies = [
 [[package]]
 name = "talpid-netstack"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "bytes 1.12.1",
  "either",
@@ -25123,6 +25341,7 @@ dependencies = [
 [[package]]
 name = "talpid-platform-metadata"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "rs-release",
  "talpid-dbus",
@@ -25133,6 +25352,7 @@ dependencies = [
 [[package]]
 name = "talpid-routing"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "bitflags 2.13.1",
  "futures 0.3.34",
@@ -25157,6 +25377,7 @@ dependencies = [
 [[package]]
 name = "talpid-time"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "nix 0.31.3",
  "tokio",
@@ -25165,6 +25386,7 @@ dependencies = [
 [[package]]
 name = "talpid-tunnel"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "cfg-if",
  "futures 0.3.34",
@@ -25189,6 +25411,7 @@ dependencies = [
 [[package]]
 name = "talpid-tunnel-config-client"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "gotatun",
  "hyper-util",
@@ -25213,6 +25436,7 @@ dependencies = [
 [[package]]
 name = "talpid-types"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "base64 0.22.1",
  "ipnetwork",
@@ -25230,6 +25454,7 @@ dependencies = [
 [[package]]
 name = "talpid-windows"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "futures 0.3.34",
  "log",
@@ -25242,6 +25467,7 @@ dependencies = [
 [[package]]
 name = "talpid-winfw"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "ipnetwork",
  "log",
@@ -25254,6 +25480,7 @@ dependencies = [
 [[package]]
 name = "talpid-wireguard"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "async-trait",
  "bitflags 1.3.2",
@@ -27026,6 +27253,7 @@ dependencies = [
 [[package]]
 name = "tunnel-obfuscation"
 version = "0.0.0"
+source = "git+https://github.com/aphrody-labs/mullvadvpn-app.git?tag=v2026.11.20-aphrody.3#585b1af2eedb341c397c391250687ad974320f99"
 dependencies = [
  "async-trait",
  "blake2",
@@ -28789,12 +29017,14 @@ dependencies = [
 [[package]]
 name = "wgpu"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "arrayvec",
  "bitflags 2.13.1",
  "bytemuck",
  "cfg-if",
  "cfg_aliases",
+ "concurrent-queue",
  "document-features",
  "hashbrown 0.17.1",
  "js-sys",
@@ -28816,6 +29046,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "arrayvec",
  "bit-set 0.11.1",
@@ -28850,6 +29081,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core-deps-apple"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "wgpu-hal",
 ]
@@ -28857,6 +29089,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core-deps-emscripten"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "wgpu-hal",
 ]
@@ -28864,6 +29097,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core-deps-linux-android-bsd"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "wgpu-hal",
 ]
@@ -28871,6 +29105,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core-deps-wasm"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "wgpu-hal",
 ]
@@ -28878,6 +29113,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core-deps-windows"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "wgpu-hal",
 ]
@@ -28885,6 +29121,7 @@ dependencies = [
 [[package]]
 name = "wgpu-hal"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "android_system_properties",
  "arrayvec",
@@ -28936,6 +29173,7 @@ dependencies = [
 [[package]]
 name = "wgpu-naga-bridge"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "naga",
  "wgpu-types",
@@ -28944,6 +29182,7 @@ dependencies = [
 [[package]]
 name = "wgpu-sync"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "cfg-if",
  "lock_api",
@@ -28956,6 +29195,7 @@ dependencies = [
 [[package]]
 name = "wgpu-types"
 version = "30.0.0"
+source = "git+https://github.com/aphrody-labs/wgpu.git?tag=v30.0.0-aphrody.20261120#3d3f41fd568b7b742b758a219a4f5a850d9e2e3f"
 dependencies = [
  "bitflags 2.13.1",
  "bytemuck",
@@ -30351,6 +30591,7 @@ dependencies = [
 [[package]]
 name = "wry"
 version = "0.57.3"
+source = "git+https://github.com/aphrody-labs/wry.git?tag=v0.57.3-aphrody.20261120#259b0969f367b69ee2a54dbdaef033e24719afdd"
 dependencies = [
  "base64 0.23.1",
  "block2 0.6.2",

@@ -40,8 +40,11 @@ const GUARD_ALLOWLIST = new Set([
  * whose working tree is not initialised cannot be verified on disk; the pinned gitlink is the contract.
  */
 export function isInsideUninitialisedSubmodule(absolutePath: string, root = repoRoot): boolean {
-  const staged = Bun.spawnSync(["git", "-C", root, "ls-files", "--stage"], { stdout: "pipe", stderr: "pipe" });
   const relativePath = relative(root, absolutePath).split(sep).join("/");
+  if (relativePath.startsWith("vendor/") && existsSync(join(root, "tooling/bun/forks-manifest.json"))) {
+    return true;
+  }
+  const staged = Bun.spawnSync(["git", "-C", root, "ls-files", "--stage"], { stdout: "pipe", stderr: "pipe" });
   return new TextDecoder()
     .decode(staged.stdout)
     .split(/\r?\n/)

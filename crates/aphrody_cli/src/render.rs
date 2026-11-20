@@ -247,6 +247,7 @@ pub(crate) fn run(args: RenderArgs) -> Result<()> {
         format: wgpu::TextureFormat::Rgba8Unorm,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
         view_formats: &[],
+        texture_binding_view_dimension: None,
     });
     let target_view = target_texture.create_view(&wgpu::TextureViewDescriptor::default());
 

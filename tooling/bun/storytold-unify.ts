@@ -246,7 +246,8 @@ export function auditStorytoldUnification(root = repoRoot): StorytoldAuditReport
 
   const rootCargo = readFileSync(join(root, "Cargo.toml"), "utf8");
   const patchedEguiInRootCargo =
-    rootCargo.includes('egui = { path = "vendor/egui/crates/egui" }') &&
+    (rootCargo.includes('egui = { path = "vendor/egui/crates/egui" }') ||
+      rootCargo.includes('egui = { git = "https://github.com/aphrody-labs/egui.git"')) &&
     rootCargo.includes('"crates/egui_gpui"') &&
     rootCargo.includes('"crates/bevy_gpui"') &&
     rootCargo.includes('"crates/aphrody_craft"');

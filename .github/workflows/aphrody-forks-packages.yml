@@ -1,0 +1,95 @@
+name: Publish Aphrody Fork Packages & Release Bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_tag:
+        description: "OCI tag on ghcr.io/aphrody-labs/aphrody-forks (defaults to manifest releaseDate compact)"
+        required: false
+        default: "20261120"
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish-fork-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout aphrody
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Fetch pinned fork release tarballs & generate SHA256SUMS
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/forks
+          cp tooling/bun/forks-manifest.json dist/forks/forks-manifest.json
+          bun -e '
+            import { readFileSync, writeFileSync } from "node:fs";
+            const manifest = JSON.parse(readFileSync("tooling/bun/forks-manifest.json", "utf8"));
+            const lines = [];
+            for (const f of manifest.forks) {
+              const out = `dist/forks/${f.name}-${f.tag}.tar.gz`;
+              const res = await fetch(f.tarballUrl, { redirect: "follow" });
+              if (!res.ok) throw new Error(`Failed to fetch ${f.tarballUrl}: HTTP ${res.status}`);
+              const buf = new Uint8Array(await res.arrayBuffer());
+              await Bun.write(out, buf);
+              const hasher = new Bun.CryptoHasher("sha256");
+              hasher.update(buf);
+              const digest = hasher.digest("hex");
+              lines.push(`${digest}  ${f.name}-${f.tag}.tar.gz`);
+              console.log(`OK ${f.repo}@${f.tag} (${buf.byteLength} bytes, sha256=${digest.slice(0, 16)}...)`);
+            }
+            writeFileSync("dist/forks/SHA256SUMS.txt", lines.join("\n") + "\n");
+          '
+
+      - name: Build and push OCI package to GitHub Packages (GHCR)
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_TAG: ${{ inputs.package_tag || '20261120' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          cat > dist/Dockerfile <<'EOF'
+          FROM scratch
+          LABEL org.opencontainers.image.source="https://github.com/aphrody-labs/aphrody"
+          LABEL org.opencontainers.image.description="Pinned Aphrody upstream + Cloudflare Kitesurf fork release tarballs and SHA256 manifest"
+          LABEL org.opencontainers.image.licenses="Apache-2.0 OR MIT"
+          COPY forks/ /forks/
+          EOF
+          IMAGE="ghcr.io/aphrody-labs/aphrody-forks"
+          docker build -f dist/Dockerfile -t "${IMAGE}:${PACKAGE_TAG}" -t "${IMAGE}:latest" dist
+          docker push "${IMAGE}:${PACKAGE_TAG}"
+          docker push "${IMAGE}:latest"
+
+      - name: Publish consolidated GitHub Release bundle
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_TAG: ${{ inputs.package_tag || '20261120' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REL_TAG="forks-${PACKAGE_TAG}"
+          NOTES="Consolidated pinned fork bundle (11 aphrody-labs/* forks merged with upstream + Cloudflare Kitesurf patches).
+
+          - OCI Package: \`ghcr.io/aphrody-labs/aphrody-forks:${PACKAGE_TAG}\`
+          - Manifest: \`forks-manifest.json\`
+          - Checksums: \`SHA256SUMS.txt\`"
+          if gh release view "$REL_TAG" >/dev/null 2>&1; then
+            gh release upload "$REL_TAG" dist/forks/forks-manifest.json dist/forks/SHA256SUMS.txt --clobber
+          else
+            gh release create "$REL_TAG" \
+              dist/forks/forks-manifest.json \
+              dist/forks/SHA256SUMS.txt \
+              --title "Aphrody Pinned Forks Bundle ${PACKAGE_TAG}" \
+              --notes "$NOTES"
+          fi

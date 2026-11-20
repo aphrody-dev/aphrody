@@ -225,7 +225,8 @@ function probeLanHosts(offline: boolean): LanHostStatus[] {
 
 export function runAudit(root = repoRoot, offline = false): VendorLanReport {
   const errors: string[] = [];
-  const gitmodulesRaw = readFileSync(join(root, ".gitmodules"), "utf8");
+  const gitmodulesPath = join(root, ".gitmodules");
+  const gitmodulesRaw = existsSync(gitmodulesPath) ? readFileSync(gitmodulesPath, "utf8") : "";
   const declared = parseGitmodules(gitmodulesRaw);
   const cargoReferenced = listReferencedPaths();
   const nested = listNestedReferencedPaths(root);

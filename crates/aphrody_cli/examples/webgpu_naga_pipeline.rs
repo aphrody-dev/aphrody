@@ -209,6 +209,7 @@ fn main() -> Result<()> {
     };
     let hlsl_pipeline = naga::back::hlsl::PipelineOptions {
         entry_point: Some((naga::ShaderStage::Fragment, "fs_main".to_string())),
+        multisampled: false,
     };
     let mut hlsl_out = String::new();
     let mut hlsl_writer =
@@ -527,7 +528,7 @@ fn main() -> Result<()> {
     });
     device
         .poll(wgpu::PollType::Wait {
-            submission_index: Some(compute_submission),
+            submission_index: compute_submission,
             timeout: Some(Duration::from_secs(10)),
         })
         .context("compute readback poll timed out")?;
@@ -580,6 +581,7 @@ fn main() -> Result<()> {
         format: wgpu::TextureFormat::Rgba8Unorm,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
         view_formats: &[],
+        texture_binding_view_dimension: None,
     });
     let render_target_view = render_target.create_view(&wgpu::TextureViewDescriptor::default());
 
@@ -711,7 +713,7 @@ fn main() -> Result<()> {
         });
     device
         .poll(wgpu::PollType::Wait {
-            submission_index: Some(render_submission),
+            submission_index: render_submission,
             timeout: Some(Duration::from_secs(10)),
         })
         .context("render readback poll timed out")?;
