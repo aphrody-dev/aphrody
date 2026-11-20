@@ -1,6 +1,6 @@
 [package]
 name = "aphrody"
-version = "0.5.0"
+version.workspace = true
 edition.workspace = true
 publish.workspace = true
 license = "GPL-3.0-or-later"

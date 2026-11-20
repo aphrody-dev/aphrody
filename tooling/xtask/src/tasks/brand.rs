@@ -974,7 +974,7 @@ mod tests {
             product: ProductSection {
                 name: "Aphrody".into(),
                 slug: "aphrody".into(),
-                tagline: "GPU-native code & UI studio".into(),
+                tagline: "OS and desktop (Zed fork, GPUI)".into(),
                 description: "Ultra-fast studio".into(),
                 authors: vec!["Aphrody Labs <dev@aphrody.com>".into()],
                 company_name: "Aphrody Labs".into(),

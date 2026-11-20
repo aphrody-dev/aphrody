@@ -44,7 +44,7 @@ const DEFAULT_ENTRIES: StoreCardItem[] = [
   {
     id: "aphrody",
     name: "Aphrody",
-    tagline: "GPU-native code & UI studio",
+    tagline: "OS and desktop (Zed fork, GPUI)",
     category: "app",
     stars: 0,
     targets: TARGETS,

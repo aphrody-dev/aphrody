@@ -541,9 +541,9 @@ function buildFirstPartyEntries(): StoreEntry[] {
   const version = sanitizeSemver(String(plugin.version ?? "1.30.0"));
   const repoUrl = String(urls.repository ?? "https://github.com/aphrody-dev/aphrody");
   const homepageUrl = String(urls.homepage ?? "https://aphrody.com");
-  const tagline = String(prod.tagline ?? "GPU-native code & UI studio");
+  const tagline = String(prod.tagline ?? "OS and desktop (Zed fork, GPUI)");
   const description = String(
-    prod.description ?? "Ultra-fast, modular GPU-native code and UI studio.",
+    prod.description ?? "Local-first OS and desktop (Zed fork, GPUI).",
   );
 
   return [

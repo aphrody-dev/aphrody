@@ -1,5 +1,5 @@
 [package]
-description = "Ultra-fast, modular GPU-native code and UI studio, 100% compatible with the Zed ecosystem."
+description = "Local-first OS and desktop: GPUI desktop shell, compositor, installer and the Aphrody Studio editor, 100% compatible with the Zed ecosystem."
 edition.workspace = true
 name = "zed"
 version = "1.31.0"

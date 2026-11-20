@@ -5,8 +5,8 @@
 [product]
 name = "Aphrody"
 slug = "aphrody"
-tagline = "GPU-native code & UI studio"
-description = "Ultra-fast, modular GPU-native code and UI studio, 100% compatible with the Zed ecosystem."
+tagline = "OS and desktop (Zed fork, GPUI)"
+description = "Local-first OS and desktop: GPUI desktop shell, compositor, installer and the Aphrody Studio editor, 100% compatible with the Zed ecosystem."
 authors = ["Aphrody Labs <dev@aphrody.com>"]
 company_name = "Aphrody Labs"
 copyright = "Copyright 2026 Aphrody Labs"

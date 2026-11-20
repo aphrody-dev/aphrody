@@ -1,6 +1,9 @@
-# Aphrody — GPU UI Library (`aphrody`)
+> [!IMPORTANT]
+> Remove this line to confirm you've reviewed this PR before submitting.
 
-Modular, local-first Rust **GPU UI Library** (GPUI, WGPU, Taffy layout, Native Shell TSX/Rust, AccessKit, Cosmic-Text, design tokens, and composable UI primitives) — with full Zed UI ecosystem compatibility. OS, kernel, POSIX, Windows, AI, and ML layers live in `fw`.
+# Aphrody — OS and desktop (Zed fork, GPUI) (`aphrody`)
+
+Local-first Rust **OS and desktop** layer, a fork of [Zed](https://github.com/zed-industries/zed): the `aphrody-os` GPUI desktop shell and compositor (`aphrody_desktop`, `aphrody_session`), the installer (`aphrody_installer`), the **Aphrody Studio** editor (`aphrody` binary), and the GPU UI stack (GPUI, WGPU, Taffy layout, Native Shell TSX/Rust, AccessKit, Cosmic-Text, design tokens), with full Zed ecosystem compatibility. It owns the UI/GPU upstream forks. The toolchain and agent runtime live in [`fw`](../fw); the SDK, cloud and edge live in [`ay`](../ay). Dependencies only point down the stack (`fw` <- `aphrody` <- `ay`).
 
 `aphrody` unifies the GPUI desktop/mobile/web engine, Native Shell (`nsh`), pinned [`aphrody-labs/*`](./tooling/bun/forks-manifest.json) GitHub Releases (`wgpu` v30.0.0, `taffy` + Cloudflare Kitesurf patches, `egui`, `accesskit`, `cosmic-text`, `wry`, `mullvadvpn-app`, `browser`, `kitesurf`, `craft-libs`, `craft-anything`), and `ghcr.io/aphrody-labs/aphrody-forks:20261120` into composable Rust libraries plus the **Aphrody** studio binary (`aphrody`), driven by a single declarative identity manifest ([`product.toml`](./product.toml)).
 
@@ -13,7 +16,7 @@ Modular, local-first Rust **GPU UI Library** (GPUI, WGPU, Taffy layout, Native S
 | **`crates/brand`** + **[`product.toml`](./product.toml)** | Single-source-of-truth product identity (`Aphrody`, `aphrody://`, `.aphrody/`, app IDs, icons) with transparent Zed compatibility (`.zed/`, `zed://`, `ZED_*`, `zed:extension`). | **Zero** (0 runtime deps) |
 | **`crates/gpui_ui`** | GPU-accelerated UI engine (`gpui`, `gpui_platform`, `Application::run_embedded`), design system (`ui`, `ui_input`, `component`), themes, icons, and optional Native Shell (`--features nsh-full`). | **Zero** (No WebRTC, No Wasmtime, No LLM SDKs, No `rolldown`) |
 | **`crates/gpui_code`** | Composable Rust code engine: pure text core (`rope`, `sum_tree`, `streaming_diff`, `imara-diff`, `fuzzy`) + opt-in Tree-sitter `syntax`/`grammars`, `buffer_diff`, `lsp`, `git`, `worktree`, `terminal` PTY, `editor`, and `vim`. | **Zero** WebRTC / Wasmtime / LLM SDKs (`--no-default-features` builds zero `rpc`/`proto`) |
-| **`crates/nsh-*` & `crates/aphrody_nsh`** | Absorbed Native Shell v0.5.0 unified on `gpui 0.2.2` & `wgpu 30.0.0`: Solid-style signals, 35+ controls, live in-memory `.tsx` hot-reload preview, and `<GpuiCodeEditor>` native embedding. | **Zero** `gpui-fast` duplicate, **zero** npm TypeScript tarballs |
+| **`crates/nsh-*` & `crates/aphrody_nsh`** | Absorbed Native Shell v0.6.0 unified on `gpui 0.2.2` & `wgpu 30.0.0`: Solid-style signals, 35+ controls, live in-memory `.tsx` hot-reload preview, and `<GpuiCodeEditor>` native embedding. | **Zero** `gpui-fast` duplicate, **zero** npm TypeScript tarballs |
 | **`crates/gpui_app_shell`** | Production multi-window docked application starter pack (`Workspace`, `Dock`, `Pane`, Command Palette, Keymaps, JSON Settings, SQLite `db`, `AppModule` trait, `NshModule`). | **Zero** WebRTC / Wasmtime |
 | **`crates/aphrody_cli` (`gpui-wgpu`)** | Unified WGPU/Naga v30 adapter, shader validator/transpiler, headless PNG renderer, compute/bench, Wasm LTO/AOT toolchain, 5 standalone `templates/wasm-wgpu/` starters, `DESIGN.md` / Lighthouse CLI, and 24-tool JSON-RPC MCP server. | Standalone Apache-2.0 CLI + MCP |
 | **`crates/aphrody_design`** | Pure-Rust `https://design.google/` HTTP/HTML5/sitemap mirror, `DESIGN.md` Tailwind v4/W3C/WGSL exporter, Google Stitch SDK + PNG capture, and Core Web Vitals / Lighthouse / W3C / Vercel auditor. | Zero subprocess `curl`/`wget`, `wasm32`-ready |
@@ -27,7 +30,7 @@ Modular, local-first Rust **GPU UI Library** (GPUI, WGPU, Taffy layout, Native S
 
 ## Quick Start
 
-### 1. Check Default SDK Crates (`gpui_ui`, `gpui_code`, `gpui_app_shell`)
+### 1. Check the Default Workspace Members (`crates/aphrody`, `gpui_wgpu`, `gpui_web`, `gpui_ui`, `gpui_code`, `aphrody_session`, `aphrody_installer`, `aphrody_desktop`, `aphrody_cli`, and the other `default-members` of [`Cargo.toml`](./Cargo.toml))
 
 ```sh
 cargo check
@@ -119,4 +122,4 @@ Aphrody isolates its user directories (`%APPDATA%\Aphrody` / `%LOCALAPPDATA%\Aph
 
 ## Licensing
 
-Derived from [Zed](https://github.com/zed-industries/zed) and [Native Shell](https://github.com/longbridge/nsh), with pinned GitHub Releases in [`tooling/bun/forks-manifest.json`](./tooling/bun/forks-manifest.json) (`aphrody-labs/wgpu`, `aphrody-labs/taffy`, `aphrody-labs/egui`, `aphrody-labs/accesskit`, `aphrody-labs/cosmic-text`, `aphrody-labs/wry`, `aphrody-labs/mullvadvpn-app`, `aphrody-labs/browser`, `aphrody-labs/kitesurf`, `aphrody-labs/craft-libs`, `aphrody-labs/craft-anything`) and OCI package `ghcr.io/aphrody-labs/aphrody-forks:20261120`. Source code is licensed under GPL-3.0-or-later and Apache-2.0 / MIT where marked (`gpui`, `brand`, `aphrody_cli`, `aphrody_session`, `aphrody_ui`, `aphrody_craft`, and `nsh-*`).
+Derived from [Zed](https://github.com/zed-industries/zed) and [Native Shell](https://github.com/longbridge/nsh), with pinned GitHub Releases in [`tooling/bun/forks-manifest.json`](./tooling/bun/forks-manifest.json) (`aphrody-labs/wgpu`, `aphrody-labs/taffy`, `aphrody-labs/egui`, `aphrody-labs/accesskit`, `aphrody-labs/cosmic-text`, `aphrody-labs/wry`, `aphrody-labs/mullvadvpn-app`, `aphrody-labs/browser`, `aphrody-labs/kitesurf`, `aphrody-labs/craft-libs`, `aphrody-labs/craft-anything`) and OCI package `ghcr.io/aphrody-labs/aphrody-forks:20261120`. Workspace crates default to Apache-2.0 (`[workspace.package]`) and each crate declares its own `license` in its `Cargo.toml`: Apache-2.0 for `gpui*`, `brand`, `aphrody_design`, `aphrody_cli` and `nsh-*`; GPL-3.0-or-later for the Zed-derived crates (including `zed`, `aphrody`, `aphrody_session`, `aphrody_ui` and `aphrody_craft`); `Apache-2.0 OR GPL-3.0-or-later` for `aphrody_pilot`, `aphrody_google` and `aphrody_media`.

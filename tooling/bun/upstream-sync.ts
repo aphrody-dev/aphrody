@@ -115,7 +115,7 @@ export function readProductUpstreamConfig(root = repoRoot): ProductUpstreamConfi
     upstreamAgentBrowser: pm.git?.upstream_agent_browser ?? "https://github.com/aphrody-labs/agent-browser.git",
     upstreamAgentDesktop: pm.git?.upstream_agent_desktop ?? "https://github.com/aphrody-labs/agent-desktop.git",
     brandName: pm.product?.name ?? "Aphrody",
-    tagline: pm.product?.tagline ?? "GPU-native code & UI studio",
+    tagline: pm.product?.tagline ?? "OS and desktop (Zed fork, GPUI)",
   };
 }
 
