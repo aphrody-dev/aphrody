@@ -998,7 +998,7 @@ mod tests {
             },
             urls: UrlsSection {
                 homepage: "https://aphrody.com".into(),
-                repository: "https://github.com/aphrody-dev/aphrody".into(),
+                repository: "https://github.com/aphrody-labs/aphrody".into(),
                 docs: "https://docs.aphrody.com".into(),
                 status: "https://status.aphrody.com".into(),
                 store: "https://aphrody.com/store".into(),
@@ -1040,7 +1040,7 @@ mod tests {
                 upstream_stitch_sdk: "https://github.com/google-labs-code/stitch-sdk.git".into(),
                 upstream_stitch_skills: "https://github.com/google-labs-code/stitch-skills.git".into(),
                 upstream_agent_browser: "https://github.com/vercel-labs/agent-browser.git".into(),
-                upstream_agent_desktop: "https://github.com/aphrody-dev/agent-desktop.git".into(),
+                upstream_agent_desktop: "https://github.com/aphrody-labs/agent-desktop.git".into(),
                 submodule_bun: "https://github.com/aphrody-labs/bun".into(),
             },
             features: FeaturesSection {
@@ -1158,15 +1158,15 @@ osx_url_schemes = ["zed"]
             r#"{"name":"old","version":"0.0.1","author":{"name":"Old","url":"https://old"},"homepage":"https://old","repository":{"type":"git","url":"https://old"}}"#,
             &manifest,
         )?;
-        assert!(plugin.contains("https://github.com/aphrody-dev/aphrody"));
+        assert!(plugin.contains("https://github.com/aphrody-labs/aphrody"));
         assert!(plugin.contains("Aphrody Labs"));
 
         let issue_cfg = render_issue_template_config(
             "contact_links:\n  - name: Discussions\n    url: https://old/discussions\n  - name: Project Wiki\n    url: https://old/wiki\n",
             &manifest,
         );
-        assert!(issue_cfg.contains("https://github.com/aphrody-dev/aphrody/discussions"));
-        assert!(issue_cfg.contains("https://github.com/aphrody-dev/aphrody/wiki"));
+        assert!(issue_cfg.contains("https://github.com/aphrody-labs/aphrody/discussions"));
+        assert!(issue_cfg.contains("https://github.com/aphrody-labs/aphrody/wiki"));
         Ok(())
     }
 
@@ -1174,7 +1174,7 @@ osx_url_schemes = ["zed"]
     fn test_sync_text_file_is_crlf_resilient() -> Result<()> {
         let dir = tempfile::tempdir()?;
         let cargo_path = dir.path().join("Cargo.toml");
-        let lf = "[workspace.package]\nhomepage = \"https://aphrody.com\"\nrepository = \"https://github.com/aphrody-dev/aphrody\"\n";
+        let lf = "[workspace.package]\nhomepage = \"https://aphrody.com\"\nrepository = \"https://github.com/aphrody-labs/aphrody\"\n";
         let manifest = test_manifest();
         fs::write(&cargo_path, lf.replace('\n', "\r\n"))?;
         let mut drifted = Vec::new();

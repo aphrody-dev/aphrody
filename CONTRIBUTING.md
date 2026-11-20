@@ -1,13 +1,13 @@
 # Contributing to Aphrody (`aphrody`)
 
-Thank you for helping make **Aphrody** (`aphrody-dev/aphrody`) better! Aphrody is the OS and desktop layer (Zed fork, GPUI): the desktop shell, session and installer (`crates/aphrody_desktop`, `crates/aphrody_session`, `crates/aphrody_installer`), GPUI, Native Shell (`crates/nsh-*`), `gpui-kit`, and WGPU/Naga v30 (`crates/gpui_wgpu`, `crates/aphrody_cli`, with the `aphrody-labs/wgpu` fork pinned as a Cargo git dependency), with 100% Zed ecosystem compatibility driven by [`product.toml`](./product.toml).
+Thank you for helping make **Aphrody** (`aphrody-labs/aphrody`) better! Aphrody is the OS and desktop layer (Zed fork, GPUI): the desktop shell, session and installer (`crates/aphrody_desktop`, `crates/aphrody_session`, `crates/aphrody_installer`), GPUI, Native Shell (`crates/nsh-*`), `gpui-kit`, and WGPU/Naga v30 (`crates/gpui_wgpu`, `crates/aphrody_cli`, with the `aphrody-labs/wgpu` fork pinned as a Cargo git dependency), with 100% Zed ecosystem compatibility driven by [`product.toml`](./product.toml).
 
 ## Before You Start
 
 - **Keep no more than three PRs open at a time.**
   This helps keep reviews responsive and gives every contributor a fair share of reviewing bandwidth. Start with one PR and see it through to merge; stacking open PRs increases rebase churn as `main` advances.
 - **Discuss features before you start writing code.**
-  If there is not already a confirmed GitHub Issue, start a [GitHub Discussion](https://github.com/aphrody-dev/aphrody/discussions) rather than opening a premature PR or duplicate issue. This is especially important for large cross-crate refactors and changes to the `zed:extension` Extension API (`crates/extension_api`).
+  If there is not already a confirmed GitHub Issue, start a [GitHub Discussion](https://github.com/aphrody-labs/aphrody/discussions) rather than opening a premature PR or duplicate issue. This is especially important for large cross-crate refactors and changes to the `zed:extension` Extension API (`crates/extension_api`).
   - Before proposing a moderate-to-large feature, read [Aphrody's Feature Process](./docs/src/development/feature-process.md) for the motivation, integration points, and design checklist to cover.
 - **Automated upstream syncs**: Synchronization with `zed-industries/zed`, `longbridge/nsh`, `longbridge/gpui-kit`, and `gfx-rs/wgpu` is managed through [`.github/workflows/aphrody-upstream-sync.yml`](./.github/workflows/aphrody-upstream-sync.yml).
 - **Code of Conduct**: All participation across issues, discussions, and pull requests is governed by [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
@@ -28,15 +28,15 @@ There are few rigid rules, but we typically decline:
 
 ### Ways to Contribute (We Love PRs That...)
 
-- **Fix or extend documentation**: browse [`documentation` issues](https://github.com/aphrody-dev/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3Adocumentation).
-- **Pick up curated starter or community issues**: browse [`good first issue`](https://github.com/aphrody-dev/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3A%22good+first+issue%22) and [`help wanted`](https://github.com/aphrody-dev/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3A%22help+wanted%22).
-- **Fix bugs**: browse open [`bug` issues](https://github.com/aphrody-dev/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3Abug) or filter by subsystem [labels](https://github.com/aphrody-dev/aphrody/labels) (`zed`, `nsh`, `gpui-kit`, `wgpu`, `gpu/vulkan`, `gpu/directx`, `gpu/webgpu`, `accessibility`).
+- **Fix or extend documentation**: browse [`documentation` issues](https://github.com/aphrody-labs/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3Adocumentation).
+- **Pick up curated starter or community issues**: browse [`good first issue`](https://github.com/aphrody-labs/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3A%22good+first+issue%22) and [`help wanted`](https://github.com/aphrody-labs/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3A%22help+wanted%22).
+- **Fix bugs**: browse open [`bug` issues](https://github.com/aphrody-labs/aphrody/issues?q=is%3Aissue+state%3Aopen+label%3Abug) or filter by subsystem [labels](https://github.com/aphrody-labs/aphrody/labels) (`zed`, `nsh`, `gpui-kit`, `wgpu`, `gpu/vulkan`, `gpu/directx`, `gpu/webgpu`, `accessibility`).
 - **Make existing features work across more platforms**, windowing backends, and GPUs (Wayland/X11, Windows DX12/Vulkan, macOS Metal, Wasm/WebGPU).
 - **Add small, focused features**, such as keybindings, actions, NSH controls, or `gpui-wgpu` diagnostics.
 
 ## Reporting Bugs & Crashes
 
-Before filing an issue, search existing [Issues](https://github.com/aphrody-dev/aphrody/issues). For feature ideas or design feedback, use [Feature Discussions](https://github.com/aphrody-dev/aphrody/discussions/new?category=feature-requests) ([template](./.github/DISCUSSION_TEMPLATE/feature-requests.yml?plain=1)).
+Before filing an issue, search existing [Issues](https://github.com/aphrody-labs/aphrody/issues). For feature ideas or design feedback, use [Feature Discussions](https://github.com/aphrody-labs/aphrody/discussions/new?category=feature-requests) ([template](./.github/DISCUSSION_TEMPLATE/feature-requests.yml?plain=1)).
 
 Use the structured issue templates:
 

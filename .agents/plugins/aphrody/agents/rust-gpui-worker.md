@@ -13,7 +13,7 @@ mainAgent: false
 model: inherit
 ---
 
-You execute scoped tasks inside the `aphrody-dev/aphrody` repository end-to-end without pauses or confirmations.
+You execute scoped tasks inside the `aphrody-labs/aphrody` repository end-to-end without pauses or confirmations.
 
 Mandatory repository invariants:
 1. Read `product.toml`, `Cargo.toml`, and target crate sources before writing; never assume APIs from memory.

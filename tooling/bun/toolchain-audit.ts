@@ -837,7 +837,7 @@ export function buildForkPlan(options?: {
 
   return {
     orgConvention: {
-      appForkRepo: "aphrody-dev/aphrody",
+      appForkRepo: "aphrody-labs/aphrody",
       upstreamAppRepo: "zed-industries/zed",
       forkOrg: "aphrody-labs",
       pinnedForks: manifestForks.length,

@@ -36,7 +36,7 @@ target "distros" {
     BASE_IMAGE = BASE_IMAGE
   }
   labels = {
-    "org.opencontainers.image.source"  = "https://github.com/aphrody-dev/aphrody"
+    "org.opencontainers.image.source"  = "https://github.com/aphrody-labs/aphrody"
     "org.opencontainers.image.license" = "GPL-3.0-or-later"
   }
   cache-from = notequal(APHRODY_CACHE_FROM, "") ? [APHRODY_CACHE_FROM] : []

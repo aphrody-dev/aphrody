@@ -35,7 +35,7 @@ const TARGETS: SkillTarget[] = [
 async function fetchCrateInfo(name: string): Promise<{ name: string; version: string; updated: string } | null> {
   try {
     const res = await fetch(`https://crates.io/api/v1/crates/${encodeURIComponent(name)}`, {
-      headers: { "User-Agent": "aphrody-skills-sync/1.0 (https://github.com/aphrody-dev/aphrody)" },
+      headers: { "User-Agent": "aphrody-skills-sync/1.0 (https://github.com/aphrody-labs/aphrody)" },
     });
     if (!res.ok) return null;
     const data = (await res.json()) as {

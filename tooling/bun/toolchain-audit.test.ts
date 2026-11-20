@@ -173,7 +173,7 @@ crate-type (bin)                     47
 
   test("buildForkPlan targets pinned aphrody-labs git forks without submodules and keeps upstream branches", () => {
     const fullPlan = buildForkPlan({ root: repoRoot });
-    expect(fullPlan.orgConvention.appForkRepo).toBe("aphrody-dev/aphrody");
+    expect(fullPlan.orgConvention.appForkRepo).toBe("aphrody-labs/aphrody");
     expect(fullPlan.orgConvention.forkOrg).toBe("aphrody-labs");
     expect(fullPlan.orgConvention.forksManifest).toBe("tooling/bun/forks-manifest.json");
     const manifest = JSON.parse(readFileSync(join(repoRoot, "tooling/bun/forks-manifest.json"), "utf8")) as { forks: unknown[] };

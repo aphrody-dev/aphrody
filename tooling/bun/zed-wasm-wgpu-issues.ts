@@ -97,7 +97,7 @@ export const WASM_WGPU_ISSUES: WasmWgpuIssueRecord[] = [
   },
   {
     id: "aphrody#wasm-aot-cache",
-    upstream: "https://github.com/aphrody-dev/aphrody",
+    upstream: "https://github.com/aphrody-labs/aphrody",
     domain: "extension-aot",
     title: "Bounded StoreLimits and persistent .cwasm AOT disk cache for Wasmtime WIT extensions",
     status: "fixed-in-fork",

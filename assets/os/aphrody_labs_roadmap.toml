@@ -4,7 +4,7 @@ schema_version = 1
 organization = "Aphrody Labs"
 design_source_of_truth = "https://design.google/"
 stitch_url = "https://stitch.withgoogle.com/"
-primary_monorepo = "aphrody-dev/aphrody"
+primary_monorepo = "aphrody-labs/aphrody"
 
 [vision]
 thesis = "Pure-Rust Desktop OS, Chromium WebGPU browser, Google Workspace & Cloud AI runtime, and multimedia studio running natively on Wayland, Windows, macOS, and WebAssembly"
@@ -20,7 +20,7 @@ principles = [
 [[domains]]
 id = "aphrody"
 org = "aphrody-dev"
-repo = "aphrody-dev/aphrody"
+repo = "aphrody-labs/aphrody"
 category = "Pure-Rust Desktop OS, Studio IDE & Material 3 Expressive UI"
 surfaces = ["Wayland", "Windows", "macOS", "Wasm/Chromium", "iOS", "Android", "Headless MCP"]
 owner_paths = ["crates/zed", "crates/aphrody_desktop", "crates/aphrody_ui", "crates/gpui"]
@@ -38,7 +38,7 @@ summary = "Relay, MCP, ACP, A2A 1.0, ADK-Rust, Gemini Computer Use, Google Works
 [[domains]]
 id = "ay"
 org = "aphrody-dev"
-repo = "aphrody-dev/ay"
+repo = "aphrody-labs/ay"
 category = "Fleet & Machine Automation"
 surfaces = ["CLI", "SSH Fleet"]
 owner_paths = ["tooling/bun/fleet-sync.ts"]
@@ -83,7 +83,7 @@ summary = "Live CDP browser control, OpenTUI terminal UI, encrypted tunnels, and
 [[domains]]
 id = "auto"
 org = "aphrody-dev"
-repo = "aphrody-dev/ay"
+repo = "aphrody-labs/ay"
 category = "Google Workspace, Cloud AI & Edge Distribution"
 surfaces = ["Desktop", "Web", "Headless CLI", "Cloudflare Edge"]
 owner_paths = ["crates/aphrody_google", "tooling/bun/multimedia-forks-audit.ts", ".cloudflare"]

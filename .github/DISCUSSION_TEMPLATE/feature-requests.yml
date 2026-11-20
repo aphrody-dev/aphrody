@@ -39,4 +39,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        See [aphrody Discussions](https://github.com/aphrody-dev/aphrody/discussions) for ongoing architecture threads and upstream sync planning.
+        See [aphrody Discussions](https://github.com/aphrody-labs/aphrody/discussions) for ongoing architecture threads and upstream sync planning.

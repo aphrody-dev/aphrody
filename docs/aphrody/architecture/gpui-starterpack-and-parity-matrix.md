@@ -32,10 +32,10 @@
 
 | Benchmark | Iterations | Throughput (ops/sec) | p50 (us) | p95 (us) |
 | --- | ---: | ---: | ---: | ---: |
-| `design_md_frontmatter_parse` | 200 | 415628 | 2.4 | 4.7 |
-| `shadcn_tailwind_v4_css_emit` | 200 | 176710 | 5 | 9.4 |
-| `cwv_lighthouse_w3c_html_audit` | 200 | 1635323 | 0.5 | 1.3 |
-| `fork_parity_graph_resolve` | 50 | 46125 | 20.8 | 29 |
+| `design_md_frontmatter_parse` | 200 | 360490 | 2.4 | 4.7 |
+| `shadcn_tailwind_v4_css_emit` | 200 | 177604 | 4.9 | 9.5 |
+| `cwv_lighthouse_w3c_html_audit` | 200 | 1626016 | 0.4 | 1.7 |
+| `fork_parity_graph_resolve` | 50 | 46117 | 21.2 | 29.1 |
 
 ## Monorepo TS -> Rust AI-Agent Readiness Audit
 

@@ -25,7 +25,7 @@ export const SITEMAPS_OUT_REL = "target/longbridge-ingest/sitemaps.json";
 export const SCREENSHOTS_OUT_REL = "target/longbridge-ingest/screenshots.json";
 export const SCREENSHOTS_DIR_REL = "target/longbridge-screenshots";
 
-const USER_AGENT = "AphrodyLongbridgeIngest/1.0 (+https://github.com/aphrody-dev/aphrody)";
+const USER_AGENT = "AphrodyLongbridgeIngest/1.0 (+https://github.com/aphrody-labs/aphrody)";
 
 export type RepoClassification =
   | "ABSORBED_FLATTENED"

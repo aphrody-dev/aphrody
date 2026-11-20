@@ -83,7 +83,7 @@ export function readProductMeta(root = repoRoot): { slug: string; repoSlug: stri
     urls?: { repository?: string };
   };
   const slug = product.product?.slug ?? "aphrody";
-  const repoUrl = product.urls?.repository ?? "https://github.com/aphrody-dev/aphrody";
+  const repoUrl = product.urls?.repository ?? "https://github.com/aphrody-labs/aphrody";
   const repoSlug = repoUrl.replace(/\.git$/, "");
   return { slug, repoSlug };
 }

@@ -40,7 +40,7 @@ Use this checklist when your changes affect UI.
 ## Consistency {#consistency}
 
 - Does it match Aphrody's design language (semantic `cx.theme()` / `@aphrody/design` tokens, spacing rhythm, typography, Material/GPUI icons)?
-  - Visit [the icon design guidelines](https://github.com/aphrody-dev/aphrody/blob/main/crates/icons/README.md)
+  - Visit [the icon design guidelines](https://github.com/aphrody-labs/aphrody/blob/main/crates/icons/README.md)
 - Is there one unmistakable primary CTA per screen, with secondary actions visually subordinate?
 - Are interactions consistent (how tabs close, how modals dismiss on Escape with focus restoration, how errors show)?
 
@@ -71,4 +71,4 @@ Use this checklist when your changes affect UI.
 - Are power features discoverable but not intrusive?
 - Is there a path from beginner → expert usage (progressive disclosure)?
 
-See the [contribution guidelines](https://github.com/aphrody-dev/aphrody/blob/main/CONTRIBUTING.md) for preparing your pull request.
+See the [contribution guidelines](https://github.com/aphrody-labs/aphrody/blob/main/CONTRIBUTING.md) for preparing your pull request.

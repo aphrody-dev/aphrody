@@ -14,7 +14,7 @@ Placing small-object `sccache` (~40K random 4–64K reads/writes) on Ceph `/srv/
 
 ## Zed Baseline Extensions
 
-- **`script/cargo`**: Updated [`script/cargo`](../../../script/cargo) to recognize [`product.toml`](../../../product.toml) and `aphrody-dev/aphrody` remotes in addition to upstream `zed-industries/zed`.
+- **`script/cargo`**: Updated [`script/cargo`](../../../script/cargo) to recognize [`product.toml`](../../../product.toml) and `aphrody-labs/aphrody` remotes in addition to upstream `zed-industries/zed`.
 - **Reproducible Profiles**: Declarative TOML profiles in [`assets/os/ci_host_profiles.toml`](../../../assets/os/ci_host_profiles.toml).
 - **Live Optimizer CLI**: [`tooling/bun/ci-host-optimize.ts`](../../../tooling/bun/ci-host-optimize.ts) (`bun run host:audit`, `bun run host:apply`, `bun run host:bench`):
   - **Kernel 7.3 & XFS sysctl (`/etc/sysctl.d/96-aphrody-ci-kernel73.conf`)**: Enables unprivileged `io_uring`, sets `vm.vfs_cache_pressure = 50`, `vm.compaction_proactiveness = 20`, `vm.dirty_background_bytes = 256M`, `vm.dirty_bytes = 1G`, `inotify`, and BBR + fq alongside `90-fr1-chromium-host.conf`.

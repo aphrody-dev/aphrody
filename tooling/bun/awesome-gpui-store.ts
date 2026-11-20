@@ -539,7 +539,7 @@ function buildFirstPartyEntries(): StoreEntry[] {
   const publisherId = pascalIdentifier(company);
   const identifierPrefix = String(prod.identifier_prefix ?? "com.aphrody.Aphrody");
   const version = sanitizeSemver(String(plugin.version ?? "1.30.0"));
-  const repoUrl = String(urls.repository ?? "https://github.com/aphrody-dev/aphrody");
+  const repoUrl = String(urls.repository ?? "https://github.com/aphrody-labs/aphrody");
   const homepageUrl = String(urls.homepage ?? "https://aphrody.com");
   const tagline = String(prod.tagline ?? "OS and desktop (Zed fork, GPUI)");
   const description = String(

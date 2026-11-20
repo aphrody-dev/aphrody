@@ -9,12 +9,12 @@ active_originals = 23
 aphrody_root_submodules = 0
 
 [owners]
-aphrody = "aphrody-dev/aphrody (Rust OS, GPUI, Craft, NSH, Wasm/WebGPU, W3C i18n, Tooling)"
+aphrody = "aphrody-labs/aphrody (Rust OS, GPUI, Craft, NSH, Wasm/WebGPU, W3C i18n, Tooling)"
 ai_os = "aphrody-dev/ai-os (Relay, ACP/A2A/HTTP/MCP daemon, OS automation)"
-ay = "aphrody-dev/ay (SDK, packages/machine, fleet & shell automation)"
+ay = "aphrody-labs/ay (SDK, packages/machine, fleet & shell automation)"
 anu = "aphrody-dev/anu (ANU monorepo)"
 open = "aphrody-labs/open (Browse, opentui, tunnel, ai-router, MV3 extension)"
-auto = "aphrody-dev/ay (Auto workspace: apps/auto-*, packages/auto*, crates/auto-sdk; the aphrody-labs/auto repository is archived)"
+auto = "aphrody-labs/ay (Auto workspace: apps/auto-*, packages/auto*, crates/auto-sdk; the aphrody-labs/auto repository is archived)"
 bun = "aphrody-labs/bun (Bun upstream fork & canary builds)"
 browser = "aphrody-labs/browser (Browser monorepo)"
 shenron = "aphrody-labs/shenron (Shenron apps)"
@@ -96,7 +96,7 @@ entries = [
   { repo = "steam-depot", cluster = 3, superseded_by = "steamroom / nie/crates", evidence = "Already marked isArchived: true on GitHub; Steam depot downloading toolkit superseded by steamroom." },
   { repo = "bun-distribution", cluster = 3, superseded_by = "auto/vendor/suite / @aphrody/bun-distribution", evidence = "Already marked isArchived: true on GitHub; vendorized directly into auto/vendor/suite." },
   { repo = "bun-os", cluster = 3, superseded_by = "crates/aphrody_* in C:\\src\\aphrody", evidence = "Already marked isArchived: true on GitHub; OS primitives migrated to aphrody_* crates." },
-  { repo = "nt", cluster = 3, superseded_by = "aphrody-dev/ayNT and C:\\src\\aphrody", evidence = "Already marked isArchived: true on GitHub; NT desktop kernel/shell superseded by ayNT and aphrody." },
+  { repo = "nt", cluster = 3, superseded_by = "aphrody-labs/aynt and C:\\src\\aphrody", evidence = "Already marked isArchived: true on GitHub; NT desktop kernel/shell superseded by ayNT and aphrody." },
   { repo = "rust-stack", cluster = 3, superseded_by = "C:\\src\\aphrody root Cargo.toml", evidence = "Already marked isArchived: true on GitHub; monorepo unit consolidated into aphrody workspace." },
   { repo = "ring3-agent", cluster = 3, superseded_by = "crates/aphrody_pilot and crates/agent in C:\\src\\aphrody", evidence = "Already marked isArchived: true on GitHub; ring3 agent logic migrated to aphrody_pilot." },
   { repo = "bench", cluster = 3, superseded_by = "crates/benchmarks and tooling/perf in C:\\src\\aphrody", evidence = "Already marked isArchived: true on GitHub; benchmarking harnesses centralized in aphrody." },
@@ -136,9 +136,9 @@ entries = [
   { repo = "depot_tools", cluster = 3, superseded_by = "Hermetic LLVM toolchain documented in docs/architecture/cross-compile-and-depot-tools.md", evidence = "Mirror of chromium depot_tools; prebuilt toolchain on fr1 avoids local depot_tools." },
   { repo = "wayland-c", cluster = 3, superseded_by = "smithay in aphrody-dev/ANU", evidence = "Read-only mirror of upstream Wayland C without local patches." },
   { repo = "binutils-gdb", cluster = 3, superseded_by = "llvm-project and LLVM linker/tools in aphrody-dev/ANU", evidence = "Read-only FSF mirror without active local patches." },
-  { repo = "dash", cluster = 3, superseded_by = "rubash in aphrody-dev/ay / ANU", evidence = "Read-only mirror of dash 0.5.11 without local patches." },
+  { repo = "dash", cluster = 3, superseded_by = "rubash in aphrody-labs/ay / ANU", evidence = "Read-only mirror of dash 0.5.11 without local patches." },
   { repo = "readline", cluster = 3, superseded_by = "crates/editor / rustyline in C:\\src\\aphrody", evidence = "Read-only mirror of devel branch without local patches." },
-  { repo = "make", cluster = 3, superseded_by = "bun / xtask / aphrody-dev/ay", evidence = "Read-only mirror of filedef-cleanup branch without local patches." },
+  { repo = "make", cluster = 3, superseded_by = "bun / xtask / aphrody-labs/ay", evidence = "Read-only mirror of filedef-cleanup branch without local patches." },
   { repo = "gnu-findutils", cluster = 3, superseded_by = "findutils (Rust rewrite in ANU)", evidence = "Read-only GNU mirror superseded by Rust rewrite." },
   { repo = "gnu-sed", cluster = 3, superseded_by = "sed (Rust rewrite in ANU)", evidence = "Read-only GNU mirror superseded by Rust rewrite." },
   { repo = "gawk", cluster = 3, superseded_by = "awk (Rust rewrite in ANU)", evidence = "Read-only mirror of dead-branches/async-events superseded by Rust rewrite." },

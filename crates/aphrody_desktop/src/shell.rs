@@ -285,7 +285,7 @@ impl OsDesktopShell {
         let store_catalog = aphrody_store::AwesomeGpuiCatalog::bundled().unwrap_or_else(|_| {
             aphrody_store::AwesomeGpuiCatalog {
                 schema_version: 1,
-                source_repo: "aphrody-dev/aphrody".to_owned(),
+                source_repo: "aphrody-labs/aphrody".to_owned(),
                 source_url: "https://aphrody.com".to_owned(),
                 synced_at: String::new(),
                 upstream_stars: 0,

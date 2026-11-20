@@ -15,9 +15,9 @@
 
 | Monorepo / Repo | Primary Scope | Consolidated / Absorbed Upstream Clusters |
 | --- | --- | --- |
-| `aphrody-dev/aphrody` ([root](../../../Cargo.toml)) | Unified Rust OS, GPUI, Craft, NSH, WebGPU/Wasm, W3C i18n, Tooling | `agent-desktop`, `artcraft`, `artcraftx`, `anicraft`, `autocraft`, `dioxus-monorepo`, standalone `cosmic-*` & `craft-*` UI crates, `gpui-component` / `nsh` merges |
+| `aphrody-labs/aphrody` ([root](../../../Cargo.toml)) | Unified Rust OS, GPUI, Craft, NSH, WebGPU/Wasm, W3C i18n, Tooling | `agent-desktop`, `artcraft`, `artcraftx`, `anicraft`, `autocraft`, `dioxus-monorepo`, standalone `cosmic-*` & `craft-*` UI crates, `gpui-component` / `nsh` merges |
 | `aphrody-dev/ai-os` | AI-OS runtime, Relay (MCP/ACP/A2A/HTTP/CLI), Automate | `relay`, `automate`, `env-kit`, `gnu-ts`, `omniu`, `wck` |
-| `aphrody-dev/ay` | Core SDK & machine setup | `packages/machine`, fleet installers |
+| `aphrody-labs/ay` | Core SDK & machine setup | `packages/machine`, fleet installers |
 | `aphrody-labs/open` | AI Router, TUI, Browser automation, Tunnel | `browse`, `opentui`, `opentunnel`, `models.dev` (0 ahead of upstream) |
 | `aphrody-labs/.github` | Org standard, CI workflows, W3C `i18n/` checker | Org-wide `STANDARD.md`, `standard.toml`, `i18n/I18N.md`, `i18n/check.ts` |
 
@@ -39,6 +39,6 @@
 
 ## 4. Deduplication & Consolidation Actions Executed
 
-- **Duplicate forks eliminated (`DELETE`)**: `anomalyco-browse` (synced into `aphrody-labs/browse`), `cloudflare-boringtun`, `cloudflare-pingora`, `mullvad-gotatun`, `mullvad-mullvadvpn-app`, `base-ui-1`, `tailwindcss-1`, `next.js-1`, `LiberNT` (commits preserved in `aphrody-dev/aynt`), `storytold-winit`, `storytold-wgpu`, `gfw-build-extra`, `gfw-MINGW-packages`, detached `antigravity-sdk-python` (replaced by canonical fork), and archived `longbridge-nsh` (active fork renamed to `aphrody-labs/longbridge-nsh`).
+- **Duplicate forks eliminated (`DELETE`)**: `anomalyco-browse` (synced into `aphrody-labs/browse`), `cloudflare-boringtun`, `cloudflare-pingora`, `mullvad-gotatun`, `mullvad-mullvadvpn-app`, `base-ui-1`, `tailwindcss-1`, `next.js-1`, `LiberNT` (commits preserved in `aphrody-labs/aynt`), `storytold-winit`, `storytold-wgpu`, `gfw-build-extra`, `gfw-MINGW-packages`, detached `antigravity-sdk-python` (replaced by canonical fork), and archived `longbridge-nsh` (active fork renamed to `aphrody-labs/longbridge-nsh`).
 - **Dead slice & cross-org collision archives eliminated (`DELETE`)**: `aphrody-labs/ai-os`, `agent-desktop`, `dioxus-monorepo`, `carbon`, `yolo-bun`, `yolo-hub`, `bench`, `depot`, `env-kit`, `gamescope-rs`, `gaming`, `infra`, `nt`, `ring3-agent`, `rust-stack`, `steam-depot`, `unix`, `wayland`, `wck`, `xtask` (`bun-os` and `bun-distribution` preserved for `crates.io` tarballs).
 - **Thin/duplicate products absorbed & archived (`PATCH archived=true`)**: `aphrody-dev/ayvpn` -> [`crates/ayvpn_daemon`](../../../crates/ayvpn_daemon/src/lib.rs) + [`crates/aphrody_vpn`](../../../crates/aphrody_vpn/src/aphrody_vpn.rs) + `browser-vpn`; `aphrody-dev/ay-tools` -> `ay/crates/ay-build` (feature `deps`); `aphrody-labs/legacy`, `yolo` + 16 `yolo-*` monorepos, `wii-os`, `google-bun`, and `gemini-super-app`.

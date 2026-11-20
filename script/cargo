@@ -181,7 +181,7 @@ function isZedRepo() {
     }
     return (
       result.stdout.includes("zed-industries/zed") ||
-      result.stdout.includes("aphrody-dev/aphrody") ||
+      result.stdout.includes("aphrody-labs/aphrody") ||
       result.stdout.includes("aphrody-labs/aphrody")
     );
   } catch {

@@ -17,7 +17,7 @@ pub const BUNDLED_STORE_TOML: &str = include_str!("../../../assets/os/awesome_gp
 /// Slim Wasm starter catalog hydrated from R2 at runtime (`web-slim` saves ~193 KiB `.rodata`).
 #[cfg(feature = "slim")]
 pub const BUNDLED_STORE_TOML: &str = r#"schema_version = 1
-source_repo = "aphrody-dev/aphrody"
+source_repo = "aphrody-labs/aphrody"
 source_url = "https://aphrody.com"
 synced_at = "2026-11-20"
 upstream_stars = 0

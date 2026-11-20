@@ -41,7 +41,7 @@ export const ORG_MANIFEST_REL = "target/gitingest/emscripten-core/org-manifest.j
 export const LLMS_TXT_REL = "docs/aphrody/architecture/emscripten-llms.txt";
 export const ARCH_DOC_REL = "docs/aphrody/architecture/emscripten-ecosystem.md";
 
-const USER_AGENT = "AphrodyEmscriptenIngest/1.0 (+https://github.com/aphrody-dev/aphrody)";
+const USER_AGENT = "AphrodyEmscriptenIngest/1.0 (+https://github.com/aphrody-labs/aphrody)";
 
 export const CORE_PROBE_PATHS = [
   "/",

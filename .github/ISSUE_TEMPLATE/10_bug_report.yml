@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Search existing [issues](https://github.com/aphrody-dev/aphrody/issues) first. For feature ideas or design feedback, open a [Discussion](https://github.com/aphrody-dev/aphrody/discussions/new?category=feature-requests) instead.
+        Search existing [issues](https://github.com/aphrody-labs/aphrody/issues) first. For feature ideas or design feedback, open a [Discussion](https://github.com/aphrody-labs/aphrody/discussions/new?category=feature-requests) instead.
   - type: dropdown
     id: component
     attributes:

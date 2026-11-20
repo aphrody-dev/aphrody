@@ -1,11 +1,11 @@
 blank_issues_enabled: true
 contact_links:
   - name: Feature request
-    url: https://github.com/aphrody-dev/aphrody/discussions/new?category=feature-requests
+    url: https://github.com/aphrody-labs/aphrody/discussions/new?category=feature-requests
     about: Propose a new feature, improvement, or architecture change in Discussions.
   - name: Discussions
-    url: https://github.com/aphrody-dev/aphrody/discussions
+    url: https://github.com/aphrody-labs/aphrody/discussions
     about: Feature requests, design architecture discussions, and Q&A for Aphrody.
   - name: Project Wiki
-    url: https://github.com/aphrody-dev/aphrody/wiki
+    url: https://github.com/aphrody-labs/aphrody/wiki
     about: Browse architecture guides for GPUI, NSH, gpui-kit, WGPU, Vulkan, DirectX 12, WebGPU, and Zed compatibility.

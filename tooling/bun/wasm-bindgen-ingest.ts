@@ -42,7 +42,7 @@ export const INGEST_MANIFEST_REL = "target/gitingest/wasm-bindgen/ingest-manifes
 export const LLMS_TXT_REL = "docs/aphrody/architecture/wasm-bindgen-llms.txt";
 export const ECOSYSTEM_DOC_REL = "docs/aphrody/architecture/wasm-bindgen-ecosystem.md";
 
-const USER_AGENT = "AphrodyWasmBindgenIngest/1.0 (+https://github.com/aphrody-dev/aphrody)";
+const USER_AGENT = "AphrodyWasmBindgenIngest/1.0 (+https://github.com/aphrody-labs/aphrody)";
 const GITINGEST_BASE = "https://gitingest.com";
 const GITINGEST_API = `${GITINGEST_BASE}/api/ingest`;
 

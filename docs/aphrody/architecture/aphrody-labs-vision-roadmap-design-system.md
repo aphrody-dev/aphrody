@@ -24,9 +24,9 @@ flowchart TD
 
 | Domain | Primary Repository | Target Surfaces | Primary Workspace Paths |
 | :--- | :--- | :--- | :--- |
-| `aphrody` | `aphrody-dev/aphrody` | Desktop, Web, iOS, Android, MCP | [`crates/aphrody_ui/src/google_design.rs`](../../../crates/aphrody_ui/src/google_design.rs) |
+| `aphrody` | `aphrody-labs/aphrody` | Desktop, Web, iOS, Android, MCP | [`crates/aphrody_ui/src/google_design.rs`](../../../crates/aphrody_ui/src/google_design.rs) |
 | `ai-os` | `aphrody-dev/ai-os` | Desktop, Edge, CLI | [`crates/aphrody_pilot`](../../../crates/aphrody_pilot/Cargo.toml) |
-| `ay` | `aphrody-dev/ay` | Fleet, SSH, WireGuard | [`tooling/bun/fleet-sync.ts`](../../../tooling/bun/fleet-sync.ts) |
+| `ay` | `aphrody-labs/ay` | Fleet, SSH, WireGuard | [`tooling/bun/fleet-sync.ts`](../../../tooling/bun/fleet-sync.ts) |
 | `anu` | `aphrody-dev/anu` | Linux Userspace, WASI | [`crates/aphrody_session`](../../../crates/aphrody_session/Cargo.toml) |
 | `bun` | `aphrody-labs/bun` | Runtime, Bundler, NSH | [`tooling/bun/design-docs-pack.ts`](../../../tooling/bun/design-docs-pack.ts) |
 | `browser` | `aphrody-labs/browser` | GPUI Chromium + WebGPU | [`crates/aphrody_browser`](../../../crates/aphrody_browser/Cargo.toml) |

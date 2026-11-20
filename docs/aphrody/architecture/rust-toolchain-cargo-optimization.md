@@ -232,7 +232,7 @@ Per fleet role separation ([`tooling/bun/fleet-sync.ts`](../../../tooling/bun/fl
 ### 5.1 Aphrody Org & Pinned Fork Convention
 
 Verified via `gh repo list Aphrody-Dev`, `gh repo list aphrody-labs`, and [`forks-manifest.json`](../../../tooling/bun/forks-manifest.json):
-- Primary monorepo: `aphrody-dev/aphrody` (fork of `zed-industries/zed`).
+- Primary monorepo: `aphrody-labs/aphrody` (fork of `zed-industries/zed`).
 - Upstream dependency forks live under `https://github.com/aphrody-labs/<tool>` and are consumed as **pinned Cargo git dependencies** (`git = "https://github.com/aphrody-labs/<tool>.git", tag = "..."` in the root [`Cargo.toml`](../../../Cargo.toml), tags recorded in `forks-manifest.json`). There are no git submodules and no `vendor/` directory.
 - None of `cargo`, `rust-clippy`, `wild`, or `sccache` are forked in `aphrody-labs` yet.
 

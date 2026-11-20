@@ -1,6 +1,6 @@
 # aphrody Unified Plugin Rules
 
-Single authoritative operating contract for agents working inside `<repo-root>` (`aphrody-dev/aphrody`).
+Single authoritative operating contract for agents working inside `<repo-root>` (`aphrody-labs/aphrody`).
 
 ## Architecture & Product Stack
 

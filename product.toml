@@ -29,7 +29,7 @@ legacy_remote_wsl_server_folder = ".zed_wsl_server"
 
 [urls]
 homepage = "https://aphrody.com"
-repository = "https://github.com/aphrody-dev/aphrody"
+repository = "https://github.com/aphrody-labs/aphrody"
 docs = "https://docs.aphrody.com"
 status = "https://status.aphrody.com"
 store = "https://aphrody.com/store"

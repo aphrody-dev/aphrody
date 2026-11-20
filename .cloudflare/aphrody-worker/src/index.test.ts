@@ -110,7 +110,7 @@ describe("unified aphrody-worker (releases + docs + r2-assets + github)", () => 
     const payload = JSON.stringify({
       ref: "refs/heads/main",
       after: "1234567890abcdef",
-      repository: { full_name: "aphrody-dev/aphrody", default_branch: "main", owner: { login: "aphrody-dev" } },
+      repository: { full_name: "aphrody-labs/aphrody", default_branch: "main", owner: { login: "aphrody-dev" } },
       head_commit: { message: "feat: consolidate workers" },
     });
     const sig = await signGithub("test-secret-key", payload);

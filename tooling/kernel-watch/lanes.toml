@@ -37,7 +37,7 @@ timeout = "60s"
 
 [lane]
 ssh = "fr1"
-repo_url = "https://github.com/aphrody-dev/aphrody.git"
+repo_url = "https://github.com/aphrody-labs/aphrody.git"
 image = "archlinux:latest"
 aur_git = "https://aur.archlinux.org/linux-mainline.git"
 kernel_git = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
