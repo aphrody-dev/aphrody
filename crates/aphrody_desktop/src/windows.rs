@@ -480,6 +480,10 @@ impl FilesState {
                     }
                 }
             }
+            // The browser build has no filesystem, so an empty listing is the expected state there.
+            Err(err) if err.kind() == std::io::ErrorKind::Unsupported => {
+                log::debug!("no filesystem to list '{}': {err}", dir.display());
+            }
             Err(err) => {
                 log::warn!("failed to list directory '{}': {err}", dir.display());
             }

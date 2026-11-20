@@ -177,7 +177,9 @@ impl WebPlatform {
         ));
         let background_executor = BackgroundExecutor::new(dispatcher.clone());
         let foreground_executor = ForegroundExecutor::new(dispatcher.clone());
-        let text_system = Arc::new(WebTextSystem::new("sans-serif", canvas_font_fallback));
+        // The web text system loads no system fonts, so `.SystemUIFont` must map to a family the
+        // app bundles (crates/assets embeds IBM Plex Sans for web); "sans-serif" never resolves.
+        let text_system = Arc::new(WebTextSystem::new("IBM Plex Sans", canvas_font_fallback));
         let text_system: Arc<dyn PlatformTextSystem> = text_system;
         let active_display: Rc<dyn PlatformDisplay> =
             Rc::new(WebDisplay::new(browser_window.clone()));

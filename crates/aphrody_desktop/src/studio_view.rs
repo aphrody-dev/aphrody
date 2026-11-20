@@ -170,8 +170,9 @@ pub fn render_studio_window(
             id: SharedString::from(app.id.clone()),
             label: SharedString::from(app.name.clone()),
             icon: parse_icon_name(&app.icon),
-            badge: (!app.extensions.is_empty())
-                .then(|| SharedString::from(app.extensions.len().to_string())),
+            // A count of supported extensions read as an unread-notification badge; formats are
+            // listed under the canvas instead.
+            badge: None,
         })
         .collect();
 
