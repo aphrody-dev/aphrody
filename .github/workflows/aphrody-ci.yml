@@ -11,7 +11,9 @@ on:
 
 concurrency:
   group: aphrody-ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Main runs deploy web.aphrody.com, so a newer push waits instead of killing the running
+  # deploy; GitHub keeps only the newest pending run, so main still ships its latest commit.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   CARGO_TERM_COLOR: always
