@@ -517,7 +517,7 @@ mod tests {
         let mut doc_b = doc_a.clone();
         doc_b
             .colors
-            .insert("primary".to_owned(), "#A8C7FA".to_owned());
+            .insert("primary".to_owned(), "#1A73E8".to_owned());
         let diff = diff_design_md(&doc_a, &doc_b);
         assert_eq!(diff.changed_colors.len(), 1);
         assert_eq!(diff.changed_colors[0].0, "primary");
