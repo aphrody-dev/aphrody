@@ -1116,6 +1116,7 @@ dependencies = [
  "aphrody_session",
  "aphrody_store",
  "aphrody_ui",
+ "aphrody_video",
  "aphrody_vpn",
  "assets",
  "brand",
@@ -1325,6 +1326,28 @@ dependencies = [
  "toml 0.9.8",
  "ui",
  "window-vibrancy",
+]
+
+[[package]]
+name = "aphrody_video"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aphrody_media",
+ "aphrody_ui",
+ "assets",
+ "brand",
+ "craft-media",
+ "craft-video",
+ "dirs 7.0.0",
+ "gpui",
+ "gpui_platform",
+ "gpui_ui",
+ "gpui_wgpu",
+ "icons",
+ "image",
+ "log",
+ "tempfile",
 ]
 
 [[package]]
@@ -9496,6 +9519,7 @@ dependencies = [
 name = "fw-m3"
 version = "0.1.0"
 dependencies = [
+ "material-colors",
  "schemars 1.0.4",
  "serde",
  "toml 1.2.1+spec-1.1.0",

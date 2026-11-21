@@ -290,6 +290,7 @@ members = [
     "crates/aphrody_session",
     "crates/aphrody_store",
     "crates/aphrody_ui",
+    "crates/aphrody_video",
     "crates/aphrody_vpn",
     "crates/ayvpn_daemon",
     "crates/bevy_gpui",
@@ -1366,6 +1367,7 @@ aphrody_pilot = { path = "crates/aphrody_pilot" }
 aphrody_session = { path = "crates/aphrody_session" }
 aphrody_ui = { path = "crates/aphrody_ui" }
 tauri_gpui = { path = "crates/tauri_gpui" }
+aphrody_video = { path = "crates/aphrody_video", default-features = false }
 aphrody_vpn = { path = "crates/aphrody_vpn" }
 ayvpn-daemon = { path = "crates/ayvpn_daemon" }
 mullvad-api = { git = "https://github.com/aphrody-labs/mullvadvpn-app.git", tag = "v2026.11.20-aphrody.3" }

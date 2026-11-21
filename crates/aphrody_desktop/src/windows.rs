@@ -25,6 +25,7 @@ pub enum WindowKind {
     GoogleWorkspace,
     YouTube,
     YouTubeMusic,
+    Video,
     Files,
     Settings,
     Monitor,
@@ -36,13 +37,14 @@ pub enum WindowKind {
 }
 
 impl WindowKind {
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 15] = [
         Self::Studio,
         Self::Browser,
         Self::Vpn,
         Self::GoogleWorkspace,
         Self::YouTube,
         Self::YouTubeMusic,
+        Self::Video,
         Self::Files,
         Self::Settings,
         Self::Monitor,
@@ -62,6 +64,7 @@ impl WindowKind {
             Self::GoogleWorkspace => "google-workspace",
             Self::YouTube => "aphrody-youtube",
             Self::YouTubeMusic => "aphrody-youtube-music",
+            Self::Video => "aphrody-video",
             Self::Files => "cosmic-files",
             Self::Settings => "cosmic-settings",
             Self::Monitor => "system-monitor",
@@ -82,6 +85,7 @@ impl WindowKind {
             Self::GoogleWorkspace => "Google Workspace & Cloud AI",
             Self::YouTube => "YouTube & Media Player",
             Self::YouTubeMusic => "YouTube Music",
+            Self::Video => "Aphrody Video",
             Self::Files => "Files",
             Self::Settings => "Settings",
             Self::Monitor => "System Monitor",
@@ -102,6 +106,7 @@ impl WindowKind {
             Self::GoogleWorkspace => IconName::Sparkle,
             Self::YouTube => IconName::PlayFilled,
             Self::YouTubeMusic => IconName::AudioOn,
+            Self::Video => IconName::Screen,
             Self::Files => IconName::FolderOpen,
             Self::Settings => IconName::Settings,
             Self::Monitor => IconName::Server,

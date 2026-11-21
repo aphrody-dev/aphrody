@@ -83,6 +83,13 @@ pub fn render_cosmic_dock(
                 craft_id: None,
             },
             DockTileSpec {
+                id: "dock-video",
+                icon: IconName::Screen,
+                label: SharedString::from("Aphrody Video"),
+                kind: Some(WindowKind::Video),
+                craft_id: None,
+            },
+            DockTileSpec {
                 id: "dock-design",
                 icon: IconName::Sparkle,
                 label: SharedString::from("Design & Hub"),
@@ -181,6 +188,13 @@ pub fn render_cosmic_dock(
                 icon: IconName::AudioOn,
                 label: SharedString::from("YouTube Music"),
                 kind: Some(WindowKind::YouTubeMusic),
+                craft_id: None,
+            },
+            DockTileSpec {
+                id: "dock-video",
+                icon: IconName::Screen,
+                label: SharedString::from("Aphrody Video"),
+                kind: Some(WindowKind::Video),
                 craft_id: None,
             },
             DockTileSpec {

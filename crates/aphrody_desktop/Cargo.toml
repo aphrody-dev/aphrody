@@ -66,6 +66,7 @@ aphrody_pilot.workspace = true
 aphrody_session.workspace = true
 aphrody_store = { workspace = true, default-features = false }
 aphrody_ui.workspace = true
+aphrody_video.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 theme.workspace = true
