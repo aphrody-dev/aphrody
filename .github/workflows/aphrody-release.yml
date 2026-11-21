@@ -2,33 +2,18 @@ name: aphrody Release
 
 on:
   push:
-    tags:
-      - 'v*'
-      - '*-v*'
-      - 'lts-*'
-      - 'canary-*'
-      - 'nightly-*'
+    tags: ["v*"]
   schedule:
     # Daily Canary & Nightly snapshots at 03:15 UTC when main moved
     - cron: '15 3 * * *'
   workflow_dispatch:
     inputs:
       channel:
-        description: 'Release channel (lts, stable, preview, canary, nightly)'
+        description: Release train channel of a main or release/<M> build (aphrody-labs/ay docs/release/model.md); a v* tag carries its own
         required: true
-        default: 'canary'
+        default: canary
         type: choice
-        options:
-          - lts
-          - stable
-          - preview
-          - canary
-          - nightly
-          - dev
-      version:
-        description: 'Override semver (defaults to tag or yyyy.mm.dd-sha)'
-        required: false
-        default: ''
+        options: [canary, dev, beta]
 
 permissions:
   contents: write
@@ -56,36 +41,26 @@ jobs:
         run: |
           fw="$GITHUB_WORKSPACE/../fw"
           if [ -d "$fw/.git" ]; then git -C "$fw" fetch --depth 1 origin main && git -C "$fw" checkout --force FETCH_HEAD; else git clone --depth 1 https://github.com/aphrody-labs/fw.git "$fw"; fi
+      # Full commit graph without trees: the build number of a version is a commit count.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: tree:0
       - uses: oven-sh/setup-bun@v2
+      # The release train (aphrody-labs/ay docs/release/model.md): version, channel and tag from the ref of this run.
+      - uses: actions/checkout@v7
+        with:
+          repository: aphrody-labs/ay
+          path: release-tools
+          sparse-checkout: |
+            tools/release-plan.ts
+            release.toml
+          sparse-checkout-cone-mode: false
       - name: Resolve channel and version
         id: meta
-        run: |
-          bun -e '
-            const fs = require("node:fs");
-            const ref = process.env.GITHUB_REF_NAME || "main";
-            const inputChannel = process.env.INPUT_CHANNEL || "";
-            const inputVersion = process.env.INPUT_VERSION || "";
-            const sha = (process.env.GITHUB_SHA || "0000000").slice(0, 7);
-            const date = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
-            let channel = inputChannel;
-            if (!channel) {
-              if (ref.startsWith("lts-")) channel = "lts";
-              else if (ref.startsWith("canary-")) channel = "canary";
-              else if (ref.startsWith("nightly-")) channel = "nightly";
-              else if (ref.includes("-pre") || ref.includes("-preview") || ref.startsWith("preview-")) channel = "preview";
-              else if (ref.startsWith("v")) channel = "stable";
-              else channel = "canary";
-            }
-            const cleanTagVer = ref.replace(/^(lts-|stable-|preview-|canary-|nightly-)?v?/, "");
-            const version = inputVersion || (ref === "main" ? `${date}-${sha}` : cleanTagVer);
-            const tag = ref.startsWith("v") || /^(lts|canary|nightly|preview)-/.test(ref) ? ref : `${channel}-v${version}`;
-            const out = process.env.GITHUB_OUTPUT;
-            fs.appendFileSync(out, `channel=${channel}\nversion=${version}\ntag=${tag}\n`);
-          '
         env:
           INPUT_CHANNEL: ${{ github.event.inputs.channel }}
-          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: bun release-tools/tools/release-plan.ts meta
 
   build:
     needs: resolve-metadata
