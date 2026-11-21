@@ -117,7 +117,7 @@ impl ObservationOps for MacOsAdapter {
             title: title.clone(),
             app: "macOS".to_owned(),
             pid: 0,
-            bounds: Rect::from(CGDisplay::main().bounds().into()),
+            bounds: Rect::from(CGDisplay::main().bounds()),
             focused: true,
             minimized: false,
             maximized: false,
