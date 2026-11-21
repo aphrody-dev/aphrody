@@ -157,7 +157,8 @@ export function buildCanonicalDesignTokens(
     seed_hex: "#135B82",
     variant: "expressive",
     principles: [
-      "Code is a design material: interactive software bridges intent and visual craft",
+      "Everything is a file: tokens, DESIGN.md, themes and icons are plain files in one namespace, read and written with standard tools (Unix)",
+      "Code is a design material: those files are edited as code in a loop between canvas and code, with structure settled in low fidelity before polish (design.google/library/code-is-a-design-material)",
       "Google Sans Flex optical size, weight, width, grade, slant, and roundness tune hierarchy",
       "Strict 3-tier design tokens (reference -> system -> component) exported via DESIGN.md",
       "Physics-based spring motion separated cleanly into spatial vs effects springs",
