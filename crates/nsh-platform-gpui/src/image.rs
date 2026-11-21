@@ -2251,7 +2251,7 @@ mod tests {
     #[test]
     fn decodes_pngs_as_bgra() {
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../../examples/nsh/gallery/logo@2x.png");
+            .join("../../examples/nsh/gallery-rs/native/assets/logo@2x.png");
         let bytes = std::fs::read(path).unwrap();
         let rgba = image::load_from_memory(&bytes).unwrap().into_rgba8();
         let decoded = decoded(&bytes, 0).unwrap();
@@ -2386,8 +2386,8 @@ mod tests {
 
     #[test]
     fn decodes_animations() {
-        let dir =
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../examples/gallery");
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../examples/nsh/gallery-rs/native/assets");
         for (name, format) in [
             ("bounce.gif", image::ImageFormat::Gif),
             ("spinner.webp", image::ImageFormat::WebP),

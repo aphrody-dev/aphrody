@@ -746,8 +746,7 @@ pub(crate) fn rust_app_platform(platform: &str) -> String {
 const HIGHLIGHT: &str = ", features = [\"highlight\"]";
 
 /// The checkout of nsh the crate directory `path` is in: the nearest
-/// directory above it with `crates/nsh-core` (GPUI's crates are in
-/// `crates/gpui`, a level deeper).
+/// directory above it with `crates/nsh-core`.
 fn checkout_of(path: &Path) -> Option<PathBuf> {
     let path = dunce::canonicalize(path).ok()?;
     path.ancestors()
@@ -4691,11 +4690,10 @@ mod tests {
         // Another version: still crates.io, retargeted to this one.
         let other = of(&[("a", "nsh-base = \"=0.0.1\"\n".into())]);
         assert_eq!(other, Ok(Nsh::Registry));
-        // By path: the checkout the crates are in, GPUI's a level deeper.
+        // By path: the checkout the crates are in.
         let source = Ok(Nsh::Source(checkout.clone()));
         assert_eq!(of(&[("a", by_path("nsh-core"))]), source);
-        let gpui = by_path("gpui/nsh-platform-gpui")
-            .replace("gpui/nsh-platform-gpui =", "nsh-platform-gpui =");
+        let gpui = by_path("nsh-platform-gpui");
         assert_eq!(
             of(&[("a", format!("{}{gpui}", by_path("nsh-base")))]),
             source

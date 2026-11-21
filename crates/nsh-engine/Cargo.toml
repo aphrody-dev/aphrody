@@ -75,6 +75,10 @@ wgpu = { workspace = true, optional = true, features = ["metal"] }
 [target.'cfg(unix)'.dependencies]
 libc.workspace = true
 
+# The backends `shader` renders on elsewhere: wgpu opens no device without one.
+[target.'cfg(all(unix, not(target_vendor = "apple")))'.dependencies]
+wgpu = { workspace = true, optional = true, features = ["vulkan"] }
+
 # Process CPU and memory (`perf`); shader frames on textures shared with
 # Direct3D 11 (`shader`; the type is in the API with or without it).
 [target.'cfg(windows)'.dependencies]
@@ -84,9 +88,9 @@ wgpu = { workspace = true, optional = true, features = ["dx12"] }
 
 [dev-dependencies]
 # The shader tests compile the apps' WGSL (nsh-core `shader`).
-nsh-core = { workspace = true, features = ["shader"] }
+nsh-core = { workspace = true, features = ["shader", "websocket"] }
 # The typed API check reads the crate's public API.
-syn = { workspace = true, features = ["visit"] }
+syn = { workspace = true, features = ["derive", "full", "parsing", "visit"] }
 nsh-base = { workspace = true, features = ["editor", "highlight", "plot", "rich-editor", "term"] }
 # The host's shared data in `nativeModule`'s tests.
 tokio = { workspace = true, features = ["sync"] }
