@@ -194,7 +194,9 @@ jobs:
       - name: Check full monorepo WebAssembly & WASI Preview 2 targets
         run: bun run web:check
       - name: Build & audit optimized WebGPU cohorts (baseline + simd128)
-        run: bun run web:build:release
+        # WebGPU only with the slim asset set (one sans and one mono font, icons): the simd cohort ships
+        # 2,827,411 B brotli instead of 4,477,344 B with the full set and the WebGL backend (fr1, 2026-11-21).
+        run: bun run web:build:release --slim --webgpu-only
       - name: Validate WGSL shaders & WGPU adapter tooling
         run: cargo test -j 4 -p aphrody_cli --bins
       # Every push to main ships the web build it just verified: assets to R2, then the

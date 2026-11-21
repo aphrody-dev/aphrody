@@ -1,0 +1,25 @@
+{
+  "name": "projects/17049554233938859262",
+  "projectId": "17049554233938859262",
+  "title": "aphrody.com — everything is a file, code is the design material",
+  "visibility": "PRIVATE",
+  "createTime": "2026-11-21T00:55:00.975467Z",
+  "updateTime": "2026-11-21T00:56:12.170611Z",
+  "projectType": "PROJECT_DESIGN",
+  "origin": "MCP",
+  "deviceType": "DESKTOP",
+  "designTheme": {},
+  "screens": {
+    "index": {
+      "id": "b5435cb2c89e408b92385b4b21f0ce46",
+      "sourceScreen": "projects/17049554233938859262/screens/b5435cb2c89e408b92385b4b21f0ce46",
+      "x": 0,
+      "y": 0,
+      "width": 2560,
+      "height": 5372
+    }
+  },
+  "metadata": {
+    "userRole": "OWNER"
+  }
+}

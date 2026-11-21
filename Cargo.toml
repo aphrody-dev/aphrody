@@ -277,6 +277,7 @@ members = [
     # === APHRODY_ISOLATED_WORKSPACE_MEMBERS START ===
     "crates/aphrody",
     "crates/aphrody_auto",
+    "crates/aphrody_av",
     "crates/aphrody_browser",
     "crates/aphrody_cli",
     "crates/aphrody_craft",

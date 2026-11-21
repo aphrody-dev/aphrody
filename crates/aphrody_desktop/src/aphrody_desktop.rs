@@ -81,6 +81,7 @@ pub fn bind_desktop_keys(cx: &mut App) {
 pub fn mount_desktop_shell(options: DesktopOptions, cx: &mut App) {
     gpui_ui::init(cx);
     bind_desktop_keys(cx);
+    #[cfg(not(target_family = "wasm"))]
     aphrody_video::init(cx);
 
     let requested = size(px(options.width), px(options.height));

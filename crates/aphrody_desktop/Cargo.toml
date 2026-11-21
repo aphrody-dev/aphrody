@@ -66,13 +66,16 @@ aphrody_pilot.workspace = true
 aphrody_session.workspace = true
 aphrody_store = { workspace = true, default-features = false }
 aphrody_ui.workspace = true
-aphrody_video.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 theme.workspace = true
 ui.workspace = true
 aphrody_vpn = { workspace = true, optional = true }
 web-time.workspace = true
+
+# Aphrody Video decodes local media files, which the wasm build cannot read.
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+aphrody_video.workspace = true
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 gpui = { workspace = true, features = ["test-support"] }
