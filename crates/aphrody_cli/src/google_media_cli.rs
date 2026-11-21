@@ -144,6 +144,10 @@ pub enum MediaSubcommand {
         #[arg(long)]
         vtt: bool,
     },
+    /// Resolve a JSON/TOML composition to frame-exact clip ranges, paint order and audio cues (JSON)
+    Timeline(crate::motion_cli::CompositionArgs),
+    /// Render a JSON/TOML composition to PNG frames and an H.264 MP4 (no browser, JS or FFmpeg)
+    Render(crate::motion_cli::RenderArgs),
 }
 
 pub fn run_google(cmd: GoogleSubcommand) -> Result<()> {
@@ -303,6 +307,8 @@ pub fn run_media(cmd: MediaSubcommand) -> Result<()> {
             let parsed = parse_subtitles(fmt, &raw)?;
             println!("{}", serde_json::to_string_pretty(&parsed)?);
         }
+        MediaSubcommand::Timeline(args) => crate::motion_cli::run_timeline(args)?,
+        MediaSubcommand::Render(args) => crate::motion_cli::run_render(args)?,
     }
     Ok(())
 }

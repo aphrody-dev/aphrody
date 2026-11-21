@@ -189,16 +189,6 @@
       "syncedAt": "2026-11-20T12:07:06.336Z"
     },
     {
-      "repo": "aphrody-labs/hyperframes",
-      "name": "hyperframes",
-      "upstream": "heygen-com/hyperframes",
-      "branch": "main",
-      "domain": "media",
-      "migrationTarget": "crates/aphrody_media::motion",
-      "sha": "468ab907ee9836e076abdd7d0e0611c475dc1271",
-      "syncedAt": "2026-11-20T12:07:06.336Z"
-    },
-    {
       "repo": "aphrody-labs/remotion",
       "name": "remotion",
       "upstream": "remotion-dev/remotion",

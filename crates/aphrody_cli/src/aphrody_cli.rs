@@ -12,6 +12,7 @@ mod design_cli;
 mod doctor;
 mod google_media_cli;
 mod mcp;
+mod motion_cli;
 mod render;
 mod shader;
 mod templates;

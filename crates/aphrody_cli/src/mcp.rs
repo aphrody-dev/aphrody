@@ -68,6 +68,8 @@ pub(crate) fn builtin_tools() -> Vec<Value> {
         json!({ "name": "ytm_lyrics", "description": "Headless pure-Rust YouTube Music lyrics lookup by video_id.", "inputSchema": {"type": "object", "properties": {"video_id": {"type": "string"}}, "required": ["video_id"], "additionalProperties": false} }),
         json!({ "name": "media_capabilities", "description": "Return pure-Rust zero-FFmpeg multimedia capabilities and supported codecs.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
         json!({ "name": "media_validate_shaders", "description": "Validate all built-in media WGSL shaders (YUV->RGB, AgX HDR, scopes, motion transitions) with Naga v30.", "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false} }),
+        json!({ "name": "media_composition_timeline", "description": "Resolve a JSON/TOML video composition to frame-exact clip ranges, paint order and audio cues.", "inputSchema": {"type": "object", "properties": {"composition": {"type": "string", "description": "Path to a .json or .toml composition"}, "variables": {"type": "object", "additionalProperties": {"type": "string"}}}, "required": ["composition"], "additionalProperties": false} }),
+        json!({ "name": "media_render_composition", "description": "Render a JSON/TOML video composition to PNG frames and/or an H.264 MP4 (pure Rust, deterministic, no browser or FFmpeg).", "inputSchema": {"type": "object", "properties": {"composition": {"type": "string"}, "frames_dir": {"type": "string"}, "video": {"type": "string"}, "variables": {"type": "object", "additionalProperties": {"type": "string"}}, "start_frame": {"type": "integer", "minimum": 0}, "end_frame": {"type": "integer", "minimum": 1}, "gpu": {"type": "boolean"}}, "required": ["composition"], "additionalProperties": false} }),
     ]
 }
 
@@ -103,6 +105,27 @@ pub(crate) fn dispatch_json_rpc_line(line: &str) -> Option<String> {
         Err((code, msg)) => json!({ "jsonrpc": "2.0", "id": id, "error": { "code": code, "message": msg } }),
     };
     Some(payload.to_string())
+}
+
+fn composition_args(args: &Value) -> Result<crate::motion_cli::CompositionArgs, (i32, String)> {
+    let composition = args
+        .get("composition")
+        .and_then(Value::as_str)
+        .ok_or((-32602, "missing 'composition' argument".to_owned()))?;
+    let variables = args
+        .get("variables")
+        .and_then(Value::as_object)
+        .map(|object| {
+            object
+                .iter()
+                .filter_map(|(name, value)| value.as_str().map(|text| (name.clone(), text.to_owned())))
+                .collect()
+        })
+        .unwrap_or_default();
+    Ok(crate::motion_cli::CompositionArgs {
+        composition: std::path::PathBuf::from(composition),
+        variables,
+    })
 }
 
 fn wrap_tool_ok(structured: Value) -> Result<Value, (i32, String)> {
@@ -438,6 +461,25 @@ fn call_tool(params: &Value) -> Result<Value, (i32, String)> {
         }
         "media_capabilities" => serde_json::to_value(aphrody_media::capabilities())
             .map_err(|e| (-32000, e.to_string()))?,
+        "media_composition_timeline" => {
+            let composition = composition_args(&args)?;
+            crate::motion_cli::timeline_report(&composition)
+                .map_err(|e| (-32002, format!("{e:#}")))?
+        }
+        "media_render_composition" => {
+            let path_of = |key: &str| args.get(key).and_then(Value::as_str).map(std::path::PathBuf::from);
+            let render = crate::motion_cli::RenderArgs {
+                composition: composition_args(&args)?,
+                frames_dir: path_of("frames_dir"),
+                video: path_of("video"),
+                crf: 18.0,
+                start_frame: args.get("start_frame").and_then(Value::as_u64).unwrap_or(0),
+                end_frame: args.get("end_frame").and_then(Value::as_u64),
+                gpu: args.get("gpu").and_then(Value::as_bool).unwrap_or(false),
+                backends: crate::BackendSelection::All,
+            };
+            crate::motion_cli::render_report(&render).map_err(|e| (-32002, format!("{e:#}")))?
+        }
         "media_validate_shaders" => {
             let report = aphrody_media::validate_all_media_shaders()
                 .map_err(|e| (-32002, e.to_string()))?;

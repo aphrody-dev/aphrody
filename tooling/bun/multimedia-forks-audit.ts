@@ -47,7 +47,6 @@ export const CANONICAL_REFERENCE_FORKS: ReferenceForkEntry[] = [
   { repo: "aphrody-labs/effectcraft", name: "effectcraft", upstream: "storytold/effectcraft", branch: "main", domain: "media", migrationTarget: "crates/aphrody_media::motion" },
   { repo: "aphrody-labs/soundcraft", name: "soundcraft", upstream: "storytold/soundcraft", branch: "main", domain: "media", migrationTarget: "crates/aphrody_media::audio_out" },
   { repo: "aphrody-labs/yt-dlp", name: "yt-dlp", upstream: "yt-dlp/yt-dlp", branch: "master", domain: "media", migrationTarget: "crates/aphrody_media::ingest" },
-  { repo: "aphrody-labs/hyperframes", name: "hyperframes", upstream: "heygen-com/hyperframes", branch: "main", domain: "media", migrationTarget: "crates/aphrody_media::motion" },
   { repo: "aphrody-labs/remotion", name: "remotion", upstream: "remotion-dev/remotion", branch: "main", domain: "media", migrationTarget: "crates/aphrody_nsh" },
   { repo: "aphrody-labs/watch-skill", name: "watch-skill", upstream: "oxbshw/watch-skill", branch: "main", domain: "media", migrationTarget: "crates/aphrody_media::watch" },
   { repo: "aphrody-labs/three.js", name: "three.js", upstream: "mrdoob/three.js", branch: "dev", domain: "media", migrationTarget: "crates/bevy_gpui" },

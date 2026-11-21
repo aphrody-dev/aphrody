@@ -1197,10 +1197,14 @@ dependencies = [
  "craft-time",
  "craft-timeline",
  "craft-video",
+ "image",
  "naga",
  "serde",
  "serde_json",
  "sha2 0.10.9",
+ "tiny-skia",
+ "toml 0.9.8",
+ "ttf-parser",
  "unicode-bidi",
 ]
 

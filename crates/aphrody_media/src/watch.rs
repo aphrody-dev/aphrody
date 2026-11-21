@@ -159,8 +159,8 @@ mod tests {
 
     #[test]
     fn detects_scene_cuts_and_queries_timestamped_evidence() {
-        let dark = vec![10_u8, 10, 10, 255].repeat(16);
-        let bright = vec![240_u8, 240, 240, 255].repeat(16);
+        let dark = [10_u8, 10, 10, 255].repeat(16);
+        let bright = [240_u8, 240, 240, 255].repeat(16);
         let s0 = fingerprint_rgba_frame(0, &dark);
         let s1 = fingerprint_rgba_frame(1000, &dark);
         let s2 = fingerprint_rgba_frame(2000, &bright);

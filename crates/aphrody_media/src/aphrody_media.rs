@@ -2,7 +2,8 @@
 //! - GPU YUV->RGB / HDR AgX / 3D LUT / scopes / transitions WGSL shaders validated with `naga 30`
 //! - Pure-Rust SRT/WebVTT subtitle parser with Unicode Bidi support
 //! - HLS (`.m3u8` + AES-128) & DASH (`.mpd`) network ingest parsers
-//! - Deterministic frame-accurate programmatic video engine (HyperFrames & Remotion parity)
+//! - Declarative frame-exact programmatic video engine: JSON/TOML compositions, keyframes with
+//!   springs and easing, transitions, captions, deterministic rendering and H.264 MP4 export
 //! - Video intelligence engine (`watch-skill` parity): luminance scene-change detector,
 //!   SHA-256 keyframe deduplication, and ranked timestamped evidence search
 //! - Unified player state machine for GPUI desktop, headless agents, and WebAssembly.
@@ -12,6 +13,7 @@ use serde::{Deserialize, Serialize};
 pub mod gpu_yuv;
 pub mod ingest;
 pub mod motion;
+pub mod motion_render;
 pub mod player;
 pub mod subtitles;
 pub mod watch;
@@ -21,9 +23,17 @@ pub use ingest::{
     DashRepresentation, HlsPlaylist, HlsSegment, IngestSourceKind, parse_dash_mpd, parse_hls_m3u8,
 };
 pub use motion::{
-    CompositionSpec, FrameClock, SequenceTrack, TransitionKind, interpolate_clamped,
+    Animation, AudioCue, CaptionCue, Clip, Color, Composition, Ease, Fps, FrameScene, Keyframe,
+    Layer, Length, Property, Props, ResolvedClip, SceneItem, SpringParams, Time, Timeline, Track,
+    Transition, TransitionKind, TransitionState, active_caption, interpolate_clamped,
     spring_progress,
 };
+pub use motion_render::{
+    Assets, CpuBlender, NoAssets, Renderer, TransitionBlender, Yuv420, decode_image,
+    demultiplied_rgba, rgba_to_yuv420,
+};
+#[cfg(feature = "video-encode")]
+pub use motion_render::Mp4Encoder;
 pub use player::{LoopRange, MediaPlayerState, PlaybackSpeed, SubtitleTrackInfo, TrackKind};
 pub use subtitles::{SubtitleCue, SubtitleFormat, parse_subtitles};
 pub use watch::{KeyframeSample, SceneChangeEvent, WatchEvidenceHit, WatchIndex};

@@ -507,7 +507,7 @@ fn main() -> Result<()> {
             compute_encoder.begin_compute_pass(&wgpu::ComputePassDescriptor::default());
         cpass.set_pipeline(&compute_pipeline);
         cpass.set_bind_group(0, &bind_group, &[]);
-        let workgroups = ((element_count as u32) + 63) / 64;
+        let workgroups = (element_count as u32).div_ceil(64);
         cpass.dispatch_workgroups(workgroups, 1, 1);
     }
     compute_encoder.copy_buffer_to_buffer(

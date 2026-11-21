@@ -81,13 +81,18 @@ fn cs_luma_histogram(@builtin(global_invocation_id) gid: vec3<u32>) {
 }
 "#;
 
-/// Programmatic video transitions WGSL shader (fade, wipe, dissolve, radial zoom).
+/// Programmatic video transitions WGSL shader. `frame_a` is the picture below a clip and `frame_b`
+/// the picture including it (premultiplied RGBA). Kinds: 0 cross-fade, 1 linear wipe,
+/// 2 dissolve (integer hash threshold, identical to `motion_render::dissolve_noise`), 3 zoom-through.
+/// `size` is the target size in pixels.
 pub const MOTION_TRANSITION_WGSL: &str = r#"
 struct TransitionUniforms {
     progress: f32,
     kind: u32,
     feather: f32,
     _pad: f32,
+    size: vec2<f32>,
+    _pad_size: vec2<f32>,
 };
 
 @group(0) @binding(0) var<uniform> params: TransitionUniforms;
@@ -110,14 +115,43 @@ fn vs_transition(@builtin(vertex_index) vid: u32) -> VertexOut {
     return out;
 }
 
+fn dissolve_noise(px: vec2<u32>) -> f32 {
+    var v = (px.x * 0x9E3779B1u) ^ (px.y * 0x85EBCA77u) ^ 0x27D4EB2Fu;
+    v = v ^ (v >> 15u);
+    v = v * 0x2C1B3C6Du;
+    v = v ^ (v >> 12u);
+    v = v * 0x297A2D39u;
+    v = v ^ (v >> 15u);
+    return f32(v >> 8u) / 16777216.0;
+}
+
+fn zoomed(tex: texture_2d<f32>, uv: vec2<f32>, zoom: f32) -> vec4<f32> {
+    let center = vec2<f32>(0.5, 0.5);
+    return textureSampleLevel(tex, samp, center + (uv - center) / zoom, 0.0);
+}
+
 @fragment
 fn fs_transition(in: VertexOut) -> @location(0) vec4<f32> {
     let t = clamp(params.progress, 0.0, 1.0);
-    let col_a = textureSample(frame_a, samp, in.uv);
-    let col_b = textureSample(frame_b, samp, in.uv);
+    let feather = max(params.feather, 0.0005);
+    let px = vec2<u32>(in.pos.xy);
+    let col_a = textureLoad(frame_a, vec2<i32>(px), 0);
+    let col_b = textureLoad(frame_b, vec2<i32>(px), 0);
     if (params.kind == 1u) {
-        let edge = smoothstep(t - params.feather, t + params.feather, in.uv.x);
+        let edge_center = t * (1.0 + 2.0 * feather) - feather;
+        let edge = smoothstep(edge_center - feather, edge_center + feather, in.uv.x);
         return mix(col_b, col_a, edge);
+    }
+    if (params.kind == 2u) {
+        if (dissolve_noise(px) < t) {
+            return col_b;
+        }
+        return col_a;
+    }
+    if (params.kind == 3u) {
+        let zoom_a = 1.0 + 0.25 * t;
+        let zoom_b = 1.0 + 0.25 * (1.0 - t);
+        return mix(zoomed(frame_a, in.uv, zoom_a), zoomed(frame_b, in.uv, zoom_b), t);
     }
     return mix(col_a, col_b, t);
 }

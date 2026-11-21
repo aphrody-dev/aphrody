@@ -236,7 +236,7 @@ fn main() -> Result<()> {
         });
         compute_pass.set_pipeline(&compute_pipeline);
         compute_pass.set_bind_group(0, &bind_group, &[]);
-        let workgroups = ((ELEMENT_COUNT as u32) + 31) / 32;
+        let workgroups = (ELEMENT_COUNT as u32).div_ceil(32);
         compute_pass.dispatch_workgroups(workgroups, 1, 1);
     }
 

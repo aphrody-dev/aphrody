@@ -312,7 +312,7 @@ fn main() -> Result<()> {
             });
         compute_pass.set_pipeline(&compute_pipeline);
         compute_pass.set_bind_group(0, &compute_bind_group, &[]);
-        compute_pass.dispatch_workgroups((BUFFER_ELEMENT_COUNT as u32 + 63) / 64, 1, 1);
+        compute_pass.dispatch_workgroups((BUFFER_ELEMENT_COUNT as u32).div_ceil(64), 1, 1);
     }
 
     compute_encoder.copy_buffer_to_buffer(
@@ -403,7 +403,7 @@ fn main() -> Result<()> {
     let bytes_per_pixel = 4u32;
     let unpadded_bytes_per_row = RENDER_WIDTH * bytes_per_pixel;
     let align = wgpu::COPY_BYTES_PER_ROW_ALIGNMENT;
-    let padded_bytes_per_row = ((unpadded_bytes_per_row + align - 1) / align) * align;
+    let padded_bytes_per_row = unpadded_bytes_per_row.div_ceil(align) * align;
     let render_buffer_size = (padded_bytes_per_row * RENDER_HEIGHT) as wgpu::BufferAddress;
 
     let staging_render_buffer = device.create_buffer(&wgpu::BufferDescriptor {
@@ -535,7 +535,7 @@ fn main() -> Result<()> {
             valid_spirv_header: valid_header,
         },
         compute_dispatch: ComputeDispatchResult {
-            workgroup_count: (BUFFER_ELEMENT_COUNT as u32 + 63) / 64,
+            workgroup_count: (BUFFER_ELEMENT_COUNT as u32).div_ceil(64),
             buffer_elements: BUFFER_ELEMENT_COUNT,
             sample_outputs,
             status: "SUCCESS".to_string(),
