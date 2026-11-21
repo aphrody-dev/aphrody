@@ -106,6 +106,7 @@ pub struct OsDesktopShell {
     pub selected_de_id: String,
     pub design_gallery: DesignGalleryState,
     pub browser_view: Entity<aphrody_browser::ChromiumBrowserView>,
+    #[cfg(not(target_family = "wasm"))]
     pub video_view: Entity<aphrody_video::VideoApp>,
     pub vpn_connected: bool,
     pub vpn_allow_lan: bool,
@@ -302,10 +303,14 @@ impl OsDesktopShell {
             cx.new(|cx| aphrody_browser::ChromiumBrowserView::new(initial_theme, cx))
         };
 
-        let video_view = cx.new(|cx| aphrody_video::VideoApp::new(window, cx));
-        if let Some(root) = aphrody_video::default_library_root() {
-            video_view.update(cx, |video, cx| video.open_library(root, cx));
-        }
+        #[cfg(not(target_family = "wasm"))]
+        let video_view = {
+            let video_view = cx.new(|cx| aphrody_video::VideoApp::new(window, cx));
+            if let Some(root) = aphrody_video::default_library_root() {
+                video_view.update(cx, |video, cx| video.open_library(root, cx));
+            }
+            video_view
+        };
 
         Self {
             focus_handle,
@@ -340,6 +345,7 @@ impl OsDesktopShell {
             selected_de_id: "aphrody-gpui".to_owned(),
             design_gallery: DesignGalleryState::bundled(),
             browser_view,
+            #[cfg(not(target_family = "wasm"))]
             video_view,
             vpn_connected: true,
             vpn_allow_lan: true,
@@ -979,7 +985,10 @@ impl OsDesktopShell {
         let body = match kind {
             WindowKind::Studio => self.build_studio_body(placed.rect.w, cx),
             WindowKind::Browser => self.browser_view.clone().into_any_element(),
+            #[cfg(not(target_family = "wasm"))]
             WindowKind::Video => self.video_view.clone().into_any_element(),
+            #[cfg(target_family = "wasm")]
+            WindowKind::Video => div().into_any_element(),
             WindowKind::Vpn => {
                 let entity_conn = cx.entity();
                 let entity_exit = cx.entity();
