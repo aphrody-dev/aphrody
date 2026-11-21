@@ -18,6 +18,7 @@ console.log("aphrody-av wasm", av.version());
 const info = JSON.parse(av.probe(data, "clip.mp4"));
 check(info.format === "mp4", `format ${info.format}`);
 check(info.streams[0].codec === "h264" && info.streams[0].width === 64 && info.streams[0].height === 48 && info.streams[0].frames === 12, "video stream");
+check(info.streams[0].profile === "High" && info.streams[0].pix_fmt === "yuv420p", `profile ${info.streams[0].profile} ${info.streams[0].pix_fmt}`);
 check(info.streams[1].codec === "aac" && info.streams[1].sample_rate === 48000 && info.streams[1].channels === 2, "audio stream");
 console.log("probe:", info.format, info.streams.map((s: any) => `${s.kind}/${s.codec}`).join(","));
 
