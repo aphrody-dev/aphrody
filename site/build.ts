@@ -5,6 +5,7 @@
 // Run from the aphrody repo root: bun site/build.ts
 import { $ } from "bun";
 import { readdirSync, statSync, existsSync } from "node:fs";
+import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
@@ -189,25 +190,35 @@ studioSections.push({
   })),
 });
 
-// Media is data too: site/media.json lists clips; each is probed with ffprobe for its real metadata.
-// Pages carry the probe values only; no clip is embedded or fetched by the page.
+// Media is data too: site/media.json lists clips; each is fetched and probed by aphrody_av, our pure-Rust
+// demuxer built to wasm (tooling/bun/av-wasm.ts writes it to target/av-wasm, or point $AV_WASM at a
+// wasm-bindgen --target nodejs output). Pages carry the probe values only; no clip is embedded or fetched by the page.
 type Media = { url: string; world?: string };
 const media = JSON.parse(await Bun.file(join(root, "site/media.json")).text()) as Media[];
+const avDir = resolve(process.env.AV_WASM ?? join(root, "target/av-wasm"));
+if (!existsSync(join(avDir, "aphrody_av.js"))) throw new Error(`aphrody_av wasm not found in ${avDir}: run bun tooling/bun/av-wasm.ts`);
+const av = createRequire(import.meta.url)(join(avDir, "aphrody_av.js")) as { probe(bytes: Uint8Array, hint?: string): string };
 const probed = await Promise.all(
   media.map(async (item) => {
-    const probe = JSON.parse(await $`ffprobe -v error -print_format json -show_streams -show_format ${item.url}`.quiet().text());
-    const video = probe.streams.find((stream: any) => stream.codec_type === "video");
-    const [num, den] = String(video.avg_frame_rate).split("/").map(Number);
+    const response = await fetch(item.url);
+    if (!response.ok) throw new Error(`${item.url}: HTTP ${response.status}`);
+    const info = JSON.parse(av.probe(new Uint8Array(await response.arrayBuffer()), new URL(item.url).pathname.split(".").pop())) as {
+      size_bytes: number;
+      duration_seconds: number;
+      streams: { kind: string; codec: string; profile?: string; pix_fmt?: string; width: number; height: number; frame_rate: number }[];
+    };
+    const video = info.streams.find((stream) => stream.kind === "video");
+    if (!video) throw new Error(`${item.url}: no video stream`);
     return {
       ...item,
       path: new URL(item.url).pathname.split("/").slice(-2).join("/"),
-      codec: `${video.codec_name} ${video.profile}`,
+      codec: [video.codec, video.profile].filter(Boolean).join(" "),
       size: `${video.width}x${video.height}`,
-      fps: (num / den).toFixed(3),
-      duration: `${Number(probe.format.duration).toFixed(1)} s`,
-      bytes: `${probe.format.size} B`,
-      pix: video.pix_fmt,
-      audio: probe.streams.some((stream: any) => stream.codec_type === "audio") ? "yes" : "none",
+      fps: video.frame_rate.toFixed(3),
+      duration: `${info.duration_seconds.toFixed(1)} s`,
+      bytes: `${info.size_bytes} B`,
+      pix: video.pix_fmt ?? "unknown",
+      audio: info.streams.some((stream) => stream.kind === "audio") ? "yes" : "none",
     };
   }),
 );
