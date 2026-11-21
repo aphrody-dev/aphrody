@@ -382,7 +382,7 @@ struct Scene { size: vec2f, count: f32, pad: f32, worlds: array<World, 4> };
 }`;
 
 const renderPage = (current: (typeof pages)[number]) => `<!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
