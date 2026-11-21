@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: ['**']
   push:
-    branches: [main]
+    # release/<M> branches of the release train (aphrody-labs/ay docs/release/model.md) get the same gates as main.
+    branches: [main, "release/**"]
   merge_group:
     types: [checks_requested]
   workflow_dispatch:

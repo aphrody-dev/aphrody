@@ -87,12 +87,6 @@ jobs:
             arch: x86_64
             driver: cargo
             asset: Aphrody-Setup-x64.exe
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            platform_os: macos
-            arch: aarch64
-            driver: cargo
-            asset: Aphrody-arm64.dmg
     runs-on: ${{ matrix.os }}
     steps:
       # fw-m3 (Material 3 tokens) is a path dependency on the sibling fw checkout.
