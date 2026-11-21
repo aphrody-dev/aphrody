@@ -39,6 +39,8 @@ jobs:
         with:
           submodules: false
       - uses: oven-sh/setup-bun@v2
+      - name: Layout map (crate homes, dependency direction, pinned git, no submodules or vendor)
+        run: bun ../fw/tools/layout.ts check
       - name: Read pinned Rust toolchain
         id: toolchain
         run: bun -e 'console.log(`channel=${Bun.TOML.parse(await Bun.file("rust-toolchain.toml").text()).toolchain.channel}`)' >> "$GITHUB_OUTPUT"

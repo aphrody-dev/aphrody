@@ -14,4 +14,4 @@ crate-type = ["cdylib"]
 test = false
 
 [dependencies]
-zed_extension_api = { path = "../../crates/extension_api" }
+zed_extension_api.workspace = true

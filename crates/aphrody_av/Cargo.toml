@@ -45,7 +45,7 @@ header = ["dep:cbindgen"]
 craft-audio = { workspace = true, features = ["decode", "encode", "flac-decode", "vorbis-decode"] }
 craft-media = { workspace = true, features = ["isobmff", "matroska", "avi", "mxf", "mpegts", "ogg"] }
 craft-video = { workspace = true, features = ["h264", "hevc", "vp9", "av1", "vp8", "mpeg2", "mpeg4", "ffv1", "mjpeg", "prores", "dnx", "apv"] }
-fw-video = { path = "../../../fw/crates/fw-video" }
+fw-video.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 thiserror.workspace = true
