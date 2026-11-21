@@ -1021,6 +1021,7 @@ export async function syncGoogleDesignTokens(
   offline = false,
   snapshotPath = DEFAULT_SITEMAP_SNAPSHOT_PATH,
   designMdPath = DEFAULT_DESIGN_MD_PATH,
+  themesPath: string | null = null,
 ): Promise<{ path: string; reachable: boolean; source: string; sitemapCount: number }> {
   let reachable = false;
   let urls: Array<{ loc: string; lastmod: string; priority: string }> = DEFAULT_ARTICLES.filter((article) =>
@@ -1153,7 +1154,43 @@ export async function syncGoogleDesignTokens(
   mkdirSync(resolve(designMdPath, ".."), { recursive: true });
   writeFileSync(designMdPath, renderDesignMdFromTokens(doc), "utf8");
 
+  if (themesPath) {
+    syncAphrodyThemesFromTokens(themesPath, doc);
+  }
+
   return { path: outPath, reachable, source: DESIGN_SOURCE_URL, sitemapCount: urls.length };
+}
+
+// The desktop reads its themes from themes.json; the Aphrody entries must carry the fw-m3 roles,
+// not a second palette derived from an older seed.
+const APHRODY_THEME_SCHEMES: Record<string, { light: string; dark: string }> = {
+  aphrody: { light: "light", dark: "dark" },
+  "google-expressive": { light: "light", dark: "dark" },
+  "aphrody-neural": { light: "light", dark: "neural_obsidian" },
+  "aphrody-oled": { light: "light", dark: "oled_pitch" },
+};
+
+export function syncAphrodyThemesFromTokens(themesPath: string, doc: GoogleDesignTokenDocument): string[] {
+  const catalog = JSON.parse(readFileSync(themesPath, "utf8")) as {
+    themes: Record<string, Record<string, unknown>>;
+  };
+  const updated: string[] = [];
+  for (const [themeName, schemes] of Object.entries(APHRODY_THEME_SCHEMES)) {
+    const theme = catalog.themes[themeName];
+    if (!theme) continue;
+    for (const mode of ["light", "dark"] as const) {
+      const roles = theme[mode] as Record<string, string> | undefined;
+      const source = (doc.sys.color as Record<string, Record<string, string>>)[schemes[mode]];
+      if (!roles || !source) continue;
+      for (const [role, hex] of Object.entries(source)) {
+        const key = role.replaceAll("_", "-");
+        if (key in roles) roles[key] = hex;
+      }
+    }
+    updated.push(themeName);
+  }
+  writeFileSync(themesPath, `${JSON.stringify(catalog, null, 2)}\n`, "utf8");
+  return updated;
 }
 
 export interface DesignAuditReport {
@@ -1300,7 +1337,13 @@ if (import.meta.main) {
     const outIdx = args.indexOf("--out");
     const outPath =
       outIdx >= 0 && args[outIdx + 1] ? resolve(repoRoot, args[outIdx + 1]) : DEFAULT_TOKENS_PATH;
-    const res = await syncGoogleDesignTokens(outPath, offline);
+    const res = await syncGoogleDesignTokens(
+      outPath,
+      offline,
+      DEFAULT_SITEMAP_SNAPSHOT_PATH,
+      DEFAULT_DESIGN_MD_PATH,
+      DEFAULT_THEMES_PATH,
+    );
     console.log(JSON.stringify({ synced: true, ...res }, null, 2));
   } else if (cmd === "audit") {
     const report = auditDesignCompliance(repoRoot);

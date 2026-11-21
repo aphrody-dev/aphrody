@@ -15,7 +15,7 @@
  */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { extname, join, resolve } from "node:path";
+import { extname, join, relative, resolve } from "node:path";
 import { brotliCompressSync, constants, gzipSync } from "node:zlib";
 
 const repoRoot = resolve(import.meta.dir, "../..");
@@ -240,7 +240,8 @@ function inspectWasmBinary(filePath: string): WasmAuditReport {
   }
 
   return {
-    path: filePath,
+    // Relative to the dist root: the manifest is published, so it must not carry build-host paths.
+    path: relative(outRoot, filePath).replaceAll("\\", "/"),
     raw: bytes.length,
     gzip: gzipSync(bytes, { level: 9 }).length,
     brotli: brotliCompressSync(bytes, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } }).length,

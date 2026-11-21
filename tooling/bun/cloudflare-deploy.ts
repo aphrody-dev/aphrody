@@ -446,6 +446,34 @@ async function smokeTest(baseUrl: string): Promise<{ ok: boolean; baseUrl: strin
   return { ok: allOk, baseUrl, checks };
 }
 
+/** Proves the live web host serves exactly the bundle in `distDir`: same index.html, same wasm per cohort. */
+export async function smokeWeb(
+  baseUrl: string,
+  distDir = join(repoRoot, "target", "web-dist"),
+): Promise<{ ok: boolean; baseUrl: string; checks: Array<Record<string, unknown>> }> {
+  const base = baseUrl.replace(/\/$/, "");
+  const checks: Array<Record<string, unknown>> = [];
+  const sha256 = (bytes: ArrayBuffer | Uint8Array) => new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
+
+  const localIndex = await Bun.file(join(distDir, "index.html")).text();
+  // Cache-busting query so the check reads what the Worker serves now, not an edge copy.
+  const indexRes = await fetch(`${base}/?smoke=${Date.now()}`);
+  const liveIndex = await indexRes.text();
+  checks.push({ url: `${base}/`, status: indexRes.status, ok: indexRes.ok && liveIndex === localIndex });
+
+  const manifest = JSON.parse(await Bun.file(join(distDir, "manifest.json")).text()) as {
+    entry: string;
+    cohorts: Record<string, { sha256: string }>;
+  };
+  for (const [cohort, info] of Object.entries(manifest.cohorts)) {
+    const url = `${base}/${cohort}/${manifest.entry}_bg.wasm?smoke=${Date.now()}`;
+    const res = await fetch(url, { headers: { "accept-encoding": "identity" } });
+    const liveSha = res.ok ? sha256(await res.arrayBuffer()) : null;
+    checks.push({ url, status: res.status, expectedSha256: info.sha256, liveSha256: liveSha, ok: liveSha === info.sha256 });
+  }
+  return { ok: checks.every((check) => check.ok === true), baseUrl: base, checks };
+}
+
 function parseMcpSseOrJson(body: string): Record<string, unknown> | null {
   const trimmed = body.trimStart();
   if (!trimmed) return null;
@@ -565,6 +593,12 @@ if (import.meta.main) {
     const scripts = onlyEnv === "web" ? { skipped: true } : publishInstallScripts(dryRun);
     const workers = deployWorkers(dryRun, allWorkers, onlyEnv);
     console.log(JSON.stringify({ ok: true, infra, scripts, workers }, null, 2));
+  } else if (cmd === "smoke-web") {
+    const distIdx = args.indexOf("--dist");
+    const distDir = (distIdx >= 0 ? args[distIdx + 1] : undefined) ?? join(repoRoot, "target", "web-dist");
+    const res = await smokeWeb(baseIdx >= 0 ? (args[baseIdx + 1] ?? "") : "https://web.aphrody.com", distDir);
+    console.log(JSON.stringify(res, null, 2));
+    process.exit(res.ok ? 0 : 1);
   } else if (cmd === "smoke") {
     const res = await smokeTest(baseUrl);
     console.log(JSON.stringify(res, null, 2));
