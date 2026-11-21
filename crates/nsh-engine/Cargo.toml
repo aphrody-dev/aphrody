@@ -68,6 +68,8 @@ objc2 = { workspace = true, optional = true }
 objc2-metal = { workspace = true, optional = true }
 objc2-core-foundation = { workspace = true, optional = true }
 block2 = { workspace = true, optional = true }
+# shader_surfaces.rs imports frames through wgpu::hal::api::Metal, which wgpu-hal compiles only with this feature.
+wgpu = { workspace = true, optional = true, features = ["metal"] }
 
 # Thread priority (Apple), process CPU and memory (`perf`).
 [target.'cfg(unix)'.dependencies]

@@ -140,6 +140,12 @@ jobs:
         if: matrix.platform_os == 'linux'
         run: ./script/linux
 
+      # Cargo checks git dependencies out under CARGO_HOME; mullvadvpn-app has paths past MAX_PATH.
+      - name: Long paths for git checkouts (Windows)
+        if: matrix.platform_os == 'windows'
+        shell: bash
+        run: git config --global core.longpaths true
+
       - name: Install Rust target
         run: |
           BASE_TARGET=$(echo "${{ matrix.target }}" | cut -d. -f1)
