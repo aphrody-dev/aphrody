@@ -3,6 +3,8 @@ name: aphrody Upstream Sync
 on:
   schedule:
     - cron: '0 4 * * *'
+    # Zed and GPUI move several times a day (stable and preview weekly, main continuously): every hour, zed only.
+    - cron: '23 * * * *'
   workflow_dispatch:
     inputs:
       target:
@@ -36,7 +38,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TARGET="${{ github.event.inputs.target || 'all' }}"
+          TARGET="${{ github.event.inputs.target || (github.event.schedule == '23 * * * *' && 'zed') || 'all' }}"
           if [ "$TARGET" = "store" ]; then
             bun tooling/bun/awesome-gpui-store.ts sync-all
             exit 0
