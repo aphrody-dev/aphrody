@@ -1,6 +1,9 @@
 > [!IMPORTANT]
 > Remove this line to confirm you've reviewed this PR before submitting.
 
+> **Moved.** This repository is archived: its code and full history (including the Zed fork history) live in [aphrody-labs/fw](https://github.com/aphrody-labs/fw) under `aphrody/`. Zed upstream is followed there with `git merge -X subtree=aphrody` (workflow `zed-sync.yml`). Issues and pull requests go to aphrody-labs/fw.
+
+
 # Aphrody — OS and desktop (Zed fork, GPUI) (`aphrody`)
 
 Local-first Rust **OS and desktop** layer, a fork of [Zed](https://github.com/zed-industries/zed): the `aphrody-os` GPUI desktop shell and compositor (`aphrody_desktop`, `aphrody_session`), the installer (`aphrody_installer`), the **Aphrody Studio** editor (`aphrody` binary), and the GPU UI stack (GPUI, WGPU, Taffy layout, Native Shell TSX/Rust, AccessKit, Cosmic-Text, design tokens), with full Zed ecosystem compatibility. It owns the UI/GPU upstream forks. The toolchain and agent runtime live in [`fw`](../fw); the SDK, cloud and edge live in [`ay`](../ay). Dependencies only point down the stack (`fw` <- `aphrody` <- `ay`).
