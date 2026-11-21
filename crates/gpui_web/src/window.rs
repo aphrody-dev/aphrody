@@ -147,7 +147,6 @@ impl WebWindow {
         Ok(canvas)
     }
 
-    #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         _handle: AnyWindowHandle,
         _params: WindowParams,
