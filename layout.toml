@@ -1122,3 +1122,263 @@ tag = "v0.1.0-aphrody.20261120.2"
 [cargo.crate.fw-video]
 repo = "fw"
 path = "crates/fw-video"
+[[area]]
+path = ".agents"
+decision = "keep"
+why = "agent plugin manifests read from .agents at the root"
+
+[[area]]
+path = ".cargo"
+decision = "keep"
+why = "Cargo reads .cargo/*.toml from the workspace root"
+
+[[area]]
+path = ".cloudflare"
+decision = "keep"
+why = "Cloudflare worker project for aphrody.com"
+
+[[area]]
+path = ".config"
+decision = "keep"
+why = "lychee, nextest and typos discover their config under .config"
+
+[[area]]
+path = ".github"
+decision = "keep"
+why = "GitHub reads workflows, actions and templates from .github"
+
+[[area]]
+path = ".stitch"
+decision = "keep"
+why = "Google Stitch design system files (DESIGN.md, SITE.md) read from .stitch"
+
+[[area]]
+path = ".zed"
+decision = "keep"
+why = "Zed project settings and tasks"
+
+[[area]]
+path = "assets"
+decision = "keep"
+why = "upstream Zed layout: embedded assets (icons, keymaps, themes, fonts); kept so upstream merges stay mechanical"
+
+[[area]]
+path = "crates"
+decision = "keep"
+why = "upstream Zed layout: flat crates/* (Cargo convention); kept so upstream merges stay mechanical"
+
+[[area]]
+path = "docs"
+decision = "keep"
+why = "upstream Zed docs tree (mdbook) plus aphrody docs"
+
+[[area]]
+path = "examples"
+decision = "keep"
+why = "runnable examples (gpu, nsh), outside the build workspace"
+
+[[area]]
+path = "extensions"
+decision = "keep"
+why = "upstream Zed layout: built-in extensions as workspace members"
+
+[[area]]
+path = "legal"
+decision = "keep"
+why = "terms and policies shipped with the product"
+
+[[area]]
+path = "nix"
+decision = "keep"
+why = "Nix build and module definitions referenced by flake.nix"
+
+[[area]]
+path = "script"
+decision = "keep"
+why = "upstream Zed layout: release and developer scripts"
+
+[[area]]
+path = "site"
+decision = "keep"
+why = "aphrody.com site generator and public assets"
+
+[[area]]
+path = "templates"
+decision = "keep"
+why = "project templates (m3-gpui-nsh, wasm-wgpu)"
+
+[[area]]
+path = "tooling"
+decision = "keep"
+why = "upstream Zed layout: repository tooling (xtask, compliance, lints, perf) plus Bun tooling"
+
+[[area]]
+path = ".dockerignore"
+decision = "keep"
+why = "Docker tooling reads these from the build context root"
+
+[[area]]
+path = ".editorconfig"
+decision = "keep"
+why = "editors and search/lint tools discover their config upward from the root"
+
+[[area]]
+path = ".git-blame-ignore-revs"
+decision = "keep"
+why = "Git reads these from the repository root"
+
+[[area]]
+path = ".gitattributes"
+decision = "keep"
+why = "Git reads these from the repository root"
+
+[[area]]
+path = ".gitignore"
+decision = "keep"
+why = "Git reads these from the repository root"
+
+[[area]]
+path = ".mailmap"
+decision = "keep"
+why = "Git reads these from the repository root"
+
+[[area]]
+path = ".prettierrc"
+decision = "keep"
+why = "Bun workspace root: install, lockfile, runtime config and TypeScript base config are read from the root"
+
+[[area]]
+path = "AGENTS.md"
+decision = "keep"
+why = "agent rules and the style contract; agents load them from the root"
+
+[[area]]
+path = "CODE_OF_CONDUCT.md"
+decision = "keep"
+why = "repository front matter and legal files, read by GitHub and package registries at the root"
+
+[[area]]
+path = "CONTRIBUTING.md"
+decision = "keep"
+why = "repository front matter and legal files, read by GitHub and package registries at the root"
+
+[[area]]
+path = "Cargo.lock"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "Cargo.toml"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "DESIGN.md"
+decision = "keep"
+why = "repository front matter and legal files, read by GitHub and package registries at the root"
+
+[[area]]
+path = "Dockerfile-distros"
+decision = "keep"
+why = "Docker tooling reads these from the build context root"
+
+[[area]]
+path = "Dockerfile-distros.dockerignore"
+decision = "keep"
+why = "Docker tooling reads these from the build context root"
+
+[[area]]
+path = "LICENSE-APACHE"
+decision = "keep"
+why = "repository front matter and legal files, read by GitHub and package registries at the root"
+
+[[area]]
+path = "LICENSE-GPL"
+decision = "keep"
+why = "repository front matter and legal files, read by GitHub and package registries at the root"
+
+[[area]]
+path = "README.md"
+decision = "keep"
+why = "repository front matter and legal files, read by GitHub and package registries at the root"
+
+[[area]]
+path = "bunfig.toml"
+decision = "keep"
+why = "Bun workspace root: install, lockfile, runtime config and TypeScript base config are read from the root"
+
+[[area]]
+path = "clippy.toml"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "corgi.toml"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "default.nix"
+decision = "keep"
+why = "Nix flakes and legacy entry points are looked up at the root"
+
+[[area]]
+path = "deny.toml"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "docker-bake.hcl"
+decision = "keep"
+why = "Docker tooling reads these from the build context root"
+
+[[area]]
+path = "flake.lock"
+decision = "keep"
+why = "Nix flakes and legacy entry points are looked up at the root"
+
+[[area]]
+path = "flake.nix"
+decision = "keep"
+why = "Nix flakes and legacy entry points are looked up at the root"
+
+[[area]]
+path = "justfile"
+decision = "keep"
+why = "just discovers the justfile at the root"
+
+[[area]]
+path = "layout.toml"
+decision = "keep"
+why = "declarative product, naming, release and layout configuration: the single root source other files are derived from"
+
+[[area]]
+path = "naming.toml"
+decision = "keep"
+why = "declarative product, naming, release and layout configuration: the single root source other files are derived from"
+
+[[area]]
+path = "package.json"
+decision = "keep"
+why = "Bun workspace root: install, lockfile, runtime config and TypeScript base config are read from the root"
+
+[[area]]
+path = "product.toml"
+decision = "keep"
+why = "declarative product, naming, release and layout configuration: the single root source other files are derived from"
+
+[[area]]
+path = "rust-toolchain.toml"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "rustfmt.toml"
+decision = "keep"
+why = "Cargo and the Rust toolchain read these from the workspace root"
+
+[[area]]
+path = "shell.nix"
+decision = "keep"
+why = "Nix flakes and legacy entry points are looked up at the root"
+
