@@ -30,6 +30,8 @@ pub enum IconName {
     AiVercel,
     AiXAi,
     AiZed,
+    AphrodyCharacter,
+    AphrodyCharacterFill,
     Archive,
     ArrowCircle,
     ArrowDown,
