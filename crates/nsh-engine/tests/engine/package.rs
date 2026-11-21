@@ -12,7 +12,8 @@ use nsh_engine::{
 use crate::ChannelSink;
 
 fn counter(build_number: u64, bytecode_version: &str) -> Contents {
-    let entry = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../examples/counter/App.tsx");
+    let entry =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../examples/nsh/counter/App.tsx");
     let bundle = nsh_bundler::bundle(&nsh_bundler::BundleOptions {
         entry,
         minify: true,

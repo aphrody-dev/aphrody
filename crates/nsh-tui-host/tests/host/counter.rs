@@ -92,7 +92,8 @@ impl Drop for BundleDirectory {
 }
 
 fn counter_bundle() -> (BundleDirectory, Bundle) {
-    let entry = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../examples/counter/App.tsx");
+    let entry =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../examples/nsh/counter/App.tsx");
     let built = nsh_bundler::bundle(&nsh_bundler::BundleOptions {
         entry: entry.clone(),
         minify: false,

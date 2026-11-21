@@ -4,8 +4,11 @@
 //! network, clocks or random outputs. Module APIs were checked against LLRT
 //! d9fd873e793c6551c5d92b2e31480f3279e3cd8d.
 
+#[path = "standard/imports.rs"]
 mod imports;
+#[path = "standard/safety.rs"]
 mod safety;
+#[path = "standard/utilities.rs"]
 mod utilities;
 
 use nsh_core::Op;

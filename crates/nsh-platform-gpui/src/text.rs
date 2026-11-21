@@ -4103,7 +4103,7 @@ mod tests {
         if !lists_fonts() {
             return;
         }
-        let data = include_bytes!("../../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf");
+        let data = include_bytes!("../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf");
         let style = ResolvedTextStyle {
             font_family: Some(nsh_core::FontFamily::new("Pacifico")),
             font_size: Points(20.0),

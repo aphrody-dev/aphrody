@@ -1998,7 +1998,7 @@ mod tests {
     fn taken(
         tree: &accesskit_consumer::Tree,
         id: accesskit::NodeId,
-    ) -> accesskit_consumer::Node<'_> {
+    ) -> accesskit_consumer::NodeRef<'_> {
         tree.state()
             .node_by_tree_local_id(id, accesskit::TreeId::ROOT)
             .unwrap_or_else(|| panic!("{id:?} is not in the tree"))
@@ -2090,16 +2090,20 @@ mod tests {
     fn frames_follow_one_another() {
         struct Changes;
         impl accesskit_consumer::TreeChangeHandler for Changes {
-            fn node_added(&mut self, _: &accesskit_consumer::Node) {}
-            fn node_updated(&mut self, _: &accesskit_consumer::Node, _: &accesskit_consumer::Node) {
+            fn node_added(&mut self, _: &accesskit_consumer::NodeRef) {}
+            fn node_updated(
+                &mut self,
+                _: &accesskit_consumer::NodeRef,
+                _: &accesskit_consumer::NodeRef,
+            ) {
             }
             fn focus_moved(
                 &mut self,
-                _: Option<&accesskit_consumer::Node>,
-                _: Option<&accesskit_consumer::Node>,
+                _: Option<&accesskit_consumer::NodeRef>,
+                _: Option<&accesskit_consumer::NodeRef>,
             ) {
             }
-            fn node_removed(&mut self, _: &accesskit_consumer::Node) {}
+            fn node_removed(&mut self, _: &accesskit_consumer::NodeRef) {}
         }
         let (root, _all) = tree();
         let (first, _) = frame(&root, None, 2, None);

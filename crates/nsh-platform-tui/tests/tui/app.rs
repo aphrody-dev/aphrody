@@ -343,7 +343,7 @@ fn the_counter_example_changes_value_through_terminal_mouse_input() {
     use nsh_platform_tui::{Bundle, Handled, MouseButton, MouseKind};
     let code = nsh_bundler::compile_module(
         "App.tsx",
-        include_str!("../../../../examples/counter/App.tsx"),
+        include_str!("../../../../examples/nsh/counter/App.tsx"),
         &[],
     )
     .unwrap();

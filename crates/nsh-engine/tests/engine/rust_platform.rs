@@ -491,8 +491,9 @@ fn components_follow_whether_the_app_is_in_use() {
 fn Downloaded() -> impl IntoElement {
     let family = signal(String::from("none"));
     spawn(async move {
-        let data =
-            include_bytes!("../../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff2");
+        let data = include_bytes!(
+            "../../../../crates/nsh-testing/tests/testing/fonts/Pacifico-Regular.woff2"
+        );
         let shown = match register_font(data.to_vec()).await {
             Ok(name) => name,
             Err(e) => format!("failed: {e}"),

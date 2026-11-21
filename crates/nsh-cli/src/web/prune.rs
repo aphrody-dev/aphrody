@@ -36,7 +36,7 @@ pub(crate) fn unlinked(wasm: &[u8]) -> anyhow::Result<Vec<u8>> {
     for payload in Parser::new(0).parse_all(wasm) {
         let payload = payload.context("the web runtime is not a WebAssembly module")?;
         if let Payload::Version { range, .. } = &payload {
-            out.extend_from_slice(&wasm[range.start as usize..range.end as usize]);
+            out.extend_from_slice(&wasm[range.start..range.end]);
         }
         if let Payload::CustomSection(custom) = &payload
             && dropped_custom(custom.name())
@@ -45,8 +45,8 @@ pub(crate) fn unlinked(wasm: &[u8]) -> anyhow::Result<Vec<u8>> {
         }
         if let Some((id, range)) = payload.as_section() {
             out.push(id);
-            put_uleb(&mut out, range.end - range.start);
-            out.extend_from_slice(&wasm[range.start as usize..range.end as usize]);
+            put_uleb(&mut out, (range.end - range.start) as u64);
+            out.extend_from_slice(&wasm[range.start..range.end]);
         }
     }
     Ok(out)
@@ -150,9 +150,7 @@ impl<'a> Module<'a> {
                     Payload::CustomSection(custom) => custom.name(),
                     _ => "",
                 };
-                module
-                    .sections
-                    .push((id, range.start as usize..range.end as usize, name));
+                module.sections.push((id, range.start..range.end, name));
             }
             match payload {
                 Payload::ImportSection(reader) => {
@@ -245,15 +243,13 @@ impl<'a> Module<'a> {
                         module.elements = Some((offset, funcs));
                     }
                 }
-                Payload::CodeSectionStart {
-                    unchecked_range, ..
-                } => module.code_start = unchecked_range.start as usize,
+                Payload::CodeSectionStart { range, .. } => module.code_start = range.start,
                 Payload::CodeSectionEntry(body) => {
                     let range = body.range();
-                    module.bodies.push(range.start as usize..range.end as usize);
+                    module.bodies.push(range.start..range.end);
                 }
                 Payload::DataSection(reader) => {
-                    module.data_start = reader.range().start as usize;
+                    module.data_start = reader.range().start;
                     for data in reader {
                         let data = data?;
                         let DataKind::Active {

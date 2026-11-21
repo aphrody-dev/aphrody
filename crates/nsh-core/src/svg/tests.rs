@@ -990,7 +990,7 @@ fn svg_text_draws_with_the_font_database() {
     // The machine's fonts are not part of this test: the document's family
     // comes from the database it is given.
     const PACIFICO: &[u8] =
-        include_bytes!("../../../../tests/compat/cases/layout/fonts/Pacifico-Regular.ttf");
+        include_bytes!("../../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf");
     let mut fontdb = usvg::fontdb::Database::new();
     fontdb.load_font_data(PACIFICO.to_vec());
     let mut options = options(true);

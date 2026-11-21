@@ -19,7 +19,8 @@ fn start() -> (Engine, Receiver<MountBatch>) {
 
 /// The counter example, bundled and compiled.
 fn config() -> EngineConfig {
-    let entry = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../examples/counter/App.tsx");
+    let entry =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../examples/nsh/counter/App.tsx");
     let bundle = nsh_bundler::bundle(&nsh_bundler::BundleOptions {
         entry,
         minify: false,

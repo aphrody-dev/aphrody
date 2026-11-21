@@ -2431,8 +2431,7 @@ mod tests {
 
     #[test]
     fn woff_and_woff2_fonts_decompress_to_the_font_they_hold() {
-        let ttf: &[u8] =
-            include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.ttf");
+        let ttf: &[u8] = include_bytes!("../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf");
         let face = |data: &[u8]| {
             let face = ttf_parser::Face::parse(data, 0).expect("a font");
             let family = face
@@ -2447,8 +2446,10 @@ mod tests {
         // TrueType comes back as it is.
         assert!(matches!(font_data(ttf), Ok(std::borrow::Cow::Borrowed(_))));
         for wrapped in [
-            &include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff")[..],
-            &include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff2")[..],
+            &include_bytes!("../../../examples/nsh/gallery/fonts/Pacifico-Regular.woff")[..],
+            &include_bytes!(
+                "../../../crates/nsh-testing/tests/testing/fonts/Pacifico-Regular.woff2"
+            )[..],
         ] {
             let data = font_data(wrapped).expect("decompressed");
             assert_eq!(face(&data), original);
@@ -2457,7 +2458,7 @@ mod tests {
         assert_eq!(font_family(ttf).as_deref(), Ok("Pacifico"));
         assert_eq!(
             font_family(include_bytes!(
-                "../../../tests/compat/cases/layout/fonts/Pacifico-Regular.woff2"
+                "../../../crates/nsh-testing/tests/testing/fonts/Pacifico-Regular.woff2"
             ))
             .as_deref(),
             Ok("Pacifico")

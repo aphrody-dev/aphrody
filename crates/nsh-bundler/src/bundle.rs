@@ -1864,7 +1864,7 @@ mod tests {
         let dir = asset_app("font", true, &[("tests/SubApp.tsx", sub)]);
         std::fs::write(
             dir.join("assets/Pacifico-Regular.ttf"),
-            include_bytes!("../../../tests/compat/cases/layout/fonts/Pacifico-Regular.ttf"),
+            include_bytes!("../../../examples/nsh/gallery/fonts/Pacifico-Regular.ttf"),
         )
         .unwrap();
         let entry = dir.join("tests/SubApp.tsx");
