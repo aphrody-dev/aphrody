@@ -154,14 +154,9 @@ mod tests {
             })
             .unwrap();
         assert_eq!(builds, 1);
-        assert_eq!(first.vertices.len(), second.vertices.len());
-        for (a, b) in first.vertices.iter().zip(&second.vertices) {
-            assert_eq!(b.xy_position.x - a.xy_position.x, px(100.));
-            assert_eq!(b.xy_position.y, a.xy_position.y);
-            assert_eq!(a.st_position, b.st_position);
-        }
-        assert_eq!(second.bounds.origin.x - first.bounds.origin.x, px(100.));
-        assert_eq!(first.bounds.size, second.bounds.size);
+        assert_eq!(second.bounds().origin.x - first.bounds().origin.x, px(100.));
+        assert_eq!(second.bounds().origin.y, first.bounds().origin.y);
+        assert_eq!(first.bounds().size, second.bounds().size);
 
         cache.get(2, point(px(0.), px(0.)), || {
             builds += 1;

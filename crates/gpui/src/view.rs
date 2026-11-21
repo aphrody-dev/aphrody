@@ -493,6 +493,7 @@ fn request_layout_view(
                 (layout_id, None)
             }
             _ => {
+                window.count_view_built();
                 let mut element = render(window, cx);
                 let layout_id = element.request_layout(window, cx);
                 (layout_id, Some(element))
@@ -561,6 +562,7 @@ fn prepaint_view(
 
                 let refreshing = mem::replace(&mut window.refreshing, true);
                 let prepaint_start = window.prepaint_index();
+                window.count_view_built();
                 let (element, accessed_entities) = cx.detect_accessed_entities(|cx| {
                     let mut element = render(window, cx);
                     element.layout_as_root(Size::<AvailableSpace>::from(bounds.size), window, cx);

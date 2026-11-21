@@ -647,7 +647,7 @@ mod tests {
         for (name, corner, x_dir, y_dir) in cases {
             let path =
                 corner_notch_path(corner, x_dir, y_dir, radius).expect("the notch tessellates");
-            let bounds = path.bounds;
+            let bounds = path.bounds();
             // Curve tessellation may inset fractionally; one pixel of slack.
             let tolerance = 1.0;
             assert!(

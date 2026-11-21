@@ -5,8 +5,8 @@ use crate::{InteractiveElementExt as _, StyledExt};
 use super::{ScrollableMask, Scrollbar, ScrollbarAxis, ScrollbarHandle};
 use gpui::{
     App, Div, Element, ElementId, InteractiveElement, IntoElement, Overflow, ParentElement,
-    PointRefinement, RenderOnce, ScrollHandle, Stateful, StatefulInteractiveElement,
-    StyleRefinement, Styled, Window, div, prelude::FluentBuilder,
+    PointRefinement, RenderOnce, ScrollHandle, StatefulInteractiveElement, StyleRefinement, Styled,
+    Window, div, prelude::FluentBuilder,
 };
 
 /// A trait for elements that can be made scrollable with scrollbars.
@@ -228,13 +228,9 @@ where
     }
 }
 
-impl ScrollableElement for Div {}
-impl<E> ScrollableElement for Stateful<E>
-where
-    E: ParentElement + Styled + Element,
-    Self: InteractiveElement,
-{
-}
+// Blanket so that elements wrapped by the `test-support` observation of
+// `gpui-base` stay scrollable whichever crate enabled that feature.
+impl<E> ScrollableElement for E where E: InteractiveElement + Styled + ParentElement + Element {}
 
 #[derive(IntoElement)]
 struct ScrollbarLayer<H: ScrollbarHandle + Clone> {
@@ -329,12 +325,6 @@ fn render_scrollbar<H: ScrollbarHandle + Clone>(
                 .axis(axis)
                 .viewport_from_layout(),
         )
-}
-
-#[cfg(feature = "test-support")]
-impl<E> ScrollableElement for gpui_base::test_support::Observed<E> where
-    E: ScrollableElement + Element<PrepaintState = Option<gpui::Hitbox>>
-{
 }
 
 #[cfg(test)]

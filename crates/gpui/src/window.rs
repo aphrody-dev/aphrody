@@ -1344,6 +1344,15 @@ pub struct Window {
     #[cfg(feature = "profiler")]
     debug_frame_overlay: crate::debug_overlay::DebugFrameOverlay,
     pub(crate) a11y: A11y,
+    layout_stats: LayoutStats,
+}
+
+/// Counters of the work a window's frames did, since it opened.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct LayoutStats {
+    /// How many times a view's `render` ran. A cached view whose cache held
+    /// does not count.
+    pub views_built: u64,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -2506,6 +2515,7 @@ impl Window {
             inspector: None,
             #[cfg(feature = "profiler")]
             debug_frame_overlay: crate::debug_overlay::DebugFrameOverlay::new(),
+            layout_stats: LayoutStats::default(),
             a11y: A11y::new(
                 a11y_active_flag,
                 accessibility_force_disabled,
@@ -2723,6 +2733,15 @@ impl Window {
     /// Obtain a handle to the window that belongs to this context.
     pub fn window_handle(&self) -> AnyWindowHandle {
         self.handle
+    }
+
+    /// What the frames drawn in this window have built so far.
+    pub fn layout_stats(&self) -> LayoutStats {
+        self.layout_stats
+    }
+
+    pub(crate) fn count_view_built(&mut self) {
+        self.layout_stats.views_built += 1;
     }
 
     /// Mark the window as dirty, scheduling it to be redrawn on the next frame.

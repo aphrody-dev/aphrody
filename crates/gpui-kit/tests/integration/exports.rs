@@ -9,6 +9,10 @@
 /// `use gpui_kit::*;` alone is GPUI, so a file needs nothing else for it.
 mod glob_is_gpui {
     use gpui_kit::*;
+    // The test binary also links the real `gpui` crate (a dependency of
+    // `gpui-kit`), which macro output naming `gpui` would find as ambiguous
+    // against the facade the glob brings in.
+    use gpui_kit::gpui;
 
     type Element = Div;
     type Window_ = Window;
